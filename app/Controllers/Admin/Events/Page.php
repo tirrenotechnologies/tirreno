@@ -16,24 +16,20 @@
 namespace Controllers\Admin\Events;
 
 class Page extends \Controllers\Pages\Base {
-    use \Traits\Filter;
-
     public $page = 'AdminEvents';
 
     public function getPageParams(): array {
-        [$startDate, $endDate] = $this->getFilter();
         $searchPlacholder = $this->f3->get('AdminEvents_search_placeholder');
 
         $pageParams = [
-            'FILTER_START_DATE' => $startDate,
-            'FILTER_END_DATE' => $endDate,
-            'SEARCH_PLACEHOLDER' => $searchPlacholder,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'LOAD_UPLOT' => true,
-            'LOAD_DATATABLE' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/events.html',
-            'JS' => 'admin_events.js',
+            'SEARCH_PLACEHOLDER'            => $searchPlacholder,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'LOAD_UPLOT'                    => true,
+            'LOAD_DATATABLE'                => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'HTML_FILE'                     => 'admin/events.html',
+            'JS'                            => 'admin_events.js',
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

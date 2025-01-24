@@ -42,7 +42,8 @@ return [
     'AdminSettings_closeAccount_success_message' => 'Your account has been successfully deleted and you are unable to use it anymore.',
 
     'AdminSettings_checkUpdates_form_title' => 'Check for updates',
-    'AdminSettings_form_checkUpdates_confirmationMessage' => 'Periodically, Tirreno releases updates to your software (which can include updates to this application and important security updates).',
+    'AdminSettings_form_checkUpdates_confirmationMessage' => 'Periodically, Tirreno releases updates which can include application updates and important security patches.',
+    'AdminSettings_form_checkUpdates_currentVerision' => 'Current version: ',
     'AdminSettings_checkUpdates_form_button' => 'Check',
 
     'AdminSettings_notificationPreferences_title' => 'Review queue notifications',

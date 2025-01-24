@@ -9,7 +9,7 @@ export class BaseGridWithPanel extends BaseGrid {
         this.config = gridParams;
         this.markerClass = 'marker';
 
-        this.allPanels = { 
+        this.allPanels = {
             'event':    {id: 'event-card',  closedEvent: 'eventPanelClosed',    close: 'closeEventPanel',   rowClicked: 'eventTableRowClicked'},
             'logbook':  {id: 'logbook-card',closedEvent: 'logbookPanelClosed',  close: 'closeLogbookPanel', rowClicked: 'logbookTableRowClicked'},
             'email':    {id: 'email-card',  closedEvent: 'emailPanelClosed',    close: 'closeEmailPanel',   rowClicked: 'emailTableRowClicked'},
@@ -65,9 +65,9 @@ export class BaseGridWithPanel extends BaseGrid {
         const markerClass   = this.markerClass;
         const isRowMarkered = targetRow.classList.contains(markerClass);
 
-        if(isRowMarkered) {
+        if (isRowMarkered) {
             fireEvent(this.currentPanel.close);
-            targetRow.classList.remove(markerClass)
+            targetRow.classList.remove(markerClass);
         } else {
             // close other panels
             for (const panel in this.allPanels) {
@@ -81,7 +81,7 @@ export class BaseGridWithPanel extends BaseGrid {
             }
             // unmark other rows in the same table
             const rows = this.table.querySelectorAll('tr[data-item-id]');
-            rows.forEach( row => row.classList.remove(markerClass));
+            rows.forEach(row => row.classList.remove(markerClass));
 
             // mark current row
             targetRow.classList.add(markerClass);

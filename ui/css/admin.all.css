@@ -40,14 +40,14 @@ a, area, button, [role="button"], input, label, select, summary, textarea {
     height: 70%;
     min-height: 350px;
     background: url(/ui/images/logo.svg) no-repeat center calc(100% + 1px) / 157px auto, linear-gradient(#2b2a3d 96%, #36354f 100%, #2b2a3d 100%);
-} 
+}
 
 .front-block {
     display: block;
     min-height: 500px;
     height: 100vh;
-    position: relative;    
-    background: linear-gradient(#131220 70%, #2b2a3d); 
+    position: relative;
+    background: linear-gradient(#131220 70%, #2b2a3d);
 }
 
 .front-block .container {
@@ -503,7 +503,7 @@ a.tag:hover {
 
 .card-content {
     padding: 0.67rem 0.75rem;
-    background: #131220;    
+    background: #131220;
 }
 
 .card-panel {
@@ -954,7 +954,7 @@ svg {
         Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
         "Segoe UI Symbol", "Noto Color Emoji";
     line-height: 1.5;
-    width: min-content;    
+    width: min-content;
 }
 
 .u-wrap {
@@ -1475,12 +1475,12 @@ input[type="datetime-local"]::placeholder {
 }
 .details-card::before {
     content: "";
-    position: fixed; 
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     background: url(/ui/images/transparent.png) rgba(0,0,0,0.125);
-    z-index: -1; 
+    z-index: -1;
     height: 100%;
     pointer-events: none;
 }
@@ -1584,7 +1584,7 @@ input[type="datetime-local"]::placeholder {
     color: #01ee99;
     background-color: #1D3036;
 }
-.notification.is-warning {    
+.notification.is-warning {
     background-color: #2F2B2F;
     color: #f5b944;
 }

@@ -68,7 +68,7 @@ class DeviceDetector
     /**
      * Current version number of DeviceDetector
      */
-    public const VERSION = '6.4.1';
+    public const VERSION = '6.4.3';
 
     /**
      * Constant used as value for unknown browser / os
@@ -776,7 +776,7 @@ class DeviceDetector
      */
     protected function hasAndroidTableFragment(): bool
     {
-        $regex = 'Android( [\.0-9]+)?; Tablet;|Tablet(?! PC)|.*\-tablet$';
+        $regex = 'Android( [.0-9]+)?; Tablet;|Tablet(?! PC)|.*\-tablet$';
 
         return !!$this->matchUserAgent($regex);
     }
@@ -788,7 +788,7 @@ class DeviceDetector
      */
     protected function hasAndroidMobileFragment(): bool
     {
-        $regex = 'Android( [\.0-9]+)?; Mobile;|.*\-mobile$';
+        $regex = 'Android( [.0-9]+)?; Mobile;|.*\-mobile$';
 
         return !!$this->matchUserAgent($regex);
     }
@@ -800,7 +800,7 @@ class DeviceDetector
      */
     protected function hasAndroidVRFragment(): bool
     {
-        $regex = 'Android( [\.0-9]+)?; Mobile VR;| VR ';
+        $regex = 'Android( [.0-9]+)?; Mobile VR;| VR ';
 
         return !!$this->matchUserAgent($regex);
     }
@@ -959,7 +959,7 @@ class DeviceDetector
          *       a detected browser, but can still be detected. So we check the useragent for Chrome instead.
          */
         if (null === $this->device && 'Android' === $osFamily
-            && $this->matchUserAgent('Chrome/[\.0-9]*')
+            && $this->matchUserAgent('Chrome/[.0-9]*')
         ) {
             if ($this->matchUserAgent('(?:Mobile|eliboM)')) {
                 $this->device = AbstractDeviceParser::DEVICE_TYPE_SMARTPHONE;
@@ -1017,9 +1017,16 @@ class DeviceDetector
         }
 
         /**
-         * All unknown devices under running Java ME are more likely a features phones
+         * All unknown devices under running Java ME are more likely features phones
          */
         if ('Java ME' === $osName && null === $this->device) {
+            $this->device = AbstractDeviceParser::DEVICE_TYPE_FEATURE_PHONE;
+        }
+
+        /**
+         * All devices running KaiOS are more likely features phones
+         */
+        if ('KaiOS' === $osName) {
             $this->device = AbstractDeviceParser::DEVICE_TYPE_FEATURE_PHONE;
         }
 
@@ -1070,7 +1077,12 @@ class DeviceDetector
         /**
          * All devices that contain Andr0id in string are assumed to be a tv
          */
-        if ($this->matchUserAgent('Andr0id|(?:Android(?: UHD)?|Google) TV|\(lite\) TV|BRAVIA| TV$')) {
+        $hasDeviceTvType = false === \in_array($this->device, [
+            AbstractDeviceParser::DEVICE_TYPE_TV,
+            AbstractDeviceParser::DEVICE_TYPE_PERIPHERAL,
+        ]) && $this->matchUserAgent('Andr0id|(?:Android(?: UHD)?|Google) TV|\(lite\) TV|BRAVIA| TV$');
+
+        if ($hasDeviceTvType) {
             $this->device = AbstractDeviceParser::DEVICE_TYPE_TV;
         }
 

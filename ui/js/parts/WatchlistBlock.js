@@ -10,11 +10,11 @@ export class WatchlistBlock {
         const me = this;
         const onButtonClick = this.onButtonClick.bind(this);
 
-        if(me.legitFraudButtonsBlock) {
+        if (me.legitFraudButtonsBlock) {
             //Get HTML w/ new fraud&legit buttons
             let fraud = null;
-            if('true'  == me.legitFraudButtonsBlock.dataset.userFraud) fraud = true;
-            if('false' == me.legitFraudButtonsBlock.dataset.userFraud) fraud = false;
+            if ('true'  == me.legitFraudButtonsBlock.dataset.userFraud) fraud = true;
+            if ('false' == me.legitFraudButtonsBlock.dataset.userFraud) fraud = false;
 
             const record = {reviewed: true, accountid: me.userId, fraud: fraud};
 
@@ -24,15 +24,15 @@ export class WatchlistBlock {
             me.legitFraudButtonsBlock.innerHTML = html;
         }
 
-        if(me.reviewedButton) {
+        if (me.reviewedButton) {
             this.reviewedButton.addEventListener('click', onButtonClick, false);
         }
 
-        if(me.legitButton) {
+        if (me.legitButton) {
             this.legitButton.addEventListener('click', onButtonClick, false);
         }
 
-        if(me.fraudButton) {
+        if (me.fraudButton) {
             this.fraudButton.addEventListener('click', onButtonClick, false);
         }
 
@@ -71,7 +71,7 @@ export class WatchlistBlock {
 
         target.classList.remove('is-loading');
 
-        if('watchlist-button' === target.id) {
+        if ('watchlist-button' === target.id) {
             const oldClass = ('add' === type)? 'is-warning' : 'is-primary';
             const newClass = ('add' === type)? 'is-primary' : 'is-warning';
 
@@ -81,7 +81,7 @@ export class WatchlistBlock {
             target.innerText    = ('add' === type)? 'Remove from watchlist':'Add to watchlist';
         }
 
-        if('reviewed-button' === target.id) {
+        if ('reviewed-button' === target.id) {
             //Get HTML w/ new fraud&legit buttons
             const record = {reviewed: true, accountid: me.userId};
 
@@ -93,18 +93,18 @@ export class WatchlistBlock {
 
             const onButtonClick = me.onButtonClick.bind(me);
 
-            if(me.legitButton) {
+            if (me.legitButton) {
                 me.legitButton.addEventListener('click', onButtonClick, false);
             }
 
-            if(me.fraudButton) {
+            if (me.fraudButton) {
                 me.fraudButton.addEventListener('click', onButtonClick, false);
             }
         }
 
         const buttonType = target.dataset.buttonType;
-        if('fraudButton' === buttonType) {
-            if('fraud' === type) {
+        if ('fraudButton' === buttonType) {
+            if ('fraud' === type) {
                 me.fraudButton.classList.replace('is-grey', 'is-warning');
                 me.fraudButton.setAttribute('disabled', '');
 

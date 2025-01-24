@@ -22,13 +22,14 @@ class Page extends \Controllers\Pages\Base {
         $searchPlacholder = $this->f3->get('AdminBots_search_placeholder');
 
         $pageParams = [
-            'SEARCH_PLACEHOLDER' => $searchPlacholder,
-            'LOAD_UPLOT' => true,
-            'LOAD_DATATABLE' => true,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/bots.html',
-            'JS' => 'admin_bots.js',
+            'SEARCH_PLACEHOLDER'            => $searchPlacholder,
+            'LOAD_UPLOT'                    => true,
+            'LOAD_DATATABLE'                => true,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'HTML_FILE'                     => 'admin/bots.html',
+            'JS'                            => 'admin_bots.js',
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

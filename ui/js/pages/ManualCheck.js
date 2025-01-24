@@ -23,6 +23,6 @@ export class ManualCheckPage extends BasePage {
         };
 
         const historyTableLinks = document.querySelectorAll('[data-item-id="manual-check-history-item"]');
-        historyTableLinks.forEach( link => link.addEventListener('click', onTableLinkClick, false));
+        historyTableLinks.forEach(link => link.addEventListener('click', onTableLinkClick, false));
     }
 }

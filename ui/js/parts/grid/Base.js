@@ -21,7 +21,7 @@ export class BaseGrid {
         const me      = this;
         const tableId = gridParams.tableId;
 
-        $(document).ready( function () {
+        $(document).ready(function() {
             $.extend($.fn.dataTable.ext.classes, {
                 sStripeEven: '', sStripeOdd: ''
             });
@@ -40,7 +40,7 @@ export class BaseGrid {
 
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
-        } );
+        });
 
         if (this.config.dateRangeGrid) {
             const onDateFilterChanged = this.onDateFilterChanged.bind(this);
@@ -60,13 +60,13 @@ export class BaseGrid {
         const order      = this.orderConfig;
 
         const config = {
-            ajax: function (data, callback, settings) {
+            ajax: function(data, callback, settings) {
                 $.ajax({
                     url: url,
                     method: 'GET',
                     data: data,
                     dataType: 'json',
-                    success: function (response, textStatus, jqXHR) {
+                    success: function(response, textStatus, jqXHR) {
                         callback(response);
                         me.performAdditional(response, me.config);
                     },
@@ -125,7 +125,7 @@ export class BaseGrid {
             let preparedBase = {};
             response.data.forEach(rec => {
                 preparedBase[rec.id] = rec;
-            })
+            });
             $.ajax({
                 type: 'GET',
                 url: '/admin/timeFrameTotal',
@@ -177,7 +177,7 @@ export class BaseGrid {
         let rowData;
         let id;
 
-        table.rows().every(function () {
+        table.rows().every(function() {
             rowData = this.data();
             id = String(rowData.id);
             if (id in data.totals) {
@@ -216,7 +216,7 @@ export class BaseGrid {
         const tableId = this.config.tableId;
         const wrapper = document.getElementById(tableId).closest('.card');
 
-        if(wrapper) {
+        if (wrapper) {
             const span = wrapper.querySelector('header span');
 
             span.innerHTML = `${value}`;
@@ -231,7 +231,7 @@ export class BaseGrid {
         const tableId = this.config.tableId;
         const pagerId = `#${tableId}_paginate`;
 
-        if( dataTable.api().page.info().pages <= 1 ) {
+        if (dataTable.api().page.info().pages <= 1) {
             $(pagerId).hide();
         } else {
             $(pagerId).show();
@@ -251,7 +251,7 @@ export class BaseGrid {
         const params = this.config.getParams();
         const queryParams = getQueryParams(params);
 
-        for(let key in queryParams) {
+        for (let key in queryParams) {
             data[key] = queryParams[key];
         }
 
@@ -280,7 +280,7 @@ export class BaseGrid {
         const row  = event.target.closest('tr');
         const link = row.querySelector('a');
 
-        if(link) {
+        if (link) {
             window.location = link.href;
         }
     }
@@ -323,7 +323,7 @@ export class BaseGrid {
     }
 
     onError(e, settings, techNote, message) {
-        if(403 === settings.jqXHR.status) {
+        if (403 === settings.jqXHR.status) {
             window.location.href = '/';
         }
 

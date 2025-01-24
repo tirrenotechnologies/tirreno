@@ -17,14 +17,14 @@ export class BasePage {
         });
 
         const initTooltip = this.initTooltip;
-        if(initTooltip) {
+        if (initTooltip) {
             Tooltip.init();
         }
 
-        const notificationBlock = this.notificationBlock;
-        if(notificationBlock) {
+        const closeNotificationButtons = this.closeNotificationButtons;
+        if (closeNotificationButtons && closeNotificationButtons.length) {
             const onCloseNotificationButtonClick = this.onCloseNotificationButtonClick.bind(this);
-            this.closeNotificationButton.addEventListener('click', onCloseNotificationButtonClick, false);
+            closeNotificationButtons.forEach(button => button.addEventListener('click', onCloseNotificationButtonClick, false));
         }
 
         const procedureNotification = this.procedureNotification;
@@ -35,7 +35,10 @@ export class BasePage {
     }
 
     onCloseNotificationButtonClick() {
-        this.notificationBlock.remove();
+        const notification = event.target.closest('.notification.system');
+        if (notification) {
+            notification.remove();
+        }
     }
 
     onCloseProcedureNotificationButtonClick() {
@@ -46,12 +49,8 @@ export class BasePage {
         return true;
     }
 
-    get notificationBlock() {
-        return document.querySelector('.notification.system:not(.is-hidden)');
-    }
-
-    get closeNotificationButton() {
-        return document.querySelector('.notification.system:not(.is-hidden) .delete');
+    get closeNotificationButtons() {
+        return document.querySelectorAll('.notification.system:not(.is-hidden) .delete');
     }
 
     get procedureNotification() {

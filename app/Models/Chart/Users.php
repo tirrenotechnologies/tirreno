@@ -18,7 +18,7 @@ namespace Models\Chart;
 class Users extends Base {
     use \Traits\DateRange;
 
-    protected $DB_TABLE_NAME = 'event';
+    protected $DB_TABLE_NAME = 'event_account';
 
     public function getData(int $apiKey): array {
         $data0 = [];
@@ -26,66 +26,61 @@ class Users extends Base {
 
         for ($i = 0; $i < count($data1); ++$i) {
             $item = $data1[$i];
-            $day = $item['day'];
+            $ts = $item['ts'];
             $score = $item['score'];
 
-            if (!isset($data0[$day])) {
-                $data0[$day] = [
-                    'day' => $day,
-
-                    'daily_new_users_with_trust_score_high' => 0,
-                    'daily_new_users_with_trust_score_medium' => 0,
-                    'daily_new_users_with_trust_score_low' => 0,
+            if (!isset($data0[$ts])) {
+                $data0[$ts] = [
+                    'ts' => $ts,
+                    'ts_new_users_with_trust_score_high' => 0,
+                    'ts_new_users_with_trust_score_medium' => 0,
+                    'ts_new_users_with_trust_score_low' => 0,
                 ];
             }
 
             $inf = \Utils\Constants::USER_HIGH_SCORE_INF;
             if ($score >= \Utils\Constants::USER_HIGH_SCORE_INF) {
-                ++$data0[$day]['daily_new_users_with_trust_score_high'];
+                ++$data0[$ts]['ts_new_users_with_trust_score_high'];
             }
 
             $inf = \Utils\Constants::USER_MEDIUM_SCORE_INF;
             $sup = \Utils\Constants::USER_MEDIUM_SCORE_SUP;
             if ($score >= $inf && $score < $sup) {
-                ++$data0[$day]['daily_new_users_with_trust_score_medium'];
+                ++$data0[$ts]['ts_new_users_with_trust_score_medium'];
             }
 
             $inf = \Utils\Constants::USER_LOW_SCORE_INF;
             $sup = \Utils\Constants::USER_LOW_SCORE_SUP;
             if ($score >= $inf && $score < $sup) {
-                ++$data0[$day]['daily_new_users_with_trust_score_low'];
+                ++$data0[$ts]['ts_new_users_with_trust_score_low'];
             }
         }
 
         $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'day');
-        $l1 = array_column($indexedData, 'daily_new_users_with_trust_score_high');
-        $l2 = array_column($indexedData, 'daily_new_users_with_trust_score_medium');
-        $l3 = array_column($indexedData, 'daily_new_users_with_trust_score_low');
+        $ox = array_column($indexedData, 'ts');
+        $l1 = array_column($indexedData, 'ts_new_users_with_trust_score_high');
+        $l2 = array_column($indexedData, 'ts_new_users_with_trust_score_medium');
+        $l3 = array_column($indexedData, 'ts_new_users_with_trust_score_low');
 
         return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
     }
 
-    private function getFirstLine($apiKey) {
+    private function getFirstLine(int $apiKey) {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event_account.created)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_account.created + :offset))::bigint AS ts,
                 event_account.id,
                 event_account.score
-
             FROM
                 event_account
 
             WHERE
-                event_account.key = :api_key
-                AND event_account.created >= :start_time
-                AND event_account.created <= :end_time
+                event_account.key = :api_key AND
+                event_account.created >= :start_time AND
+                event_account.created <= :end_time
 
-            GROUP BY
-                day, event_account.id
-
-            ORDER BY
-                day"
+            GROUP BY ts, event_account.id
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

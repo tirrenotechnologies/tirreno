@@ -16,20 +16,15 @@
 namespace Controllers\Admin\Home;
 
 class Page extends \Controllers\Pages\Base {
-    use \Traits\Filter;
-
     public $page = 'AdminHome';
 
     public function getPageParams(): array {
-        [$startDate, $endDate] = $this->getFilter();
-
         $pageParams = [
-            'FILTER_START_DATE' => $startDate,
-            'FILTER_END_DATE' => $endDate,
-            'LOAD_DATATABLE' => true,
+            'LOAD_DATATABLE'    => true,
             'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/home.html',
-            'JS' => 'admin_dashboard.js',
+            'HTML_FILE'         => 'admin/home.html',
+            'JS'                => 'admin_dashboard.js',
+            'OFFSET'            => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

@@ -39,14 +39,14 @@ abstract class Base {
 
     // TODO: reverse
     public function getPageTitle(): string {
-        $page = $this->page;
-        $i18nKey = sprintf('%s_page_title', $page);
+        $title = $this->f3->get(sprintf('%s_page_title', $this->page));
 
-        return $this->f3->get($i18nKey);
+        return $this->getInternalPageTitleWithPostfix($title);
     }
 
     public function getInternalPageTitleWithPostfix(string $title): string {
-        //$title = sprintf('%s - %s', $title, $postfix);
+        $title = sprintf('%s %s', $title, \Utils\Constants::PAGE_TITLE_POSTFIX);
+
         return $title;
     }
 

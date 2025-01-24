@@ -21,7 +21,7 @@ class Ips extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'day');
+        $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'residence_ip_count');
         $l2 = array_column($data, 'total_privacy');
         $l3 = array_column($data, 'suspicious_ip_count');
@@ -31,15 +31,15 @@ class Ips extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(DISTINCT event.ip) AS unique_ip_count,
 
                 COUNT(DISTINCT
                     CASE
-                        WHEN event_ip.data_center = 'True' OR
-                             event_ip.tor = 'True' OR
-                             event_ip.vpn = 'True'
+                        WHEN event_ip.data_center IS TRUE OR
+                             event_ip.tor IS TRUE OR
+                             event_ip.vpn IS TRUE
                         THEN event.ip
                         ELSE NULL
                      END
@@ -47,9 +47,9 @@ class Ips extends Base {
 
                 COUNT(DISTINCT event.ip) - COUNT(DISTINCT
                     CASE
-                        WHEN event_ip.data_center = 'True' OR
-                             event_ip.tor = 'True' OR
-                             event_ip.vpn = 'True'
+                        WHEN event_ip.data_center IS TRUE OR
+                             event_ip.tor IS TRUE OR
+                             event_ip.vpn IS TRUE
                         THEN event.ip
                         ELSE NULL
                     END
@@ -71,15 +71,12 @@ class Ips extends Base {
             ON (event.ip = event_ip.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

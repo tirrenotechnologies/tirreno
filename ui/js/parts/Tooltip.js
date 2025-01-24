@@ -85,7 +85,7 @@ export class Tooltip {
             theme: 'tooltipster-borderless'
         };
 
-        if(useMaxWidth) {
+        if (useMaxWidth) {
             config['maxWidth'] = 250;
         }
 

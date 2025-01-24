@@ -64,7 +64,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	@param $options array
 	*	@param $ttl int
 	**/
-	abstract function find($filter=NULL,array $options=NULL,$ttl=0);
+	abstract function find($filter=NULL,?array $options=NULL,$ttl=0);
 
 	/**
 	*	Count records that match criteria
@@ -73,7 +73,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	@param $options array
 	*	@param $ttl int
 	**/
-	abstract function count($filter=NULL,array $options=NULL,$ttl=0);
+	abstract function count($filter=NULL,?array $options=NULL,$ttl=0);
 
 	/**
 	*	Insert new record
@@ -126,7 +126,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	@param $options array
 	*	@param $ttl int
 	**/
-	function findone($filter=NULL,array $options=NULL,$ttl=0) {
+	function findone($filter=NULL,?array $options=NULL,$ttl=0) {
 		if (!$options)
 			$options=[];
 		// Override limit
@@ -147,7 +147,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	@param $bounce bool
 	**/
 	function paginate(
-		$pos=0,$size=10,$filter=NULL,array $options=NULL,$ttl=0,$bounce=TRUE) {
+		$pos=0,$size=10,$filter=NULL,?array $options=NULL,$ttl=0,$bounce=TRUE) {
 		$total=$this->count($filter,$options,$ttl);
 		$count=(int)ceil($total/$size);
 		if ($bounce)
@@ -169,12 +169,12 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 
 	/**
 	*	Map to first record that matches criteria
-	*	@return array|FALSE
+	*	@return \DB\SQL\Mapper|FALSE
 	*	@param $filter string|array
 	*	@param $options array
 	*	@param $ttl int
 	**/
-	function load($filter=NULL,array $options=NULL,$ttl=0) {
+	function load($filter=NULL,?array $options=NULL,$ttl=0) {
 		$this->reset();
 		return ($this->query=$this->find($filter,$options,$ttl)) &&
 			$this->skip(0)?$this->query[$this->ptr]:FALSE;

@@ -37,4 +37,25 @@ class TimeZones {
         $utc = new \DateTimeZone(self::DEFAULT);
         $time = self::localizeTimeStamp($time, $utc, $operatorTimeZone, $useMilliseconds);
     }
+
+    public static function localizeUnixTimestamps(array &$ts): void {
+        $f3 = \Base::instance();
+        $currentOperator = $f3->get('CURRENT_USER');
+        $operatorTimeZone = new \DateTimeZone($currentOperator->timezone ?? self::DEFAULT);
+        $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $offsetInSeconds = $operatorTimeZone->getOffset($utcTime);
+
+        foreach ($ts as $i => $t) {
+            $ts[$i] += $offsetInSeconds;
+        }
+    }
+
+    public static function getCurrentOperatorOffset(): int {
+        $f3 = \Base::instance();
+        $currentOperator = $f3->get('CURRENT_USER');
+        $operatorTimeZone = new \DateTimeZone($currentOperator->timezone ?? self::DEFAULT);
+        $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return $operatorTimeZone->getOffset($utcTime);
+    }
 }

@@ -93,6 +93,8 @@ class Constants {
     public const MAIL_HOST      = 'smtp.eu.mailgun.org';
     public const MAIL_SEND_BIN  = '/usr/sbin/sendmail';
 
+    public const PAGE_TITLE_POSTFIX = '| Tirreno';
+
     public const DEFAULT_RULES = [
         // Positive
         29  => -20, // E20
@@ -197,6 +199,12 @@ class Constants {
         'isps',
         'domains',
         'blacklist',
+    ];
+
+    public const CHART_RESOLUTION = [
+        'day'       => 60 * 60 * 24,
+        'hour'      => 60 * 60,
+        'minute'    => 60,
     ];
 
     public const TOP_TEN_MODELS_MAP = [

@@ -9,11 +9,11 @@ export class RulesFilter {
         const choices = new Choices('#rule-selectors select', {
             removeItemButton: true,
             allowHTML: true,
-            callbackOnCreateTemplates: function (strToEl) {
+            callbackOnCreateTemplates: function(strToEl) {
                 const {classNames, itemSelectText} = this.config;
                 return {
-                    item: function ({classNames}, data) {return strToEl(renderRuleSelectorItem(classNames, data));},
-                    choice: function ({classNames}, data) {return strToEl(renderRuleSelectorChoice(classNames, data, itemSelectText));},
+                    item: function({classNames}, data) {return strToEl(renderRuleSelectorItem(classNames, data));},
+                    choice: function({classNames}, data) {return strToEl(renderRuleSelectorChoice(classNames, data, itemSelectText));},
                 };
             }
         });

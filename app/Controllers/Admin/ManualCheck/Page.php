@@ -26,7 +26,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_DATATABLE'    => true,
             'HTML_FILE'         => 'admin/manualCheck.html',
             'JS'                => 'admin_manual_check.js',
-            'PAGE_TITLE'        => $this->f3->get('AdminManualCheck_page_title'),
         ];
 
         $currentOperator = $this->f3->get('CURRENT_USER');

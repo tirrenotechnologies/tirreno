@@ -39,15 +39,16 @@ class Page extends \Controllers\Pages\Base {
         $pageTitle = $this->getInternalPageTitleWithPostfix($pageTitle);
 
         $pageParams = [
-            'LOAD_DATATABLE' => true,
-            'LOAD_JVECTORMAP' => true,
-            'LOAD_UPLOT' => true,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/resource.html',
-            'RESOURCE' => $resource,
-            'PAGE_TITLE' => $pageTitle,
-            'JS' => 'admin_resource.js',
+            'LOAD_DATATABLE'                => true,
+            'LOAD_JVECTORMAP'               => true,
+            'LOAD_UPLOT'                    => true,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'HTML_FILE'                     => 'admin/resource.html',
+            'RESOURCE'                      => $resource,
+            'PAGE_TITLE'                    => $pageTitle,
+            'JS'                            => 'admin_resource.js',
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

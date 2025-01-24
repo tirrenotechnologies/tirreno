@@ -592,7 +592,7 @@ class Web extends Prefab {
 	*	@param $url string
 	*	@param $options array
 	**/
-	function request($url,array $options=NULL) {
+	function request($url,?array $options=NULL) {
 		$fw=Base::instance();
 		$parts=parse_url($url);
 		if (empty($parts['scheme'])) {

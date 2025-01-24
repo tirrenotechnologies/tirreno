@@ -3,6 +3,5 @@ ui/node_modules
 public/*
 vendor/*
 .DS_Store
-composer.lock
 composer.phar
 /.php-cs-fixer.cache

@@ -156,7 +156,7 @@ class Mapper extends \DB\Cursor {
 	*	@param $ttl int|array
 	*	@param $log bool
 	**/
-	function find($filter=NULL,array $options=NULL,$ttl=0,$log=TRUE) {
+	function find($filter=NULL,?array $options=NULL,$ttl=0,$log=TRUE) {
 		if (!$options)
 			$options=[];
 		$options+=[
@@ -352,7 +352,7 @@ class Mapper extends \DB\Cursor {
 	*	@param $options array
 	*	@param $ttl int|array
 	**/
-	function count($filter=NULL,array $options=NULL,$ttl=0) {
+	function count($filter=NULL,?array $options=NULL,$ttl=0) {
 		$now=microtime(TRUE);
 		$out=count($this->find($filter,$options,$ttl,FALSE));
 		$this->db->jot('('.sprintf('%.1f',1e3*(microtime(TRUE)-$now)).'ms) '.

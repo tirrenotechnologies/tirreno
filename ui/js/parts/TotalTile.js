@@ -16,7 +16,7 @@ export class TotalTile {
         const path    = `.${tileId} .title`;
         const el      = document.querySelector(path);
 
-        if(el) {
+        if (el) {
             el.classList.add('loaded');
             el.classList.remove('loading');
 
@@ -38,11 +38,11 @@ export class TotalTile {
         const USER_ID     = parseInt(window.location.pathname.replace('/id/', ''));
         const isUserPage  = () => !isNaN(USER_ID);
 
-        if(!litmus || !isUserPage()) return;
+        if (!litmus || !isUserPage()) return;
 
         let cls = null;
 
-        if(value >= litmus) {
+        if (value >= litmus) {
             cls = 'medium';
         }
 

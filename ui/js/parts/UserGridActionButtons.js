@@ -16,7 +16,7 @@ export class UserGridActionButtons {
         const buttons = document.querySelectorAll(`#${tableId} button`);
 
         const onButtonClick = this.onButtonClick.bind(this);
-        buttons.forEach( button => button.addEventListener('click', onButtonClick, false));
+        buttons.forEach(button => button.addEventListener('click', onButtonClick, false));
     }
 
     onButtonClick(e) {
@@ -25,7 +25,7 @@ export class UserGridActionButtons {
 
         const me = this;
         const target = e.target;
-        const url = `/admin/manageUser`;
+        const url = '/admin/manageUser';
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const data = {userId: target.dataset.userId, type: target.dataset.type, token: token};
 
@@ -73,16 +73,16 @@ export class UserGridActionButtons {
         target.classList.remove('is-loading');
 
         const twoButtonsContainer = target.closest('.legitfraud');
-        if(twoButtonsContainer && !twoButtonsContainer.hasAttribute('counterUpdated')) {
+        if (twoButtonsContainer && !twoButtonsContainer.hasAttribute('counterUpdated')) {
             twoButtonsContainer.setAttribute('counterUpdated', 0);
         }
 
-        if('fraudButton' === buttonType) {
+        if ('fraudButton' === buttonType) {
             const td = target.closest('td');
             const fraudButton = td.querySelector('[data-type="fraud"]');
             const legitButton = td.querySelector('[data-type="legit"]');
 
-            if('fraud' === type) {
+            if ('fraud' === type) {
                 fraudButton.classList.replace('is-neutral', 'is-highlighted');
                 fraudButton.setAttribute('disabled', '');
 
@@ -98,12 +98,12 @@ export class UserGridActionButtons {
 
             const counterUpdated    = twoButtonsContainer.getAttribute('counterUpdated');
             const wasCounterUpdated = parseInt(counterUpdated);
-            if(!wasCounterUpdated) {
+            if (!wasCounterUpdated) {
                 const card = target.closest('.card');
                 const span = card.querySelector('.card-header-title span');
                 let total  = parseInt(span.innerHTML);
 
-                if(total > 0) {
+                if (total > 0) {
                     total -= 1;
                 }
 
@@ -119,7 +119,7 @@ export class UserGridActionButtons {
             }
         }
 
-        if('reviewedButton' === buttonType) {
+        if ('reviewedButton' === buttonType) {
             //Get HTML w/ new fraud&legit buttons
             const record = {reviewed: true, accountid: accountId};
             const html   = renderUserActionButtons(record);
@@ -130,7 +130,7 @@ export class UserGridActionButtons {
             //Add event listener to newly created buttons
             const buttons = td.querySelectorAll('button');
             const onButtonClick = me.onButtonClick.bind(me);
-            buttons.forEach( button => button.addEventListener('click', onButtonClick, false));
+            buttons.forEach(button => button.addEventListener('click', onButtonClick, false));
         }
     }
 }

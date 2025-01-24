@@ -78,7 +78,7 @@ class Jig {
 	*	@param $file string
 	*	@param $data array
 	**/
-	function write($file,array $data=NULL) {
+	function write($file,?array $data=NULL) {
 		if (!$this->dir || $this->lazy)
 			return count($this->data[$file]=$data);
 		$fw=\Base::instance();

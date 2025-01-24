@@ -77,8 +77,8 @@ class Audit extends Prefab {
 	*	@param $addr string
 	**/
 	function isprivate($addr) {
-		return !(bool)filter_var($addr,FILTER_VALIDATE_IP,
-			FILTER_FLAG_IPV4|FILTER_FLAG_IPV6|FILTER_FLAG_NO_PRIV_RANGE);
+		return (bool)filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)
+			&& !(bool)filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE);
 	}
 
 	/**
@@ -188,5 +188,15 @@ class Audit extends Prefab {
 			6*(bool)(preg_match(
 				'/[A-Z].*?[0-9[:punct:]]|[0-9[:punct:]].*?[A-Z]/',$str));
 	}
+
+    /**
+     *	Return TRUE if string is a valid MAC address including EUI-64 format
+     *	@return bool
+     *	@param $addr string
+     **/
+    function mac($addr) {
+        return (bool)filter_var($addr,FILTER_VALIDATE_MAC)
+            || preg_match('/^([0-9a-f]{2}:){3}ff:fe(:[0-9a-f]{2}){3}$/i', $addr);
+    }
 
 }

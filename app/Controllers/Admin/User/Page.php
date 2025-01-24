@@ -39,18 +39,19 @@ class Page extends \Controllers\Pages\Base {
         $payload = $dataController->getPayloadColumns($userId);
 
         $pageParams = [
-            'LOAD_DATATABLE' => true,
-            'LOAD_JVECTORMAP' => true,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'HTML_FILE' => 'admin/user.html',
-            'LOAD_UPLOT' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'USER' => $user,
-            'SCHEDULED_FOR_DELETION' => $scheduledForDeletion,
-            'PAGE_TITLE' => $pageTitle,
-            'PAYLOAD' => $payload,
-            'JS' => 'admin_user.js',
-            'ERROR_CODE' => $errorCode,
+            'LOAD_DATATABLE'                => true,
+            'LOAD_JVECTORMAP'               => true,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'HTML_FILE'                     => 'admin/user.html',
+            'LOAD_UPLOT'                    => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'USER'                          => $user,
+            'SCHEDULED_FOR_DELETION'        => $scheduledForDeletion,
+            'PAGE_TITLE'                    => $pageTitle,
+            'PAYLOAD'                       => $payload,
+            'JS'                            => 'admin_user.js',
+            'ERROR_CODE'                    => $errorCode,
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         if ($this->isPostRequest()) {

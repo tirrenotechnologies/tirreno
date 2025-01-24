@@ -275,7 +275,7 @@ class Template extends Preview {
 			if (preg_match('/^(.{0,'.$w.'}?)<(\/?)(?:F3:)?'.
 				'('.$this->tags.')\b((?:\s+[\w.:@!\-]+'.
 				'(?:\h*=\h*(?:"(?:.*?)"|\'(?:.*?)\'))?|'.
-				'\h*\{\{.+?\}\})*)\h*(\/?)>/is',
+				'\h*\{\{.+?\}\})*)\s*(\/?)>/is',
 				substr($text,$ptr),$match)) {
 				if (strlen($tmp) || isset($match[1]))
 					$tree[]=$tmp.$match[1];

@@ -16,8 +16,6 @@
 namespace Controllers\Admin\Logbook;
 
 class Page extends \Controllers\Pages\Base {
-    use \Traits\Filter;
-
     public $page = 'AdminLogbook';
 
     public function getPageParams(): array {

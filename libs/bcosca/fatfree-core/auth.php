@@ -247,7 +247,7 @@ class Auth {
 	*	@param $args array
 	*	@param $func callback
 	**/
-	function __construct($storage,array $args=NULL,$func=NULL) {
+	function __construct($storage,?array $args=NULL,$func=NULL) {
 		if (is_object($storage) && is_a($storage,'DB\Cursor')) {
 			$this->storage=$storage->dbtype();
 			$this->mapper=$storage;

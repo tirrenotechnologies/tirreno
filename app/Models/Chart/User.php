@@ -15,29 +15,12 @@
 
 namespace Models\Chart;
 
-class User extends \Models\BaseSql {
-    use \Traits\DateRange;
-
-    protected $DB_TABLE_NAME = 'event';
-
-    public function getData(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-
-        $userId = $request['id'];
-        $dateRange = $this->getLatest180DatesRange();
-
-        $params = [
-            ':api_key' => $apiKey,
-            ':user_id' => $userId,
-            ':end_time' => $dateRange['endDate'],
-            ':start_time' => $dateRange['startDate'],
-        ];
-
+class User extends BaseEventsCount {
+    public function getCounts(int $apiKey) {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(event.id) AS event_count
-
             FROM
                 event
 
@@ -45,18 +28,15 @@ class User extends \Models\BaseSql {
             ON (event.account = event_account.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
-                AND event_account.id = :user_id
+                event_account.id = :id AND
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
-        return $this->execQuery($query, $params);
+        return $this->executeOnRangeById($query, $apiKey);
     }
 }

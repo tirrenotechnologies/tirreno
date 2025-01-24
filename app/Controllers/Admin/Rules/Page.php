@@ -16,7 +16,6 @@
 namespace Controllers\Admin\Rules;
 
 class Page extends \Controllers\Pages\Base {
-    use \Traits\Filter;
     use \Traits\ApiKeys;
 
     public $page = 'AdminRules';

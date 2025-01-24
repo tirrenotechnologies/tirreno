@@ -36,7 +36,10 @@ const USER_EVENTS_CRITICAL_VALUE    = Infinity;
 const USER_DEVICES_CRITICAL_VALUE   = 4;
 const USER_COUNTRIES_CRITICAL_VALUE = 3;
 
+const MAX_HOURS_CHART = 96;
+const MIN_HOURS_CHART = 3;
 const DAYS_IN_RANGE = 7;
+const X_AXIS_SERIFS = 8;
 
 const ASN_OVERRIDE = {
     '0':        'LAN',
@@ -52,7 +55,7 @@ const NO_RULES_MSG = {
     tooltip:    'User currently doesn\'t correspond to selected rules.',
 };
 
-const UNDEFINED_RULES_MSG = { 
+const UNDEFINED_RULES_MSG = {
     value:      'In queue',
     tooltip:    'Waiting for a score to be calculated.',
 };
@@ -99,7 +102,10 @@ export {
     USER_DEVICES_CRITICAL_VALUE,
     USER_COUNTRIES_CRITICAL_VALUE,
 
+    MAX_HOURS_CHART,
+    MIN_HOURS_CHART,
     DAYS_IN_RANGE,
+    X_AXIS_SERIFS,
 
     ASN_OVERRIDE,
 

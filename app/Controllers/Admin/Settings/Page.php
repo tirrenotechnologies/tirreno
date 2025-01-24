@@ -35,6 +35,7 @@ class Page extends \Controllers\Pages\Base {
             'JS'                => 'admin_settings.js',
             'API_KEYS'          => $apiKeys,
             'IS_OWNER'          => $isOwner,
+            'CURRENT_VERSION'   => \Utils\VersionControl::fullVersionString(),
         ];
 
         if ($this->isPostRequest()) {

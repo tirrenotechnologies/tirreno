@@ -67,7 +67,7 @@ return [
     'Details_earliest_breach' => 'Earliest breach',
     'Details_mx_record' => 'MX record missing',
     'Details_domain_return_code' => 'Domain return code',
-    'Details_closest_snapshot' => 'Closest snapshot',
+    'Details_closest_snapshot' => 'Oldest mention',
 
     //Resource
     'Details_url' => 'URL',

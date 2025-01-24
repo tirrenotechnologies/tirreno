@@ -50,7 +50,7 @@ return [
         'ua' => 'User agent',
         'phone' => 'Phone',
     ],
-    'AdminApi_data_enrichment_success_message' => 'Data enrichment parameters and API token have been updated successfully.',
+    'AdminApi_data_enrichment_success_message' => 'Enrichment settings have been updated successfully.',
 
     'AdminApi_form_title' => 'Enrichment key',
     'AdminApi_form_title_tooltip' => 'Enrichment key enables access to enrichment.',

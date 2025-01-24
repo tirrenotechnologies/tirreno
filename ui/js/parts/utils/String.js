@@ -3,11 +3,11 @@ import {MAX_TOOLTIP_LENGTH} from './Constants.js?v=2';
 const truncateWithHellip = (value, n) => {
     let fullValue = value;
 
-    if(value && value.length > (n + 2)) {
+    if (value && value.length > (n + 2)) {
         value = `${value.slice(0, n)}&hellip;`;
     }
 
-    if(fullValue && fullValue.length > MAX_TOOLTIP_LENGTH) {
+    if (fullValue && fullValue.length > MAX_TOOLTIP_LENGTH) {
         fullValue = `${fullValue.slice(0, MAX_TOOLTIP_LENGTH)}&hellip;`;
     }
 
@@ -26,7 +26,7 @@ const escapeForHTMLAttribute = (str) => {
             switch (match) {
                 case '"':
                     return '&quot;';
-                case "'":
+                case '\'':
                     return '&apos;';
                 case '&':
                     return '&amp;';
@@ -37,7 +37,7 @@ const escapeForHTMLAttribute = (str) => {
                 default:
                     return match;
             };
-    });
+        });
 };
 
 const replaceUnicodeWithEntities = (str) => {
@@ -52,7 +52,7 @@ const replaceUnicodeWithEntities = (str) => {
 };
 
 const getRuleClass = (value) => {
-    switch(value) {
+    switch (value) {
         case -20:
             return 'positive';
         case 10:
@@ -101,7 +101,7 @@ const formatTime = (str) => {
     if (humanTime === '') humanTime = '1 s';
 
     return humanTime.trim();
-}
+};
 
 const openJson = (str) => {
     try {
@@ -109,6 +109,6 @@ const openJson = (str) => {
     } catch (error) {
         return null;
     }
-}
+};
 
 export {truncateWithHellip, replaceAll, escapeForHTMLAttribute, replaceUnicodeWithEntities, getRuleClass, formatTime, openJson};

@@ -68,7 +68,7 @@ class ErrorHandler {
 
         if ($errorData['code'] === 500) {
             $toName = 'Admin';
-            $toAddress = $f3->get('ADMIN_EMAIL');
+            $toAddress = \Utils\Variables::getAdminEmail();
 
             $subject = $f3->get('error_email_subject');
             $subject = sprintf($subject, $errorData['code']);

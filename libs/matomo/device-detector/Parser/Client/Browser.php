@@ -89,6 +89,7 @@ class Browser extends AbstractClientParser
         'AL' => 'Aloha Browser',
         'AH' => 'Aloha Browser Lite',
         'A8' => 'ALVA',
+        '9A' => 'AltiBrowser',
         'AM' => 'Amaya',
         'A3' => 'Amaze Browser',
         'A5' => 'Amerigo',
@@ -108,7 +109,7 @@ class Browser extends AbstractClientParser
         'AW' => 'Amiga Aweb',
         'PN' => 'APN Browser',
         '6A' => 'Arachne',
-        'RA' => 'Arc',
+        'RA' => 'Arc Search',
         'R5' => 'Armorfly Browser',
         'AI' => 'Arvin',
         'AK' => 'Ask.com',
@@ -300,6 +301,7 @@ class Browser extends AbstractClientParser
         'HA' => 'Hawk Turbo Browser',
         'HQ' => 'Hawk Quick Browser',
         'HE' => 'Helio',
+        'HN' => 'Herond Browser',
         'HX' => 'Hexa Web Browser',
         'HI' => 'Hi Browser',
         'HO' => 'hola! Browser',
@@ -390,6 +392,7 @@ class Browser extends AbstractClientParser
         'LX' => 'Lynx',
         'L2' => 'Lynket Browser',
         'MD' => 'Mandarin',
+        'MP' => 'Maple',
         'M5' => 'MarsLab Web Browser',
         'M7' => 'MaxBrowser',
         'M1' => 'mCent',
@@ -577,6 +580,7 @@ class Browser extends AbstractClientParser
         'K1' => 'Sidekick',
         'S1' => 'SimpleBrowser',
         '3S' => 'SilverMob US',
+        'ZB' => 'Singlebox',
         'SY' => 'Sizzy',
         'K3' => 'Skye',
         'SK' => 'Skyfire',
@@ -684,6 +688,7 @@ class Browser extends AbstractClientParser
         'WB' => 'Wave Browser',
         'WA' => 'Wavebox',
         'WH' => 'Whale Browser',
+        'W2' => 'Whale TV Browser',
         'WO' => 'wOSBrowser',
         '3W' => 'w3m',
         'WT' => 'WeTab Browser',
@@ -767,15 +772,16 @@ class Browser extends AbstractClientParser
             'K4', 'WK', 'T3', 'K5', 'MU', '9P', 'K6', 'VR', 'N9',
             'M9', 'F9', '0P', '0A', 'JR', 'D3', 'TK', 'BP', '2F',
             '2M', 'K7', '1N', '8A', 'H7', 'X3', 'T4', 'X4', '5O',
-            '8C', '3M', '6I', '2P', 'PU', '7I', 'X5',
+            '8C', '3M', '6I', '2P', 'PU', '7I', 'X5', 'AL', '3P',
+            'W2', 'ZB', 'HN',
         ],
         'Firefox'            => [
             'FF', 'BI', 'BF', 'BH', 'BN', 'C0', 'CU', 'EI', 'F1',
-            'FB', 'FE', 'AX', 'FM', 'FR', 'FY', 'GZ', 'I4', 'IF',
+            'FB', 'FE', 'AX', 'FM', 'FR', 'FY', 'I4', 'IF', '8P',
             'IW', 'LH', 'LY', 'MB', 'MN', 'MO', 'MY', 'OA', 'OS',
             'PI', 'PX', 'QA', 'S5', 'SX', 'TF', 'TO', 'WF', 'ZV',
-            'FP', 'AD', 'WL', '2I', 'P9', 'KJ', 'WY', 'VK', 'W5',
-            '7C', 'N7', 'W7', '8P',
+            'FP', 'AD', '2I', 'P9', 'KJ', 'WY', 'VK', 'W5',
+            '7C', 'N7', 'W7',
         ],
         'Internet Explorer'  => ['IE', 'CZ', 'BZ', 'IM', 'PS', '3A', '4A', 'RN'],
         'Konqueror'          => ['KO'],
@@ -816,7 +822,7 @@ class Browser extends AbstractClientParser
         'DP', 'KL', 'K4', 'N6', 'KU', 'WK', 'M8', 'UP', 'ZT',
         '9P', 'N8', 'VR', 'N9', 'M9', 'F9', '0P', '0A', '2F',
         '2M', 'K7', '1N', '8A', 'H7', 'X3', 'X4', '5O', '6I',
-        '7I', 'X5',
+        '7I', 'X5', '3P',
     ];
 
     /**
@@ -1042,6 +1048,13 @@ class Browser extends AbstractClientParser
             if ('DuckDuckGo Privacy Browser' === $name) {
                 $version = '';
             }
+
+            // In case client hints report a more detailed engine version, we try to use this instead
+            if ('Blink' === $engine && 'Iridium' !== $name
+                && \version_compare($engineVersion, $browserFromClientHints['version'], '<')
+            ) {
+                $engineVersion = $browserFromClientHints['version'];
+            }
         } else {
             $name          = $browserFromUserAgent['name'];
             $version       = $browserFromUserAgent['version'];
@@ -1074,7 +1087,7 @@ class Browser extends AbstractClientParser
             }
         }
 
-        if (empty($name)) {
+        if (empty($name) || 1 === \preg_match('/Cypress|PhantomJS/', $this->userAgent)) {
             return [];
         }
 
@@ -1095,6 +1108,14 @@ class Browser extends AbstractClientParser
             $family        = 'Chrome';
             $engine        = 'Blink';
             $engineVersion = '';
+        }
+
+        if ('Wolvic' === $name && 'Blink' === $engine) {
+            $family = 'Chrome';
+        }
+
+        if ('Wolvic' === $name && 'Gecko' === $engine) {
+            $family = 'Firefox';
         }
 
         return [

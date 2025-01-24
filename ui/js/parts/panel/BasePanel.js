@@ -90,7 +90,7 @@ export class BasePanel {
     }
 
     onEnrichmentLoaded(data, status) {
-        if('success' !== status || 0 === data.length) {
+        if ('success' !== status || 0 === data.length) {
             return;
         }
 
@@ -133,7 +133,7 @@ export class BasePanel {
 
     onDetailsLoaded(data, status) {
 
-        if('success' !== status || 0 === data.length) {
+        if ('success' !== status || 0 === data.length) {
             return;
         }
 
@@ -157,7 +157,7 @@ export class BasePanel {
         //todo: foreach and arrow fn ?
         for (const key in data) {
             span = this.card.querySelector(`#details_${key}`);
-            if(span) {
+            if (span) {
                 span.innerHTML = data[key];
             }
         }

@@ -15,7 +15,7 @@ export class ApiPage extends BasePage {
         this.versionSelect.addEventListener('change', onSelectChange, false);
 
         const onTextAreaClick = this.onTextAreaClick.bind(this);
-        this.snippetTextareas.forEach( txt => txt.addEventListener('click', onTextAreaClick, false));
+        this.snippetTextareas.forEach(txt => txt.addEventListener('click', onTextAreaClick, false));
 
         const gridParams = {
             url    : '/admin/loadUsageStats',
@@ -43,10 +43,10 @@ export class ApiPage extends BasePage {
     onSelectChange(e) {
         const value = event.target.value;
 
-        this.snippetTextareas.forEach( txt => {
+        this.snippetTextareas.forEach(txt => {
             const container = txt.closest('div');
             const isHidden = container.classList.contains('is-hidden');
-            if(!isHidden) {
+            if (!isHidden) {
                 container.classList.add('is-hidden');
             }
         });

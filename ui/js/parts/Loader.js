@@ -23,7 +23,7 @@ export class Loader {
         this.loaderEl.classList.remove('loaded');
 
         let timerId = setInterval(() => {
-            if(me.loaderEl.classList.contains('loaded')) {
+            if (me.loaderEl.classList.contains('loaded')) {
                 clearInterval(timerId);
                 return;
             }

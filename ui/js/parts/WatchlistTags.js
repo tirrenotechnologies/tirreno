@@ -7,7 +7,7 @@ export class WatchlistTags {
         this.onRemoveUserTagClick = this.onRemoveUserTagClick.bind(this);
         this.onUserTagRemoveCallback = this.onUserTagRemoveCallback.bind(this);
 
-        this.tags.forEach( tag => tag.addEventListener('click', this.onRemoveUserTagClick, false));
+        this.tags.forEach(tag => tag.addEventListener('click', this.onRemoveUserTagClick, false));
     }
 
     onRemoveUserTagClick(e) {
@@ -31,7 +31,7 @@ export class WatchlistTags {
     }
 
     onUserTagRemoveCallback(response) {
-        if(response.success) {
+        if (response.success) {
             const userId = response.userId;
             const tag = document.querySelector(`[data-id="${userId}"]`);
             const wrapper = tag.closest('.control');

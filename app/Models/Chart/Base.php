@@ -18,68 +18,58 @@ namespace Models\Chart;
 abstract class Base extends \Models\BaseSql {
     use \Traits\DateRange;
 
-    private function getDt(array $item): string {
-        $ts = strtotime($item['day']);
-
-        return date('Y-m-d', $ts);
-    }
-
     protected function concatDataLines(array $data1, string $field1, array $data2, string $field2, array $data3 = [], ?string $field3 = null): array {
         $data0 = [];
 
         for ($i = 0; $i < count($data1); ++$i) {
             $item = $data1[$i];
+            $ts = $item['ts'];
 
-            $dt = $this->getDt($item);
-            $data0[$dt] = [];
-
-            $data0[$dt]['day'] = $dt;
-            $data0[$dt][$field1] = $item[$field1];
-            $data0[$dt][$field2] = 0;
+            $data0[$ts] = [
+                'ts'    => $ts,
+                $field1 => $item[$field1],
+                $field2 => 0,
+            ];
 
             if ($field3) {
-                $data0[$dt][$field3] = 0;
+                $data0[$ts][$field3] = 0;
             }
         }
 
         for ($i = 0; $i < count($data2); ++$i) {
             $item = $data2[$i];
+            $ts = $item['ts'];
 
-            $dt = $this->getDt($item);
-            $isExist = $data0[$dt] ?? null;
-
-            if (!$isExist) {
-                $data0[$dt] = [];
-
-                $data0[$dt]['day'] = $dt;
-                $data0[$dt][$field1] = 0;
-                $data0[$dt][$field2] = 0;
+            if (!array_key_exists($ts, $data0)) {
+                $data0[$ts] = [
+                    'ts'    => $ts,
+                    $field1 => 0,
+                    $field2 => 0,
+                ];
             }
 
-            $data0[$dt][$field2] = $item[$field2];
+            $data0[$ts][$field2] = $item[$field2];
         }
 
         for ($i = 0; $i < count($data3); ++$i) {
             $item = $data3[$i];
+            $ts = $item['ts'];
 
-            $dt = $this->getDt($item);
-            $isExist = $data0[$dt] ?? null;
-
-            if (!$isExist) {
-                $data0[$dt] = [];
-
-                $data0[$dt]['day'] = $dt;
-                $data0[$dt][$field1] = 0;
-                $data0[$dt][$field2] = 0;
-                $data0[$dt][$field3] = 0;
+            if (!array_key_exists($ts, $data0)) {
+                $data0[$ts] = [
+                    'ts'    => $ts,
+                    $field1 => 0,
+                    $field2 => 0,
+                    $field2 => 3,
+                ];
             }
 
-            $data0[$dt][$field3] = $item[$field3];
+            $data0[$ts][$field3] = $item[$field3];
         }
 
         // TODO: tmp order troubles fix
         usort($data0, function ($a, $b) {
-            return strtotime($a['day']) - strtotime($b['day']);
+            return $a['ts'] - $b['ts'];
         });
 
         return $data0;
@@ -90,70 +80,73 @@ abstract class Base extends \Models\BaseSql {
         $data = array_fill(0, $n, []);
 
         $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
+        $step = \Utils\Constants::CHART_RESOLUTION[$this->getResolution($request)];
+        // use offset shift because $startTs/$endTs compared with shifted ['ts']
+        $offset = \Utils\TimeZones::getCurrentOperatorOffset();
+        $dateRange = $this->getDatesRange($request, $offset);
 
         if (!$dateRange) {
-            for ($i = 0; $i < count($params[0]); ++$i) {
-                $dt = $params[0][$i];
-                $params[0][$i] = $this->formatDay($dt);
+            $now = time() + $offset;
+            $week = 7 * 24 * 60 * 60;
+            if (count($params[0]) === 0) {
+                $dateRange = [
+                    'endDate' => date('Y-m-d H:i:s', $now),
+                    'startDate' => date('Y-m-d 00:00:01', $now - $week),
+                ];
+            } else {
+                $firstTs = ($now - $params[0][0] < $week) ? $now - $week : $params[0][0];
+                $dateRange = [
+                    'endDate'   => date('Y-m-d H:i:s', $now),
+                    'startDate' => date('Y-m-d 00:00:01', $firstTs),
+                ];
             }
-
-            return $params;
         }
 
-        $endDate = $dateRange['endDate'];
-        $startDate = $dateRange['startDate'];
+        $endTs = strtotime($dateRange['endDate']);
+        $startTs = strtotime($dateRange['startDate']);
 
-        $endTs = strtotime($endDate);
-        $startTs = strtotime($startDate);
+        $endTs = $endTs - ($endTs % $step);
+        $startTs = $startTs - ($startTs % $step);
 
         $ox = $params[0];
 
-        while ($endTs > $startTs) {
-            $dt = date('Y-m-d', $startTs);
+        while ($endTs >= $startTs) {
+            $itemIdx = array_search($startTs, $ox);
 
-            $itemIndex = array_search($dt, $ox);
-            $isExists = $itemIndex !== false;
-
-            $data[0][] = $this->formatDay($dt);
+            $data[0][] = $startTs;
 
             for ($i = 1; $i < $n; ++$i) {
-                if ($isExists) {
-                    $data[$i][] = $params[$i][$itemIndex];
-                } else {
-                    $data[$i][] = 0;
-                }
+                $data[$i][] = ($itemIdx !== false) ? $params[$i][$itemIdx] : 0;
             }
 
-            $startTs = strtotime('+1 day', $startTs);
+            $startTs += $step;
         }
 
         return $data;
     }
 
-    protected function formatDay(string $dt) {
-        $ts = strtotime($dt);
-        $dt = date('Y-m-d', $ts);
-
-        return strtotime($dt);
-    }
-
     protected function execute(string $query, int $apiKey): array {
         $request = $this->f3->get('REQUEST');
+
+        // do not use offset because :start_time/:end_time compared with UTC db timestamps
         $dateRange = $this->getDatesRange($request);
 
-        //Search request does not contain daterange param
+        // Search request does not contain daterange param
         if (!$dateRange) {
             $dateRange = [
                 'endDate' => date('Y-m-d H:i:s'),
-                'startDate' => '1970-01-01',
+                'startDate' => date('Y-m-d H:i:s', 0),
             ];
         }
 
+        $offset = \Utils\TimeZones::getCurrentOperatorOffset();
+
         $params = [
-            ':api_key' => $apiKey,
-            ':end_time' => $dateRange['endDate'],
-            ':start_time' => $dateRange['startDate'],
+            ':api_key'      => $apiKey,
+            ':end_time'     => $dateRange['endDate'],
+            ':start_time'   => $dateRange['startDate'],
+            ':resolution'   => $this->getResolution($request),
+            ':offset'       => strval($offset),     // str for postgres
         ];
 
         return $this->execQuery($query, $params);

@@ -39,7 +39,7 @@ class Rules {
         89  => ['uid' => 'B10', 'name' => 'Dormant account (1 year)', 'description' => 'The account has been inactive for a year.', 'attributes' => []],
         76  => ['uid' => 'B11', 'name' => 'New account (1 day)', 'description' => 'The account has been created today.', 'attributes' => []],
         77  => ['uid' => 'B12', 'name' => 'New account (1 week)', 'description' => 'The account has been created this week.', 'attributes' => []],
-        95  => ['uid' => 'B13', 'name' => 'New account (1 month)', 'description' => 'The account has been created this week.', 'attributes' => []],
+        95  => ['uid' => 'B13', 'name' => 'New account (1 month)', 'description' => 'The account has been created this month.', 'attributes' => []],
         80  => ['uid' => 'B14', 'name' => 'Aged account (>30 days)', 'description' => 'The account has been created over 30 days ago.', 'attributes' => []],
         93  => ['uid' => 'B15', 'name' => 'Aged account (>90 days)', 'description' => 'The account has been created over 90 days ago.', 'attributes' => []],
         94  => ['uid' => 'B16', 'name' => 'Aged account (>180 days)', 'description' => 'The account has been created over 180 days ago.', 'attributes' => []],

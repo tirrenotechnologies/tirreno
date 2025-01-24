@@ -9,7 +9,7 @@ export class PayloadsGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [];
 
-        this.payloadsColumns.forEach( (column, index) => {
+        this.payloadsColumns.forEach((column, index) => {
             columnDefs.push({
                 className: `${column.innerHTML}-col`,
                 targets: index
@@ -22,7 +22,7 @@ export class PayloadsGrid extends BaseGrid {
     get columns() {
         const columns = [];
 
-        this.payloadsColumns.forEach( column => {
+        this.payloadsColumns.forEach(column => {
             columns.push({data: column.innerHTML});
         });
 

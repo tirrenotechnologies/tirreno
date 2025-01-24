@@ -1,8 +1,9 @@
 <check if="{{ isset(@SYSTEM_MESSAGES) && count(@SYSTEM_MESSAGES) }}">
-  <div class="notification system is-warning">
     {~ foreach (@SYSTEM_MESSAGES as @id=>@message): ~}
-        <span class="faded">[{{ \Utils\ElapsedDate::short(@message.created_at) }}]</span>&nbsp;&nbsp;{{ @message.text | raw }}
-    {~ endforeach ~}<button class="delete"></button>
-  </div>
+        <div class="notification system is-warning" id="system-notification-{{ @id }}">
+            <span class="faded">[{{ \Utils\ElapsedDate::short(@message.created_at) }}]</span>&nbsp;&nbsp;{{ @message.text | raw }}<button class="delete"></button>
+        </div>
+    {~ endforeach ~}
 </check>
 <div class="notification system is-danger is-hidden" id="client-error"></div>
+

@@ -75,7 +75,7 @@ export class DomainsGrid extends BaseGrid {
                 name: 'tranco_rank',
                 render: (data, type, record) => {
                     let rank = renderDefaultIfEmpty(data);
-                    if(data) {
+                    if (data) {
                         rank = data;
                     }
 
@@ -101,7 +101,7 @@ export class DomainsGrid extends BaseGrid {
                 render: (data, type, record) => {
                     const creation_date = record.creation_date;
 
-                    if(creation_date) {
+                    if (creation_date) {
                         return renderDate(creation_date);
                     } else {
                         return renderDefaultIfEmpty(creation_date);

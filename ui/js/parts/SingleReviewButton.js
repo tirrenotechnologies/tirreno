@@ -10,11 +10,11 @@ export class SingleReviewButton {
         const me = this;
         const onButtonClick = this.onButtonClick.bind(this);
 
-        if(me.legitFraudButtonsBlock) {
+        if (me.legitFraudButtonsBlock) {
             //Get HTML w/ new fraud&legit buttons
             let fraud = null;
-            if('true'  == me.legitFraudButtonsBlock.dataset.userFraud) fraud = true;
-            if('false' == me.legitFraudButtonsBlock.dataset.userFraud) fraud = false;
+            if ('true'  == me.legitFraudButtonsBlock.dataset.userFraud) fraud = true;
+            if ('false' == me.legitFraudButtonsBlock.dataset.userFraud) fraud = false;
 
             const record = {reviewed: true, accountid: me.userId, fraud: fraud};
 
@@ -24,15 +24,15 @@ export class SingleReviewButton {
             me.legitFraudButtonsBlock.innerHTML = html;
         }
 
-        if(me.reviewedButton) {
+        if (me.reviewedButton) {
             this.reviewedButton.addEventListener('click', onButtonClick, false);
         }
 
-        if(me.legitButton) {
+        if (me.legitButton) {
             this.legitButton.addEventListener('click', onButtonClick, false);
         }
 
-        if(me.fraudButton) {
+        if (me.fraudButton) {
             this.fraudButton.addEventListener('click', onButtonClick, false);
         }
     }
@@ -70,7 +70,7 @@ export class SingleReviewButton {
 
         target.classList.remove('is-loading');
 
-        if('reviewed-button' === target.id) {
+        if ('reviewed-button' === target.id) {
             //Get HTML w/ new fraud&legit buttons
             const record = {reviewed: true, accountid: me.userId};
 
@@ -82,19 +82,19 @@ export class SingleReviewButton {
 
             const onButtonClick = me.onButtonClick.bind(me);
 
-            if(me.legitButton) {
+            if (me.legitButton) {
                 me.legitButton.addEventListener('click', onButtonClick, false);
             }
 
-            if(me.fraudButton) {
+            if (me.fraudButton) {
                 me.fraudButton.addEventListener('click', onButtonClick, false);
             }
         }
 
         const buttonType = target.dataset.buttonType;
-        if('fraudButton' === buttonType) {
+        if ('fraudButton' === buttonType) {
             let reviewStatus = '';
-            if('fraud' === type) {
+            if ('fraud' === type) {
                 reviewStatus = 'Blacklisted';
                 me.fraudButton.classList.replace('is-neutral', 'is-highlighted');
                 me.fraudButton.setAttribute('disabled', '');

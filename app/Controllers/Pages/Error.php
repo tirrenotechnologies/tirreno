@@ -17,10 +17,12 @@ namespace Controllers\Pages;
 
 class Error extends Base {
     public function getPageParams($errorData): array {
+        $pageTitle = $this->getInternalPageTitleWithPostfix($errorData['code']);
+
         return [
             'HTML_FILE' => 'error.html',
             'ERROR_DATA' => $errorData,
-            'PAGE_TITLE' => '',
+            'PAGE_TITLE' => $pageTitle,
         ];
     }
 }

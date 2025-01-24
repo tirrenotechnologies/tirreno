@@ -18,9 +18,13 @@ namespace Utils;
 class VersionControl {
     public const versionMajor = 0;
     public const versionMinor = 9;
-    public const versionRevision = 0;
+    public const versionRevision = 1;
 
     public static function versionString(): string {
         return sprintf('%d.%d.%d', self::versionMajor, self::versionMinor, self::versionRevision);
+    }
+
+    public static function fullVersionString(): string {
+        return sprintf('v%d.%d.%d', self::versionMajor, self::versionMinor, self::versionRevision);
     }
 }

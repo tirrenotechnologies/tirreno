@@ -20,12 +20,13 @@
 
             <div class="control has-icons-left">
                 <span class="dateselector">
-                    <a href="javascript:void(0);" data-type="d" data-value="1">1D</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="3">3D</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="7" class="active">1W</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="14">2W</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="30">1M</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="90">3M</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="1">1H</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="24">1D</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="72">3D</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="168" class="active">1W</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="336">2W</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="720">1M</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="2160">3M</a>
                     <a href="javascript:void(0);" data-type="d" data-value="0">MAX</a>
                 </span>
 
@@ -35,6 +36,7 @@
 
                 <input type="hidden" name="date_from" />
                 <input type="hidden" name="date_to" />
+                <input type="hidden" name="offset" value="{{ @OFFSET }}"/>
             </div>
 
     </check>
@@ -42,7 +44,7 @@
     <check if="{{ @USE_RANGE }}">
         <div class="field">
             <p class="control has-icons-left">
-                <input type="datetime-local" class="input" name="date_from" step="1">
+                <input type="datetime-local" class="input" name="date_from_local" step="1">
                 <span class="icon">
                     <include href="images/icons/calendar.svg" />
                 </span>
@@ -51,11 +53,15 @@
 
         <div class="field">
             <p class="control has-icons-left">
-                <input type="datetime-local" class="input" name="date_to" step="1">
+                <input type="datetime-local" class="input" name="date_to_local" step="1">
                 <span class="icon">
                     <include href="images/icons/calendar.svg" />
                 </span>
             </p>
         </div>
+
+        <input type="hidden" name="date_from" />
+        <input type="hidden" name="date_to" />
+        <input type="hidden" name="offset" value="{{ @OFFSET ?? 0 }}"/>
     </check>
 </nav>

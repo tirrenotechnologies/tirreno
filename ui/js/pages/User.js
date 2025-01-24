@@ -130,7 +130,7 @@ export class UserPage extends BasePage {
 
         const emailPanel    = new EmailPanel();
         const phonePanel    = new PhonePanel();
-        const devicePanel   = new DevicePanel()
+        const devicePanel   = new DevicePanel();
         const reenrichment  = new ReenrichmentButton();
         const countriesMap  = new Map(mapParams);
         const barChart      = new BaseBarChart(chartParams);

@@ -16,24 +16,21 @@
 namespace Traits;
 
 trait DateRange {
-    public function getDatesRangeByGivenDates(string $startDate, string $endDate): array {
-        $endDate = strtotime($endDate);
-        $startDate = strtotime($startDate);
-
+    public function getDatesRangeByGivenDates(string $startDate, string $endDate, int $offset): array {
         return [
-            'endDate' => date('Y-m-d H:i:s', $endDate),
-            'startDate' => date('Y-m-d H:i:s', $startDate),
+            'endDate' => date('Y-m-d H:i:s', strtotime($endDate) + $offset),
+            'startDate' => date('Y-m-d H:i:s', strtotime($startDate) + $offset),
         ];
     }
 
-    public function getDatesRange(array $request): ?array {
+    public function getDatesRange(array $request, int $offset = 0): ?array {
         $dates = null;
         $dateTo = $request['dateTo'] ?? null;
         $dateFrom = $request['dateFrom'] ?? null;
         $keepDates = $request['keepDates'] ?? null;
 
         if ($dateTo && $dateFrom) {
-            $dates = $this->getDatesRangeByGivenDates($dateFrom, $dateTo);
+            $dates = $this->getDatesRangeByGivenDates($dateFrom, $dateTo, $offset);
 
             $endDate = null;
             $startDate = null;
@@ -50,10 +47,16 @@ trait DateRange {
         return $dates;
     }
 
-    public function getLatest180DatesRange(): array {
+    public function getLatest180DatesRange(int $offset = 0): array {
         return [
-            'endDate' => date('Y-m-d 23:59:59'),
-            'startDate' => date('Y-m-d 00:00:01', strtotime('-180 day')),
+            'endDate' => date('Y-m-d 23:59:59', time() + $offset),
+            'startDate' => date('Y-m-d 00:00:01', time() - (180 * 24 * 60 * 60) + $offset),
         ];
+    }
+
+    public function getResolution(array $request): string {
+        $resolution = $request['resolution'] ?? 'day';
+
+        return array_key_exists($resolution, \Utils\Constants::CHART_RESOLUTION) ? $resolution : 'day';
     }
 }

@@ -1,5 +1,6 @@
-Release song: https://youtu.be/OXeh742_jak
+Release song: https://youtu.be/5TySnF_Pb3M
 
-We are thrilled to announce the release of Tirreno version 0.9.0! This marks a significant milestone in our 
-journey and is the result of 1,000 days of dedicated development and over 6,038 commits. We're incredibly
-proud of the collective effort of the Tirreno team to bring this project to life.
+Tirreno is pleased to announce version v0.9.1.
+
+This update enhances data plotting with hour and minute resolutions,
+improves JS linting and dependency security, and fixes minor bugs including logbook search issues.

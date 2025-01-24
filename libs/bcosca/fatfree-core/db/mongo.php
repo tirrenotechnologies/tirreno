@@ -130,7 +130,7 @@ class Mongo {
 	*	@param $dbname string
 	*	@param $options array
 	**/
-	function __construct($dsn,$dbname,array $options=NULL) {
+	function __construct($dsn,$dbname,?array $options=NULL) {
 		$this->uuid=\Base::instance()->hash($this->dsn=$dsn);
 		if ($this->legacy=class_exists('\MongoClient')) {
 			$this->db=new \MongoDB(new \MongoClient($dsn,$options?:[]),$dbname);

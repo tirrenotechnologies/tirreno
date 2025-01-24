@@ -1,8 +1,8 @@
 <include href="templates/parts/header.html" />
 <section class="front-block">
 
-    <div class="container">    
-        <code><span style="background:#8080AA;color:#2B2A3D;">&nbsp;A secret place!&nbsp;</span><br>  
+    <div class="container">
+        <code><span style="background:#8080AA;color:#2B2A3D;">&nbsp;A secret place!&nbsp;</span><br>
                     <check if="{{ isset(@ERROR_DATA) }}">
                         <true>
                             <p>* {{ @ERROR_DATA.message }}</p>

@@ -64,7 +64,7 @@ const wrapWithCountryDiv = html => {
 };
 
 const wrapWithImportantSpan = (html, record) => {
-    if(record.is_important) {
+    if (record.is_important) {
         html = `<span class="importantUser">${html}</span>`;
     }
 
@@ -114,7 +114,7 @@ const wrapWithDomainLink = (html, record) => {
 };
 
 const wrapWithFraudSpan = (html, record) => {
-    if(record.fraud_detected) {
+    if (record.fraud_detected) {
         html = `<span class="fraud">${html}</span>`;
     }
 
@@ -130,13 +130,13 @@ const normalizeTimestamp = (ts) => {
 };
 
 const renderTime = (data) => {
-    if(data) {
+    if (data) {
         data = normalizeTimestamp(data);
     }
 
     const dt = new Date(data);
 
-    if(dt instanceof Date && !isNaN(dt)) {
+    if (dt instanceof Date && !isNaN(dt)) {
         let [month, day, year] = [
             dt.getMonth() + 1,
             dt.getDate(),
@@ -164,7 +164,7 @@ const renderTime = (data) => {
 
 const renderTimeMs = (data) => {
     let milliseconds = 0;
-    if(data) {
+    if (data) {
         //Fix for ie and safari: https://www.linkedin.com/pulse/fix-invalid-date-safari-ie-hatem-ahmad
         data = data.replace(/-/g, '/');
         const s = data.split('.');
@@ -176,7 +176,7 @@ const renderTimeMs = (data) => {
 
     const dt = new Date(data);
 
-    if(dt instanceof Date && !isNaN(dt)) {
+    if (dt instanceof Date && !isNaN(dt)) {
         let [month, day, year] = [
             dt.getMonth() + 1,
             dt.getDate(),
@@ -204,7 +204,7 @@ const renderTimeMs = (data) => {
 };
 
 const renderDate = (data) => {
-    if(data) {
+    if (data) {
         data = normalizeTimestamp(data);
     } else {
         data = renderDefaultIfEmpty(data);
@@ -213,7 +213,7 @@ const renderDate = (data) => {
 
     const dt = new Date(data);
 
-    if(dt instanceof Date && !isNaN(dt)) {
+    if (dt instanceof Date && !isNaN(dt)) {
         let [month, day, year] = [
             dt.getMonth() + 1,
             dt.getDate(),
@@ -270,7 +270,7 @@ const renderHttpCode = record => {
     let html;
     const code = record.http_code;
 
-    if(code) {
+    if (code) {
         let tooltip = '';
 
         switch (Math.floor(code / 100)) {
@@ -344,11 +344,11 @@ const checkErrorEventType = record => {
 const renderBoolean = (data) => {
     let value = null;
 
-    if(false === data) {
+    if (false === data) {
         value = '<span class="nolight">No</span>';
     }
 
-    if(true === data) {
+    if (true === data) {
         value = '<span class="highlight">Yes</span>';
     }
 
@@ -364,7 +364,7 @@ const renderProportion = (n, t) => {
     const tooltip = t ? `Last updated: ${renderDate(t)}` : '&minus;';
 
     return `<span class="tooltip" title="${tooltip}">${number}</span>`;
-}
+};
 
 const renderUserScore = record => {
     const score = (record.score !== null && record.score !== undefined) ? record.score : '&minus;';
@@ -379,7 +379,7 @@ const renderUserScore = record => {
         cls = 'medium';
     }
 
-    if(score >= USER_LOW_TRUST_SCORE_INF && score < USER_LOW_TRUST_SCORE_SUP) {
+    if (score >= USER_LOW_TRUST_SCORE_INF && score < USER_LOW_TRUST_SCORE_SUP) {
         cls = 'low';
     }
 
@@ -394,7 +394,7 @@ const renderUserScore = record => {
 const renderUserId = (value) => {
     let html = '';
 
-    if(value) {
+    if (value) {
         html = truncateWithHellip(value, MAX_STRING_USERID_LENGTH_IN_TABLE);
     }
 
@@ -529,7 +529,7 @@ const renderUserReviewedStatus = record => {
 
     let html = reviewStatus;
 
-    if(record.reviewed && record.fraud !== null) {
+    if (record.reviewed && record.fraud !== null) {
         if (true === record.fraud) {
             reviewStatus = 'Blacklisted';
         }
@@ -546,7 +546,7 @@ const renderUserReviewedStatus = record => {
 
 const renderUserActionButtons = record => {
     let html;
-    if(record.reviewed) {
+    if (record.reviewed) {
         html = getFraudLegitButtons(record);
     } else {
         html = getToBeReviewedButton(record);
@@ -573,7 +573,7 @@ const getFraudLegitButtons = record => {
     let fraudBtnDisabled = '';
     let legitBtnDisabled = '';
 
-    if(true === record.fraud) {
+    if (true === record.fraud) {
         fraudBtnCls = 'is-highlighted';
         legitBtnCls = 'is-neutral';
 
@@ -581,7 +581,7 @@ const getFraudLegitButtons = record => {
         legitBtnDisabled = '';
     }
 
-    if(false === record.fraud) {
+    if (false === record.fraud) {
         fraudBtnCls = 'is-neutral';
         legitBtnCls = 'is-highlighted';
 
@@ -655,7 +655,7 @@ const renderEmail = (record, length = MAX_STRING_LENGTH_FOR_EMAIL) => {
     let html;
     const email = record.email;
 
-    if(email) {
+    if (email) {
         const n = (length === MAX_STRING_LENGTH_FOR_EMAIL) ? length : getNumberOfSymbols(length);
 
         const value = truncateWithHellip(email, n);
@@ -685,9 +685,9 @@ const renderReputation = record => {
     let reputation = record.reputation;
     let text = reputation.charAt(0).toUpperCase() + reputation.slice(1);
 
-    if('low' === reputation)    icon = 'reputation-low';
-    if('medium' === reputation) icon = 'reputation-medium';
-    if('high' === reputation)   icon = 'reputation-high';
+    if ('low' === reputation)    icon = 'reputation-low';
+    if ('medium' === reputation) icon = 'reputation-medium';
+    if ('high' === reputation)   icon = 'reputation-high';
 
     const html = `<img class="tooltip" title="${reputation}" src="/ui/images/icons/${icon}.svg" alt="${reputation}">${text}`;
 
@@ -699,7 +699,7 @@ const renderPhone = (record) => {
     let html;
     const phone = record.phonenumber;
 
-    if(phone) {
+    if (phone) {
         const code = !COUNTRIES_EXCEPTIONS.includes(record.country) ? record.country : 'lh';
         const tooltip = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
 
@@ -726,7 +726,7 @@ const renderClickablePhone = record => {
 
 const renderFullCountry = value => {
     let html = '&#65293;';
-    if(value) {
+    if (value) {
         html = truncateWithHellip(value, MAX_STRING_LENGTH_FULL_COUNTRY);
     }
     return html;
@@ -736,7 +736,7 @@ const renderPhoneCarrierName = (record, length = 'medium') => {
     let html;
     let carrierName = record.carrier_name;
 
-    if(carrierName) {
+    if (carrierName) {
         const n = getNumberOfSymbols(length);
         carrierName = carrierName.replace(',', '');
         html = truncateWithHellip(carrierName, n);
@@ -750,7 +750,7 @@ const renderPhoneType = record => {
     let html;
     const type = record.type;
 
-    if(type) {
+    if (type) {
         const n = getNumberOfSymbols();
         html = truncateWithHellip(type, n);
 
@@ -805,7 +805,7 @@ const renderResource = (value, tooltip) => {
 
 const renderResourceWithoutQuery = record => {
     let value = record.url;
-    if(record.title) {
+    if (record.title) {
         value = record.title;
     }
 
@@ -818,11 +818,11 @@ const renderResourceWithoutQuery = record => {
 const renderResourceWithQueryAndEventType = record => {
     let url = record.url;
 
-    if(record.query) {
+    if (record.query) {
         url = `${record.url}${record.query}`;
     }
 
-    if(url && url.length > MAX_TOOLTIP_URL_LENGTH) {
+    if (url && url.length > MAX_TOOLTIP_URL_LENGTH) {
         url = `${url.slice(0, MAX_TOOLTIP_URL_LENGTH)}&hellip;`;
     }
 
@@ -847,7 +847,7 @@ const renderIp = record => {
 
     let html = truncateWithHellip(record.ip, n);
     let name = record.isp_name;
-    if(name) {
+    if (name) {
         html = html.replace(/title=".*?"/, `title="${name}"`);
     }
     //html = wrapWithFraudSpan(html, record);
@@ -879,7 +879,7 @@ const renderIpWithCountry = record => {
     let ip = record.ip;
     const n = getNumberOfSymbols();
 
-    if(ip && ip.length > n) {
+    if (ip && ip.length > n) {
         ip = `${ip.slice(0, n)}&hellip;`;
     }
 
@@ -890,7 +890,7 @@ const renderClickableIpWithCountry = record => {
     let ip = record.ip;
     const n = getNumberOfSymbols();
 
-    if(ip && ip.length > n) {
+    if (ip && ip.length > n) {
         ip = `${ip.slice(0, n)}&hellip;`;
     }
 
@@ -924,19 +924,19 @@ const renderIpType = record => {
 const renderNetName = (record, length = 'default') => {
     let html = '';
 
-    if(record.netname) {
+    if (record.netname) {
         html = record.netname;
     }
 
-    if(!html && record.description) {
+    if (!html && record.description) {
         html = record.description;
     }
 
-    if(!html && record.asn) {
+    if (!html && record.asn) {
         html = record.asn;
     }
 
-    if(html) {
+    if (html) {
         const regex = /-|_/ig;
         html = html.replace(regex, ' ');
 
@@ -1077,21 +1077,21 @@ const renderLanguage = record => {
     const language  = record.lang;
     const languages = parse(language);
 
-    const rec1 = languages.find( record => record.code);
-    const rec2 = languages.find( record => record.region);
+    const rec1 = languages.find(record => record.code);
+    const rec2 = languages.find(record => record.region);
 
     let codeAndRegion = [];
 
-    if(rec1) {
+    if (rec1) {
         codeAndRegion.push(rec1.code.toUpperCase());
     }
 
-    if(rec2) {
+    if (rec2) {
         codeAndRegion.push(rec2.region.toUpperCase());
     }
 
     codeAndRegion = codeAndRegion.join('-');
-    if(codeAndRegion) {
+    if (codeAndRegion) {
         codeAndRegion = `<span class="nolight">${codeAndRegion}</span>`;
     }
 
@@ -1103,11 +1103,11 @@ const renderLanguage = record => {
 const renderOs = record => {
     let os = record.os;
 
-    if('string' == typeof os) {
+    if ('string' == typeof os) {
         os = os.trim();
     }
 
-    if(os) {
+    if (os) {
         os = truncateWithHellip(os, MAX_STRING_LENGTH_FOR_TILE);
     }
 
@@ -1126,7 +1126,7 @@ const renderClickableOs = record => {
 const renderDomain = (record, length = 'short') => {
     let domain = record.domain;
 
-    if(domain) {
+    if (domain) {
         const n = getNumberOfSymbols(length);
         domain = truncateWithHellip(domain, n);
     }
@@ -1146,11 +1146,11 @@ const renderClickableDomain = (record, length = 'short') => {
 const renderBrowser = record => {
     let browser = record.browser;
 
-    if('string' == typeof browser) {
+    if ('string' == typeof browser) {
         browser = browser.trim();
     }
 
-    if(browser) {
+    if (browser) {
         browser = browser.split('.');
         browser = browser[0].trim();
 
@@ -1174,7 +1174,7 @@ const renderUserAgent = record => {
 };
 
 const renderDefaultIfEmpty = (value) => {
-    if(value) {
+    if (value) {
         return value;
     }
 
@@ -1236,7 +1236,7 @@ const renderSensorErrorColumn = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join('; ') : null;
     return truncateWithHellip(renderDefaultIfEmpty(s), MAX_STRING_LONG_NETNAME_IN_TABLE);
-}
+};
 
 const renderSensorError = record => {
     const obj = openJson(record.error_text);

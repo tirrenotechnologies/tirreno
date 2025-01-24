@@ -20,7 +20,6 @@ class Logout extends Base {
 
     public function getPageParams() {
         $pageParams = [
-            'PAGE_TITLE'    => $this->f3->get('Logout_page_title'),
             'HTML_FILE'     => 'logout.html',
             'JS'            => 'user_main.js',
         ];

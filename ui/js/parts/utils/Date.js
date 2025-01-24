@@ -6,10 +6,10 @@ const addDays = (date, days) => {
 };
 
 const addHours = (date, hours) => {
-    hours = hours * 60 * 60 * 1000;
+    const ms = hours * 60 * 60 * 1000;
 
     const dateCopy = new Date(date);
-    dateCopy.setTime(date.getTime() + hours);
+    dateCopy.setTime(date.getTime() + ms);
 
     return dateCopy;
 };
@@ -31,23 +31,48 @@ const notificationTime = () => {
     return `[${day}/${month}/${year} ${hours}:${minutes}:${seconds}]`;
 };
 
-const format_ymdThis = (dt, useTime) => {
+// offsetInSeconds is not inverted as .getTimezoneOffset() result
+const formatIntTimeUtc = (ts, useTime, offsetInSeconds = 0, utcAlready = false) => {
+    const dt = new Date(ts + ((new Date()).getTimezoneOffset() * 60 + offsetInSeconds) * 1000);
+
     let m = dt.getMonth() + 1;
     let d = dt.getDate();
     let y = dt.getFullYear();
-    let h = useTime ? dt.getHours()   : 0;
-    let i = useTime ? dt.getMinutes() : 0;
-    let s = useTime ? dt.getSeconds() : 0;
-
     m = padZero(m);
     d = padZero(d);
     y = padZero(y, 4);
+
+    if (!useTime) {
+        return `${d}/${m}/${y}`;
+    }
+
+    let h = dt.getHours();
+    let i = dt.getMinutes();
+    let s = dt.getSeconds();
     h = padZero(h);
     i = padZero(i);
     s = padZero(s);
 
-    const dateStr = `${y}-${m}-${d}T${h}:${i}:${s}`;
-    return dateStr;
+    return `${d}/${m}/${y} ${h}:${i}:${s}`;
 };
 
-export {format_ymdThis, notificationTime, padZero, addDays, addHours};
+const formatStringTime = (dt) => {
+
+    let m = dt.getMonth() + 1;
+    let d = dt.getDate();
+    let y = dt.getFullYear();
+    m = padZero(m);
+    d = padZero(d);
+    y = padZero(y, 4);
+
+    let h = dt.getHours();
+    let i = dt.getMinutes();
+    let s = dt.getSeconds();
+    h = padZero(h);
+    i = padZero(i);
+    s = padZero(s);
+
+    return `${y}-${m}-${d}T${h}:${i}:${s}`;
+};
+
+export {formatIntTimeUtc, formatStringTime, notificationTime, padZero, addDays, addHours};

@@ -7,7 +7,7 @@ export class StaticTiles {
         this.config = tilesParams;
         this.loaders = {};
 
-        this.config.elems.forEach( elem => {
+        this.config.elems.forEach(elem => {
             me.loaders[elem] = new Loader();
         });
 

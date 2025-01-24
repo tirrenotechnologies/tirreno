@@ -40,7 +40,7 @@ export class Map {
                 }
             },
 
-            onRegionTipShow: function(e, el, code){
+            onRegionTipShow: function(e, el, code) {
                 onRegionTipShow(el, code);
             },
 
@@ -64,9 +64,9 @@ export class Map {
         const me = this;
         const regions = {};
 
-        records.forEach( rec => {
+        records.forEach(rec => {
             const country = rec.country;
-            if(!regions[country]) {
+            if (!regions[country]) {
                 regions[country] = 0;
             }
 
@@ -89,7 +89,7 @@ export class Map {
 
         //Remove countries which does not exist in the vectormap: MU, BH, etc...
         for (const [key, value] of Object.entries(regions)) {
-            if( !map.regions.hasOwnProperty(key) ) {
+            if (!map.regions.hasOwnProperty(key)) {
                 delete regions[key];
             }
         }
@@ -124,7 +124,7 @@ export class Map {
     }
 
     onCountriesListLoaded(data, status) {
-        if('success' == status) {
+        if ('success' == status) {
             const me = this.scope;
 
             const tileId  = 'totalCountries';
@@ -144,7 +144,7 @@ export class Map {
         value = value ? value : 0;
 
         let string = this.config.tooltipString;
-        if(1 !== value) {
+        if (1 !== value) {
             string += 's';
         }
 

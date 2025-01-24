@@ -23,7 +23,7 @@
     <!-- Enforce brace placement for class declarations -->
     <rule ref="PSR12">
         <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine" />
-    </rule>    
+    </rule>
     <rule ref="Generic.Classes.OpeningBraceSameLine"/>
 
     <!-- Prevent alignment sniffs from flagging aligned code -->
@@ -43,6 +43,10 @@
         <exclude name="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
         <exclude name="Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase"/>
     </rule>
+
+    <!-- Enforce no spaces after `[/(` and before `]/)` -->
+    <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
+    <rule ref="Squiz.WhiteSpace.ControlStructureSpacing"/>
 
     <!-- Name php, js and html files in CamelCase -->
 

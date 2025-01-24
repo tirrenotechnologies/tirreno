@@ -1,29 +1,39 @@
 import {fireEvent} from './utils/Event.js?v=2';
-import {format_ymdThis, addDays} from './utils/Date.js?v=2';
+import {formatStringTime, addDays, addHours} from './utils/Date.js?v=2';
 import {debounce} from './utils/Functions.js?v=2';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {DAYS_IN_RANGE} from './utils/Constants.js?v=2';
 
 export class DatesFilter {
-
     constructor() {
         this.setupXhrPool();
+        this.offset = (this.offsetField) ? parseInt(this.offsetField.value) : 0;
 
-        if(this.isDateFilterUnavailable) {
+        if (this.isDateFilterUnavailable) {
             return true;
         }
 
-        if(!this.dateFromField.value && !this.dateToField.value) {
+        if (this.dateToLocalField !== null && this.dateFromLocalField !== null) {
+            // visible fields change should set invisible fields
+            this.onTimestampFieldChange = this.onTimestampFieldChange.bind(this);
+            const debouncedOnTimestampFieldChange = debounce(this.onTimestampFieldChange);
+
+            this.dateToLocalField.addEventListener('change', debouncedOnTimestampFieldChange, false);
+            this.dateFromLocalField.addEventListener('change', debouncedOnTimestampFieldChange, false);
+
+            this.setDefaultLocalDates();
+            this.setDefaultDates();
+        } else if (!this.dateFromField.value && !this.dateToField.value) {
             this.setDefaultDates();
         }
 
-        this.onDateFilterChange = this.onDateFilterChange.bind(this);
-        const debouncedOnDateFilterChange = debounce(this.onDateFilterChange);
+        const onDateFilterChange = this.onDateFilterChange.bind(this);
 
-        this.dateToField.addEventListener('change', debouncedOnDateFilterChange, false);
-        this.dateFromField.addEventListener('change', debouncedOnDateFilterChange, false);
+        this.dateToField.addEventListener('change', onDateFilterChange, false);
+        this.dateFromField.addEventListener('change', onDateFilterChange, false);
 
         const onIntervalLinkClick = this.onIntervalLinkClick.bind(this);
-        this.intervalLinks.forEach( item => item.addEventListener('click', onIntervalLinkClick, false));
+        this.intervalLinks.forEach(item => item.addEventListener('click', onIntervalLinkClick, false));
     }
 
     setupXhrPool() {
@@ -50,23 +60,52 @@ export class DatesFilter {
         });
     }
 
-    getDateRange(dateFrom, dateTo, useFromTime) {
-        const localDateTo   = this.formatDt(dateTo, true);
-        const localDateFrom = this.formatDt(dateFrom, useFromTime);
-
-        return {localDateFrom, localDateTo};
-    }
-
     setDefaultDates() {
-        const days     = -DAYS_IN_RANGE;
-        const dateTo   = new Date();
-        const dateFrom = addDays(dateTo, days);
-
-        // override H:i:s part with 00:00:00 to avoid zero values for first day on chart
-        this.setDateRange(dateFrom, dateTo, false);
+        this.setDateRangeFromNow(DAYS_IN_RANGE * 24);
     }
 
-    onDateFilterChange({target}) {
+    setDefaultLocalDates() {
+        let dateTo = new Date();
+        dateTo = new Date(dateTo.getTime() + (dateTo.getTimezoneOffset() * 60 + this.offset) * 1000); // now time in op tz
+
+        const dateFrom = addDays(dateTo, -DAYS_IN_RANGE); // dateFrom in op tz
+        dateFrom.setHours(0, 0, 0, 0);
+
+        this.dateToLocalField.value   = formatStringTime(dateTo);
+        this.dateFromLocalField.value = formatStringTime(dateFrom);
+    }
+
+    onTimestampFieldChange(e) {
+        // get value (with offset)
+        // set normal input exluding offset
+        e.preventDefault();
+
+        const input = e.target;
+
+        $.xhrPool.abortAll();
+
+        const type  = input.type;
+        const value = input.value;
+        const name  = input.name;
+
+        let target = null;
+
+        if (name === 'date_from_local') {
+            target = this.dateFromField;
+        } else if (name === 'date_to_local') {
+            target = this.dateToField;
+        }
+
+        let dt = new Date(value);
+        dt = new Date(dt.getTime() - this.offset * 1000); // shift fom op tz to utc
+
+        target.value = formatStringTime(dt);
+
+        this.onDateFilterChange(e);
+        return false;
+    }
+
+    onDateFilterChange() {
         $.xhrPool.abortAll();
         fireEvent('dateFilterChanged');
     }
@@ -77,7 +116,7 @@ export class DatesFilter {
             dateFrom: null
         };
 
-        if(this.isDateFilterUnavailable) {
+        if (this.isDateFilterUnavailable) {
             return data;
         }
 
@@ -85,54 +124,57 @@ export class DatesFilter {
         data['dateFrom'] = this.dateFromField.value;
 
         const rangeWasChanged = (1 == this.dateFromField.dataset.changed) || (1 == this.dateToField.dataset.changed);
-        if(rangeWasChanged) {
+        if (rangeWasChanged) {
             data['keepDates'] = 1;
         }
 
         return data;
     }
 
-    formatDt(dt, useTime) {
-        const dateStr = format_ymdThis(dt, useTime);
-
-        return dateStr;
-    }
-
     onIntervalLinkClick(e) {
         e.preventDefault();
 
         const link = e.target;
-        if(link.classList.contains('active')) {
+        if (link.classList.contains('active')) {
             return false;
         }
 
         $.xhrPool.abortAll();
 
         const type  = link.dataset.type;
-        const value = -link.dataset.value;
+        const value = link.dataset.value;
 
-        let dateTo   = new Date();
-        let dateFrom = addDays(dateTo, value);
-
-        if(0 == value) {
+        if (value == 0) {
             this.clearDateRange();
         } else {
-            this.setDateRange(dateFrom, dateTo, false);
+            this.setDateRangeFromNow(value);
         }
 
         this.intervalLinks.forEach(item => item.classList.remove('active'));
         link.classList.add('active');
 
-        this.onDateFilterChange(e);
+        this.onDateFilterChange();
 
         return false;
     }
 
-    setDateRange(dateFrom, dateTo, useFromTime) {
-        const {localDateFrom, localDateTo} = this.getDateRange(dateFrom, dateTo, useFromTime);
+    // with op tz and utc shift for calculation request
+    setDateRangeFromNow(hoursDiff) {
+        let dateTo = new Date();
+        dateTo = new Date(dateTo.getTime() + (dateTo.getTimezoneOffset() * 60 + this.offset) * 1000); // now time in op tz
+        let dateFrom = addHours(dateTo, -hoursDiff); // dateFrom in op tz
+        // floor to not miss data in group
+        if (hoursDiff < 24 && hoursDiff > -24) {
+            dateFrom.setMinutes(0, 0, 0);
+        } else {
+            dateFrom.setHours(0, 0, 0, 0);
+        }
 
-        this.dateToField.value   = localDateTo;
-        this.dateFromField.value = localDateFrom;
+        dateTo = new Date(dateTo.getTime() - (this.offset * 1000)); // dateTo at utc
+        dateFrom = new Date(dateFrom.getTime() - (this.offset * 1000)); // dateFrom at utc
+
+        this.dateToField.value = formatStringTime(dateTo);
+        this.dateFromField.value = formatStringTime(dateFrom);
     }
 
     clearDateRange() {
@@ -141,7 +183,7 @@ export class DatesFilter {
     }
 
     get isDateFilterUnavailable() {
-        return !this.dateFromField || !this.dateToField;
+        return this.dateFromField === null || this.dateToField === null;
     }
 
     get intervalLinks() {
@@ -152,11 +194,23 @@ export class DatesFilter {
         return document.querySelector('nav.filtersForm.daterange');
     }
 
+    get offsetField() {
+        return document.querySelector('input[name="offset"]');
+    }
+
     get dateToField() {
         return document.querySelector('input[name="date_to"]');
     }
 
     get dateFromField() {
         return document.querySelector('input[name="date_from"]');
+    }
+
+    get dateToLocalField() {
+        return document.querySelector('input[name="date_to_local"]');
+    }
+
+    get dateFromLocalField() {
+        return document.querySelector('input[name="date_from_local"]');
     }
 }

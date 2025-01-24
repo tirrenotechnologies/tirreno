@@ -21,7 +21,7 @@ class Phones extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'day');
+        $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'phone_count');
 
         return $this->addEmptyDays([$ox, $l1]);
@@ -29,23 +29,19 @@ class Phones extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event_phone.lastseen)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_phone.lastseen + :offset))::bigint AS ts,
                 COUNT(*) AS phone_count
-
             FROM
                 event_phone
 
             WHERE
-                event_phone.key = :api_key
-                AND event_phone.lastseen >= :start_time
-                AND event_phone.lastseen <= :end_time
+                event_phone.key = :api_key AND
+                event_phone.lastseen >= :start_time AND
+                event_phone.lastseen <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

@@ -13,7 +13,7 @@ export class BlacklistGridActionButtons {
         const buttons = document.querySelectorAll(`#${tableId} button`);
 
         const onButtonClick = this.onButtonClick.bind(this);
-        buttons.forEach( button => button.addEventListener('click', onButtonClick, false));
+        buttons.forEach(button => button.addEventListener('click', onButtonClick, false));
     }
 
     onButtonClick(e) {
@@ -47,7 +47,7 @@ export class BlacklistGridActionButtons {
     }
 
     onSuccess(dta, status) {
-        if('success' !== status) {
+        if ('success' !== status) {
             return;
         }
 
@@ -65,7 +65,7 @@ export class BlacklistGridActionButtons {
 
         let total = parseInt(span.innerHTML);
 
-        if(total > 0) {
+        if (total > 0) {
             total -= 1;
         }
 

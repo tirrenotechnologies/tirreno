@@ -21,7 +21,7 @@ class Bots extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'day');
+        $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'bot_count');
 
         return $this->addEmptyDays([$ox, $l1]);
@@ -29,28 +29,26 @@ class Bots extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(DISTINCT (
                     CASE WHEN event_ua_parsed.modified IS TRUE THEN event.device END)
                 ) AS bot_count
-
             FROM
                 event
+
             INNER JOIN event_device
             ON(event.device = event_device.id)
             INNER JOIN event_ua_parsed
             ON(event_device.user_agent=event_ua_parsed.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

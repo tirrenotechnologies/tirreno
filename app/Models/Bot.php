@@ -20,13 +20,13 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $query = (
-            'SELECT 
+            'SELECT
                 event_ua_parsed.id
 
-            FROM 
-                event_ua_parsed               
+            FROM
+                event_ua_parsed
 
-            WHERE 
+            WHERE
                 event_ua_parsed.key    = :api_key
                 AND event_ua_parsed.id = :ua_id'
         );
@@ -48,7 +48,7 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         ];
 
         $query = (
-            'SELECT 
+            'SELECT
                 event_ua_parsed.id,
                 event_ua_parsed.device,
                 event_ua_parsed.device AS title,
@@ -62,7 +62,7 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
             FROM
                 event_ua_parsed
 
-            WHERE 
+            WHERE
                 event_ua_parsed.key = :api_key AND
                 event_ua_parsed.id  = :ua_id'
         );
@@ -79,13 +79,13 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         ];
 
         $query = (
-            "SELECT 
+            "SELECT
                 COALESCE(event_ua_parsed.ua, '') AS value
 
-            FROM 
+            FROM
                 event_ua_parsed
 
-            WHERE 
+            WHERE
                 event_ua_parsed.key = :api_key
                 AND event_ua_parsed.id = :id
 

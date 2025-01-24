@@ -32,7 +32,8 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_CHOICES'          => true,
             'HTML_FILE'             => 'admin/users.html',
             'JS'                    => 'admin_users.js',
-            'rules'                 => $rulesController->getAllRulesByApiKey($apiKey),
+            'RULES'                 => $rulesController->getAllRulesByApiKey($apiKey),
+            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         $pageParams = parent::applyPageParams($pageParams);

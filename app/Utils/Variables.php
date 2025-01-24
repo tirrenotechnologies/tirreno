@@ -32,6 +32,10 @@ class Variables {
         return getenv('SITE') ?: self::getF3()->get('SITE');
     }
 
+    public static function getAdminEmail(): ?string {
+        return getenv('ADMIN_EMAIL') ?: self::getF3()->get('ADMIN_EMAIL');
+    }
+
     public static function getMailLogin(): ?string {
         return getenv('MAIL_LOGIN') ?: self::getF3()->get('MAIL_LOGIN');
     }

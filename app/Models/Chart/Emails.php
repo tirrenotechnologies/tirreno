@@ -21,7 +21,7 @@ class Emails extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'day');
+        $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'email_count');
         $l2 = array_column($data, 'blockemails_count');
 
@@ -30,13 +30,12 @@ class Emails extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(DISTINCT event.email) AS email_count,
                 COUNT(DISTINCT (
-                    CASE WHEN event_email.blockemails = 'True' THEN event.email END)
+                    CASE WHEN event_email.blockemails IS TRUE THEN event.email END)
                 ) AS blockemails_count
-
             FROM
                 event
 
@@ -44,15 +43,12 @@ class Emails extends Base {
             ON (event.email = event_email.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

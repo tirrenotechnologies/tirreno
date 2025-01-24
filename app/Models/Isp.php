@@ -288,7 +288,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                     event.key = :key
                 GROUP BY event_ip.isp
             ) AS sub
-            RIGHT JOIN event_isp sub_isp ON sub.isp = sub_isp.id 
+            RIGHT JOIN event_isp sub_isp ON sub.isp = sub_isp.id
             WHERE
                 event_isp.key = :key AND
                 event_isp.id = sub_isp.id AND

@@ -22,12 +22,13 @@ class Page extends \Controllers\Pages\Base {
         $searchPlacholder = $this->f3->get('AdminDomains_search_placeholder');
 
         $pageParams = [
-            'SEARCH_PLACEHOLDER' => $searchPlacholder,
-            'LOAD_UPLOT' => true,
-            'LOAD_DATATABLE' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/domains.html',
-            'JS' => 'admin_domains.js',
+            'SEARCH_PLACEHOLDER'    => $searchPlacholder,
+            'LOAD_UPLOT'            => true,
+            'LOAD_DATATABLE'        => true,
+            'LOAD_AUTOCOMPLETE'     => true,
+            'HTML_FILE'             => 'admin/domains.html',
+            'JS'                    => 'admin_domains.js',
+            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

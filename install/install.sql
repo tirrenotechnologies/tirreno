@@ -823,7 +823,7 @@ CREATE TABLE event_phone (
     key integer NOT NULL,
     phone_number character varying(19) NOT NULL,
     calling_country_code integer,
-    national_format character varying(19) DEFAULT NULL::character varying,
+    national_format character varying DEFAULT NULL::character varying,
     country_code smallint,
     validation_errors json,
     mobile_country_code smallint,

@@ -1,4 +1,22 @@
 {
+    "name": "tirreno/tirreno",
+    "type": "project",
+    "description": "User security analytics for mission-critical web applications",
+    "keywords": [
+        "tirreno",
+        "fraud-detection",
+        "audit-trail",
+        "analytics"
+    ],
+    "license": "AGPL-3.0+",
+    "homepage": "https://www.tirreno.com",
+    "authors": [
+        {
+            "name": "Tirreno Technologies Sàrl",
+            "email": "team@tirreno.com",
+            "homepage": "https://www.tirreno.com/"
+        }
+    ],
     "config": {
         "platform": {
             "php": "8"
@@ -8,9 +26,9 @@
         }
     },
     "require": {
-        "php": ">=7.2.5",
-        "bcosca/fatfree-core": "3.8.2",
-        "phpmailer/phpmailer": "6.9.1",
+        "php": ">=8.0",
+        "bcosca/fatfree-core": "3.9.0",
+        "phpmailer/phpmailer": "6.9.3",
         "ruler/ruler": "0.4.0",
         "matomo/device-detector": "^6.4.1"
     },

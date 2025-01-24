@@ -24,16 +24,12 @@ export class DeleteAccountPopUp {
             return; // Do nothing if the event was already processed
         }
         switch (e.key) {
-        case 'Esc': // IE/Edge specific value
-        case 'Escape': {
-            this.close();
-
-            break;
-        }
-
-        default: {
-            return;
-        }
+            case 'Esc': // IE/Edge specific value
+            case 'Escape':
+                this.close();
+                break;
+            default:
+                return;
         }
         // Cancel the default action to avoid it being handled twice
         e.preventDefault();
@@ -52,7 +48,7 @@ export class DeleteAccountPopUp {
         e.preventDefault();
 
         // close other panels
-        const card = document.querySelector(`.details-card#enrich-all-popup`);
+        const card = document.querySelector('.details-card#enrich-all-popup');
         if (card && !card.classList.contains('is-hidden')) {
             fireEvent('enrichAllPopUpClosed');
             card.classList.add('is-hidden');

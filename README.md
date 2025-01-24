@@ -1,4 +1,4 @@
-# Tirreno
+# tirreno
 
 <p align="center">
     <a href="https://www.tirreno.com/" target="_blank">
@@ -6,7 +6,7 @@
     </a>
 </p>
 
-Tirreno is open-source user analytics software.
+Tirreno is an open-source user security analytics for mission-critical web applications.
 
 Tirreno is a universal analytic tool for monitoring online platforms, web applications, SaaS, communities, IoT, mobile applications, intranets, and e-commerce websites. It is effective against external threats associated with partners or customers, as well as internal risks posed by employees or suppliers.
 
@@ -28,16 +28,14 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 * **PHP**: Version 8.0 to 8.3
 * **PostgreSQL**: Version 12 or greater
 * **PHP Extensions**: `PDO_PGSQL`, `cURL`
-* **HTTP Web Server**: Any, configured to work with PHP
+* **HTTP Web Server**: `Apache` with `mod_rewrite` and `mod_headers` enabled
 * **Operating System**: A Unix-like system is recommended
 * **Minimum Hardware Requirements**:
     * **PostgreSQL**: 512 MB RAM (2 GB recommended)
     * **Application**: 512 MB RAM (1 GB recommended)
     * **Storage**: Approximately 1 GB PostgreSQL storage per 1 million events
 
-If you prefer Apache web server, `mod_rewrite` and `mod_headers` should be enabled.
-
-## Installation instructions
+## Quickstart install
 
 1. [Download](https://www.tirreno.com/download.php) the latest version of Tirreno (ZIP file).
 2. Extract the tirreno-master.zip file to the location where you want it installed on your web server.
@@ -67,21 +65,20 @@ The idea for Tirreno arose from a challenge: an online platform was in need of a
 
 While building Tirreno, we concentrated on **privacy**, **trust**, and true **sovereignty**. As a result, we have built Tirreno in a secure and independent manner. The application does not have a long list of development dependencies, nor does it rely on heavy frameworks. This approach minimizes the potential attack surface.
 
-### Enrichment API
-
-As the solution we built has proved to be efficient in guarding our platform, over time we have implemented a data enrichment API. The goal was to provide our partners and clients with ethical means in their struggle against malicious actors.
-
-We have built the Tirreno API in-house, eliminating the need to share information with third parties. It operates without collecting or storing user data.
-
-Along with making Tirreno's code publicly available, we provide access to this API on a [monthly subscription](https://www.tirreno.com/pricing/) basis.
-
 ### Why the name Tirreno?
 
-History suggests the Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as the 10th-9th centuries BC. The term "Tyrrhenian” became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name — a name still in use today. This name is believed to be an exonym, possibly meaning “tower”.
+History suggests that the Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as 800 BC. The term "Tyrrhenian” became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name — a name still in use today. This name is believed to be an exonym, possibly meaning “tower”.
 
 While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book.
 
-Finally, the 'tirreno' wordmark is cropped at the bottom, creating a horizon line that symbolises the continuous development cycle of cybersecurity software.
+The tirreno wordmark, positioned beyond a horizon line, as a metaphor for the constant evolution of the cybersecurity landscape and our commitment to staying ahead of these never-ending changes.
+
+## Links
+
+- [Website](https://www.tirreno.com)
+- [Live demo](https://play.tirreno.com)
+- [Documentation](https://docs.tirreno.com)
+- [Mattermost community](https://chat.tirreno.com)
 
 ## Reporting a security issue
 

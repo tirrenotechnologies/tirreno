@@ -163,7 +163,7 @@ class Data extends \Controllers\Base {
                 if (version_compare($currentVersion, $jsonResponse['version'], '<')) {
                     $pageParams['SUCCESS_MESSAGE'] = sprintf('An update is available. Released date: %s.', $jsonResponse['release_date']);
                 } else {
-                    $pageParams['SUCCESS_MESSAGE'] = 'Current version is already up-to-date.';
+                    $pageParams['SUCCESS_MESSAGE'] = 'Current version is up to date.';
                 }
             }
         }

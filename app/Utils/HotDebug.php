@@ -32,7 +32,7 @@ class HotDebug {
             <tr>
                 <th>Message:</th>
                 <td><pre>%s</pre></td>
-            </tr>            
+            </tr>
         </table>';
 
         $bt = debug_backtrace();

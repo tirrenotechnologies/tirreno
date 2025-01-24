@@ -15,29 +15,12 @@
 
 namespace Models\Chart;
 
-class Bot extends \Models\BaseSql {
-    use \Traits\DateRange;
-
-    protected $DB_TABLE_NAME = 'event';
-
-    public function getData(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-
-        $deviceId = $request['id'];
-        $dateRange = $this->getLatest180DatesRange();
-
-        $params = [
-            ':api_key' => $apiKey,
-            ':device_id' => $deviceId,
-            ':end_time' => $dateRange['endDate'],
-            ':start_time' => $dateRange['startDate'],
-        ];
-
+class Bot extends BaseEventsCount {
+    public function getCounts(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(event.id) AS event_count
-
             FROM
                 event
 
@@ -48,18 +31,15 @@ class Bot extends \Models\BaseSql {
             ON (event_device.user_agent = event_ua_parsed.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
-                AND event_ua_parsed.id = :device_id
+                event_ua_parsed.id = :id AND
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
-        return $this->execQuery($query, $params);
+        return $this->executeOnRangeById($query, $apiKey);
     }
 }

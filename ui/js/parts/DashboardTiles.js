@@ -12,7 +12,7 @@ export class DashboardTiles {
             'totalCountries', 'totalUsersForReview', 'totalBlockedUsers'
         ];
 
-        elems.forEach( elem => {
+        elems.forEach(elem => {
             me.loaders[elem] = new Loader();
         });
 
@@ -43,7 +43,7 @@ export class DashboardTiles {
     }
 
     onLoad(data, status) {
-        if('success' == status) {
+        if ('success' == status) {
             for (const property in this.scope.loaders) {
                 this.scope.loaders[property].stop();
             }

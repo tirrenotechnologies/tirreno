@@ -24,7 +24,7 @@ export class ScoreDetails {
     }
 
     onScoreDetailsLoaded(data, status) {
-        if('success' !== status || 0 === data.length) {
+        if ('success' !== status || 0 === data.length) {
             return;
         }
 

@@ -33,15 +33,16 @@ class Page extends \Controllers\Pages\Base {
         $pageTitle = $this->getInternalPageTitleWithPostfix(strval($isp['asn']));
 
         $pageParams = [
-            'LOAD_DATATABLE' => true,
-            'LOAD_JVECTORMAP' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/isp.html',
-            'ISP' => $isp,
-            'PAGE_TITLE' => $pageTitle,
-            'LOAD_UPLOT' => true,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'JS' => 'admin_isp.js',
+            'LOAD_DATATABLE'                => true,
+            'LOAD_JVECTORMAP'               => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'HTML_FILE'                     => 'admin/isp.html',
+            'ISP'                           => $isp,
+            'PAGE_TITLE'                    => $pageTitle,
+            'LOAD_UPLOT'                    => true,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'JS'                            => 'admin_isp.js',
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

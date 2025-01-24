@@ -28,7 +28,14 @@ class Timestamp extends Base {
     public function __construct(string $value) {
         parent::__construct($value, 'timestamp');
         $invalid = false;
-        $val = \DateTimeImmutable::createFromFormat(self::EVENTFORMAT, $value);
+
+        try {
+            $val = \DateTimeImmutable::createFromFormat(self::EVENTFORMAT, $value);
+        } catch (\Throwable $e) {
+            // \DateTimeImmutable::createFromFormat throws ValueError when the datetime contains NULL-bytes
+            $invalid = true;
+            $val = new \DateTimeImmutable(self::INVALIDPLACEHOLDER);
+        }
 
         if ($val === false) {
             $val = \DateTimeImmutable::createFromFormat(self::FORMAT, $value);

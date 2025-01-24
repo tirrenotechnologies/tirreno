@@ -27,7 +27,6 @@ class Watchlist extends Base {
             "SELECT
                 TEXT(date_trunc('day', event.time)) AS day,
                 COUNT(event.id) AS event_count
-
             FROM
                 event
 
@@ -47,11 +46,8 @@ class Watchlist extends Base {
                 event.key = :api_key
                 %s
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY day
+            ORDER BY day"
         );
         //$request = $this->f3->get('REQUEST');
         //$dateRange = $this->getDatesRange($request);

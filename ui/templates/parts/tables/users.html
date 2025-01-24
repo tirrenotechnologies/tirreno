@@ -28,7 +28,7 @@
                             <div class="selector">
                                 <select class="input" name="version" multiple>
                                     <option placeholder>{{ @AdminUsers_rules_search_placeholder }}</option>
-                                    <repeat group="{{ @rules }}" value="{{ @record }}">
+                                    <repeat group="{{ @RULES }}" value="{{ @record }}">
                                         <option value="{{ @record['id'] }}">{{ @record['uid'] }}|{{ \Utils\Rules::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
                                     </repeat>
                                 </select>

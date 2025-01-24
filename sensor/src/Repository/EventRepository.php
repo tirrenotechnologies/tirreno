@@ -108,7 +108,7 @@ class EventRepository {
     ): int {
         $payload = $event->payload !== null ? json_encode($event->payload) : null;
 
-        $sql = 'INSERT INTO event 
+        $sql = 'INSERT INTO event
                 (key, account, ip, url, device, referer, time, query, type, http_method, email, phone, http_code, traceid, payload, session_id)
             VALUES
                 (:key, :account, :ip, :url, :device, :referer, :time, :query, :type, :method, :email, :phone, :http_code, :traceid, :payload, :session_id)

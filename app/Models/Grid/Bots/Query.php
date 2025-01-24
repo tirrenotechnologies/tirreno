@@ -34,8 +34,8 @@ class Query extends \Models\Grid\Base\Query {
                 event_ua_parsed.modified,
                 ed.lastseen
 
-            FROM 
-                event_ua_parsed 
+            FROM
+                event_ua_parsed
 
             LEFT JOIN (
                 SELECT
@@ -47,7 +47,7 @@ class Query extends \Models\Grid\Base\Query {
             ) AS ed
             ON event_ua_parsed.id = ed.user_agent
 
-            WHERE 
+            WHERE
                 event_ua_parsed.key = :api_key AND
                 event_ua_parsed.modified IS TRUE
                 %s'
@@ -66,9 +66,9 @@ class Query extends \Models\Grid\Base\Query {
         $query = (
             'SELECT
                 COUNT(*)
-                
-            FROM 
-                event_ua_parsed 
+
+            FROM
+                event_ua_parsed
 
             LEFT JOIN (
                 SELECT
@@ -80,7 +80,7 @@ class Query extends \Models\Grid\Base\Query {
             ) AS ed
             ON event_ua_parsed.id = ed.user_agent
 
-            WHERE 
+            WHERE
                 event_ua_parsed.key = :api_key AND
                 event_ua_parsed.modified IS TRUE
                 %s'
@@ -99,7 +99,7 @@ class Query extends \Models\Grid\Base\Query {
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions = (
-                ' AND 
+                ' AND
                 (
                     event_ua_parsed.device          LIKE LOWER(:search_value) OR
                     event_ua_parsed.browser_name    LIKE LOWER(:search_value) OR

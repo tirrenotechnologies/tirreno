@@ -21,7 +21,7 @@ class Resources extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'day');
+        $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'count_200');
         $l2 = array_column($data, 'count_404');
         $l3 = array_column($data, 'count_500');
@@ -31,8 +31,8 @@ class Resources extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(DISTINCT event.id) AS url_count,
 
                 COUNT(DISTINCT (
@@ -51,15 +51,12 @@ class Resources extends Base {
                 event
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);

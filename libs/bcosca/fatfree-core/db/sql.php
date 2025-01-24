@@ -375,6 +375,7 @@ class SQL {
 							('AND K.TABLE_CATALOG=T.TABLE_CATALOG '):'').
 				'WHERE '.
 					'C.TABLE_NAME='.$this->quote($table).
+					(empty($schema) ? '' : ' AND C.TABLE_SCHEMA='.$this->quote($schema)).
 					($this->dbname?
 						(' AND C.TABLE_CATALOG='.
 							$this->quote($this->dbname)):''),
@@ -535,7 +536,7 @@ class SQL {
 	*	@param $pw string
 	*	@param $options array
 	**/
-	function __construct($dsn,$user=NULL,$pw=NULL,array $options=NULL) {
+	function __construct($dsn,$user=NULL,$pw=NULL,?array $options=NULL) {
 		$fw=\Base::instance();
 		$this->uuid=$fw->hash($this->dsn=$dsn);
 		if (preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/is',$dsn,$parts))

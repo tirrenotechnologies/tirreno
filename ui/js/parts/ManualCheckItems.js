@@ -5,25 +5,25 @@ export class ManualCheckItems {
     constructor() {
         const table = document.querySelector('.events-card.is-hidden');
 
-        if(!table) return;
+        if (!table) return;
 
         table.classList.remove('is-hidden');
 
         const itemType = table.dataset.itemType;
 
-        if('ip' == itemType) {
+        if ('ip' == itemType) {
             this.enrichIpDetails();
         }
 
-        if('email' == itemType) {
+        if ('email' == itemType) {
             this.enrichEmailDetails();
         }
 
-        if('domain' == itemType) {
+        if ('domain' == itemType) {
             this.enrichDomainDetails();
         }
 
-        if('phone' == itemType) {
+        if ('phone' == itemType) {
             this.enrichPhoneDetails();
         }
     }
@@ -136,7 +136,7 @@ export class ManualCheckItems {
 
         item = 'domains_count';
         value = this.getItem(item);
-        if(value) {
+        if (value) {
             value = JSON.parse(value);
 
             if (Array.isArray(value)) {
@@ -145,7 +145,7 @@ export class ManualCheckItems {
                 value = parseInt(value);
             }
 
-            if(isNaN(value)) {
+            if (isNaN(value)) {
                 value = Renderers.renderDefaultIfEmpty(value);
             } else {
                 value = !!value;
@@ -182,7 +182,7 @@ export class ManualCheckItems {
 
         value = this.getItem(itemId);
 
-        if(null === value) {
+        if (null === value) {
             value = Renderers.renderDefaultIfEmpty(value);
         } else {
             //Revert databreach to "No databreach"
@@ -199,7 +199,7 @@ export class ManualCheckItems {
         value = this.getItem(itemId);
         value = parseInt(value);
 
-        if(isNaN(value)) {
+        if (isNaN(value)) {
             value = Renderers.renderDefaultIfEmpty(value);
         } else {
             //Convert to boolean
@@ -278,20 +278,20 @@ export class ManualCheckItems {
     getItem(itemId, returnNode = false) {
         const td = document.querySelector(`td[data-item-id="${itemId}"]`);
 
-        if(!td) return null;
+        if (!td) return null;
 
         const tr = td.closest('tr');
 
         const valueTd = tr.lastElementChild;
-        if(returnNode) {
+        if (returnNode) {
             return valueTd;
         } else {
             let text  = valueTd.innerText;
             let value = text;
 
-            if('false' === text) value = false;
-            if('true'  === text) value = true;
-            if('null'  === text) value = null;
+            if ('false' === text) value = false;
+            if ('true'  === text) value = true;
+            if ('null'  === text) value = null;
 
             return value;
         }
@@ -299,7 +299,7 @@ export class ManualCheckItems {
 
     setItem(itemId, value) {
         const item = this.getItem(itemId, true);
-        if(item) {
+        if (item) {
             item.innerHTML = value;
         }
     }

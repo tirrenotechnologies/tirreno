@@ -141,7 +141,7 @@ class OpenID extends \Magic {
 	*	@param $attr array
 	*	@param $reqd string|array
 	**/
-	function auth($proxy=NULL,$attr=[],array $reqd=NULL) {
+	function auth($proxy=NULL,$attr=[],?array $reqd=NULL) {
 		$fw=\Base::instance();
 		$root=$fw->SCHEME.'://'.$fw->HOST;
 		if (empty($this->args['trust_root']))

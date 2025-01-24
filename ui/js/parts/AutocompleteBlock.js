@@ -19,12 +19,12 @@ export class AutocompleteBlock {
             showNoSuggestionNotice: true,
             noSuggestionNotice: 'Sorry, no matching results',
 
-            onSelect: function (suggestion) {
+            onSelect: function(suggestion) {
                 const url = `/${suggestion.entityId}/${suggestion.id}`;
                 window.open(url, '_self');
             },
 
-            onSearchStart: function (params) {
+            onSearchStart: function(params) {
                 params.query = params.query.trim();
             },
             onSearchError: handleAjaxError,

@@ -9,7 +9,7 @@ export class BaseTiles {
         this.config = tilesParams;
         this.loaders = {};
 
-        this.elems.forEach( elem => {
+        this.elems.forEach(elem => {
             me.loaders[elem] = new Loader();
         });
 
@@ -51,7 +51,7 @@ export class BaseTiles {
     }
 
     onLoad(data, status) {
-        if('success' == status) {
+        if ('success' == status) {
             this.stopLoaders();
             this.updateTiles(data);
         }

@@ -45,7 +45,8 @@ class Session extends Magic {
 	*	@param $path string
 	*	@param $name string
 	**/
-	function open($path,$name) {
+	function open(string $path, string $name): bool
+    {
 		return TRUE;
 	}
 
@@ -53,7 +54,8 @@ class Session extends Magic {
 	*	Close session
 	*	@return TRUE
 	**/
-	function close() {
+	function close(): bool
+    {
 		$this->sid=NULL;
 		$this->_data=[];
 		return TRUE;
@@ -61,10 +63,12 @@ class Session extends Magic {
 
 	/**
 	*	Return session data in serialized format
-	*	@return string
+	*	@return false|string
 	*	@param $id string
 	**/
-	function read($id) {
+	#[ReturnTypeWillChange]
+    function read(string $id)
+    {
 		$this->sid=$id;
 		if (!$data=$this->_cache->get($id.'.@'))
 			return '';
@@ -85,11 +89,9 @@ class Session extends Magic {
 
 	/**
 	*	Write session data
-	*	@return TRUE
-	*	@param $id string
-	*	@param $data string
-	**/
-	function write($id,$data) {
+	*/
+	function write(string $id, string $data): bool
+    {
 		$fw=Base::instance();
 		$jar=$fw->JAR;
 		$this->_cache->set($id.'.@',
@@ -106,21 +108,20 @@ class Session extends Magic {
 
 	/**
 	*	Destroy session
-	*	@return TRUE
-	*	@param $id string
-	**/
-	function destroy($id) {
+	*/
+	function destroy(string $id): bool
+    {
 		$this->_cache->clear($id.'.@');
 		return TRUE;
 	}
 
 	/**
 	*	Garbage collector
-	*	@return TRUE
-	*	@param $max int
 	**/
-	function cleanup($max) {
-		$this->_cache->reset('.@',$max);
+    #[ReturnTypeWillChange]
+    function gc(int $max_lifetime)
+    {
+		$this->_cache->reset('.@',$max_lifetime);
 		return TRUE;
 	}
 
@@ -175,14 +176,19 @@ class Session extends Magic {
 	function __construct($onsuspect=NULL,$key=NULL,$cache=null) {
 		$this->onsuspect=$onsuspect;
 		$this->_cache=$cache?:Cache::instance();
-		session_set_save_handler(
-			[$this,'open'],
-			[$this,'close'],
-			[$this,'read'],
-			[$this,'write'],
-			[$this,'destroy'],
-			[$this,'cleanup']
-		);
+        if (version_compare(PHP_VERSION, '8.4.0')>=0) {
+            // TODO: remove this when php7 support is dropped
+            session_set_save_handler(new SessionAdapter($this));
+        } else {
+            session_set_save_handler(
+                [$this,'open'],
+                [$this,'close'],
+                [$this,'read'],
+                [$this,'write'],
+                [$this,'destroy'],
+                [$this,'gc']
+            );
+        }
 		register_shutdown_function('session_commit');
 		$fw=\Base::instance();
 		$headers=$fw->HEADERS;

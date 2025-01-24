@@ -36,14 +36,15 @@ class Page extends \Controllers\Pages\Base {
         $pageTitle = $this->getInternalPageTitleWithPostfix($country['value']);
 
         $pageParams = [
-            'LOAD_DATATABLE' => true,
-            'LOAD_UPLOT' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'HTML_FILE' => 'admin/country.html',
-            'COUNTRY' => $country,
-            'PAGE_TITLE' => $pageTitle,
-            'JS' => 'admin_country.js',
+            'LOAD_DATATABLE'                => true,
+            'LOAD_UPLOT'                    => true,
+            'LOAD_AUTOCOMPLETE'             => true,
+            'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
+            'HTML_FILE'                     => 'admin/country.html',
+            'COUNTRY'                       => $country,
+            'PAGE_TITLE'                    => $pageTitle,
+            'JS'                            => 'admin_country.js',
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

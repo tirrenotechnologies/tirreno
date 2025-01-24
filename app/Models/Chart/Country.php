@@ -15,29 +15,12 @@
 
 namespace Models\Chart;
 
-class Country extends \Models\BaseSql {
-    use \Traits\DateRange;
-
-    protected $DB_TABLE_NAME = 'event';
-
-    public function getData(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-
-        $countryId = $request['id'];
-        $dateRange = $this->getLatest180DatesRange();
-
-        $params = [
-            ':api_key' => $apiKey,
-            ':country_id' => $countryId,
-            ':end_time' => $dateRange['endDate'],
-            ':start_time' => $dateRange['startDate'],
-        ];
-
+class Country extends BaseEventsCount {
+    public function getCounts(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(event.id) AS event_count
-
             FROM
                 event
 
@@ -48,18 +31,15 @@ class Country extends \Models\BaseSql {
             ON (event_ip.country = countries.serial)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
-                AND countries.serial = :country_id
+                countries.serial = :id AND
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
-        return $this->execQuery($query, $params);
+        return $this->executeOnRangeById($query, $apiKey);
     }
 }

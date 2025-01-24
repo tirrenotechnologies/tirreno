@@ -90,14 +90,13 @@ class Query extends \Models\Grid\Base\Query {
 
                 $queryParams[':search_value'] = $search['value'];
             } else {
-                // https://stackoverflow.com/a/63701098
                 $searchConditions .= (
-                    " AND
+                    ' AND
                     (
                         LOWER(event_logbook.raw::text)      LIKE LOWER(:search_value) OR
                         LOWER(event_logbook.error_text)     LIKE LOWER(:search_value) OR
-                        LOWER(event_error_type.name)        LIKE LOWER(:search_value) OR
-                    )"
+                        LOWER(event_error_type.name)        LIKE LOWER(:search_value)
+                    )'
                 );
 
                 $queryParams[':search_value'] = '%' . $search['value'] . '%';

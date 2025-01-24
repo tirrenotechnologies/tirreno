@@ -22,13 +22,13 @@ class Domains extends Base {
         $field1 = 'unique_domains_count';
         $data1 = $this->getFirstLine($apiKey);
 
-        $field2 = 'daily_new_domains';
+        $field2 = 'ts_new_domains';
         $data2 = $this->getSecondLine($apiKey);
 
         $data0 = $this->concatDataLines($data1, $field1, $data2, $field2);
 
         $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'day');
+        $ox = array_column($indexedData, 'ts');
         $l1 = array_column($indexedData, $field1);
         $l2 = array_column($indexedData, $field2);
 
@@ -37,10 +37,9 @@ class Domains extends Base {
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(DISTINCT event_email.domain) AS unique_domains_count
-
             FROM
                 event
 
@@ -48,15 +47,12 @@ class Domains extends Base {
             ON (event.email = event_email.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey);
@@ -64,23 +60,19 @@ class Domains extends Base {
 
     private function getSecondLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event_domain.created)::date) AS day,
-                COUNT(event_domain.id) AS daily_new_domains
-
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_domain.created + :offset))::bigint AS ts,
+                COUNT(event_domain.id) AS ts_new_domains
             FROM
                 event_domain
 
             WHERE
-                event_domain.key = :api_key
-                AND event_domain.created >= :start_time
-                AND event_domain.created <= :end_time
+                event_domain.key = :api_key AND
+                event_domain.created >= :start_time AND
+                event_domain.created <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey, false);

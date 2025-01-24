@@ -15,29 +15,12 @@
 
 namespace Models\Chart;
 
-class Isp extends \Models\BaseSql {
-    use \Traits\DateRange;
-
-    protected $DB_TABLE_NAME = 'event';
-
-    public function getData(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-
-        $ispId = $request['id'];
-        $dateRange = $this->getLatest180DatesRange();
-
-        $params = [
-            ':api_key' => $apiKey,
-            ':isp_id' => $ispId,
-            ':end_time' => $dateRange['endDate'],
-            ':start_time' => $dateRange['startDate'],
-        ];
-
+class Isp extends BaseEventsCount {
+    public function getCounts(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', event.time)) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(event.id) AS event_count
-
             FROM
                 event
 
@@ -48,18 +31,15 @@ class Isp extends \Models\BaseSql {
             ON (event_ip.isp = event_isp.id)
 
             WHERE
-                event.key = :api_key
-                AND event.time >= :start_time
-                AND event.time <= :end_time
-                AND event_isp.id = :isp_id
+                event_isp.id = :id AND
+                event.key = :api_key AND
+                event.time >= :start_time AND
+                event.time <= :end_time
 
-            GROUP BY
-                day
-
-            ORDER BY
-                day"
+            GROUP BY ts
+            ORDER BY ts'
         );
 
-        return $this->execQuery($query, $params);
+        return $this->executeOnRangeById($query, $apiKey);
     }
 }

@@ -17,13 +17,13 @@ export class RulesPage extends BasePage {
         this.searchInput.addEventListener('keyup', searchTable, false);
 
         const onPlayButtonClick = this.onPlayButtonClick.bind(this);
-        this.playButtons.forEach( button => button.addEventListener('click', onPlayButtonClick, false));
+        this.playButtons.forEach(button => button.addEventListener('click', onPlayButtonClick, false));
 
         const onSaveButtonClick = this.onSaveButtonClick.bind(this);
-        this.saveButtons.forEach( button => button.addEventListener('click', onSaveButtonClick, false));
+        this.saveButtons.forEach(button => button.addEventListener('click', onSaveButtonClick, false));
 
         const onSelectChange = this.onSelectChange.bind(this);
-        this.selects.forEach( select => select.addEventListener('change', onSelectChange, false));
+        this.selects.forEach(select => select.addEventListener('change', onSelectChange, false));
     }
 
     onPlayButtonClick(e) {
@@ -51,7 +51,7 @@ export class RulesPage extends BasePage {
     }
 
     onCheckRuleLoad(data, status) {
-        if('success' !== status || 0 === data.length) {
+        if ('success' !== status || 0 === data.length) {
             return;
         }
 
@@ -66,21 +66,21 @@ export class RulesPage extends BasePage {
         });
 
 
-        if(!count) {
+        if (!count) {
             html = `There are no users that match ${this.ruleUid} rule.`;
         }
 
-        if(1 === count) {
+        if (1 === count) {
             html = `One user matching ${this.ruleUid} rule: ${html.join(', ')}`;
         }
 
-        if(count > 1) {
+        if (count > 1) {
             html = `${count} users matching ${this.ruleUid} rule: ${html.join(', ')}`;
         }
 
         let row     = document.querySelector(`tr[data-rule-uid="${this.ruleUid}"]`);
         let nextRow = row.nextElementSibling;
-        if(!nextRow || nextRow.dataset.ruleUid) {
+        if (!nextRow || nextRow.dataset.ruleUid) {
             let ex = document.createElement('tr');
             ex.innerHTML = '<td colspan="6"></td>';
 
@@ -145,7 +145,7 @@ export class RulesPage extends BasePage {
     }
 
     onSaveLoaded(data, status) {
-        if('success' !== status) {
+        if ('success' !== status) {
             return;
         }
 

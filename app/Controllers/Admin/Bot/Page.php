@@ -42,6 +42,7 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_UPLOT'                    => true,
             'JS'                            => 'admin_bot.js',
             'IS_ENRICHABLE'                 => $isEnrichable,
+            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         if ($this->isPostRequest()) {

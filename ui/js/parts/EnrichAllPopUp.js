@@ -27,16 +27,12 @@ export class EnrichAllPopUp {
             return; // Do nothing if the event was already processed
         }
         switch (e.key) {
-        case 'Esc': // IE/Edge specific value
-        case 'Escape': {
-            this.close();
-
-            break;
-        }
-
-        default: {
-            return;
-        }
+            case 'Esc': // IE/Edge specific value
+            case 'Escape':
+                this.close();
+                break;
+            default:
+                return;
         }
         // Cancel the default action to avoid it being handled twice
         e.preventDefault();
@@ -55,14 +51,14 @@ export class EnrichAllPopUp {
         e.preventDefault();
 
         // close other panels
-        const card = document.querySelector(`.details-card#close-account-popup`);
+        const card = document.querySelector('.details-card#close-account-popup');
         if (card && !card.classList.contains('is-hidden')) {
             fireEvent('closeAccountPopUpClosed');
             card.classList.add('is-hidden');
         }
 
         // call ajax
-        this.loadData(); 
+        this.loadData();
     }
 
     loadData(id) {
@@ -86,7 +82,7 @@ export class EnrichAllPopUp {
     }
 
     onDetailsLoaded(data, status) {
-        if('success' !== status || 0 === data.length) {
+        if ('success' !== status || 0 === data.length) {
             return;
         }
 
@@ -100,7 +96,7 @@ export class EnrichAllPopUp {
         //todo: foreach and arrow fn ?
         for (const key in data) {
             span = this.card.querySelector(`#details_${key}`);
-            if(span) {
+            if (span) {
                 span.innerHTML = data[key];
             }
         }

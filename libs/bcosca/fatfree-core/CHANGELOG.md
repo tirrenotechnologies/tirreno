@@ -1,5 +1,21 @@
 CHANGELOG
 
+3.9.0 (29.12.2024)
+---
+*	feat [#377], DB\SQL: check TABLE_SCHEMA in fields introspection query
+*	feat [#379]: Added `REROUTE_TRAILING_SLASH` to optionally disable rerouting
+*	feat [#380], Audit: Adding new mac address validation
+*	fix [#372], Audit: `isprivate()`, `FILTER_FLAG_NO_PRIV_RANGE` usage
+*	fix [#378]: websocket handlers call
+*	fix: php 8.4 session handler compatibility
+*	fix: various php 8.4 warnings
+*	fix [#382]: PHP 8.4 `E_STRICT` deprecation fix
+* 	fix [#371]: trim string based routes handler
+*	fix [bcosca/fatfree#1285]: multi-line template tags 
+* 	fix [#375]: PHP 8.4 Fixes for implicit nullability deprecation
+*	fix [#374]: http_build_query usage deprecation fix
+* 	fix [#369]: unify key string replacement for cache getter/setter
+
 3.8.2 (24.07.2023)
 ---
 *	feat, Base->format: optimize international date formatting for php8.1+

@@ -26,59 +26,54 @@ class ReviewQueue extends Base {
 
         for ($i = 0; $i < count($data1); ++$i) {
             $item = $data1[$i];
-            $day = $item['day'];
+            $ts = $item['ts'];
             $reviewed = $item['reviewed'];
             $fraud = $item['fraud'];
 
-            if (!isset($data0[$day])) {
-                $data0[$day] = [
-                    'day' => $day,
-
-                    'daily_new_users_whitelisted' => 0,
-                    'daily_new_users_on_review' => 0,
-                    'daily_new_users_blacklisted' => 0,
+            if (!isset($data0[$ts])) {
+                $data0[$ts] = [
+                    'ts' => $ts,
+                    'ts_new_users_whitelisted' => 0,
+                    'ts_new_users_on_review' => 0,
+                    'ts_new_users_blacklisted' => 0,
                 ];
             }
 
             if ($fraud === false && $reviewed) {
-                ++$data0[$day]['daily_new_users_whitelisted'];
+                ++$data0[$ts]['ts_new_users_whitelisted'];
             } elseif ($fraud === true && $reviewed) {
-                ++$data0[$day]['daily_new_users_blacklisted'];
+                ++$data0[$ts]['ts_new_users_blacklisted'];
             } else {
-                ++$data0[$day]['daily_new_users_on_review'];
+                ++$data0[$ts]['ts_new_users_on_review'];
             }
         }
 
         $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'day');
-        $l1 = array_column($indexedData, 'daily_new_users_whitelisted');
-        $l2 = array_column($indexedData, 'daily_new_users_on_review');
-        $l3 = array_column($indexedData, 'daily_new_users_blacklisted');
+        $ox = array_column($indexedData, 'ts');
+        $l1 = array_column($indexedData, 'ts_new_users_whitelisted');
+        $l2 = array_column($indexedData, 'ts_new_users_on_review');
+        $l3 = array_column($indexedData, 'ts_new_users_blacklisted');
 
         return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
     }
 
     private function getFirstLine(int $apiKey): array {
         $query = (
-            "SELECT
-                TEXT(date_trunc('day', COALESCE(event_account.latest_decision, event_account.lastseen))::date) AS day,
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, COALESCE(event_account.latest_decision, event_account.lastseen) + :offset))::bigint AS ts,
                 event_account.id,
                 event_account.reviewed,
                 event_account.fraud
-
             FROM
                 event_account
 
             WHERE
-                event_account.key = :api_key
-                AND event_account.lastseen >= :start_time
-                AND event_account.lastseen <= :end_time
+                event_account.key = :api_key AND
+                event_account.lastseen >= :start_time AND
+                event_account.lastseen <= :end_time
 
-            GROUP BY
-                day, event_account.id
-
-            ORDER BY
-                day"
+            GROUP BY ts, event_account.id
+            ORDER BY ts'
         );
 
         return $this->execute($query, $apiKey, false);
