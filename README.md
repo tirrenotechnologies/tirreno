@@ -6,16 +6,14 @@
     </a>
 </p>
 
-Tirreno is an open-source user security analytics for mission-critical web applications.
+Tirreno is an open-source fraud prevention platform.
 
-Tirreno is a universal analytic tool for monitoring online platforms, web applications, SaaS, communities, IoT, mobile applications, intranets, and e-commerce websites. It is effective against external threats associated with partners or customers, as well as internal risks posed by employees or suppliers.
+Tirreno is a universal analytic tool for monitoring online platforms, web applications, SaaS, communities, mobile applications, intranets, and e-commerce websites.
 
 * **For Website Owners**: Protect your user areas from account takeovers, malicious bots, and common web vulnerabilities caused by user behavior.
 * **For Online Communities**: Combat spam, prevent fake registrations, and stop re-registration from the same IP addresses.
 * **For Startups, SaaS, and E-commerce**: Get a ready-made boilerplate for client security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
 * **For Platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
-* **For IoT Security**: Enhance the security of your IoT ecosystem by tracking user activity and identifying potential vulnerabilities.
-* **For CISOs and Security Teams**: Monitor employee accounts and secure critical enterprise applications like Mattermost™, GitLab™, CRMs, or intranets. Identify unusual activity patterns or unauthorized access attempts.
 
 Tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time analytics.
 

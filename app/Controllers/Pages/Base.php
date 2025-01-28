@@ -45,7 +45,8 @@ abstract class Base {
     }
 
     public function getInternalPageTitleWithPostfix(string $title): string {
-        $title = sprintf('%s %s', $title, \Utils\Constants::PAGE_TITLE_POSTFIX);
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $title = sprintf('%s %s', $safeTitle, \Utils\Constants::PAGE_TITLE_POSTFIX);
 
         return $title;
     }

@@ -1,17 +1,23 @@
 import {MAX_TOOLTIP_LENGTH} from './Constants.js?v=2';
 
 const truncateWithHellip = (value, n) => {
-    let fullValue = value;
+    let tooltip = value;
 
-    if (value && value.length > (n + 2)) {
-        value = `${value.slice(0, n)}&hellip;`;
+    if (value) {
+        if (value.length > (n + 2)) {
+            value = `${escapeForHTMLAttribute(value.slice(0, n))}&hellip;`;
+        } else {
+            value = escapeForHTMLAttribute(value);
+        }
     }
 
-    if (fullValue && fullValue.length > MAX_TOOLTIP_LENGTH) {
-        fullValue = `${fullValue.slice(0, MAX_TOOLTIP_LENGTH)}&hellip;`;
+    if (tooltip.length > MAX_TOOLTIP_LENGTH) {
+        tooltip = `${escapeForHTMLAttribute(tooltip.slice(0, MAX_TOOLTIP_LENGTH))}&hellip;`;
+    } else {
+        tooltip = escapeForHTMLAttribute(tooltip);
     }
 
-    value = `<span class="tooltip" title="${fullValue}">${value}</span>`;
+    value = `<span class="tooltip" title="${tooltip}">${value}</span>`;
 
     return value;
 };
@@ -21,6 +27,10 @@ const replaceAll = (str, search, replacement) => {
 };
 
 const escapeForHTMLAttribute = (str) => {
+    if (str === '&#65293;') {
+        return str;
+    }
+
     return (str === null || str === undefined) ? '' :
         str.replace(/["'&<>]/g, function(match) {
             switch (match) {

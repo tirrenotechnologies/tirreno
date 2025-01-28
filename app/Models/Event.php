@@ -36,7 +36,7 @@ class Event extends \Models\BaseSql {
             WHERE
                 event.key = :api_key
 
-            ORDER BY time DESC
+            ORDER BY id DESC
             LIMIT 1 OFFSET 0'
         );
 

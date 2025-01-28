@@ -1,5 +1,10 @@
 # Tirreno Changelog
 
+## Tirreno v0.9.2
+
+* XSS vulnerability patch
+* optimize getLastEvent()
+
 ## Tirreno v0.9.1
 
 * data plotting with hour and minute resolution

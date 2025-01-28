@@ -159,7 +159,7 @@ const renderTime = (data) => {
         data = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
 
-    return data;
+    return escapeForHTMLAttribute(data);
 };
 
 const renderTimeMs = (data) => {
@@ -227,7 +227,7 @@ const renderDate = (data) => {
         data = `${day}/${month}/${year}`;
     }
 
-    return data;
+    return escapeForHTMLAttribute(data);
 };
 
 const renderRuleSelectorItem = (classNames, data) => {
@@ -309,7 +309,7 @@ const renderHttpMethod = record => {
     const type = record.http_method;
     if (type) {
         let style = (type === 'POST' || type === 'GET') ? 'nolight' : 'highlight';
-        html = `<span class="${style}">${type}</span>`;
+        html = `<span class="${style}">${escapeForHTMLAttribute(type)}</span>`;
     }
 
     html = renderDefaultIfEmpty(html);
@@ -700,8 +700,8 @@ const renderPhone = (record) => {
     const phone = record.phonenumber;
 
     if (phone) {
-        const code = !COUNTRIES_EXCEPTIONS.includes(record.country) ? record.country : 'lh';
-        const tooltip = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
+        const code = !COUNTRIES_EXCEPTIONS.includes(record.country) ? escapeForHTMLAttribute(record.country) : 'lh';
+        const tooltip = (record.full_country !== null && record.full_country !== undefined) ? escapeForHTMLAttribute(record.full_country) : '';
 
         const n       = MAX_STRING_LENGTH_FOR_PHONE;
         const number  = truncateWithHellip(phone, n);
@@ -752,13 +752,12 @@ const renderPhoneType = record => {
 
     if (type) {
         const n = getNumberOfSymbols();
-        html = truncateWithHellip(type, n);
 
         let src = 'smartphone.svg';
         if (['landline', 'FIXED_LINE', 'FIXED_LINE_OR_MOBILE', 'TOLL_FREE', 'SHARED_COST'].includes(type)) src = 'landline.svg';
         if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
 
-        const tooltip = type.toLowerCase().replace(/_/g, ' ');
+        const tooltip = escapeForHTMLAttribute(type.toLowerCase().replace(/_/g, ' '));
 
         html = `<span class="tooltip" title="${tooltip}"><img src="/ui/images/icons/${src}"/></span>`;
     }
@@ -794,7 +793,7 @@ const renderUsersList = (data) => {
 const renderResource = (value, tooltip) => {
     const n = getNumberOfSymbols();
     value = value ? value : '/';
-    tooltip = tooltip ? tooltip : '/';
+    tooltip = tooltip ? escapeForHTMLAttribute(tooltip) : '/';
     value = truncateWithHellip(value, n);
 
     //Create a tooltip data with full url
@@ -817,19 +816,21 @@ const renderResourceWithoutQuery = record => {
 
 const renderResourceWithQueryAndEventType = record => {
     let url = record.url;
-
     if (record.query) {
-        url = `${record.url}${record.query}`;
+        url += record.query;
     }
 
-    if (url && url.length > MAX_TOOLTIP_URL_LENGTH) {
-        url = `${url.slice(0, MAX_TOOLTIP_URL_LENGTH)}&hellip;`;
+    let tooltip = '';
+    if (url.length > MAX_TOOLTIP_URL_LENGTH) {
+        tooltip = `${escapeForHTMLAttribute(url.slice(0, MAX_TOOLTIP_URL_LENGTH))}&hellip;`
+    } else {
+        tooltip = escapeForHTMLAttribute(url);
     }
 
     const event_type = checkErrorEventType(record);
 
-    const html = `<p class="bullet ${event_type.event_type} tooltip" title="${record.url}"
-        ></p><span class="tooltip" title="${url}">${event_type.event_type_name}</span>`;
+    const html = `<p class="bullet ${event_type.event_type} tooltip" title="${tooltip}"
+        ></p><span class="tooltip" title="${tooltip}">${event_type.event_type_name}</span>`;
 
     return html;
 };
@@ -846,7 +847,7 @@ const renderIp = record => {
     const n = getNumberOfSymbols();
 
     let html = truncateWithHellip(record.ip, n);
-    let name = record.isp_name;
+    let name = escapeForHTMLAttribute(record.isp_name);
     if (name) {
         html = html.replace(/title=".*?"/, `title="${name}"`);
     }
@@ -925,15 +926,15 @@ const renderNetName = (record, length = 'default') => {
     let html = '';
 
     if (record.netname) {
-        html = record.netname;
+        html = escapeForHTMLAttribute(record.netname);
     }
 
     if (!html && record.description) {
-        html = record.description;
+        html = escapeForHTMLAttribute(record.description);
     }
 
     if (!html && record.asn) {
-        html = record.asn;
+        html = escapeForHTMLAttribute(record.asn);
     }
 
     if (html) {
@@ -1050,6 +1051,8 @@ const renderDevice = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = deviceIsNormal ? record.device_name : 'unknown';
 
+    const ua = escapeForHTMLAttribute(record.ua);
+
     let deviceTypeName = 'unknown';
 
     if (record.device_name && record.device_name !== 'unknown') {
@@ -1057,7 +1060,7 @@ const renderDevice = record => {
     }
 
     const html = `<span class="tooltip" title="${deviceTypeTooltip}"><img src="/ui/images/icons/${deviceTypeImg}.svg"
-        /></span><span class="tooltip" title="${record.ua}">${deviceTypeName}</span>`;
+        /></span><span class="tooltip" title="${ua}">${deviceTypeName}</span>`;
 
     return html;
 };
@@ -1067,8 +1070,10 @@ const renderDeviceWithOs = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = NORMAL_DEVICES.includes(record.device_name) ? record.device_name : 'unknown';
 
+    const ua = escapeForHTMLAttribute(record.ua);
+
     const html = `<span class="tooltip" title="${deviceTypeTooltip}"><img src="/ui/images/icons/${deviceTypeImg}.svg"
-        /></span><span class="tooltip" title="${record.ua}">${os}</span>`;
+        /></span><span class="tooltip" title="${ua}">${os}</span>`;
 
     return html;
 };
@@ -1092,7 +1097,7 @@ const renderLanguage = record => {
 
     codeAndRegion = codeAndRegion.join('-');
     if (codeAndRegion) {
-        codeAndRegion = `<span class="nolight">${codeAndRegion}</span>`;
+        codeAndRegion = `<span class="nolight">${escapeForHTMLAttribute(codeAndRegion)}</span>`;
     }
 
     const html = renderDefaultIfEmpty(codeAndRegion);
@@ -1162,15 +1167,15 @@ const renderBrowser = record => {
 };
 
 const renderQuery = record => {
-    return `<textarea readonly rows="4" cols="37">${renderDefaultIfEmpty(record.query)}</textarea>`;
+    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.query))}</textarea>`;
 };
 
 const renderReferer = record => {
-    return `<textarea readonly rows="4" cols="37">${renderDefaultIfEmpty(record.referer)}</textarea>`;
+    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.referer))}</textarea>`;
 };
 
 const renderUserAgent = record => {
-    return `<textarea readonly rows="5" cols="37">${renderDefaultIfEmpty(record.ua)}</textarea>`;
+    return `<textarea readonly rows="5" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.ua))}</textarea>`;
 };
 
 const renderDefaultIfEmpty = (value) => {
@@ -1241,17 +1246,17 @@ const renderSensorErrorColumn = record => {
 const renderSensorError = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join(';\n') : null;
-    return `<textarea readonly rows="4" cols="37">${renderDefaultIfEmpty(s)}</textarea>`;
+    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(s))}</textarea>`;
 };
 
 const renderRawRequest = record => {
     const obj = openJson(record.raw);
     const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
-    return `<textarea readonly rows="24" cols="37">${renderDefaultIfEmpty(s)}</textarea>`;
+    return `<textarea readonly rows="24" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(s))}</textarea>`;
 };
 
 const renderErrorType = record => {
-    return `<p class="bullet ${record.error_value}"></p><span>${record.error_name}</span>`;
+    return `<p class="bullet ${escapeForHTMLAttribute(record.error_value)}"></p><span>${escapeForHTMLAttribute(record.error_name)}</span>`;
 };
 
 const renderMailto = record => {
@@ -1341,7 +1346,6 @@ export {
 
     //Time
     renderTime,
-    renderTimeMs,
     renderDate,
 
     //Rule selector
