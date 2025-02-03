@@ -48,9 +48,8 @@ class BlacklistQueueHandler extends AbstractQueueCron {
 
         $model = new \Models\ApiKeys();
         $model->getKeyById($item['key']);
-        $skipBlacklistSync = $model->skip_blacklist_sync;
 
-        $errorMessage = $skipBlacklistSync ? $this->sendBlacklistReportPostRequest($creator, $hashes) : '';
+        $errorMessage = $model->skip_blacklist_sync ? $this->sendBlacklistReportPostRequest($creator, $hashes) : '';
         if (strlen($errorMessage) > 0) {
             // Log error to database
             \Utils\Logger::log('Fraud enrichment API curl error', $errorMessage);

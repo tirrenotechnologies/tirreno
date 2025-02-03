@@ -9,7 +9,10 @@ export class Map {
 
         this.totalTile = new TotalTile();
 
+        this.regions = {};
+
         const onRegionTipShow = this.onRegionTipShow.bind(this);
+        const onRegionClick = this.onRegionClick.bind(this);
 
         $('#world-map-markers').vectorMap({
             map: 'world_mill_en',
@@ -43,6 +46,9 @@ export class Map {
             onRegionTipShow: function(e, el, code) {
                 onRegionTipShow(el, code);
             },
+            onRegionClick: function(e, code) {
+                onRegionClick(code);
+            },
 
             backgroundColor: '#131220'
         });
@@ -60,18 +66,31 @@ export class Map {
         tipEl.html(`${tipEl.html()} - ${phrase}`);
     }
 
+    onRegionClick(value) {
+        if (this.regions[value] !== undefined && this.regions[value][this.config.tooltipField] > 0) {
+            window.location.href = `/country/${this.regions[value]['serial']}`;
+        }
+    }
+
     getCountriesRegionsFromResponse(records) {
         const me = this;
         const regions = {};
+
+        this.regions = {};
 
         records.forEach(rec => {
             const country = rec.country;
             if (!regions[country]) {
                 regions[country] = 0;
+                this.regions[country] = 0;
             }
 
             const value = me.getRegionValue(rec);
             regions[country] = value;
+            this.regions[country] = {
+                [this.config.tooltipField]: rec[this.config.tooltipField],
+                serial: rec['serial'],
+            };
         });
 
         return regions;

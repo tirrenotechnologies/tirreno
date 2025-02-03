@@ -66,9 +66,23 @@ class ErrorHandler {
             }
         }
 
+        $db = $f3->get('API_DATABASE');
+        if ($db) {
+            $errorData['sql_log'] = $db->log();
+            $logModel = new \Models\Log();
+            $logModel->add($errorData);
+
+            \Utils\Logger::log('SQL', $errorData['sql_log']);
+        }
+
         if ($errorData['code'] === 500) {
             $toName = 'Admin';
             $toAddress = \Utils\Variables::getAdminEmail();
+            if ($toAddress === null) {
+                \Utils\Logger::log('Log mail error', 'ADMIN_EMAIL is not set');
+
+                return;
+            }
 
             $subject = $f3->get('error_email_subject');
             $subject = sprintf($subject, $errorData['code']);
@@ -81,15 +95,6 @@ class ErrorHandler {
             $message = sprintf($message, $currentTime, $errorMessage, $errorTrace);
 
             \Utils\Mailer::send($toName, $toAddress, $subject, $message);
-        }
-
-        $db = $f3->get('API_DATABASE');
-        if ($db) {
-            $errorData['sql_log'] = $db->log();
-            $logModel = new \Models\Log();
-            $logModel->add($errorData);
-
-            \Utils\Logger::log('SQL', $errorData['sql_log']);
         }
     }
 

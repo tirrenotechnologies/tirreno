@@ -165,7 +165,7 @@ class Data extends \Controllers\Base {
             }
         }
 
-        if (!$apiKey->skip_blacklist_sync && !$inQueue && $fraud) {
+        if (!$inQueue && $fraud) {
             $accountOperationQueueModel->add($accountId, $apiKey->id);
         }
 

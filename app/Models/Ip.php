@@ -212,7 +212,7 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             "UPDATE event_ip
             SET
                 total_visit = COALESCE(sub.total_visit, 0),
-                shared = COALESCE(sub.shared, 0),
+                shared = COALESCE(sub.shared, 1),
                 updated = date_trunc('milliseconds', now())
             FROM (
                 SELECT
@@ -257,7 +257,7 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             "UPDATE event_ip
             SET
                 total_visit = COALESCE(sub.total_visit, 0),
-                shared = COALESCE(sub.shared, 0),
+                shared = COALESCE(sub.shared, 1),
                 updated = date_trunc('milliseconds', now())
             FROM (
                 SELECT

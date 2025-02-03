@@ -41,8 +41,15 @@ class SynchroniseBlacklist extends AbstractCron {
 
                 // use different access keys for email lists grouped by apiKey
                 foreach ($groupedEmails as $key => $items) {
-                    $subscriptionKey = $model->getKeyById($key)->token;
+                    $keyModel = $model->getKeyById($key);
+                    if ($keyModel->skip_blacklist_sync) {
+                        $this->log(sprintf('Skip synchronising blacklist for key %s.', strval($key)));
+                        continue;
+                    }
+
+                    $subscriptionKey = $keyModel->token;
                     if ($subscriptionKey === null) {
+                        $this->log(sprintf('Skip synchronising blacklist for key %s due to missing subscription key.', strval($key)));
                         continue;
                     }
 

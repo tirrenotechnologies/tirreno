@@ -1,6 +1,6 @@
 import {BasePage} from './Base.js';
 
-import {BaseLineChart} from '../parts/chart/BaseLine.js?v=2';
+import {EventsChart} from '../parts/chart/Events.js?v=2';
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
 import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
@@ -48,7 +48,7 @@ export class EventsPage extends BasePage {
         const datesFilter  = new DatesFilter();
         const searchFilter = new SearchFilter();
         const eventPanel   = new EventPanel();
-        const lineChart    = new BaseLineChart(chartParams);
+        const lineChart    = new EventsChart(chartParams);
         const eventsGrid   = new EventsGrid(gridParams);
     }
 }

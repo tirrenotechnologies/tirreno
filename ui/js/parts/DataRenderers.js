@@ -822,7 +822,7 @@ const renderResourceWithQueryAndEventType = record => {
 
     let tooltip = '';
     if (url.length > MAX_TOOLTIP_URL_LENGTH) {
-        tooltip = `${escapeForHTMLAttribute(url.slice(0, MAX_TOOLTIP_URL_LENGTH))}&hellip;`
+        tooltip = `${escapeForHTMLAttribute(url.slice(0, MAX_TOOLTIP_URL_LENGTH))}&hellip;`;
     } else {
         tooltip = escapeForHTMLAttribute(url);
     }
@@ -923,19 +923,7 @@ const renderIpType = record => {
 
 //Net
 const renderNetName = (record, length = 'default') => {
-    let html = '';
-
-    if (record.netname) {
-        html = escapeForHTMLAttribute(record.netname);
-    }
-
-    if (!html && record.description) {
-        html = escapeForHTMLAttribute(record.description);
-    }
-
-    if (!html && record.asn) {
-        html = escapeForHTMLAttribute(record.asn);
-    }
+    let html = record.netname || record.description || record.asn || '';
 
     if (html) {
         const regex = /-|_/ig;
@@ -1199,12 +1187,12 @@ const renderBlacklistItem = record => {
     }
     if (type === 'email') {
         rec.accountid = record.accountid;
-        html = renderDefaultIfEmpty(record.value);
+        html = escapeForHTMLAttribute(renderDefaultIfEmpty(record.value));
         html = wrapWithUserLink(html, rec);
     }
     if (type === 'phone') {
         rec.accountid = record.accountid;
-        html = renderDefaultIfEmpty(record.value);
+        html = escapeForHTMLAttribute(renderDefaultIfEmpty(record.value));
         html = wrapWithUserLink(html, rec);
     }
 

@@ -27,4 +27,10 @@ class Grid extends \Models\Grid\Base\Grid {
     public function getAllBlacklistedItems(): array {
         return $this->getGrid();
     }
+
+    protected function convertTimeToUserTimezone(array &$result): void {
+        $fields = ['created'];
+
+        $this->translateTimeZones($result, $fields);
+    }
 }

@@ -338,8 +338,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                     COUNT(DISTINCT event.ip) AS total_ip,
                     COUNT(DISTINCT event.device) AS total_device,
                     COUNT(DISTINCT event_ip.country) AS total_country,
-                    COUNT(DISTINCT CASE WHEN event_ip.shared > 0 THEN event.ip ELSE NULL END) AS total_shared_ips,
-                    (SELECT COUNT(*) FROM event_phone WHERE event_phone.account_id = event.account AND event_phone.shared > 0) AS total_shared_phones
+                    COUNT(DISTINCT CASE WHEN event_ip.shared > 1 THEN event.ip ELSE NULL END) AS total_shared_ips,
+                    (SELECT COUNT(*) FROM event_phone WHERE event_phone.account_id = event.account AND event_phone.shared > 1) AS total_shared_phones
                 FROM event
                 LEFT JOIN event_ip
                 ON event_ip.id = event.ip

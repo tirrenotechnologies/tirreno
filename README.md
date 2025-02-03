@@ -63,13 +63,13 @@ The idea for Tirreno arose from a challenge: an online platform was in need of a
 
 While building Tirreno, we concentrated on **privacy**, **trust**, and true **sovereignty**. As a result, we have built Tirreno in a secure and independent manner. The application does not have a long list of development dependencies, nor does it rely on heavy frameworks. This approach minimizes the potential attack surface.
 
-### Why the name Tirreno?
+### Why the name tirreno?
 
 History suggests that the Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as 800 BC. The term "Tyrrhenian” became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name — a name still in use today. This name is believed to be an exonym, possibly meaning “tower”.
 
 While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book.
 
-The tirreno wordmark, positioned beyond a horizon line, as a metaphor for the constant evolution of the cybersecurity landscape and our commitment to staying ahead of these never-ending changes.
+The tirreno wordmark, positioned beyond a horizon line, as a metaphor for the constant evolution of the fraud landscape and our commitment to staying ahead of change.
 
 ## Links
 

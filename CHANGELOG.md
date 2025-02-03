@@ -1,5 +1,13 @@
 # Tirreno Changelog
 
+## Tirreno v0.9.3
+
+* user graph on /event plot
+* clickable countries on svg map
+* improve /blacklist management
+* index.php in all subdirs to prevent directory listing
+* force utf-8 sensor input
+
 ## Tirreno v0.9.2
 
 * XSS vulnerability patch

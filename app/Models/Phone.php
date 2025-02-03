@@ -216,20 +216,35 @@ class Phone extends \Models\BaseSql {
 
         [$params, $flatIds] = $this->getArrayPlaceholders($ids);
         $params[':key'] = $apiKey;
+
+        $idsQuery = (
+            "SELECT
+                DISTINCT event_phone.phone_number
+            FROM event_phone
+            WHERE
+                event_phone.account_id IN ($flatIds) AND
+                event_phone.key = :key"
+        );
+
         $query = (
             "UPDATE event_phone
             SET
-                shared = (
-                    SELECT COUNT(*)
-                    FROM event_phone AS ep
-                    WHERE
-                        ep.phone_number = event_phone.phone_number AND
-                        ep.key = :key
-                ),
-                updated = date_trunc('milliseconds', now())
+                shared = COALESCE(sub.shared, 1)
+            FROM (
+                SELECT
+                    COUNT(*) AS shared,
+                    event_phone.phone_number
+                FROM
+                    event_phone
+                WHERE
+                    event_phone.phone_number IN ($idsQuery) AND
+                    event_phone.key = :key
+                GROUP BY event_phone.phone_number
+            ) AS sub
+            RIGHT JOIN event_phone sub_phone ON sub.phone_number = sub_phone.phone_number
             WHERE
-                event_phone.account_id IN ({$flatIds}) AND
-                event_phone.lastseen >= event_phone.updated AND
+                event_phone.phone_number = sub_phone.phone_number AND
+                event_phone.phone_number IN ($idsQuery) AND
                 event_phone.key = :key"
         );
 

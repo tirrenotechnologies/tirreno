@@ -1,15 +1,7 @@
-Release song: https://youtu.be/8hYgxwmHbxA
+Release song: https://youtu.be/bcxnbfRYM-g
 
-Important security update: tirreno v0.9.2.
+Tirreno is announcing version v0.9.3.
 
-Today, we received a report from IT security expert Sandro Bauer regarding
-an XSS vulnerability in Tirreno. After receiving the report, we confirmed
-receipt and immediately reproduced the problem, developing a patch the same
-day. Briefly, the XSS vulnerability potentially allows attackers to post
-malicious scripts by sending them through a payload. However, it's important
-to clarify that the Tirreno platform does not directly receive user event data,
-as it must come from the main web application, which we expect to be trustworthy.
-Another aspect that makes it difficult to exploit this vulnerability is the
-truncation of all data displayed in the dashboard.
-
-The Tirreno team highly appreciates Sandro's report and help in maintaining Tirreno's application security.
+This update improves visualization of the 'events' graph by introducing user correlation vs.
+events for the selected time period, makes countries on maps clickable, improves sensor
+security by enforcing UTF-8 encoding, and includes some minor fixes.

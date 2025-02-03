@@ -23,15 +23,17 @@ class Events extends Base {
 
         $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'event_count');
+        $l2 = array_column($data, 'users_count');
 
-        return $this->addEmptyDays([$ox, $l1]);
+        return $this->addEmptyDays([$ox, $l1, $l2]);
     }
 
     private function getFirstLine(int $apiKey): array {
         $query = (
             'SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(event.id) AS event_count
+                COUNT(event.id) AS event_count,
+                COUNT(DISTINCT event.account) AS users_count
 
             FROM
                 event

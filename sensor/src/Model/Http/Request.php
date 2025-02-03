@@ -58,9 +58,9 @@ class Request {
                 if (is_bool($value)) {
                     $this->body[$key] = ($value) ? 'true' : 'false';
                 } elseif (is_array($value)) {
-                    $this->body[$key] = json_encode($value);
+                    $this->body[$key] = json_encode($this->cleanArrayEncoding($value));
                 } elseif ($value !== null) {
-                    $this->body[$key] = (string) $value;
+                    $this->body[$key] = $this->cleanArrayEncoding(strval($value));
                 }
             } else {
                 $this->body[$key] = null;
@@ -69,5 +69,18 @@ class Request {
         $this->body['hashEmailAddress'] = null;
         $this->body['hashPhoneNumber'] = null;
         $this->body['hashIpAddress'] = null;
+    }
+
+    // recursive array encoding cleanup
+    private function cleanArrayEncoding(mixed $data): mixed {
+        if (is_string($data)) {
+            return mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+        } elseif (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->cleanArrayEncoding($value);
+            }
+        }
+
+        return $data;
     }
 }
