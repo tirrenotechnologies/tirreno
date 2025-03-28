@@ -15,6 +15,9 @@ export class BlacklistPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter    = new DatesFilter();
+        const searchFilter   = new SearchFilter();
+
         const gridParams = {
             url     : '/admin/loadBlacklist',
             tileId  : 'totalBlacklist',
@@ -40,11 +43,8 @@ export class BlacklistPage extends BasePage {
             }
         };
 
-        const datesFilter    = new DatesFilter();
-        const searchFilter   = new SearchFilter();
-        const blacklistChart = new BlacklistChart(chartParams);
-        const blacklistGrid  = new BlacklistGrid(gridParams);
-
-        const blacklistGridButtons  = new BlacklistGridActionButtons(this.tableId);
+        new BlacklistChart(chartParams);
+        new BlacklistGrid(gridParams);
+        new BlacklistGridActionButtons(this.tableId);
     }
 }

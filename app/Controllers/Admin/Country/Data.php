@@ -31,10 +31,4 @@ class Data extends \Controllers\Base {
 
         return $model->getCountryById($countryId, $apiKey);
     }
-
-    public function updateTotalsByCountryId(int $countryId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Country();
-        $model->updateTotalsByEntityIds([$countryId], $apiKey);
-    }
 }

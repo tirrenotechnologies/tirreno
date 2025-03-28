@@ -101,7 +101,7 @@ export class RulesPage extends BasePage {
         const saveButton = parentRow.querySelector('button[type="button"]');
 
         const value = field.value;
-        const cls   = getRuleClass(parseInt(value));
+        const cls   = getRuleClass(parseInt(value, 10));
 
         const newClassName = `ruleHighlight ${cls}`;
         parentRow.querySelector('h3').className = newClassName;

@@ -1,9 +1,7 @@
 import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
 import {
-    renderTime, renderResourceWithQueryAndEventType,
-    renderDeviceWithOs, renderIpType, renderIpWithCountry,
-    renderCountryIso, renderUserWithScore, renderUserForEvent,
+    renderResourceWithQueryAndEventType, renderDeviceWithOs,
+    renderIpType, renderIpWithCountry, renderUserForEvent,
     renderTimestampForEvent
 } from '../DataRenderers.js?v=2';
 

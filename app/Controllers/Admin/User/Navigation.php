@@ -37,30 +37,30 @@ class Navigation extends \Controllers\Base {
 
         if (!$errorCode) {
             $cmd = $params['type'] ?? null;
-
+            $apiKey = $this->getCurrentOperatorApiKeyId();
             switch ($cmd) {
                 case 'add':
-                    $dataController->addToWatchlist($accountId);
+                    $dataController->addToWatchlist($accountId, $apiKey);
                     $successCode = \Utils\ErrorCodes::USER_HAS_BEEN_SUCCESSFULLY_ADDED_TO_WATCH_LIST;
                     break;
 
                 case 'remove':
-                    $dataController->removeFromWatchlist($accountId);
+                    $dataController->removeFromWatchlist($accountId, $apiKey);
                     $successCode = \Utils\ErrorCodes::USER_HAS_BEEN_SUCCESSFULLY_REMOVED_FROM_WATCH_LIST;
                     break;
 
                 case 'fraud':
-                    $dataController->addToBlacklistQueue($accountId, true);
+                    $dataController->addToBlacklistQueue($accountId, true, $apiKey);
                     $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_HAS_BEEN_SET;
                     break;
 
                 case 'legit':
-                    $dataController->addToBlacklistQueue($accountId, false);
+                    $dataController->addToBlacklistQueue($accountId, false, $apiKey);
                     $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_HAS_BEEN_UNSET;
                     break;
 
                 case 'reviewed':
-                    $dataController->setReviewedFlag($accountId, true);
+                    $dataController->setReviewedFlag($accountId, true, $apiKey);
                     $successCode = \Utils\ErrorCodes::USER_REVIEWED_FLAG_HAS_BEEN_SET;
                     break;
             }

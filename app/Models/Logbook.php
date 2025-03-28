@@ -68,7 +68,7 @@ class Logbook extends \Models\BaseSql {
     public function rotateRequests(?int $apiKey): int {
         $params = [
             ':key'      => $apiKey,
-            ':limit'    => \Utils\Constants::LOGBOOK_LIMIT,
+            ':limit'    => \Utils\Constants::get('LOGBOOK_LIMIT'),
         ];
 
         $query = (

@@ -33,13 +33,18 @@ class Dashboard extends \Models\BaseSql {
         $this->API_KEY = $apiKey;
         $this->USE_DATES = $useDates;
 
+        // $model = new \Models\ApiKeys();
+        // $model->getKeyById($apiKey);
+        // $reviewQueueThreshold = $model->review_queue_threshold;
+        $reviewQueueThreshold = \Utils\Constants::USER_LOW_SCORE_SUP;
+
         $ips = $this->getTotalIps();
         $users = $this->getTotalUsers();
         $events = $this->getTotalEvents();
         $countries = $this->getTotalCountries();
         $resources = $this->getTotalResources();
         $blockedUsers = $this->getTotalBlockedUsers();
-        $usersForReview = $this->getTotalUsersForReview();
+        $usersForReview = $this->getTotalUsersForReview($reviewQueueThreshold);
 
         return [
             'ips' => $ips,
@@ -71,7 +76,7 @@ class Dashboard extends \Models\BaseSql {
         return $this->getTotal($query, $field);
     }
 
-    private function getTotalUsersForReview(): int {
+    private function getTotalUsersForReview(int $lowScore): int {
         $query = (
             'SELECT
                 COUNT(event_account.id)
@@ -91,8 +96,8 @@ class Dashboard extends \Models\BaseSql {
         );
 
         $additionalParams = [
-            ':reviewed' => false,
-            ':low_score' => \Utils\Constants::USER_LOW_SCORE_SUP,
+            ':reviewed'     => false,
+            ':low_score'    => $lowScore,
         ];
 
         $field = 'event_account.created';

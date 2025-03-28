@@ -21,7 +21,7 @@ export class ResourcePage extends BasePage {
 
     initUi() {
 
-        const RESOURCE_ID = parseInt(window.location.pathname.replace('/resource/', ''));
+        const RESOURCE_ID = parseInt(window.location.pathname.replace('/resource/', ''), 10);
 
         const getParams = () => {
             return {resourceId: RESOURCE_ID};
@@ -95,16 +95,15 @@ export class ResourcePage extends BasePage {
             elems: ['totalUsers', 'totalCountries', 'totalIps', 'totalEvents']
         };
 
-        const staticTiles  = new StaticTiles(tilesParams);
-        const eventPanel   = new EventPanel();
-        const devicePanel  = new DevicePanel();
-        const countriesMap = new Map(mapParams);
-        const barChart     = new BaseBarChart(chartParams);
-
-        const ipsGrid                   = new IpsGrid(ipsGridParams);
-        const ispsGrid                  = new IspsGrid(ispsGridParams);
-        const usersGrid                 = new UsersGrid(usersGridParams);
-        const eventsGrid                = new EventsGrid(eventsGridParams);
-        const devicesGrid               = new DevicesGrid(devicesGridParams);
+        new StaticTiles(tilesParams);
+        new EventPanel();
+        new DevicePanel();
+        new Map(mapParams);
+        new BaseBarChart(chartParams);
+        new IpsGrid(ipsGridParams);
+        new IspsGrid(ispsGridParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
+        new DevicesGrid(devicesGridParams);
     }
 }

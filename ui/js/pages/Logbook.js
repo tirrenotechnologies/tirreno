@@ -13,6 +13,8 @@ export class LogbookPage extends BasePage {
     }
 
     initUi() {
+        const searchFilter = new SearchFilter();
+
         const gridParams = {
             url    : '/admin/loadLogbook',
             tileId : 'totalLogbook',
@@ -31,8 +33,7 @@ export class LogbookPage extends BasePage {
             }
         };
 
-        const searchFilter      = new SearchFilter();
-        const logbookPanel   = new LogbookPanel();
-        const logbookGrid    = new LogbookGrid(gridParams);
+        new LogbookPanel();
+        new LogbookGrid(gridParams);
     }
 }

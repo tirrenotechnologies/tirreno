@@ -58,7 +58,7 @@ return [
     'AdminApi_form_field_token_label' => 'Enrichment key',
     'AdminApi_form_field_token_placeholder' => 'TIR:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=',
     'AdminApi_current_token_tooltip' => 'Current key: ',
-    'AdminApi_form_confirmationMessage' => 'You can use a limited version of Tirreno without a paid subscription or choose to enrich one or several types of data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
+    'AdminApi_form_confirmationMessage' => 'You can use a limited version of tirreno without a paid subscription or choose to enrich one or several types of data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
 
     'AdminApi_token_management_title' => 'Enrichment subscription management',
     'AdminApi_token_management_title_tooltip' => 'Usage statistics and subscription key management',
@@ -77,6 +77,8 @@ return [
     'AdminApi_exchange_blacklist_save_button' => 'Save',
     'AdminApi_exchange_blacklist_success_message' => 'Data exchange parameter has been updated successfully.',
     'AdminApi_update_token_success_message' => 'Enrichment key has been updated successfully.',
+
+    'AdminApi_data_alert_list_exchange' => 'Antifraud network exchange',
 
     'AdminApi_shared_keys_title' => 'Share access',
     'AdminApi_shared_keys_delete' => '[ x ]',

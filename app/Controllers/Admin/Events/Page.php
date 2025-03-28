@@ -20,15 +20,21 @@ class Page extends \Controllers\Pages\Base {
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminEvents_search_placeholder');
+        $controller = new Data();
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $rulesController = new \Controllers\Admin\Rules\Data();
 
         $pageParams = [
             'SEARCH_PLACEHOLDER'            => $searchPlacholder,
             'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
             'LOAD_UPLOT'                    => true,
             'LOAD_DATATABLE'                => true,
+            'LOAD_CHOICES'                  => true,
             'LOAD_AUTOCOMPLETE'             => true,
             'HTML_FILE'                     => 'admin/events.html',
             'JS'                            => 'admin_events.js',
+            'EVENT_TYPES'                   => $controller->getAllEventTypes(),
+            'RULES'                         => $rulesController->getAllRulesByApiKey($apiKey),
             'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 

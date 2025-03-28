@@ -25,6 +25,11 @@ class Page extends \Controllers\Pages\Base {
         $rules = $dataController->getRulesForLoggedUser();
         $searchPlacholder = $this->f3->get('AdminRules_search_placeholder');
 
+        $currentOperator = $this->f3->get('CURRENT_USER');
+        $operatorId = $currentOperator->id;
+
+        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+
         $ruleValues = [
             ['value' => -20, 'text' => $this->f3->get('AdminRules_weight_minus20')],
             ['value' => 0,   'text' => $this->f3->get('AdminRules_weight_0')],
@@ -41,7 +46,19 @@ class Page extends \Controllers\Pages\Base {
             'RULE_VALUES'           => $ruleValues,
             'RULES'                 => $rules,
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
+            'IS_OWNER'              => $isOwner,
         ];
+
+        if ($this->isPostRequest()) {
+            $params = $this->f3->get('POST');
+            $params['id'] = $operatorId;
+            $operationResponse = $dataController->proceedPostRequest($params);
+
+            $pageParams = array_merge($pageParams, $operationResponse);
+            $pageParams['CMD'] = $params['cmd'];
+        }
+
+        $pageParams['API_KEYS'] = $apiKeys;
 
         return parent::applyPageParams($pageParams);
     }

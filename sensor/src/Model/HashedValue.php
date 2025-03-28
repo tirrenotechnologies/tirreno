@@ -23,13 +23,14 @@ use Sensor\Model\Validated\Phone;
 
 class HashedValue {
     public string $value;
+    public string $hash;
     public ?bool $localhost = null;
 
     public function __construct(
         Email|IpAddress|Phone $input,
-        public ?string $hash,
     ) {
         $this->value = $input->value;
+        $this->hash = hash('sha256', $this->value);
         if ($input instanceof IpAddress) {
             $this->localhost = $input->isLocalhost();
         }
@@ -38,10 +39,10 @@ class HashedValue {
     /**
      * @return array{value: string, hash: ?string}
      */
-    public function toArray(): array {
+    public function toArray(bool $hashExchange): array {
         return [
             'value' => $this->value,
-            'hash' => $this->hash,
+            'hash' => $hashExchange ? $this->hash : null,
         ];
     }
 }

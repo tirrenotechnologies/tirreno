@@ -1,0 +1,15 @@
+<div id="rule-selectors" class="settings-page choices-selector">
+    <div class="field">
+        <div class="control">
+            <div class="selector">
+                <select class="input" name="version" multiple>
+                    <option placeholder>{{ @AdminUsers_rules_search_placeholder }}</option>
+                    <repeat group="{{ @RULES }}" value="{{ @record }}">
+                        <option value="{{ @record['id'] }}" {{ isset(@DEFAULT_RULE) && @DEFAULT_RULE === @record['uid'] ? 'selected' : '' }}
+                            >{{ @record['uid'] }}|{{ \Utils\Rules::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
+                    </repeat>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

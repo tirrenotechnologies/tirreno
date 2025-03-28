@@ -18,7 +18,7 @@ export class BotPage extends BasePage {
     }
 
     initUi() {
-        const BOT_ID = parseInt(window.location.pathname.replace('/bot/', ''));
+        const BOT_ID = parseInt(window.location.pathname.replace('/bot/', ''), 10);
 
         const getParams = () => {
             return {botId: BOT_ID};
@@ -75,13 +75,13 @@ export class BotPage extends BasePage {
             tooltipField : 'total_visit'
         };
 
-        const eventPanel   = new EventPanel();
-        const detailsTiles = new BotTiles(botDetailsTiles);
-        const countriesMap = new Map(mapParams);
-        const ipsGrid      = new IpsGrid(ipsGridParams);
-        const barChart     = new BaseBarChart(chartParams);
-        const usersGrid    = new UsersGrid(usersGridParams);
-        const eventsGrid   = new EventsGrid(eventsGridParams);
-        const reenrichment = new ReenrichmentButton();
+        new EventPanel();
+        new BotTiles(botDetailsTiles);
+        new Map(mapParams);
+        new IpsGrid(ipsGridParams);
+        new BaseBarChart(chartParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
+        new ReenrichmentButton();
     }
 }

@@ -29,9 +29,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        // update totals if user has not-up-to-date totals
-        $dataController->updateTotalsByAccountId($userId);
-
         [$scheduledForDeletion, $errorCode] = $dataController->getScheduledForDeletion($userId);
         $user = $dataController->getUserById($userId);
 

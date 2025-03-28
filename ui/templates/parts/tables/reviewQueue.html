@@ -12,8 +12,8 @@
 <div class="card events-card">
     <header class="card-header">
         <div class="card-header-title">
-            {{ @ReviewQueue_table_title }}
-            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @ReviewQueue_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
+            {{ @AdminReviewQueue_table_title }}
+            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @AdminReviewQueue_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
             </p>
         </div>
     </header>
@@ -22,7 +22,8 @@
         <div class="content">
             <check if="false !== strpos(@CURRENT_PATH, 'review-queue')">
                 <true>
-                <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/choices/rules.html" />
                 </true>
             </check>
             <table class="table" id="review-queue-table">

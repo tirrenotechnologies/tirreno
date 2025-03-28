@@ -15,6 +15,9 @@ export class WatchlistPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter   = new DatesFilter();
+        const searchFilter  = new SearchFilter();
+
         const gridParams = {
             url    : '/admin/loadEvents?watchlist=true',
             tileId : 'totalEvents',
@@ -32,10 +35,8 @@ export class WatchlistPage extends BasePage {
             }
         };
 
-        const datesFilter   = new DatesFilter();
-        const searchFilter  = new SearchFilter();
-        const eventPanel    = new EventPanel();
-        const watchlistTags = new WatchlistTags();
-        const eventsGrid    = new EventsGrid(gridParams);
+        new EventPanel();
+        new WatchlistTags();
+        new EventsGrid(gridParams);
     }
 }

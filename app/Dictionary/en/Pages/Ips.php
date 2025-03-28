@@ -17,6 +17,7 @@ return [
     'AdminIps_page_title' => 'IPs',
     'AdminIps_breadcrumb_title' => 'IPs',
     'AdminIps_search_placeholder' => 'IP, ASN, Country or Network operator',
+    'AdminUsers_ip_type_search_placeholder' => '+ Add another IP type',
 
     'AdminIps_table_title' => 'IP addresses',
     'AdminIps_table_title_tooltip' => 'This page outputs information grouped by IP address. The data is shown for a selected period of time. To open a page with more details, click on a table row. The chart shows the number of the residential (considered safe) and non-residential (considered a warning signal) IP addresses from which the requests were made each day.',

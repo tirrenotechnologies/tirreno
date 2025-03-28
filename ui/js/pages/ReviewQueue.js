@@ -2,6 +2,7 @@ import {BasePage} from './Base.js';
 
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
+import {RulesFilter} from '../parts/choices/RulesFilter.js?v=2';
 import {UserGridActionButtons} from '../parts/UserGridActionButtons.js?v=2';
 import {ReviewQueueGrid} from '../parts/grid/ReviewQueue.js?v=2';
 import {ReviewQueueChart} from '../parts/chart/ReviewQueue.js?v=2';
@@ -15,6 +16,10 @@ export class ReviewQueuePage extends BasePage {
     }
 
     initUi() {
+        const datesFilter   = new DatesFilter();
+        const searchFilter  = new SearchFilter();
+        const rulesFilter   = new RulesFilter();
+
         const chartParams = {
             getParams: function() {
                 const mode        = 'review-queue';
@@ -32,19 +37,19 @@ export class ReviewQueuePage extends BasePage {
             tableId : 'review-queue-table',
             dateRangeGrid: true,
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
+            choicesFilterEvents: [rulesFilter.getEventType()],
 
-                return {dateRange, searchValue};
+            getParams: function() {
+                const dateRange     = datesFilter.getValue();
+                const searchValue   = searchFilter.getValue();
+                const ruleIds       = rulesFilter.getValues();
+
+                return {dateRange, searchValue, ruleIds};
             }
         };
 
-        const datesFilter           = new DatesFilter();
-        const searchFilter          = new SearchFilter();
-        const reviewQueueChart      = new ReviewQueueChart(chartParams);
-        const reviewQueueGrid       = new ReviewQueueGrid(gridParams);
-
-        const userGridActionButtons = new UserGridActionButtons(this.tableId);
+        new ReviewQueueChart(chartParams);
+        new ReviewQueueGrid(gridParams);
+        new UserGridActionButtons(this.tableId);
     }
 }

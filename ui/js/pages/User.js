@@ -28,7 +28,7 @@ export class UserPage extends BasePage {
     }
 
     initUi() {
-        const ACCOUNT_ID = parseInt(window.location.pathname.replace('/id/', ''));
+        const ACCOUNT_ID = parseInt(window.location.pathname.replace('/id/', ''), 10);
 
         const getParams = () => {
             return {userId: ACCOUNT_ID};
@@ -121,25 +121,25 @@ export class UserPage extends BasePage {
             elems: ['totalCountries', 'totalIps', 'totalDevices', 'totalEvents']
         };
 
-        const staticTiles    = new StaticTiles(tilesParams);
-        const detailsTiles   = new UserTiles(userDetailsTiles);
-        const reviewButton   = new SingleReviewButton(ACCOUNT_ID);
-        const scoreDetails   = new ScoreDetails(userScoreDetails);
+        new StaticTiles(tilesParams);
+        new UserTiles(userDetailsTiles);
+        new SingleReviewButton(ACCOUNT_ID);
+        new ScoreDetails(userScoreDetails);
 
-        const eventPanel    = new EventPanel();
+        new EventPanel();
 
-        const emailPanel    = new EmailPanel();
-        const phonePanel    = new PhonePanel();
-        const devicePanel   = new DevicePanel();
-        const reenrichment  = new ReenrichmentButton();
-        const countriesMap  = new Map(mapParams);
-        const barChart      = new BaseBarChart(chartParams);
+        new EmailPanel();
+        new PhonePanel();
+        new DevicePanel();
+        new ReenrichmentButton();
+        new Map(mapParams);
+        new BaseBarChart(chartParams);
 
-        const ipsGrid               = new IpsGrid(ipsGridParams);
-        const ispsGrid              = new IspsGrid(ispsGridParams);
-        const emailsGrid            = new EmailsGrid(emailsGridParams);
-        const phonesGrid            = new PhonesGrid(phonesGridParams);
-        const eventsGrid            = new EventsGrid(eventsGridParams);
-        const devicesGrid           = new DevicesGrid(devicesGridParams);
+        new IpsGrid(ipsGridParams);
+        new IspsGrid(ispsGridParams);
+        new EmailsGrid(emailsGridParams);
+        new PhonesGrid(phonesGridParams);
+        new EventsGrid(eventsGridParams);
+        new DevicesGrid(devicesGridParams);
     }
 }

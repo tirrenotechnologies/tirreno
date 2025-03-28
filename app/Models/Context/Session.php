@@ -27,8 +27,8 @@ class Session extends Base {
     private function getSessionDetails(int $timezoneOffset, int $apiKey, array $accountIds): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
-        $params[':night_start'] = gmdate('H:i:s', \Utils\Constants::NIGHT_RANGE_SECONDS_START - $timezoneOffset);
-        $params[':night_end'] = gmdate('H:i:s', \Utils\Constants::NIGHT_RANGE_SECONDS_END - $timezoneOffset);
+        $params[':night_start'] = gmdate('H:i:s', \Utils\Constants::get('NIGHT_RANGE_SECONDS_START') - $timezoneOffset);
+        $params[':night_end'] = gmdate('H:i:s', \Utils\Constants::get('NIGHT_RANGE_SECONDS_END') - $timezoneOffset);
 
         // boolean logic for defining time ranges overlap
         $query = (

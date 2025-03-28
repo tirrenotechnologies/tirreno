@@ -264,13 +264,6 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
             $this->score_updated_at = date('Y-m-d H:i:s');
             $this->score_recalculate = false;
 
-            if (
-                $data['score'] > \Utils\Constants::USER_HIGH_SCORE_INF
-                && $this->reviewed !== true
-            ) {
-                $this->reviewed = false;
-            }
-
             $this->save();
         }
     }

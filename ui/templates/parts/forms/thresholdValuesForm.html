@@ -1,0 +1,54 @@
+<div class="card events-card" data-item-id="threshhold-values-form">
+    <form method="POST" action="{{ 'rules' | alias }}">
+        <input type="hidden" name="token" value="{{ @CSRF }}">
+        <input type="hidden" name="cmd" value="changeThresholdValues" />
+        <input type="hidden" name="keyId" value="{{ @apiKeyId }}">
+
+        <header class="card-header">
+            <div class="card-header-title">{{ @AdminThresholdValues_form_title }}<p class="tooltip-info tooltip" title="{{ @AdminThresholdValues_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            </div>
+        </header>
+
+        <div class="card-content">
+            <div class="content">
+                {{ @AdminThresholdValues_form_field_warning }}
+                <div class="field">
+                    <label class="label">{{ @AdminThresholdValues_form_field_review_queue_threshold_label }}</label>
+                    <div class="control">
+                        <div class="selector">
+                            <select class="input" name="review-queue-threshold" id="review-queue-threshold">
+                                <option value="11" {{ @reviewQueueThreshold === 11 ? 'selected' : '' }}>11</option>
+                                <option value="22" {{ @reviewQueueThreshold === 22 ? 'selected' : '' }}>22</option>
+                                <option value="33" {{ @reviewQueueThreshold === 33 ? 'selected' : '' }}>33</option>
+                                <option value="44" {{ @reviewQueueThreshold === 44 ? 'selected' : '' }}>44</option>
+                                <option value="55" {{ @reviewQueueThreshold === 55 ? 'selected' : '' }}>55</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="content">
+                <div class="field">
+                    <label class="label">{{ @AdminThresholdValues_form_field_blacklist_threshold_label }}</label>
+                    <div class="control">
+                        <div class="selector">
+                            <select class="input" name="blacklist-threshold" id="blacklist-threshold">
+                                <option value="-1" {{ @blacklistThreshold === -1 ? 'selected' : '' }}>No blacklist threshold</option>
+                                <option value="0" {{ @blacklistThreshold === 0 ? 'selected' : '' }}>0</option>
+                                <option value="6" {{ @blacklistThreshold === 6 ? 'selected' : '' }}>6</option>
+                                <option value="12" {{ @blacklistThreshold === 12 ? 'selected' : '' }}>12</option>
+                                <option value="18" {{ @blacklistThreshold === 18 ? 'selected' : '' }}>18</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="card-footer">
+            <input type="submit" class="button is-primary" value="{{ @AdminThresholdValues_form_button_save }}">
+        </footer>
+    </form>
+</div>

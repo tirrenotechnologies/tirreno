@@ -3,13 +3,14 @@
 <include href="templates/parts/leftMenu.html" />
 <div class="main">
     <include href="templates/parts/popups/enrichAllPopup.html" />
+
+    <include href="templates/parts/forms/globalSearchForm.html" />
+    <include href="templates/parts/systemNotification.html" />
+    <include href="templates/parts/welcomeMessage.html" />
+    <include href="templates/parts/notification.html" />
+
     <div class="columns">
         <div class="column settings-page">
-            <include href="templates/parts/forms/globalSearchForm.html" />
-            <include href="templates/parts/systemNotification.html" />
-            <include href="templates/parts/welcomeMessage.html" />
-            <include href="templates/parts/notification.html" />
-
             <div class="card events-card">
                 <header class="card-header">
                     <div class="card-header-title">{{ @AdminApi_http_endpoint }}<p class="tooltip-info tooltip"title="{{ @AdminApi_table_title_tooltip }}"><include href="images/icons/information.svg" alt='' /></p>
@@ -75,14 +76,6 @@
                 </div>
             </div>
 
-{***
-            <!-- TODO: return alert_list back in next release -->
-            <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
-                <div class="card events-card">
-                    <include href="templates/parts/forms/exchangeBlacklistForm.html" />
-                </div>
-            </repeat>
-***}
             <check if="{{ @IS_OWNER }}">
                 <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
                     <div class="card events-card">

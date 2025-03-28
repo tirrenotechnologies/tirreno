@@ -25,9 +25,11 @@ class Page extends \Controllers\Pages\Base {
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
             'LOAD_UPLOT'            => true,
             'LOAD_DATATABLE'        => true,
+            'LOAD_CHOICES'          => true,
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/ips.html',
             'JS'                    => 'admin_ips.js',
+            'IP_TYPES'              => \Utils\Constants::get('IP_TYPES'),
             'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 

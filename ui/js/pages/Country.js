@@ -17,7 +17,7 @@ export class CountryPage extends BasePage {
     }
 
     initUi() {
-        const COUNTRY_ID = parseInt(window.location.pathname.replace('/country/', ''));
+        const COUNTRY_ID = parseInt(window.location.pathname.replace('/country/', ''), 10);
 
         const getParams = () => {
             return {countryId: COUNTRY_ID};
@@ -75,12 +75,12 @@ export class CountryPage extends BasePage {
             elems: ['totalUsers', 'totalIps', 'totalEvents']
         };
 
-        const staticTiles  = new StaticTiles(tilesParams);
-        const eventPanel   = new EventPanel();
-        const barChart     = new BaseBarChart(chartParams);
-        const ipsGrid      = new IpsGrid(ipsGridParams);
-        const ispsGrid     = new IspsGrid(ispsGridParams);
-        const usersGrid    = new UsersGrid(usersGridParams);
-        const eventsGrid   = new EventsGrid(eventsGridParams);
+        new StaticTiles(tilesParams);
+        new EventPanel();
+        new BaseBarChart(chartParams);
+        new IpsGrid(ipsGridParams);
+        new IspsGrid(ispsGridParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
     }
 }

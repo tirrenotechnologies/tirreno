@@ -22,7 +22,7 @@ class Data extends \Controllers\Base {
         $request = $this->f3->get('REQUEST');
         $type = $request['type'];
         $mode = $request['mode'];
-        $modelMap = \Utils\Constants::CHART_MODEL_MAP;
+        $modelMap = \Utils\Constants::get('CHART_MODEL_MAP');
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
 
@@ -63,7 +63,7 @@ class Data extends \Controllers\Base {
         $params = $this->f3->get('GET');
         $dateRange = $this->getDatesRange($params);
         $mode = $params['mode'];
-        $modelMap = \Utils\Constants::TOP_TEN_MODELS_MAP;
+        $modelMap = \Utils\Constants::get('TOP_TEN_MODELS_MAP');
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
         $data = $model ? $model->getList($apiKey, $dateRange) : [];

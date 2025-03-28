@@ -14,6 +14,9 @@ export class CountriesPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter   = new DatesFilter();
+        const searchFilter  = new SearchFilter();
+
         const getMapParams = () => {
             const dateRange   = datesFilter.getValue();
             return {dateRange};
@@ -44,9 +47,7 @@ export class CountriesPage extends BasePage {
             tooltipField : 'total_account'
         };
 
-        const datesFilter   = new DatesFilter();
-        const searchFilter  = new SearchFilter();
-        const countriesMap  = new Map(mapParams);
-        const countriesGrid = new CountriesGrid(gridParams);
+        new Map(mapParams);
+        new CountriesGrid(gridParams);
     }
 }

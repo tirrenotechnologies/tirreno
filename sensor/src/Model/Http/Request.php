@@ -36,9 +36,6 @@ class Request {
         'eventType',
         'httpMethod',
         'userCreated',
-        //'hashEmailAddress',
-        //'hashPhoneNumber',
-        //'hashIpAddress',
     ];
 
     /**

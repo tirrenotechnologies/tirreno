@@ -33,7 +33,7 @@ class BaseEventsCount extends \Models\BaseSql {
         $datesRange = $this->getLatest180DatesRange($offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Utils\Constants::CHART_RESOLUTION[$this->getResolution($request)];
+        $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);

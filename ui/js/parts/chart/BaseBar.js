@@ -54,7 +54,7 @@ export class BaseBarChart extends BaseChart {
             width: 995,
             height: 200,
 
-            tzDate: ts => uPlot.tzDate(new Date(ts * 1e3), 'Etc/UTC'),
+            tzDate: ts => uPlot.tzDate(new Date(ts * 1000), 'Etc/UTC'),
             series: series,
 
             legend: {

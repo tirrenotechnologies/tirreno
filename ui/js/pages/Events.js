@@ -3,6 +3,8 @@ import {BasePage} from './Base.js';
 import {EventsChart} from '../parts/chart/Events.js?v=2';
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
+import {EventTypeFilter} from '../parts/choices/EventTypeFilter.js?v=2';
+import {RulesFilter} from '../parts/choices/RulesFilter.js?v=2';
 import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 import {EventsGrid} from '../parts/grid/Events.js?v=2';
 
@@ -15,6 +17,11 @@ export class EventsPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter       = new DatesFilter();
+        const searchFilter      = new SearchFilter();
+        const eventTypeFilter   = new EventTypeFilter();
+        const rulesFilter       = new RulesFilter();
+
         const chartParams = {
             getParams: function() {
                 const mode        = 'events';
@@ -37,18 +44,20 @@ export class EventsPage extends BasePage {
             singleUser: false,
             isSortable: true,
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
+            choicesFilterEvents: [eventTypeFilter.getEventType(), rulesFilter.getEventType()],
 
-                return {dateRange, searchValue};
+            getParams: function() {
+                const dateRange     = datesFilter.getValue();
+                const searchValue   = searchFilter.getValue();
+                const eventTypeIds  = eventTypeFilter.getValues();
+                const ruleIds       = rulesFilter.getValues();
+
+                return {dateRange, searchValue, eventTypeIds, ruleIds};
             }
         };
 
-        const datesFilter  = new DatesFilter();
-        const searchFilter = new SearchFilter();
-        const eventPanel   = new EventPanel();
-        const lineChart    = new EventsChart(chartParams);
-        const eventsGrid   = new EventsGrid(gridParams);
+        new EventPanel();
+        new EventsChart(chartParams);
+        new EventsGrid(gridParams);
     }
 }

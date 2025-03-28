@@ -25,7 +25,7 @@ export class EventPanel extends BasePanel {
         data.event_time                 = Renderers.renderTime(event_record.time);
         data.event_http_code            = Renderers.renderHttpCode(event_record);
         data.event_http_method          = Renderers.renderHttpMethod(event_record);
-        data.event_type_name            = data.event_type_name;
+        //data.event_type_name            = data.event_type_name;
 
         //Convert to boolean if number exists
         //if(Number.isInteger(data.profiles)) {
@@ -53,6 +53,7 @@ export class EventPanel extends BasePanel {
             email:              data.current_email,
             score_updated_at:   data.score_updated_at,
             score:              data.score,
+            fraud:              data.fraud,
         };
         data.user_id              = Renderers.renderClickableImportantUserWithScore(current_email_record, 'long');
         data.accounttitle         = Renderers.renderUserId(data.accounttitle);
@@ -149,7 +150,7 @@ export class EventPanel extends BasePanel {
         data.lastname             = Renderers.renderUserLastname(data);
 
         data.ip_users             = Renderers.renderUserCounter(data.ip_users, 2);
-        data.ip_events            = data.ip_events;
+        //data.ip_events            = data.ip_events;
         data.ip_spamlist          = Renderers.renderBoolean(data.spamlist);
         data.ip_type              = Renderers.renderIpType(data);
         //  TODO: return alert_list back in next release

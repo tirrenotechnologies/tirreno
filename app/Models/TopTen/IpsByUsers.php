@@ -21,7 +21,7 @@ class IpsByUsers extends Base {
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
-        $queryConditions = $this->getQueryqueryConditions($dateRange);
+        $queryConditions = $this->getQueryConditions($dateRange);
         $queryConditions[] = 'event_ip.shared > 1';
         $queryConditions = join(' AND ', $queryConditions);
 

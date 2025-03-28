@@ -24,19 +24,43 @@ class Events extends Base {
         $ox = array_column($data, 'ts');
         $l1 = array_column($data, 'event_count');
         $l2 = array_column($data, 'users_count');
+        $l3 = array_column($data, 'event_alert_type_count');
 
-        return $this->addEmptyDays([$ox, $l1, $l2]);
+        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
     }
 
     private function getFirstLine(int $apiKey): array {
+        $request = $this->f3->get('REQUEST');
+        $dateRange = $this->getDatesRange($request);
+        if (!$dateRange) {
+            $dateRange = [
+                'endDate' => date('Y-m-d H:i:s'),
+                'startDate' => date('Y-m-d H:i:s', 0),
+            ];
+        }
+        $offset = \Utils\TimeZones::getCurrentOperatorOffset();
+        [$typesParams, $flatIds] = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES);
+        $params = [
+            ':api_key'      => $apiKey,
+            ':end_time'     => $dateRange['endDate'],
+            ':start_time'   => $dateRange['startDate'],
+            ':resolution'   => $this->getResolution($request),
+            ':offset'       => strval($offset),
+        ];
+        $params = array_merge($params, $typesParams);
+
         $query = (
-            'SELECT
+            "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(event.id) AS event_count,
-                COUNT(DISTINCT event.account) AS users_count
+                COUNT(DISTINCT event.account) AS users_count,
+                COUNT(CASE WHEN event_type.value IN ({$flatIds}) THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event
+
+            LEFT JOIN event_type
+            ON event.type = event_type.id
 
             WHERE
                 event.key = :api_key AND
@@ -44,9 +68,9 @@ class Events extends Base {
                 event.time <= :end_time
 
             GROUP BY ts
-            ORDER BY ts'
+            ORDER BY ts"
         );
 
-        return $this->execute($query, $apiKey);
+        return $this->execQuery($query, $params);
     }
 }

@@ -3,19 +3,22 @@
     <include href="templates/parts/leftMenu.html" />
     <div class="main">
         <include href="templates/parts/popups/closeAccountPopup.html" />
+
+        <include href="templates/parts/forms/globalSearchForm.html" />
+        <include href="templates/parts/systemNotification.html" />
+        <include href="templates/parts/welcomeMessage.html" />
+        <include href="templates/parts/notification.html" />
+
         <div class="columns">
             <div class="column settings-page">
-                <include href="templates/parts/forms/globalSearchForm.html" />
-                <include href="templates/parts/systemNotification.html" />
-                <include href="templates/parts/welcomeMessage.html" />
-                <include href="templates/parts/notification.html" />
-
                 <include href="templates/parts/forms/timeZoneForm.html" />
 
-                <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
-                    <include href="templates/parts/forms/retentionPolicyForm.html"
-                        with="apiKeyId={{ @API_KEY.id }},retentionPolicy={{ @API_KEY.retention_policy }}" />
-                </repeat>
+                <check if="{{ @IS_OWNER }}">
+                    <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                        <include href="templates/parts/forms/retentionPolicyForm.html"
+                            with="apiKeyId={{ @API_KEY.id }},retentionPolicy={{ @API_KEY.retention_policy }}" />
+                    </repeat>
+                </check>
 
                 <set FREQUENCY="{{ isset(@VALUES)?@VALUES.unreviewed_items_reminder_freq:@PROFILE.unreviewed_items_reminder_freq }}" />
                 <include href="templates/parts/forms/notificationPreferencesForm.html" with="frequency={{ @FREQUENCY }}" />

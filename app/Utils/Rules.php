@@ -172,15 +172,15 @@ class Rules {
             return ['&minus;', $cls];
         }
 
-        if ($score >= \Utils\Constants::USER_LOW_SCORE_INF && $score < \Utils\Constants::USER_LOW_SCORE_SUP) {
+        if ($score >= \Utils\Constants::get('USER_LOW_SCORE_INF') && $score < \Utils\Constants::get('USER_LOW_SCORE_SUP')) {
             $cls = 'low';
         }
 
-        if ($score >= \Utils\Constants::USER_MEDIUM_SCORE_INF && $score < \Utils\Constants::USER_MEDIUM_SCORE_SUP) {
+        if ($score >= \Utils\Constants::get('USER_MEDIUM_SCORE_INF') && $score < \Utils\Constants::get('USER_MEDIUM_SCORE_SUP')) {
             $cls = 'medium';
         }
 
-        if ($score >= \Utils\Constants::USER_HIGH_SCORE_INF) {
+        if ($score >= \Utils\Constants::get('USER_HIGH_SCORE_INF')) {
             $cls = 'high';
         }
 

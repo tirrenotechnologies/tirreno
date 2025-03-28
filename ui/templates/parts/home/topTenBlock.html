@@ -38,12 +38,12 @@
             </div>
         </td>
 
-        <td class="table-card" id="ips-with-tor-one">
+        <td class="table-card" id="users-with-most-login-fail">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_ips_with_tor_one }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_ips_with_tor_one_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @AdminHome_top10_users_with_most_login_fail }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_users_with_most_login_fail_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
-                <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_ip,c2=@Top10_events,id=ips-with-tor-one-table"/>
+                <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_user,c2=@Top10_attempts,id=users-with-most-login-fail-table"/>
             </div>
         </td>
 

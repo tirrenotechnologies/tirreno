@@ -2,7 +2,6 @@ import {Loader} from '../Loader.js?v=2';
 import {Tooltip} from '../Tooltip.js?v=2';
 import {fireEvent} from '../utils/Event.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
-import * as Renderers from '../DataRenderers.js?v=2';
 
 export class BasePanel {
 

@@ -46,19 +46,8 @@ const escapeForHTMLAttribute = (str) => {
                     return '&gt;';
                 default:
                     return match;
-            };
+            }
         });
-};
-
-const replaceUnicodeWithEntities = (str) => {
-    return str.split('').map(char => {
-        const code = char.charCodeAt(0);
-        if (code > 127) {
-            return `&#${code};`;
-        } else {
-            return char;
-        }
-    }).join('');
 };
 
 const getRuleClass = (value) => {
@@ -82,7 +71,7 @@ const formatTime = (str) => {
     let days = 0;
     const dayMatch = str.match(dayPattern);
     if (dayMatch) {
-        days = parseInt(dayMatch[1]);
+        days = parseInt(dayMatch[1], 10);
         str = str.replace(dayPattern, '').trim();
     }
 
@@ -95,9 +84,9 @@ const formatTime = (str) => {
     }
 
     const parts = str.split(':');
-    const hours = parseInt(parts[0]);
-    let minutes = parseInt(parts[1]);
-    const seconds = parseInt(parts[2]);
+    const hours = parseInt(parts[0], 10);
+    let minutes = parseInt(parts[1], 10);
+    const seconds = parseInt(parts[2], 10);
 
     let humanTime = '';
     if (days > 0) {
@@ -116,9 +105,9 @@ const formatTime = (str) => {
 const openJson = (str) => {
     try {
         return JSON.parse(str);
-    } catch (error) {
+    } catch (e) {
         return null;
     }
 };
 
-export {truncateWithHellip, replaceAll, escapeForHTMLAttribute, replaceUnicodeWithEntities, getRuleClass, formatTime, openJson};
+export {truncateWithHellip, replaceAll, escapeForHTMLAttribute, getRuleClass, formatTime, openJson};

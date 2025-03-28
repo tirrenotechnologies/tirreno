@@ -18,6 +18,90 @@ namespace Controllers\Admin\Rules;
 class Data extends \Controllers\Base {
     use \Traits\ApiKeys;
 
+    public function proceedPostRequest(array $params): array {
+        return match ($params['cmd']) {
+            'changeThresholdValues' => $this->changeThresholdValues($params),
+            default => []
+        };
+    }
+
+    public function changeThresholdValues(array $params): array {
+        $pageParams = [];
+        $errorCode = $this->validateThresholdValues($params);
+
+        if ($errorCode) {
+            $pageParams['ERROR_CODE'] = $errorCode;
+        } else {
+            $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
+
+            $model = new \Models\ApiKeys();
+            $model->getKeyById($keyId);
+
+            $blacklistThreshold = (int) ($params['blacklist-threshold'] ?? -1);
+            $reviewQueueThreshold = (int) ($params['review-queue-threshold'] ?? 0);
+
+            $recalculateReviewQueueCnt = $model->review_queue_threshold !== $reviewQueueThreshold;
+
+            $model->updateBlacklistThreshold($blacklistThreshold);
+            $model->updateReviewQueueThreshold($reviewQueueThreshold);
+
+            if ($recalculateReviewQueueCnt) {
+                $controller = new \Controllers\Admin\ReviewQueue\Data();
+                $controller->getNumberOfNotReviewedUsers($keyId, false, true);
+            }
+
+            $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminThresholdValues_update_success_message');
+        }
+
+        return $pageParams;
+    }
+
+    private function validateThresholdValues(array $params): int|false {
+        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
+        if ($errorCode) {
+            return $errorCode;
+        }
+
+        $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
+        if (!$keyId) {
+            return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
+        }
+
+        $blacklistThreshold = (int) ($params['blacklist-threshold'] ?? -1);
+        if ($blacklistThreshold < -1 || $blacklistThreshold > 18) {
+            return \Utils\ErrorCodes::BLACKLIST_THRESHOLD_DOES_NOT_EXIST;
+        }
+
+        $reviewQueueThreshold = (int) ($params['review-queue-threshold'] ?? 0);
+        if ($reviewQueueThreshold < 0 || $reviewQueueThreshold > 100) {
+            return \Utils\ErrorCodes::REVIEW_QUEUE_THRESHOLD_DOES_NOT_EXIST;
+        }
+
+        if ($reviewQueueThreshold <= $blacklistThreshold) {
+            return \Utils\ErrorCodes::BLACKLIST_THRESHOLD_EXCEEDS_REVIEW_QUEUE_THRESHOLD;
+        }
+
+        return false;
+    }
+
+    public function getOperatorApiKeys(int $operatorId): array {
+        $model = new \Models\ApiKeys();
+        $apiKeys = $model->getKeys($operatorId);
+
+        $isOwner = true;
+        if (!$apiKeys) {
+            $coOwnerModel = new \Models\ApiKeyCoOwner();
+            $coOwnerModel->getCoOwnership($operatorId);
+
+            if ($coOwnerModel->loaded()) {
+                $isOwner = false;
+                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
+            }
+        }
+
+        return [$isOwner, $apiKeys];
+    }
+
     public function getRulesForLoggedUser(): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
 
@@ -43,7 +127,7 @@ class Data extends \Controllers\Base {
 
         $proportion = (float) (100 * $ruleUsers) / (float) $totalUsers;
 
-        // if number is too small make it a bit grater so it will be written in db as 0 < n < 1
+        // if number is too small make it a bit greater so it will be written in db as 0 < n < 1
         return abs($proportion) < 0.001 ? 0.001 : $proportion;
     }
 
@@ -67,6 +151,15 @@ class Data extends \Controllers\Base {
             'details'   => json_encode($details),
             'accountId' => $accountId,
         ];
+
+        $model = new \Models\ApiKeys();
+        $model->getKeyById($apiKey);
+
+        // $blacklistThreshold = $model->blacklist_threshold;
+        $blacklistThreshold = -1;
+        if ($total <= $blacklistThreshold) {
+            (new \Controllers\Admin\User\Data())->addToBlacklistQueue($accountId, true, $apiKey);
+        }
 
         $dataController->updateScoreDetails($data);
     }
@@ -158,7 +251,7 @@ class Data extends \Controllers\Base {
     }
 
     public function updateTotalsByAccountIds(array $accountsIds, int $apiKey): void {
-        foreach (\Utils\Constants::RULES_TOTALS_MODELS as $model) {
+        foreach (\Utils\Constants::get('RULES_TOTALS_MODELS') as $model) {
             (new $model())->updateTotalsByAccountIds($accountsIds, $apiKey);
         }
     }

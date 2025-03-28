@@ -17,7 +17,7 @@ $style = (
 '<style>
   body {
     background-color: #2b2a3d;
-    color: #bfbed0;
+    color: #d7e6e1;
     font-family: monospace, monospace;
     padding: 50px;
     font-size: 13px;
@@ -25,7 +25,7 @@ $style = (
   input[type="text"],input[type="email"]{
     width: 550px;
     background-color: #151220;
-    color: #bfbed0;
+    color: #d7e6e1;
     font-size: 100%;
   }
   label {
@@ -269,8 +269,9 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
         $httpHost = explode(':', $httpHost)[0];
 
         $configData = [
-            'SITE' => $httpHost,
-            'DATABASE_URL' => "postgres://$values[db_user]:$values[db_pass]@$values[db_host]:$values[db_port]/$values[db_name]",
+            'SITE'          => $httpHost,
+            'DATABASE_URL'  => "postgres://$values[db_user]:$values[db_pass]@$values[db_host]:$values[db_port]/$values[db_name]",
+            'PEPPER'        => strval(bin2hex(random_bytes(32))),
         ];
         if ($values['admin_email'] !== '') {
             $configData['ADMIN_EMAIL'] = $values['admin_email'];

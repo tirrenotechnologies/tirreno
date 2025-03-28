@@ -48,10 +48,6 @@ class Variables {
         return getenv('ENRICHMENT_API') ?: self::getF3()->get('ENRICHMENT_API');
     }
 
-    public static function getFraudEnrichmentApi(): ?string {
-        return getenv('FRAUD_ENRICHMENT_API') ?: self::getF3()->get('FRAUD_ENRICHMENT_API');
-    }
-
     public static function getPepper(): string {
         return getenv('PEPPER') ?: self::getF3()->get('PEPPER');
     }
@@ -68,15 +64,15 @@ class Variables {
     }
 
     public static function getAccountOperationQueueBatchSize(): int {
-        return getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE') ? intval(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE')) : \Utils\Constants::ACCOUNT_OPERATION_QUEUE_BATCH_SIZE;
+        return getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE') ? intval(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE')) : \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE');
     }
 
     public static function getNewEventsBatchSize(): int {
-        return getenv('NEW_EVENTS_BATCH_SIZE') ? intval(getenv('NEW_EVENTS_BATCH_SIZE')) : \Utils\Constants::NEW_EVENTS_BATCH_SIZE;
+        return getenv('NEW_EVENTS_BATCH_SIZE') ? intval(getenv('NEW_EVENTS_BATCH_SIZE')) : \Utils\Constants::get('NEW_EVENTS_BATCH_SIZE');
     }
 
     public static function getRuleUsersBatchSize(): int {
-        return getenv('RULE_USERS_BATCH_SIZE') ? intval(getenv('RULE_USERS_BATCH_SIZE')) : \Utils\Constants::RULE_USERS_BATCH_SIZE;
+        return getenv('RULE_USERS_BATCH_SIZE') ? intval(getenv('RULE_USERS_BATCH_SIZE')) : \Utils\Constants::get('RULE_USERS_BATCH_SIZE');
     }
 
     public static function completedConfig(): bool {

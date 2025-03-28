@@ -7,7 +7,7 @@ const handleAjaxError = (xhr, status, error) => {
     }
 
     if (xhr.status === 401 || xhr.status === 403) {
-        window.location.href = '/login';
+        window.location.href = escape('/login');
         return;
     }
 

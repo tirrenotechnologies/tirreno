@@ -15,40 +15,42 @@
 
 namespace Models\TopTen;
 
-class IpsWithTorOne extends Base {
+class UsersByLoginFail extends Base {
     protected $DB_TABLE_NAME = 'event';
 
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
-        $queryConditions = $this->getQueryqueryConditions($dateRange);
-        $queryConditions[] = 'event_ip.tor is True';
+        $queryConditions = $this->getQueryConditions($dateRange);
+        $queryConditions[] = 'event.type = 7';
         $queryConditions = join(' AND ', $queryConditions);
 
         $query = (
             "SELECT
-                event_ip.ip AS ip,
-                MAX(event_ip.id) AS ipid,
-                COUNT(event.ip) AS value,
-                MAX(countries.id) as country,
-                MAX(event_isp.name) as isp_name
+                event_account.id            AS accountid,
+                event_account.userid        AS accounttitle,
+                event_account.fraud,
+                event_account.score,
+                event_account.score_updated_at,
+                event_email.email,
+                COUNT(event_account.userid) AS value
+
             FROM
                 event
 
-            INNER JOIN event_ip
-            ON (event.ip = event_ip.id)
+            INNER JOIN event_account
+            ON (event.account = event_account.id)
 
-            INNER JOIN countries
-            ON (event_ip.country = countries.serial)
-
-            INNER JOIN event_isp
-            ON (event_ip.isp = event_isp.id)
+            LEFT JOIN event_email
+            ON (event_account.lastemail = event_email.id)
 
             WHERE
                 {$queryConditions}
 
             GROUP BY
-                event_ip.ip
+                event_account.id,
+                event_account.userid,
+                event_email.email
 
             ORDER BY
                 value DESC

@@ -15,6 +15,8 @@ export class DashboardPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter = new DatesFilter();
+
         const getParams = () => {
             const dateRange = datesFilter.getValue();
             return {dateRange};
@@ -52,12 +54,12 @@ export class DashboardPage extends BasePage {
             renderItemColumn: Renderers.renderClickableIpWithCountry
         };
 
-        const topTenIpsTorOneGridParams = {
+        const topTenUsersWithMostLoginFailGridParams = {
             getParams: getParams,
-            mode: 'ipsWithTorOne',
-            tableId: 'ips-with-tor-one-table',
+            mode: 'usersWithMostLoginFail',
+            tableId: 'users-with-most-login-fail-table',
             dateRangeGrid: true,
-            renderItemColumn: Renderers.renderClickableIpWithCountry
+            renderItemColumn: Renderers.renderClickableImportantUserWithScoreTile
         };
 
         const topTenUsersWithMostIpsGridParams = {
@@ -72,14 +74,12 @@ export class DashboardPage extends BasePage {
             getParams: getParams
         };
 
-        const datesFilter    = new DatesFilter();
-        const dashboardTiles = new DashboardTiles(tilesParams);
-
-        const topTenUsersGrid            = new TopTenGrid(topTenUsersGridParams);
-        const topTenCountriesGrid        = new TopTenGrid(topTenCountriesGridParams);
-        const topTenResourcesGrid        = new TopTenGrid(topTenResourcesGridParams);
-        const topTenUsersWithMostIpsGrid = new TopTenGrid(topTenUsersWithMostIpsGridParams);
-        const topTenIpsTorOneGrid        = new TopTenGrid(topTenIpsTorOneGridParams);
-        const topTenIpsWithMostUsersGrid = new TopTenGrid(topTenIpsWithMostUsersGridParams);
+        new DashboardTiles(tilesParams);
+        new TopTenGrid(topTenUsersGridParams);
+        new TopTenGrid(topTenCountriesGridParams);
+        new TopTenGrid(topTenResourcesGridParams);
+        new TopTenGrid(topTenUsersWithMostIpsGridParams);
+        new TopTenGrid(topTenUsersWithMostLoginFailGridParams);
+        new TopTenGrid(topTenIpsWithMostUsersGridParams);
     }
 }

@@ -20,7 +20,7 @@ export class DomainPage extends BasePage {
     }
 
     initUi() {
-        const DOMAIN_ID = parseInt(window.location.pathname.replace('/domain/', ''));
+        const DOMAIN_ID = parseInt(window.location.pathname.replace('/domain/', ''), 10);
 
         const getParams = () => {
             return {domainId: DOMAIN_ID};
@@ -95,15 +95,15 @@ export class DomainPage extends BasePage {
             }
         };
 
-        const countriesMap = new Map(mapParams);
-        const eventPanel   = new EventPanel();
-        const detailsTiles = new DomainTiles(domainDetailsTiles);
-        const barChart     = new BaseBarChart(chartParams);
-        const ipsGrid      = new IpsGrid(ipsGridParams);
-        const ispsGrid     = new IspsGrid(ispsGridParams);
-        const usersGrid    = new UsersGrid(usersGridParams);
-        const eventsGrid   = new EventsGrid(eventsGridParams);
-        const domainsGrid  = new DomainsGrid(domainsGridParams);
-        const reenrichment = new ReenrichmentButton();
+        new Map(mapParams);
+        new EventPanel();
+        new DomainTiles(domainDetailsTiles);
+        new BaseBarChart(chartParams);
+        new IpsGrid(ipsGridParams);
+        new IspsGrid(ispsGridParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
+        new DomainsGrid(domainsGridParams);
+        new ReenrichmentButton();
     }
 }

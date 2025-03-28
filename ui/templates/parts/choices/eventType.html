@@ -1,0 +1,14 @@
+<div id="event-type-selectors" class="settings-page choices-selector">
+    <div class="field">
+        <div class="control">
+            <div class="selector">
+                <select class="input" name="version" multiple>
+                    <option placeholder>{{ @AdminEvents_event_type_search_placeholder }}</option>
+                    <repeat group="{{ @EVENT_TYPES }}" value="{{ @record }}">
+                        <option value="{{ @record['id'] }}">{{ @record['value'] }}|{{ @record['name'] }}</option>
+                    </repeat>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

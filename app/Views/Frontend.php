@@ -26,6 +26,11 @@ class Frontend extends Base {
         // Use anti-CSRF token in templates.
         $this->f3->CSRF = $this->f3->get('SESSION.csrf');
 
+        $tpl = $this->f3->get('TPL') ?? null;
+        if ($tpl) {
+            $tpl::registerExtends();
+        }
+
         return \Template::instance()->render('templates/layout.html');
     }
 }

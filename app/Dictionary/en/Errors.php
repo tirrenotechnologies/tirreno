@@ -94,6 +94,9 @@ $errors = addExerciseError($errors, \Utils\ErrorCodes::CHANGE_EMAIL_KEY_IS_NOT_C
 $errors = addExerciseError($errors, \Utils\ErrorCodes::CHANGE_EMAIL_KEY_WAS_EXPIRED, 'Change email key has expired');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::EMAIL_CHANGED, 'Your email has been successfully changed. Please <a href="/login">login</a> with your new credentials and continue using the system.');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::RULES_HAS_BEEN_SUCCESSFULLY_UPDATED, 'Rules have been successfully updated');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::BLACKLIST_THRESHOLD_DOES_NOT_EXIST, 'Blacklist threshold is mandatory fields');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::REVIEW_QUEUE_THRESHOLD_DOES_NOT_EXIST, 'Review queue threshold is mandatory field');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::BLACKLIST_THRESHOLD_EXCEEDS_REVIEW_QUEUE_THRESHOLD, 'Blacklist threshold must not exceed review queue threshold.');
 
 $errors = addExerciseError($errors, \Utils\ErrorCodes::REST_API_KEY_DOES_NOT_EXIST, 'API key could not be found in the headers');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::REST_API_KEY_IS_NOT_CORRECT, 'API key is incorrect');
@@ -119,5 +122,10 @@ $errors = addExerciseError($errors, \Utils\ErrorCodes::SUBSCRIPTION_KEY_INVALID_
 $errors = addExerciseError($errors, \Utils\ErrorCodes::TOTALS_INVALID_TYPE, 'Invalid entity type was passed for totals calculation');
 
 $errors = addExerciseError($errors, \Utils\ErrorCodes::CRON_JOB_MAY_BE_OFF, 'A cron job isn\'t running. Please check the cron job configuration.');
+
+$extraErrors = \Base::instance()->get('EXTRA_DICT_EN_ERRORS') ?? [];
+foreach ($extraErrors as $errorCode => $desc) {
+    $errors = addExerciseError($errors, $errorCode, $desc);
+}
 
 return $errors;

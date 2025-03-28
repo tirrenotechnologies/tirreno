@@ -32,7 +32,7 @@ const notificationTime = () => {
 };
 
 // offsetInSeconds is not inverted as .getTimezoneOffset() result
-const formatIntTimeUtc = (ts, useTime, offsetInSeconds = 0, utcAlready = false) => {
+const formatIntTimeUtc = (ts, useTime, offsetInSeconds = 0) => {
     const dt = new Date(ts + ((new Date()).getTimezoneOffset() * 60 + offsetInSeconds) * 1000);
 
     let m = dt.getMonth() + 1;

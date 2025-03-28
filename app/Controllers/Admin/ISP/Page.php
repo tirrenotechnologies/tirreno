@@ -27,8 +27,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        $dataController->updateTotalsByIspId($ispId);
-
         $isp = $dataController->getFullIspInfoById($ispId);
         $pageTitle = $this->getInternalPageTitleWithPostfix(strval($isp['asn']));
 

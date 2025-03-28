@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="CustomCodingStandard">
-    <description>Custom coding standards.</description>
+<ruleset name="PHPCodingStandards">
+    <description>PHP coding standards.</description>
 
     <file>app/</file>
     <file>sensor/</file>

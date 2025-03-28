@@ -38,7 +38,7 @@ abstract class AbstractQueueCron extends AbstractCron {
 
             $this->accountOperationQueueModel->setExecutingForBatch(\array_column($items, 'id'));
 
-            while (time() - $start < \Utils\Constants::ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC) {
+            while (time() - $start < \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {
                 $item = \array_pop($items); // array_pop has O(1) complexity, array_shift has O(n) complexity.
                 if (!$item) {
                     break;
@@ -53,7 +53,7 @@ abstract class AbstractQueueCron extends AbstractCron {
                     $errors[] = sprintf('Error on %s: %s. Trace: %s', json_encode($item), $e->getMessage(), $e->getTraceAsString());
                 }
             }
-        } while (time() - $start < \Utils\Constants::ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC); // allow another batch to be fetched if time permits.
+        } while (time() - $start < \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')); // allow another batch to be fetched if time permits.
 
         $this->accountOperationQueueModel->setCompletedForBatch(\array_column($success, 'id'));
         $this->accountOperationQueueModel->setFailedForBatch(\array_column($failed, 'id'));

@@ -6,6 +6,16 @@
         <include href="templates/parts/systemNotification.html" />
         <include href="templates/parts/welcomeMessage.html" />
         <include href="templates/parts/notification.html" />
+{***
+        <div class="column rules-page">
+            <check if="{{ @IS_OWNER }}">
+                <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                        <include href="templates/parts/forms/thresholdValuesForm.html"
+                            with="apiKeyId={{ @API_KEY.id }},blacklistThreshold={{ @API_KEY.blacklist_threshold }},reviewQueueThreshold={{ @API_KEY.review_queue_threshold }}"/>
+                </repeat>
+            </check>
+        </div>
+***}
         <include href="templates/parts/tables/rules.html" />
     </div>
 <include href="templates/parts/footerAdmin.html" />

@@ -2,7 +2,6 @@ import {padZero} from './utils/Date.js?v=2';
 import {
     truncateWithHellip,
     escapeForHTMLAttribute,
-    replaceUnicodeWithEntities,
     getRuleClass,
     formatTime,
     openJson,
@@ -113,13 +112,18 @@ const wrapWithDomainLink = (html, record) => {
     return html;
 };
 
-const wrapWithFraudSpan = (html, record) => {
+const wrapWithRuleLink = (html, ruleUid) => {
+    html = `<a href="/id?ruleUid=${ruleUid}">${html}</a>`;
+    return html;
+};
+
+/*const wrapWithFraudSpan = (html, record) => {
     if (record.fraud_detected) {
         html = `<span class="fraud">${html}</span>`;
     }
 
     return html;
-};
+};*/
 
 const normalizeTimestamp = (ts) => {
     //Fix for ie and safari: https://www.linkedin.com/pulse/fix-invalid-date-safari-ie-hatem-ahmad
@@ -230,11 +234,8 @@ const renderDate = (data) => {
     return escapeForHTMLAttribute(data);
 };
 
-const renderRuleSelectorItem = (classNames, data) => {
+const renderChoicesSelectorItem = (classNames, data, innerHtml) => {
     const itemClass = data.highlighted ? classNames.highlightedState : classNames.itemSelectable;
-    const [uid, className, title] = data.label.split('|');
-
-    const span = `<span class="ruleHighlight ${className}">${uid}</span>`;
     const button = `<button type="button" class="${classNames.button}" aria-label="Remove item" data-button="">Remove item</button>`;
     const html = `<div
             class="${classNames.item} ${itemClass}"
@@ -243,16 +244,13 @@ const renderRuleSelectorItem = (classNames, data) => {
             data-value="${data.value}"
             ${data.active ? 'aria-selected="true"' : ''}
             ${data.disabled ? 'aria-disabled="true"' : ''}
-        >${span}${title}${button}</div>`;
+        >${innerHtml}${button}</div>`;
 
     return html;
 };
 
-const renderRuleSelectorChoice = (classNames, data, itemSelectText) => {
+const renderChoicesSelectorChoice = (classNames, data, itemSelectText, innerHtml) => {
     const choiceClass = data.disabled ? classNames.itemDisabled : classNames.itemSelectable;
-    const [uid, className, title] = data.label.split('|');
-
-    const span = `<span class="ruleHighlight ${className}">${uid}</span>`;
     const html = `<div
             class="${classNames.item} ${classNames.itemChoice} ${choiceClass}"
             data-select-text="${itemSelectText}"
@@ -261,9 +259,51 @@ const renderRuleSelectorChoice = (classNames, data, itemSelectText) => {
             data-id="${data.id}"
             data-value="${data.value}"
             ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}
-        >${span}${title}</div>`;
+        >${innerHtml}</div>`;
 
     return html;
+};
+
+const renderRuleSelectorItem = (classNames, data) => {
+    const [uid, className, title] = data.label.split('|');
+    const innerHtml = `<span class="ruleHighlight ${className}">${uid}</span>${title}`;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderRuleSelectorChoice = (classNames, data, itemSelectText) => {
+    const [uid, className, title] = data.label.split('|');
+    const innerHtml = `<span class="ruleHighlight ${className}">${uid}</span>${title}`;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
+const renderEventTypeSelectorItem = (classNames, data) => {
+    const [value, name] = data.label.split('|');
+    const innerHtml = `<p class="bullet ${value}"></p>${name}`;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderEventTypeSelectorChoice = (classNames, data, itemSelectText) => {
+    const [value, name] = data.label.split('|');
+    const innerHtml = `<p class="bullet ${value}"></p>${name}`;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
+const renderIpTypeSelectorItem = (classNames, data) => {
+    const value = data.label;
+    const innerHtml = `<span>${value}</span>`;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderIpTypeSelectorChoice = (classNames, data, itemSelectText) => {
+    const value = data.label;
+    const innerHtml = `<span>${value}</span>`;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderHttpCode = record => {
@@ -318,7 +358,7 @@ const renderHttpMethod = record => {
 
 const renderTotalFrame = (base, val) => {
     const rest = (base !== null && base !== undefined && base > 0 && base >= val) ? (base - val) : HORIZONTAL_ELLIPSIS;
-    return (parseInt(base) > parseInt(val)) ? `<span class="addlight">${val}/</span>${rest}` : base;
+    return (parseInt(base, 10) > parseInt(val, 10)) ? `<span class="addlight">${val}/</span>${rest}` : base;
 };
 
 const renderUserCounter = (data, critical = 1) => {
@@ -367,23 +407,27 @@ const renderProportion = (n, t) => {
 };
 
 const renderUserScore = record => {
-    const score = (record.score !== null && record.score !== undefined) ? record.score : '&minus;';
-
+    let score = (record.score !== null && record.score !== undefined) ? record.score : '&minus;';
     let cls = 'empty';
 
-    if (score >= USER_HIGH_TRUST_SCORE_INF) {
-        cls = 'high';
+    if (record.fraud !== undefined && record.fraud !== null) {
+        score = (record.fraud) ? 'X' : 'OK';
+        cls = (record.fraud) ? 'low' : 'high';
+    } else {
+        if (score >= USER_HIGH_TRUST_SCORE_INF) {
+            cls = 'high';
+        }
+
+        if (score >= USER_MEDIUM_TRUST_SCORE_INF && score < USER_MEDIUM_TRUST_SCORE_SUP) {
+            cls = 'medium';
+        }
+
+        if (score >= USER_LOW_TRUST_SCORE_INF && score < USER_LOW_TRUST_SCORE_SUP) {
+            cls = 'low';
+        }
     }
 
-    if (score >= USER_MEDIUM_TRUST_SCORE_INF && score < USER_MEDIUM_TRUST_SCORE_SUP) {
-        cls = 'medium';
-    }
-
-    if (score >= USER_LOW_TRUST_SCORE_INF && score < USER_LOW_TRUST_SCORE_SUP) {
-        cls = 'low';
-    }
-
-    let html = `<span class="score ${cls}">${score}</span>`;
+    let html = `<span class="ignore-select score ${cls}">${score}</span>`;
     const lastUpdate = `Last updated: ${renderDate(record.score_updated_at)}`;
     html = `<span class="tooltip" title="${lastUpdate}">${html}</span>`;
 
@@ -634,12 +678,14 @@ const renderScoreDetails = record => {
         let uid = '';
         let descr = '';
         let name = '';
+        let part = '';
         for (let i = 0; i < details.length; i++) {
             uid = (details[i].uid !== null && details[i].uid !== undefined) ? details[i].uid : '';
             descr = (details[i].description !== null && details[i].description !== undefined) ? details[i].description : '';
             name = (details[i].name!== null && details[i].name !== undefined) ? details[i].name : '';
-            html += `<p><span class="ruleHighlight ${getRuleClass(details[i].score)}"
+            part = `<p><span class="ruleHighlight ${getRuleClass(details[i].score)}"
                 >${uid}</span>&nbsp;<span class="ruleName tooltip" title="${descr}">${name}</span></p>`;
+            html += wrapWithRuleLink(part, uid);
         }
     }
 
@@ -751,8 +797,6 @@ const renderPhoneType = record => {
     const type = record.type;
 
     if (type) {
-        const n = getNumberOfSymbols();
-
         let src = 'smartphone.svg';
         if (['landline', 'FIXED_LINE', 'FIXED_LINE_OR_MOBILE', 'TOLL_FREE', 'SHARED_COST'].includes(type)) src = 'landline.svg';
         if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
@@ -1009,7 +1053,7 @@ const renderClickableCountry = record => {
 const renderClickableCountryName = record => {
     const value   = record.full_country;
     const country = (value !== null && value !== undefined) ? value : '';
-    const html = wrapWithCountryLink(record.full_country, record);
+    const html = wrapWithCountryLink(country, record);
 
     return html;
 };
@@ -1261,7 +1305,7 @@ const renderRawTime = record => {
     return truncateWithHellip(renderDefaultIfEmpty(renderTimeMs(record.raw_time)), MAX_STRING_LONG_NETNAME_IN_TABLE);
 };
 
-const currentPlanRender = (data, type, record, meta) => {
+const currentPlanRender = (data, type, record, _meta) => {
     const value = record.sub_plan_api_calls;
     return (value !== null && value !== undefined) ? value + ' API calls' : HORIZONTAL_ELLIPSIS;
 };
@@ -1336,9 +1380,13 @@ export {
     renderTime,
     renderDate,
 
-    //Rule selector
+    //Choices selector
     renderRuleSelectorItem,
     renderRuleSelectorChoice,
+    renderEventTypeSelectorItem,
+    renderEventTypeSelectorChoice,
+    renderIpTypeSelectorItem,
+    renderIpTypeSelectorChoice,
 
     //User
     renderUser,                                 //! only internal usage

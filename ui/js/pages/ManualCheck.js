@@ -11,7 +11,7 @@ export class ManualCheckPage extends BasePage {
     }
 
     initUi() {
-        const manualCheckItems    = new ManualCheckItems();
+        new ManualCheckItems();
 
         const onTableLinkClick = e => {
             e.preventDefault();

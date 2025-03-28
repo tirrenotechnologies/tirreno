@@ -108,9 +108,9 @@ class Data extends \Controllers\Base {
 
         if ($type === 'ip') {
             // do not raise on bogon ip
-            if ($apiError === \Utils\Constants::ENRICHMENT_IP_IS_NOT_FOUND) {
+            if ($apiError === \Utils\Constants::get('ENRICHMENT_IP_IS_NOT_FOUND')) {
                 return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_IP_NOT_FOUND];
-            } elseif ($apiError !== null && $apiError !== \Utils\Constants::ENRICHMENT_IP_IS_BOGON) {
+            } elseif ($apiError !== null && $apiError !== \Utils\Constants::get('ENRICHMENT_IP_IS_BOGON')) {
                 return $processErrorMessage;
             }
         } elseif ($apiError !== null || $statusCode !== 200 || $response[$type] === null) {

@@ -24,6 +24,10 @@ class Page extends \Controllers\Pages\Base {
         $searchPlacholder = $this->f3->get('AdminUsers_search_placeholder');
         $apiKey = $this->getCurrentOperatorApiKeyId();
         $rulesController = new \Controllers\Admin\Rules\Data();
+
+        $ruleUid = $this->f3->get('GET.ruleUid');
+        $ruleUid = $ruleUid !== null ? strtoupper($ruleUid) : null;
+
         $pageParams = [
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
             'LOAD_UPLOT'            => true,
@@ -33,6 +37,7 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'             => 'admin/users.html',
             'JS'                    => 'admin_users.js',
             'RULES'                 => $rulesController->getAllRulesByApiKey($apiKey),
+            'DEFAULT_RULE'          => $ruleUid,
             'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 

@@ -113,6 +113,12 @@ export class SingleReviewButton {
             const title = tile.querySelector('#review-status span').title;
 
             tile.querySelector('#review-status').innerHTML = `<span class="tooltip reviewstatus ${reviewStatus}" title="${title}">${reviewStatus}</span>`;
+
+            const userTitleSpan = document.querySelector('h1 span');
+
+            userTitleSpan.textContent = (reviewStatus === 'Blacklisted') ? 'X' : 'OK';
+            userTitleSpan.classList.remove('high', 'medium', 'low', 'empty');
+            userTitleSpan.classList.add((reviewStatus === 'Blacklisted') ? 'low' : 'high');
         }
     }
 

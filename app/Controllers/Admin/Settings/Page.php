@@ -29,8 +29,8 @@ class Page extends \Controllers\Pages\Base {
         [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
 
         $pageParams = [
-            'LOAD_AUTOCOMPLETE' => true,
             'LOAD_DATATABLE'    => true,
+            'LOAD_AUTOCOMPLETE' => true,
             'HTML_FILE'         => 'admin/settings.html',
             'JS'                => 'admin_settings.js',
             'API_KEYS'          => $apiKeys,

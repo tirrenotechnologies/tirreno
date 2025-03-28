@@ -16,18 +16,22 @@
 namespace Controllers\Admin\ReviewQueue;
 
 class Page extends \Controllers\Pages\Base {
-    public $page = 'ReviewQueue';
+    public $page = 'AdminReviewQueue';
 
     public function getPageParams(): array {
-        $searchPlacholder = $this->f3->get('ReviewQueue_search_placeholder');
+        $searchPlacholder = $this->f3->get('AdminReviewQueue_search_placeholder');
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $rulesController = new \Controllers\Admin\Rules\Data();
 
         $pageParams = [
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
             'LOAD_UPLOT'            => true,
             'LOAD_DATATABLE'        => true,
+            'LOAD_CHOICES'          => true,
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/reviewQueue.html',
             'JS'                    => 'admin_review_queue.js',
+            'RULES'                 => $rulesController->getAllRulesByApiKey($apiKey),
             'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 

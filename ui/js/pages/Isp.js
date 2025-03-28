@@ -17,8 +17,7 @@ export class IspPage extends BasePage {
     }
 
     initUi() {
-        //const ISP_ID  = parseInt(window.location.pathname.replace('/isp/', ''));
-        const ISP_ID = window.location.pathname.replace('/isp/', '');
+        const ISP_ID = parseInt(window.location.pathname.replace('/isp/', ''), 10);
 
         const getParams = () => {
             return {ispId: ISP_ID};
@@ -76,13 +75,12 @@ export class IspPage extends BasePage {
             }
         };
 
-        const countriesMap = new Map(mapParams);
-        const eventPanel   = new EventPanel();
-        const detailsTiles = new IspTiles(ispDetailsTiles);
-        const barChart     = new BaseBarChart(chartParams);
-
-        const ipsGrid      = new IpsGrid(ipsGridParams);
-        const usersGrid    = new UsersGrid(usersGridParams);
-        const eventsGrid   = new EventsGrid(eventsGridParams);
+        new Map(mapParams);
+        new EventPanel();
+        new IspTiles(ispDetailsTiles);
+        new BaseBarChart(chartParams);
+        new IpsGrid(ipsGridParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
     }
 }

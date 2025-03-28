@@ -53,12 +53,6 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function updateTotalsByDomainId(int $domainId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Domain();
-        $model->updateTotalsByEntityIds([$domainId], $apiKey);
-    }
-
     public function isEnrichable(): bool {
         $apiKey = $this->getCurrentOperatorApiKeyId();
         $model = new \Models\ApiKeys();

@@ -21,4 +21,5 @@ return [
     'Top10_events' => 'Events',
     'Top10_country' => 'Country',
     'Top10_resource' => 'Resource',
+    'Top10_attempts' => 'Attempts',
 ];

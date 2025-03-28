@@ -6,7 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=1216, initial-scale=0.6">
     <title>{{ @PAGE_TITLE }}</title>
+    <link rel="icon" href="/ui/images/favicon.png">
     <link rel="stylesheet" type="text/css" href="/ui/css/admin.all.css" />
+    <check if="(isset(@EXTRA_CSS) && @EXTRA_CSS)">
+        <link rel="stylesheet" type="text/css" href="{{ @EXTRA_CSS }}?dc={{time()}}" />
+    </check>
     <meta name="format-detection" content="telephone=no">
     <meta name="google" content="notranslate">
     <meta name="generator" content="FrontPage 4.0">

@@ -22,6 +22,7 @@ class GetApiKeyDto {
         public int $id,
         public string $key,
         public ?string $token,
+        public bool $hashExchange,
         public bool $skipEnrichingDomains,
         public bool $skipEnrichingEmails,
         public bool $skipEnrichingIps,

@@ -36,7 +36,11 @@
 </check>
 
 {~
-    [$score, $cls] = \Utils\Rules::getUserScoreClass($USER['score']);
+    if ($USER['fraud'] !== null) {
+        [$score, $cls] = $USER['fraud'] ? ['X', 'low'] : ['OK', 'high'];
+    } else {
+        [$score, $cls] = \Utils\Rules::getUserScoreClass($USER['score']);
+    }
 ~}
 
 <h1 class="title">

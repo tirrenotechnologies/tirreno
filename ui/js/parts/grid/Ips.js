@@ -1,8 +1,7 @@
 import { BaseGrid } from './Base.js?v=2';
 import {
-    renderIpType, renderUserCounter, renderBoolean,
-    renderNetName, renderCountryIso, renderFullCountry,
-    renderAsn, renderClickableIpWithCountry,
+    renderIpType, renderUserCounter, renderNetName,
+    renderFullCountry, renderAsn, renderClickableIpWithCountry,
 } from '../DataRenderers.js?v=2';
 
 

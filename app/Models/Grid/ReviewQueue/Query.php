@@ -23,7 +23,6 @@ class Query extends \Models\Grid\Base\Query {
         $queryParams = $this->getQueryParams();
 
         $queryParams[':reviewed'] = false;
-        $queryParams[':low_score'] = \Utils\Constants::USER_LOW_SCORE_SUP;
 
         $query = (
             'SELECT
@@ -56,6 +55,7 @@ class Query extends \Models\Grid\Base\Query {
         );
 
         $this->applySearch($query, $queryParams);
+        $this->applyRules($query, $queryParams);
         $this->applyOrder($query);
         $this->applyLimit($query, $queryParams);
 
@@ -66,7 +66,6 @@ class Query extends \Models\Grid\Base\Query {
         $queryParams = $this->getQueryParams();
 
         $queryParams[':reviewed'] = false;
-        $queryParams[':low_score'] = \Utils\Constants::USER_LOW_SCORE_SUP;
 
         $query = (
             'SELECT
@@ -89,6 +88,7 @@ class Query extends \Models\Grid\Base\Query {
         );
 
         $this->applySearch($query, $queryParams);
+        $this->applyRules($query, $queryParams);
 
         return [$query, $queryParams];
     }
@@ -97,7 +97,6 @@ class Query extends \Models\Grid\Base\Query {
         $queryParams = $this->getQueryParams();
 
         $queryParams[':reviewed'] = false;
-        $queryParams[':low_score'] = \Utils\Constants::USER_LOW_SCORE_SUP;
 
         $query = (
             'SELECT
@@ -116,6 +115,18 @@ class Query extends \Models\Grid\Base\Query {
         );
 
         return [$query, $queryParams];
+    }
+
+    protected function getQueryParams(): array {
+        // $model = new \Models\ApiKeys();
+        // $model->getKeyById($this->apiKey);
+        // $reviewQueueThreshold = $model->review_queue_threshold;
+        $reviewQueueThreshold = \Utils\Constants::USER_LOW_SCORE_SUP;
+
+        return [
+            ':api_key'      => $this->apiKey,
+            ':low_score'    => $reviewQueueThreshold,
+        ];
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
@@ -145,5 +156,17 @@ class Query extends \Models\Grid\Base\Query {
 
         //Add search and ids into request
         $query = sprintf($query, $searchConditions);
+    }
+
+    private function applyRules(string &$query, array &$queryParams): void {
+        $ruleIds = $this->f3->get('REQUEST.ruleIds');
+        if ($ruleIds === null) {
+            return;
+        }
+
+        foreach ($ruleIds as $key => $ruleId) {
+            $query .= ' AND score_details LIKE :rule_id_' . $key;
+            $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
+        }
     }
 }

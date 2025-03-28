@@ -39,4 +39,12 @@ return [
     'AdminRules_weight_10' => 'Medium',
     'AdminRules_weight_20' => 'High',
     'AdminRules_weight_70' => 'Extreme',
+
+    'AdminThresholdValues_form_title' => 'Thresholds management',
+    'AdminThresholdValues_form_title_tooltip' => 'Manage and set thresholds for automated user blacklisting and review queue.',
+    'AdminThresholdValues_form_field_warning' => 'Caution! Blacklist threshold setting will result with automated blacklisting of users having trust score lower than setted threshold.',
+    'AdminThresholdValues_form_field_blacklist_threshold_label' => 'Blacklist threshold',
+    'AdminThresholdValues_form_field_review_queue_threshold_label' => 'Review queue threshold',
+    'AdminThresholdValues_form_button_save' => 'Update threshold',
+    'AdminThresholdValues_update_success_message' => 'Thresholds updated successfully',
 ];

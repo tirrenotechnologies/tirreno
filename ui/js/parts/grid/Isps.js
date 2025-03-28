@@ -3,7 +3,6 @@ import {
     renderClickableAsn, renderNetName,
     renderUserCounter,
 } from '../DataRenderers.js?v=2';
-import { handleAjaxError } from '../utils/ErrorHandler.js?v=2';
 
 export class IspsGrid extends BaseGrid {
     get orderConfig() {

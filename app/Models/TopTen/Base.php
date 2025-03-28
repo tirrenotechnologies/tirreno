@@ -30,7 +30,7 @@ class Base extends \Models\BaseSql {
         return $queryParams;
     }
 
-    public function getQueryqueryConditions(?array $dateRange): array {
+    public function getQueryConditions(?array $dateRange): array {
         $conditions = ['event.key = :api_key'];
 
         $endDate = $dateRange['endDate'] ?? null;

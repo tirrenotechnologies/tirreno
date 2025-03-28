@@ -17,7 +17,6 @@ namespace Controllers\Admin\Logbook;
 
 class Data extends \Controllers\Base {
     public function getList(int $apiKey): array {
-        $result = [];
         $model = new \Models\Grid\Logbook\Grid($apiKey);
 
         return $model->getAllLogbookEvents();

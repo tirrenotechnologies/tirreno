@@ -137,7 +137,7 @@ class QueueNewEventsCursor extends \Models\BaseSql {
             $differenceInSeconds = $currentDateTime->getTimestamp() - $updatedDateTime->getTimestamp();
             $totalMinutes = floor($differenceInSeconds / 60);
 
-            if ($totalMinutes < \Utils\Constants::ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_MINUTES) {
+            if ($totalMinutes < \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_MINUTES')) {
                 return false; // Time not elapsed, no need to unclog (yet).
             }
 

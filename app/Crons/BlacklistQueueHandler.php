@@ -43,28 +43,36 @@ class BlacklistQueueHandler extends AbstractQueueCron {
             $item['key'],
         );
 
-        $creator = strval($item['creator']);
-        $hashes = $this->getHashes($items);
-
         $model = new \Models\ApiKeys();
         $model->getKeyById($item['key']);
 
-        $errorMessage = $model->skip_blacklist_sync ? $this->sendBlacklistReportPostRequest($creator, $hashes) : '';
-        if (strlen($errorMessage) > 0) {
-            // Log error to database
-            \Utils\Logger::log('Fraud enrichment API curl error', $errorMessage);
-            $this->log('Fraud enrichment API curl error logged to database.');
+        if (!$model->skip_blacklist_sync && $model->token) {
+            $user = new \Models\User();
+            $userEmail = $user->getUser($item['event_account'], $item['key'])['email'] ?? null;
+
+            if ($userEmail !== null) {
+                $hashes = $this->getHashes($items, $userEmail);
+                $errorMessage = $this->sendBlacklistReportPostRequest($hashes, $model->token);
+                if (strlen($errorMessage) > 0) {
+                    // Log error to database
+                    \Utils\Logger::log('Fraud enrichment API curl error', $errorMessage);
+                    $this->log('Fraud enrichment API curl error logged to database.');
+                }
+            }
         }
     }
 
     /**
      * @param array<array{type: string, value: string}> $items
      */
-    private function getHashes(array $items): array {
-        return array_map(function ($item) {
+    private function getHashes(array $items, string $userEmail): array {
+        $userHash = hash('sha256', $userEmail);
+
+        return array_map(function ($item) use ($userHash) {
             return [
-                'type' => $item['type'],
+                'type'  => $item['type'],
                 'value' => hash('sha256', $item['value']),
+                'id'    => $userHash,
             ];
         }, $items);
     }
@@ -72,25 +80,22 @@ class BlacklistQueueHandler extends AbstractQueueCron {
     /**
      * @param array<array{type: string, value: string}> $hashes
      */
-    private function sendBlacklistReportPostRequest(string $reporter, array $hashes): string {
-        $api = \Utils\Variables::getFraudEnrichmentApi();
-
+    private function sendBlacklistReportPostRequest(array $hashes, string $subscriptionKeyString): string {
         $postFields = [
-            'reporter' => $reporter,
             'data' => $hashes,
         ];
-
         $options = [
             'method' => 'POST',
             'header' => [
                 'Content-Type: application/json',
+                'Authorization: Bearer ' . $subscriptionKeyString,
             ],
             'content' => \json_encode($postFields),
         ];
 
         /** @var array{request: array<string>, body: string, headers: array<string>, engine: string, cached: bool, error: string} $result */
         $result = \Web::instance()->request(
-            url: sprintf('%s/global_alert_report', $api),
+            url: \Utils\Variables::getEnrichtmentApi() . '/global_alert_report',
             options: $options,
         );
 

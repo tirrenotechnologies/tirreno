@@ -68,7 +68,12 @@ export class Map {
 
     onRegionClick(value) {
         if (this.regions[value] !== undefined && this.regions[value][this.config.tooltipField] > 0) {
-            window.location.href = `/country/${this.regions[value]['serial']}`;
+            const url = `/country/${this.regions[value]['serial']}`;
+            if (event.ctrlKey || event.metaKey) {
+                window.open(url, '_blank');
+            } else {
+                window.location.href = url;
+            }
         }
     }
 

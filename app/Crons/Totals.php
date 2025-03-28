@@ -20,7 +20,7 @@ class Totals extends AbstractCron {
     public function calculateTotals(): void {
         $this->log('Start totals calculation.');
         $start = time();
-        $models = \Utils\Constants::REST_TOTALS_MODELS;
+        $models = \Utils\Constants::get('REST_TOTALS_MODELS');
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
         $queueModel = new \Models\Queue\AccountOperationQueue($actionType);
@@ -35,7 +35,7 @@ class Totals extends AbstractCron {
             foreach ($keys as $key) {
                 $cnt = $model->updateAllTotals($key);
                 $res[$name]['cnt'] += $cnt;
-                if (time() - $start > \Utils\Constants::ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC) {
+                if (time() - $start > \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {
                     // TODO: any reason to put the rest keys to queue?
                     $res[$name]['s'] = time() - $s;
                     break 2;

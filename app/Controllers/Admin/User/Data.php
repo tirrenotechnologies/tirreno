@@ -139,26 +139,23 @@ class Data extends \Controllers\Base {
         return $userModel->checkAccess($userId, $apiKey);
     }
 
-    public function addToWatchlist(int $accountId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+    public function addToWatchlist(int $accountId, int $apiKey): void {
         $model = new \Models\Watchlist();
         $model->add($accountId, $apiKey);
     }
 
-    public function removeFromWatchlist(int $accountId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+    public function removeFromWatchlist(int $accountId, int $apiKey): void {
         $model = new \Models\Watchlist();
         $model->remove($accountId, $apiKey);
     }
 
-    public function addToBlacklistQueue(int $accountId, bool $fraud): void {
-        $apiKey = $this->getCurrentOperatorApiKeyObject();
+    public function addToBlacklistQueue(int $accountId, bool $fraud, int $apiKey): void {
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
         $accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $inQueue = $accountOperationQueueModel->isInQueue($accountId, $apiKey->id);
+        $inQueue = $accountOperationQueueModel->isInQueue($accountId, $apiKey);
 
         if (!$fraud) {
-            $this->setFraudFlag($accountId, false, $apiKey->id); // Directly remove blacklisted items
+            $this->setFraudFlag($accountId, false, $apiKey); // Directly remove blacklisted items
 
             if ($inQueue) {
                 $accountOperationQueueModel->removeFromQueue(); // Cancel queued operation
@@ -166,11 +163,11 @@ class Data extends \Controllers\Base {
         }
 
         if (!$inQueue && $fraud) {
-            $accountOperationQueueModel->add($accountId, $apiKey->id);
+            $accountOperationQueueModel->add($accountId, $apiKey);
         }
 
         $model = new \Models\User();
-        $model->updateFraudFlag([$accountId], $apiKey->id, $fraud);
+        $model->updateFraudFlag([$accountId], $apiKey, $fraud);
     }
 
     public function addToCalulcateRiskScoreQueue(int $accountId): void {
@@ -194,8 +191,7 @@ class Data extends \Controllers\Base {
         $accountOperationQueueModel->addBatch($accounts);
     }
 
-    public function setReviewedFlag(int $accountId, bool $reviewed): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+    public function setReviewedFlag(int $accountId, bool $reviewed, int $apiKey): void {
         $model = new \Models\User();
         $model->updateReviewedFlag($accountId, $apiKey, $reviewed);
     }
@@ -279,11 +275,5 @@ class Data extends \Controllers\Base {
         }
 
         return array_merge($ips, $emails, $phones);
-    }
-
-    public function updateTotalsByAccountId(int $accountId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\User();
-        $model->updateTotalsByAccountIds([$accountId], $apiKey);
     }
 }

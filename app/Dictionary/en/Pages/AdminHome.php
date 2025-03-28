@@ -49,8 +49,8 @@ return [
     'AdminHome_top10_active_urls_tooltip' => 'A list of resources with the highest quantity of recorded users.',
     'AdminHome_top10_ips_with_the_most_users' => 'Shared IP addresses',
     'AdminHome_top10_ips_with_the_most_users_tooltip' => 'A list of IP addresses utilized by several users.',
-    'AdminHome_top10_ips_with_tor_one' => 'IP belongs to TOR',
-    'AdminHome_top10_ips_with_tor_one_tooltip' => 'A list of IP addresses associated with The Onion Router (TOR) network that enables anonymous communications.',
+    'AdminHome_top10_users_with_most_login_fail' => 'Account login fail',
+    'AdminHome_top10_users_with_most_login_fail_tooltip' => 'A list of users with the highest quantity of failed login attempts.',
     'AdminHome_top10_users_with_the_most_ips' => 'Multiple IP addresses',
     'AdminHome_top10_users_with_the_most_ips_tooltip' => 'A list of users with a high number of IP addresses.',
 ];

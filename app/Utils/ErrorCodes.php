@@ -92,6 +92,9 @@ class ErrorCodes {
 
     //Rules
     public const RULES_HAS_BEEN_SUCCESSFULLY_UPDATED = 800;
+    public const BLACKLIST_THRESHOLD_DOES_NOT_EXIST = 801;
+    public const REVIEW_QUEUE_THRESHOLD_DOES_NOT_EXIST = 802;
+    public const BLACKLIST_THRESHOLD_EXCEEDS_REVIEW_QUEUE_THRESHOLD = 803;
 
     // REST API
     public const REST_API_KEY_DOES_NOT_EXIST = 900;

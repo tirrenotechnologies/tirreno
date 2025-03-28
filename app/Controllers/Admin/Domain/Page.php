@@ -28,8 +28,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        $dataController->updateTotalsByDomainId($domainId);
-
         $domain = $dataController->getDomainDetails($domainId);
         $pageTitle = $this->getInternalPageTitleWithPostfix($domain['domain']);
         $isEnrichable = $dataController->isEnrichable();

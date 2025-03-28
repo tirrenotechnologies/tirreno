@@ -13,4 +13,4 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-return include 'en/All.php';
+return array_merge(include 'en/All.php', \Base::instance()->get('EXTRA_DICT_EN') ?? []);

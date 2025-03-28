@@ -35,7 +35,7 @@ export class TotalTile {
     getTileClass(tableId, tileId, value) {
         const litmus = this.criticalValues[tileId];
 
-        const USER_ID     = parseInt(window.location.pathname.replace('/id/', ''));
+        const USER_ID     = parseInt(window.location.pathname.replace('/id/', ''), 10);
         const isUserPage  = () => !isNaN(USER_ID);
 
         if (!litmus || !isUserPage()) return;

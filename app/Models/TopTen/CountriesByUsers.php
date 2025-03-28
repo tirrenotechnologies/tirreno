@@ -21,7 +21,7 @@ class CountriesByUsers extends Base {
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
-        $queryConditions = $this->getQueryqueryConditions($dateRange);
+        $queryConditions = $this->getQueryConditions($dateRange);
         $queryConditions = join(' AND ', $queryConditions);
 
         $query = (

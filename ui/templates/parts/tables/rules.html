@@ -28,7 +28,7 @@
                         <SET PROPORTION_UPD="{{ @RULES[@I].proportion_updated_at !== null ? 'Last updated: '.(new DateTime(@RULES[@I].proportion_updated_at))->format('d/m/Y') : '&minus;' }}"/>
                         <tr data-rule-uid="{{ @RULES[@I].uid }}">
                             <td align="right">
-                                <h3 class="ruleHighlight {{ \Utils\Rules::getRuleClass($VALUE) }}">{{@RULES[@I].uid}}</h3>
+                                <a href="/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ \Utils\Rules::getRuleClass($VALUE) }}">{{@RULES[@I].uid}}</h3></a>
                             </td>
                             <td>{{@RULES[@I].type}}</td>
                             <td>

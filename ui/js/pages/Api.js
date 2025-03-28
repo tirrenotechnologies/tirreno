@@ -29,8 +29,8 @@ export class ApiPage extends BasePage {
             }
         };
 
-        const usageStatsGrid = new UsageStatsGrid(gridParams);
-        const enrichAllPopUp = new EnrichAllPopUp();
+        new UsageStatsGrid(gridParams);
+        new EnrichAllPopUp();
     }
 
     onTextAreaClick(e) {

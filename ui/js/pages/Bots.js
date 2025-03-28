@@ -41,7 +41,8 @@ export class BotsPage extends BasePage {
 
         const datesFilter  = new DatesFilter();
         const searchFilter = new SearchFilter();
-        const botsChart    = new BotsChart(chartParams);
-        const botsGrid     = new BotsGrid(gridParams);
+
+        new BotsChart(chartParams);
+        new BotsGrid(gridParams);
     }
 }

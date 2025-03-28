@@ -30,8 +30,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        $dataController->updateTotalsByCountryId($countryId);
-
         $country = $dataController->getCountryById($countryId);
         $pageTitle = $this->getInternalPageTitleWithPostfix($country['value']);
 

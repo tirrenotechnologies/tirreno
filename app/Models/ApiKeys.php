@@ -133,7 +133,7 @@ class ApiKeys extends \Models\BaseSql {
 
     public function enrichableAttributes(int $keyId): array {
         $skipAttributes = $this->getSkipEnrichingAttributes($keyId);
-        $attributes = \Utils\Constants::ENRICHING_ATTRIBUTES;
+        $attributes = \Utils\Constants::get('ENRICHING_ATTRIBUTES');
         $attributes = array_diff_key($attributes, array_flip($skipAttributes));
 
         return $attributes;
@@ -166,6 +166,20 @@ class ApiKeys extends \Models\BaseSql {
     public function updateRetentionPolicy(int $policyInWeeks): void {
         if ($this->loaded()) {
             $this->retention_policy = $policyInWeeks;
+            $this->save();
+        }
+    }
+
+    public function updateBlacklistThreshold(int $value): void {
+        if ($this->loaded()) {
+            $this->blacklist_threshold = $value;
+            $this->save();
+        }
+    }
+
+    public function updateReviewQueueThreshold(int $value): void {
+        if ($this->loaded()) {
+            $this->review_queue_threshold = $value;
             $this->save();
         }
     }

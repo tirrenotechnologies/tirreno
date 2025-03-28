@@ -38,7 +38,7 @@ class Event extends Base {
 
     private function getEventDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
-        $contextLimit = \Utils\Constants::RULE_EVENT_CONTEXT_LIMIT;
+        $contextLimit = \Utils\Constants::get('RULE_EVENT_CONTEXT_LIMIT');
 
         $query = (
             "WITH ranked_events AS (

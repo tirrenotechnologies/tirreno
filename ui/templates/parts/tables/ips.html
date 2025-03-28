@@ -30,7 +30,8 @@
         <div class="content">
             <check if="'/ip' == @CURRENT_PATH">
                 <true>
-                <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/choices/ipTypes.html" />
                 </true>
             </check>
             <table class="table" id="ips-table">

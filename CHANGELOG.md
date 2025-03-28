@@ -1,6 +1,19 @@
-# Tirreno Changelog
+# tirreno changelog
 
-## Tirreno v0.9.3
+## tirreno v0.9.4
+
+* new search filters for types of events and IPs
+* failed login attempt widget for the dashboard screen
+* inactive session limit
+* new chart for events
+* clickable rules
+* highlighting reviewed users
+* js improvements
+* minor bug fixes
+* lint configurations
+* [wip] review queue threshold settings
+
+## tirreno v0.9.3
 
 * user graph on /event plot
 * clickable countries on svg map
@@ -8,12 +21,12 @@
 * index.php in all subdirs to prevent directory listing
 * force utf-8 sensor input
 
-## Tirreno v0.9.2
+## tirreno v0.9.2
 
 * XSS vulnerability patch
 * optimize getLastEvent()
 
-## Tirreno v0.9.1
+## tirreno v0.9.1
 
 * data plotting with hour and minute resolution
 * minor bug fixes
@@ -21,6 +34,6 @@
 * js linting improvements
 * logbook search fix
 
-## Tirreno v0.9.0
+## tirreno v0.9.0
 
 * initial release

@@ -31,9 +31,13 @@
         }
     }
 
-    [$score, $cls] = \Utils\Rules::getUserScoreClass($USER['score']);
+    if ($USER['fraud'] !== null) {
+        [$score, $cls] = $USER['fraud'] ? ['X', 'low'] : ['OK', 'high'];
+    } else {
+        [$score, $cls] = \Utils\Rules::getUserScoreClass($USER['score']);
+    }
 ~}
 
 <h1 class="title grey-title">
-    <span class="tooltip score {{ @cls }}" data-score="{{ @USER.score }}" title="{{ @scoreUpd }}">{{ @score | raw }}</span>{{ @title }}<include href="templates/parts/forms/riskScoreButtonForm.html" with="accountid={{@USER.accountid}}"/>
+    <span class="ignore-select tooltip score {{ @cls }}" data-score="{{ @USER.score }}" title="{{ @scoreUpd }}">{{ @score | raw }}</span>{{ @title }}<include href="templates/parts/forms/riskScoreButtonForm.html" with="accountid={{@USER.accountid}}"/>
 </h1>

@@ -42,7 +42,7 @@ class Mailer {
     private static function sendByMailgun(string $toAddress, string $toName, string $subject, string $message): array {
         $f3 = \Base::instance();
 
-        $fromName = \Utils\Constants::MAIL_FROM_NAME;
+        $fromName = \Utils\Constants::get('MAIL_FROM_NAME');
         $smtpDebug = $f3->get('SMTP_DEBUG');
         $fromAddress = \Utils\Variables::getMailLogin();
         $mailLogin = \Utils\Variables::getMailLogin();
@@ -61,7 +61,7 @@ class Mailer {
             //Server settings
             $mail->SMTPDebug = $smtpDebug;                                              //Enable verbose debug output
             $mail->isSMTP();                                                            //Send using SMTP
-            $mail->Host = \Utils\Constants::MAIL_HOST;                                  //Set the SMTP server to send through
+            $mail->Host = \Utils\Constants::get('MAIL_HOST');                                  //Set the SMTP server to send through
             $mail->SMTPAuth = true;                                                     //Enable SMTP authentication
             $mail->Username = $mailLogin;                                               //SMTP username
             $mail->Password = $mailPassword;                                            //SMTP password
@@ -94,7 +94,7 @@ class Mailer {
     }
 
     private static function sendByNativeMail(string $toAddress, string $toName, string $subject, string $message): array {
-        $sendMailPath = \Utils\Constants::MAIL_SEND_BIN;
+        $sendMailPath = \Utils\Constants::get('MAIL_SEND_BIN');
 
         if (!file_exists($sendMailPath) || !is_executable($sendMailPath)) {
             return [
@@ -103,7 +103,7 @@ class Mailer {
             ];
         }
 
-        $fromName = \Utils\Constants::MAIL_FROM_NAME;
+        $fromName = \Utils\Constants::get('MAIL_FROM_NAME');
         $fromAddress = \Utils\Variables::getMailLogin();
 
         if ($fromAddress === null) {

@@ -46,7 +46,7 @@ abstract class Base {
 
     public function getInternalPageTitleWithPostfix(string $title): string {
         $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        $title = sprintf('%s %s', $safeTitle, \Utils\Constants::PAGE_TITLE_POSTFIX);
+        $title = sprintf('%s %s', $safeTitle, \Utils\Constants::get('PAGE_TITLE_POSTFIX'));
 
         return $title;
     }
@@ -65,6 +65,10 @@ abstract class Base {
         if (!isset($params['PAGE_TITLE'])) {
             $pageTitle = $this->getPageTitle();
             $params['PAGE_TITLE'] = $pageTitle;
+        }
+
+        if ($this->f3->get('EXTRA_CSS')) {
+            $params['EXTRA_CSS'] = $this->f3->get('EXTRA_CSS');
         }
 
         $breadCrumbTitle = $this->getBreadcrumbTitle();
@@ -97,13 +101,17 @@ abstract class Base {
 
         $currentOperator = $this->f3->get('CURRENT_USER');
         if ($currentOperator) {
-            $controller = new \Controllers\Admin\ReviewQueue\Navigation();
-            $result = $controller->getNumberOfNotReviewedUsers(true, true);    // use cache, overall count
-            $params['NUMBER_OF_NOT_REVIEWED_USERS'] = $result['total'] ?? 0;
+            $cnt = $currentOperator->review_queue_cnt > 999 ? 999 : ($currentOperator->review_queue_cnt ?? 0);
+            $params['NUMBER_OF_NOT_REVIEWED_USERS'] = $cnt;
         }
 
         $page = $this->page;
         \Utils\DictManager::load($page);
+
+        $extra = $this->f3->get('EXTRA_APPLY_PAGE_PARAMS');
+        if ($extra && is_callable($extra)) {
+            $params = $extra($params, $page);
+        }
 
         return $params;
     }

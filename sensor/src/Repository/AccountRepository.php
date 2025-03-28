@@ -51,8 +51,12 @@ class AccountRepository {
                 lastip = EXCLUDED.lastip, lastseen = EXCLUDED.lastseen, firstname = COALESCE(EXCLUDED.firstname, event_account.firstname),
                 fullname = COALESCE(EXCLUDED.fullname, event_account.fullname), lastname = COALESCE(EXCLUDED.lastname, event_account.lastname),
                 created = COALESCE(:created, event_account.created),
-                session_id = CASE WHEN ABS(EXTRACT(epoch FROM (EXCLUDED.lastseen - event_account.lastseen))) > 1800 OR event_account.session_id IS NULL
-                    THEN nextval(\'session_id_seq\') ELSE event_account.session_id END
+                session_id = CASE
+                    WHEN ABS(EXTRACT(epoch FROM (EXCLUDED.lastseen - event_account.lastseen))) > 1800
+                        OR event_account.session_id IS NULL
+                        OR (SELECT EXTRACT(epoch FROM (event_session.lastseen - event_session.created)) FROM event_session WHERE event_session.id = event_account.session_id LIMIT 1) > 14400
+                    THEN nextval(\'session_id_seq\')
+                    ELSE event_account.session_id END
             RETURNING id, lastemail, lastphone, session_id';
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':userid', $account->userName);

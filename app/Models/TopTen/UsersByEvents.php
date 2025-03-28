@@ -21,13 +21,14 @@ class UsersByEvents extends Base {
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
-        $queryConditions = $this->getQueryqueryConditions($dateRange);
+        $queryConditions = $this->getQueryConditions($dateRange);
         $queryConditions = join(' AND ', $queryConditions);
 
         $query = (
             "SELECT
                 event_account.id            AS accountid,
                 event_account.userid        AS accounttitle,
+                event_account.fraud,
                 event_account.score,
                 event_account.score_updated_at,
                 event_email.email,

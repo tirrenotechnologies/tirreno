@@ -13,13 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Controllers\Pages;
+namespace Updates;
 
-class Index extends Base {
-    public function getPageParams(): array {
-        return [
-            'LOAD_DATATABLE' => true,
-            'HTML_FILE' => 'index.html',
-        ];
+abstract class Base {
+    public static $version = '';
+
+    abstract public static function up($db);
+
+    public static function isApplied($updatesModel) {
+        return $updatesModel->isApplied(static::$version, 'core');
     }
 }

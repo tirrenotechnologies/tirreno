@@ -37,20 +37,6 @@ class Navigation extends \Controllers\Base {
         $apiKey = $this->getCurrentOperatorApiKeyId();
         $dataController->saveUserRule($ruleId, $score);
 
-        [$allUsersCnt, $users] = $dataController->checkRule($ruleId);
-        foreach ($users as $idx => $record) {
-            $users[$idx] = [
-                'accountId' => $users[$idx]['accountid'],
-                'key'       => $apiKey,
-            ];
-        }
-
-        $proportion = $dataController->getRuleProportion($allUsersCnt, count($users));
-        $dataController->saveRuleProportion($ruleId, $proportion);
-
-        $userDataController = new \Controllers\Admin\User\Data();
-        $userDataController->addBatchToCalulcateRiskScoreQueue($users);
-
         return ['success' => true];
     }
 
@@ -67,7 +53,7 @@ class Navigation extends \Controllers\Base {
         $dataController->saveRuleProportion($ruleId, $proportion);
 
         return [
-            'users'                 => array_slice($users, 0, \Utils\Constants::RULE_CHECK_USERS_PASSED_TO_CLIENT),
+            'users'                 => array_slice($users, 0, \Utils\Constants::get('RULE_CHECK_USERS_PASSED_TO_CLIENT')),
             'count'                 => count($users),
             'proportion'            => $proportion,
             'proportion_updated_at' => date('Y-m-d H:i:s'),

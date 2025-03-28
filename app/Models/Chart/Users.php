@@ -38,19 +38,19 @@ class Users extends Base {
                 ];
             }
 
-            $inf = \Utils\Constants::USER_HIGH_SCORE_INF;
-            if ($score >= \Utils\Constants::USER_HIGH_SCORE_INF) {
+            $inf = \Utils\Constants::get('USER_HIGH_SCORE_INF');
+            if ($score >= \Utils\Constants::get('USER_HIGH_SCORE_INF')) {
                 ++$data0[$ts]['ts_new_users_with_trust_score_high'];
             }
 
-            $inf = \Utils\Constants::USER_MEDIUM_SCORE_INF;
-            $sup = \Utils\Constants::USER_MEDIUM_SCORE_SUP;
+            $inf = \Utils\Constants::get('USER_MEDIUM_SCORE_INF');
+            $sup = \Utils\Constants::get('USER_MEDIUM_SCORE_SUP');
             if ($score >= $inf && $score < $sup) {
                 ++$data0[$ts]['ts_new_users_with_trust_score_medium'];
             }
 
-            $inf = \Utils\Constants::USER_LOW_SCORE_INF;
-            $sup = \Utils\Constants::USER_LOW_SCORE_SUP;
+            $inf = \Utils\Constants::get('USER_LOW_SCORE_INF');
+            $sup = \Utils\Constants::get('USER_LOW_SCORE_SUP');
             if ($score >= $inf && $score < $sup) {
                 ++$data0[$ts]['ts_new_users_with_trust_score_low'];
             }

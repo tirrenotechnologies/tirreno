@@ -47,6 +47,13 @@ export class BaseGrid {
             window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
         }
 
+        if (gridParams.choicesFilterEvents) {
+            const onChoicesFilterChanged = this.onChoicesFilterChanged.bind(this);
+            for (let i = 0; i < gridParams.choicesFilterEvents.length; i++) {
+                window.addEventListener(gridParams.choicesFilterEvents[i], onChoicesFilterChanged, false);
+            }
+        }
+
         const onSearchFilterChanged = this.onSearchFilterChanged.bind(this);
         window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
     }
@@ -281,7 +288,12 @@ export class BaseGrid {
         const link = row.querySelector('a');
 
         if (link) {
-            window.location = link.href;
+            event.preventDefault();
+            if (event.ctrlKey || event.metaKey) {
+                window.open(link.href, '_blank');
+            } else {
+                window.location.href = link.href;
+            }
         }
     }
 
@@ -324,7 +336,7 @@ export class BaseGrid {
 
     onError(e, settings, techNote, message) {
         if (403 === settings.jqXHR.status) {
-            window.location.href = '/';
+            window.location.href = escape('/');
         }
 
         //console.warn('An error has been reported by DataTables: ', message);
@@ -341,6 +353,10 @@ export class BaseGrid {
     }
 
     onSearchFilterChanged() {
+        this.reloadData();
+    }
+
+    onChoicesFilterChanged() {
         this.reloadData();
     }
 
@@ -365,5 +381,5 @@ export class BaseGrid {
     renderTotalsLoader(data, type, record, meta) {
         const col_name = meta.settings.aoColumns[meta.col].name;
         return this.config.calculateTotals && this.config.totals.columns.includes(col_name) ? LOADER_PLACEHOLDER : data;
-    };
+    }
 }

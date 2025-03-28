@@ -15,10 +15,11 @@
 
 session_name('CONSOLESESSION');
 
-if (file_exists(__DIR__.'/vendor/autoload.php')) {
-    require __DIR__.'/vendor/autoload.php';
+
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
 } else {
-    require __DIR__.'/libs/bcosca/fatfree-core/base.php';
+    require __DIR__ . '/libs/bcosca/fatfree-core/base.php';
 
     // PSR-4 autoloader
     spl_autoload_register(function (string $className): void {
@@ -29,7 +30,7 @@ if (file_exists(__DIR__.'/vendor/autoload.php')) {
 
         foreach ($libs as $namespace => $path) {
             if (str_starts_with($className, $namespace)) {
-                require __DIR__.$path.str_replace([$namespace, '\\'], ['', '/'], $className).'.php';
+                require __DIR__ . $path.str_replace([$namespace, '\\'], ['', '/'], $className).'.php';
                 break;
             }
         }
@@ -58,6 +59,8 @@ $f3->config('config/routes.ini');
 
 //Use custom onError function
 $f3->set('ONERROR', \Utils\ErrorHandler::getOnErrorHandler());
+
+// \Utils\Updates::syncUpdates();
 
 //Load dictionary file
 $f3->set('LOCALES', 'app/Dictionary/');

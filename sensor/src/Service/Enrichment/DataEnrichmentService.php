@@ -71,6 +71,7 @@ class DataEnrichmentService {
         // Enrich data, only if it's missing
         return $this->query(
             $apiKeyDto->token,
+            $apiKeyDto->hashExchange,
             $skipIp ? null : $ipAddress,
             $skipEmail ? null : $email,
             $skipPhone ? null : $phoneNumber,
@@ -80,15 +81,16 @@ class DataEnrichmentService {
 
     private function query(
         string $token,
+        bool $hashExchange,
         ?HashedValue $ipAddress,
         ?HashedValue $email,
         ?HashedValue $phone,
         ?string $emailDomain,
     ): ?EnrichedData {
         $query = array_filter([
-            'email' => $email?->toArray(),
-            'ip' => $ipAddress?->toArray(),
-            'phone' => $phone?->toArray(),
+            'email' => $email?->toArray($hashExchange),
+            'ip' => $ipAddress?->toArray($hashExchange),
+            'phone' => $phone?->toArray($hashExchange),
             'domain' => $emailDomain,
         ], static function ($value): bool {
             return $value !== null;

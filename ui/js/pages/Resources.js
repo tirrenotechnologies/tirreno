@@ -1,6 +1,5 @@
 import {BasePage} from './Base.js';
 
-import {Map} from '../parts/Map.js?v=2';
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
 import {ResourcesChart} from '../parts/chart/Resources.js?v=2';
@@ -15,6 +14,9 @@ export class ResourcesPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter   = new DatesFilter();
+        const searchFilter  = new SearchFilter();
+
         const gridParams = {
             url         : '/admin/loadResources',
             tileId      : 'totalResources',
@@ -45,9 +47,7 @@ export class ResourcesPage extends BasePage {
             }
         };
 
-        const datesFilter   = new DatesFilter();
-        const searchFilter  = new SearchFilter();
-        const lineChart     = new ResourcesChart(chartParams);
-        const resourcesGrid = new ResourcesGrid(gridParams);
+        new ResourcesChart(chartParams);
+        new ResourcesGrid(gridParams);
     }
 }

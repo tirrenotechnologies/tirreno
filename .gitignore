@@ -1,7 +1,12 @@
 config/config.local.ini
 ui/node_modules
+node_modules/*
 public/*
 vendor/*
 .DS_Store
 composer.phar
 /.php-cs-fixer.cache
+logs/*
+!/logs/index.php
+tmp/*
+!/tmp/index.php

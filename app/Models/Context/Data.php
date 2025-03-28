@@ -144,8 +144,8 @@ class Data {
         $record['le_email_has_vowels']              = preg_match('/[aeoui]/i', $record['le_local_part']) > 0;
         $record['le_email_has_consonants']          = preg_match('/[bcdfghjklmnpqrstvwxyz]/i', $record['le_local_part']) > 0;
 
-        $record['le_with_long_local_part_length']   = $localPartLen > \Utils\Constants::RULE_EMAIL_MAXIMUM_LOCAL_PART_LENGTH;
-        $record['le_with_long_domain_length']       = $domainPartLen > \Utils\Constants::RULE_EMAIL_MAXIMUM_DOMAIN_LENGTH;
+        $record['le_with_long_local_part_length']   = $localPartLen > \Utils\Constants::get('RULE_EMAIL_MAXIMUM_LOCAL_PART_LENGTH');
+        $record['le_with_long_domain_length']       = $domainPartLen > \Utils\Constants::get('RULE_EMAIL_MAXIMUM_DOMAIN_LENGTH');
         $record['le_email_in_blockemails']          = $record['le_blockemails'] ?? false;
         $record['le_is_invalid']                    = $record['le_exists'] && filter_var($record['le_email'], FILTER_VALIDATE_EMAIL) === false;
 
@@ -187,8 +187,8 @@ class Data {
         $record['lp_fraud_detected']    = $record['lp_fraud_detected'] ?? false;
         $record['le_fraud_detected']    = $record['le_fraud_detected'] ?? false;
 
-        $record['eup_has_rare_browser'] = (bool) count(array_diff($record['eup_browser_name'], array_keys(\Utils\Constants::RULE_REGULAR_BROWSER_NAMES)));
-        $record['eup_has_rare_os']      = (bool) count(array_diff($record['eup_os_name'], \Utils\Constants::RULE_REGULAR_OS_NAMES));
+        $record['eup_has_rare_browser'] = (bool) count(array_diff($record['eup_browser_name'], array_keys(\Utils\Constants::get('RULE_REGULAR_BROWSER_NAMES'))));
+        $record['eup_has_rare_os']      = (bool) count(array_diff($record['eup_os_name'], \Utils\Constants::get('RULE_REGULAR_OS_NAMES')));
         $record['eup_device_count']     = count($record['eup_device']);
 
         $record['eup_vulnerable_ua']    = false;
@@ -215,15 +215,15 @@ class Data {
 
         $eventTypeCount                     = array_count_values($eventTypeFiltered);
 
-        //$accountLoginFailId = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL;
-        $accountEmailChangeId               = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_EMAIL_CHANGE;
-        $accountPasswordChangeId            = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE;
+        //$accountLoginFailId = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
+        $accountEmailChangeId               = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_EMAIL_CHANGE');
+        $accountPasswordChangeId            = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
 
         //$record['event_failed_login_attempts'] = $eventTypeCount[$accountLoginFailId] ?? 0;
         $record['event_email_changed']      = array_key_exists($accountEmailChangeId, $eventTypeCount);
         $record['event_password_changed']   = array_key_exists($accountPasswordChangeId, $eventTypeCount);
 
-        $record['event_http_method_head']  = in_array(\Utils\Constants::EVENT_REQUEST_TYPE_HEAD, $record['event_http_method']);
+        $record['event_http_method_head']  = in_array(\Utils\Constants::get('EVENT_REQUEST_TYPE_HEAD'), $record['event_http_method']);
 
         $clientErrors = 0;
         $serverErrors = 0;

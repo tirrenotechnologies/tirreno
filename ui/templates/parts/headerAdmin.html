@@ -7,9 +7,13 @@
     <meta name="viewport" content="width=1216, initial-scale=0.6">
     <meta name="referrer" content="no-referrer">
     <title>{{ @PAGE_TITLE }}</title>
+    <link rel="icon" href="/ui/images/favicon.png">
     <link rel="stylesheet" type="text/css" href="/ui/css/admin.all.css?dc={{time()}}" />
+    <check if="(isset(@EXTRA_CSS) && @EXTRA_CSS)">
+        <link rel="stylesheet" type="text/css" href="{{ @EXTRA_CSS }}?dc={{time()}}" />
+    </check>
 
-    <check if="(isset(@LOAD_DATATABLE) && @LOAD_DATATABLE) || (isset(@LOAD_JVECTORMAP) && @LOAD_JVECTORMAP)">
+    <check if="(isset(@LOAD_DATATABLE) && @LOAD_DATATABLE) || (isset(@LOAD_JVECTORMAP) && @LOAD_JVECTORMAP) || (isset(@LOAD_AUTOCOMPLETE) && @LOAD_AUTOCOMPLETE)">
     <script type="text/javascript" src="/ui/js/vendor/jquery-3.6.0/jquery.min.js"></script>
     </check>
 

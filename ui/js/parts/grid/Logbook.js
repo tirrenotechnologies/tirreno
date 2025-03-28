@@ -1,5 +1,4 @@
 import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
-import { fireEvent } from '../utils/Event.js?v=2';
 import {renderIp, renderRawTime, renderErrorType, renderSensorErrorColumn} from '../DataRenderers.js?v=2';
 
 export class LogbookGrid extends BaseGridWithPanel {

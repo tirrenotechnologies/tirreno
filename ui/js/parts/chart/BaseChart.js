@@ -58,8 +58,6 @@ export class BaseChart {
     }
 
     reloadData() {
-        const me = this;
-
         this.updateTimer();
 
         const token  = document.head.querySelector('[name=\'csrf-token\'][content]').content;
@@ -215,7 +213,7 @@ export class BaseChart {
 
                 if (Number.isInteger(xVal)) {
                     const useTime = resolution === 'hour' || resolution === 'minute';
-                    ts = formatIntTimeUtc(xVal * 1000, useTime, true);
+                    ts = formatIntTimeUtc(xVal * 1000, useTime);
                 }
 
                 let top;

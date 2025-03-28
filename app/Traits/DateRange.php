@@ -57,6 +57,6 @@ trait DateRange {
     public function getResolution(array $request): string {
         $resolution = $request['resolution'] ?? 'day';
 
-        return array_key_exists($resolution, \Utils\Constants::CHART_RESOLUTION) ? $resolution : 'day';
+        return array_key_exists($resolution, \Utils\Constants::get('CHART_RESOLUTION')) ? $resolution : 'day';
     }
 }

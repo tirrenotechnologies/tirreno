@@ -1,5 +1,4 @@
 import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
 import {
     renderBoolean, renderReputation, renderEmail, renderDefaultIfEmpty
 } from '../DataRenderers.js?v=2';

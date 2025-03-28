@@ -1,8 +1,3 @@
-const isSearchOrRangeRequest = (params = {}) => {
-    const isDateRangeExists = (params.dateRange !== undefined) ? params.dateRange : null;
-    return !!isDateRangeExists;
-};
-
 const getQueryParams = (params) => {
     const data = {};
     Object.assign(data, params);

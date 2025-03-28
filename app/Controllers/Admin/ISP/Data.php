@@ -57,10 +57,4 @@ class Data extends \Controllers\Base {
 
         return $result;
     }
-
-    public function updateTotalsByIspId(int $ispId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Isp();
-        $model->updateTotalsByEntityIds([$ispId], $apiKey);
-    }
 }

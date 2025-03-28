@@ -37,6 +37,9 @@ class Login extends Base {
                 $operatorsModel->getActivatedByEmail($params['email']);
 
                 if ($operatorsModel->loaded() && $operatorsModel->verifyPassword($params['password'])) {
+                    $controller = new \Controllers\Admin\ReviewQueue\Navigation();
+                    $controller->getNumberOfNotReviewedUsers(true, true);    // use cache, overall count
+
                     $this->f3->set('SESSION.active_user_id', $operatorsModel->id);
                     $this->f3->reroute('/');
                 } else {

@@ -30,7 +30,6 @@ export class ManualCheckItems {
 
     enrichPhoneDetails() {
         let item  = null;
-        let value = null;
 
         item = 'iso_country_code';
         this.renderCountryIso(item);
@@ -142,7 +141,7 @@ export class ManualCheckItems {
             if (Array.isArray(value)) {
                 value = value.length;
             } else {
-                value = parseInt(value);
+                value = parseInt(value, 10);
             }
 
             if (isNaN(value)) {
@@ -197,7 +196,7 @@ export class ManualCheckItems {
         let value;
 
         value = this.getItem(itemId);
-        value = parseInt(value);
+        value = parseInt(value, 10);
 
         if (isNaN(value)) {
             value = Renderers.renderDefaultIfEmpty(value);

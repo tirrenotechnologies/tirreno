@@ -402,82 +402,82 @@ class Ruler extends \Controllers\Base {
 
     //Nigeria
     private function ruleC01(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_NIGERIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_NIGERIA'));
     }
 
     //India
     private function ruleC02(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_INDIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_INDIA'));
     }
 
     //China
     private function ruleC03(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_CHINA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_CHINA'));
     }
 
     //Brazil
     private function ruleC04(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_BRAZIL);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_BRAZIL'));
     }
 
     //Pakistan
     private function ruleC05(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_PAKISTAN);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_PAKISTAN'));
     }
 
     //Indonesia
     private function ruleC06(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_INDONESIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_INDONESIA'));
     }
 
     //Venezuela
     private function ruleC07(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_VENEZUELA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_VENEZUELA'));
     }
 
     //South Africa
     private function ruleC08(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_SOUTH_AFRICA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_SOUTH_AFRICA'));
     }
 
     //Philippines
     private function ruleC09(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_PHILIPPINES);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_PHILIPPINES'));
     }
 
     //Romania
     private function ruleC10(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_ROMANIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_ROMANIA'));
     }
 
     //Russia
     private function ruleC11(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_RUSSIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_RUSSIA'));
     }
 
     //Europe
     private function ruleC12(array $params): bool {
-        return $this->scoreCountryMatchArray($params, \Utils\Constants::COUNTRY_CODES_EUROPE);
+        return $this->scoreCountryMatchArray($params, \Utils\Constants::get('COUNTRY_CODES_EUROPE'));
     }
 
     //North America
     private function ruleC13(array $params): bool {
-        return $this->scoreCountryMatchArray($params, \Utils\Constants::COUNTRY_CODES_NORTH_AMERICA);
+        return $this->scoreCountryMatchArray($params, \Utils\Constants::get('COUNTRY_CODES_NORTH_AMERICA'));
     }
 
     //Australia
     private function ruleC14(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_AUSTRALIA);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_AUSTRALIA'));
     }
 
     //Emirates
     private function ruleC15(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_UAE);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_UAE'));
     }
 
     //Japan
     private function ruleC16(array $params): bool {
-        return $this->scoreCountryMatch($params, \Utils\Constants::COUNTRY_CODE_JAPAN);
+        return $this->scoreCountryMatch($params, \Utils\Constants::get('COUNTRY_CODE_JAPAN'));
     }
 
     private function scoreCountryMatchArray(array $params, array $countries): bool {
@@ -843,9 +843,9 @@ class Ruler extends \Controllers\Base {
     }
 
     private function ruleA01(array $params): bool {
-        $maximumAttempts = \Utils\Constants::RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS;
-        $loginFail = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL;
-        $windowSize = \Utils\Constants::RULE_LOGIN_ATTEMPTS_WINDOW;
+        $maximumAttempts = \Utils\Constants::get('RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS');
+        $loginFail = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
+        $windowSize = \Utils\Constants::get('RULE_LOGIN_ATTEMPTS_WINDOW');
         $tooManyLoginAttempts = false;
         $cnt = 0;
         $start = 0;
@@ -876,7 +876,7 @@ class Ruler extends \Controllers\Base {
 
     private function ruleA02(array $params): bool {
         $suspiciousLoginFailed = false;
-        $loginFail = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL;
+        $loginFail = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
 
         foreach ($params['event_type'] as $idx => $event) {
             if ($event === $loginFail && $this->eventDeviceIsNew($params, $idx)) {
@@ -933,7 +933,7 @@ class Ruler extends \Controllers\Base {
 
     private function ruleA05(array $params): bool {
         $passwordChangeOnNewDevice = false;
-        $passwordChange = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE;
+        $passwordChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
 
         if ($params['eup_device_count'] > 1) {
             foreach ($params['event_device'] as $idx => $device) {
@@ -954,7 +954,7 @@ class Ruler extends \Controllers\Base {
 
     private function ruleA06(array $params): bool {
         $passwordChangeInNewCountry = false;
-        $passwordChange = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE;
+        $passwordChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
 
         if (count(array_unique($params['eip_country_id'])) > 1) {
             foreach ($params['event_type'] as $idx => $event) {
@@ -977,7 +977,7 @@ class Ruler extends \Controllers\Base {
 
     private function ruleA07(array $params): bool {
         $passwordChangeInNewCidr = false;
-        $passwordChange = \Utils\Constants::EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE;
+        $passwordChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
 
         if ($params['eip_unique_cidrs'] > 1) {
             foreach ($params['event_type'] as $idx => $event) {
@@ -1031,7 +1031,7 @@ class Ruler extends \Controllers\Base {
         $browserVersion = '';
         $oldBrowser = false;
         for ($i = 0; $i < count($params['eup_browser_name']); ++$i) {
-            $minVersion = \Utils\Constants::RULE_REGULAR_BROWSER_NAMES[$params['eup_browser_name'][$i]] ?? null;
+            $minVersion = \Utils\Constants::get('RULE_REGULAR_BROWSER_NAMES')[$params['eup_browser_name'][$i]] ?? null;
             if ($minVersion !== null) {
                 $browserVersion = explode('.', $params['eup_browser_version'][$i] ?? '')[0];
                 if (ctype_digit($browserVersion) && intval($browserVersion) < $minVersion) {
@@ -1084,7 +1084,7 @@ class Ruler extends \Controllers\Base {
     }
 
     private function ruleB04(array $params): bool {
-        $maximumErrors = \Utils\Constants::RULE_MAXIMUM_NUMBER_OF_500_CODES;
+        $maximumErrors = \Utils\Constants::get('RULE_MAXIMUM_NUMBER_OF_500_CODES');
         $cond = [
             $this->ruleBuilder['event_multiple_5xx_http']->greaterThan($maximumErrors),
         ];
@@ -1093,7 +1093,7 @@ class Ruler extends \Controllers\Base {
     }
 
     private function ruleB05(array $params): bool {
-        $maximumErrors = \Utils\Constants::RULE_MAXIMUM_NUMBER_OF_404_CODES;
+        $maximumErrors = \Utils\Constants::get('RULE_MAXIMUM_NUMBER_OF_404_CODES');
         $cond = [
             $this->ruleBuilder['event_multiple_4xx_http']->greaterThanOrEqualTo($maximumErrors),
         ];
@@ -1139,7 +1139,7 @@ class Ruler extends \Controllers\Base {
         $deviceLastseen = new \DateTime($params['event_device_lastseen'][$idx]);
         $interval = $deviceCreated->diff($deviceLastseen);
 
-        return abs($interval->days * 24 * 60 + $interval->h * 60 + $interval->i) < \Utils\Constants::RULE_NEW_DEVICE_MAX_AGE_IN_MINUTES;
+        return abs($interval->days * 24 * 60 + $interval->h * 60 + $interval->i) < \Utils\Constants::get('RULE_NEW_DEVICE_MAX_AGE_IN_MINUTES');
     }
 
     private function countryIsNewByIpId(array $params, int $ipId): bool {

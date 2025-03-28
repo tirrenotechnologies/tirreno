@@ -14,6 +14,9 @@ export class DomainsPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter  = new DatesFilter();
+        const searchFilter = new SearchFilter();
+
         const gridParams = {
             url     : '/admin/loadDomains',
             tileId  : 'totalDomains',
@@ -44,9 +47,7 @@ export class DomainsPage extends BasePage {
             }
         };
 
-        const datesFilter  = new DatesFilter();
-        const searchFilter = new SearchFilter();
-        const domainsChart = new DomainsChart(chartParams);
-        const domainsGrid  = new DomainsGrid(gridParams);
+        new DomainsChart(chartParams);
+        new DomainsGrid(gridParams);
     }
 }

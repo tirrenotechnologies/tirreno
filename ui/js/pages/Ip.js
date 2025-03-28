@@ -18,7 +18,7 @@ export class IpPage extends BasePage {
     }
 
     initUi() {
-        const IP_ID = parseInt(window.location.pathname.replace('/ip/', ''));
+        const IP_ID = parseInt(window.location.pathname.replace('/ip/', ''), 10);
 
         const getParams = () => {
             return {ipId: IP_ID};
@@ -68,13 +68,13 @@ export class IpPage extends BasePage {
             }
         };
 
-        const eventPanel                = new EventPanel();
-        const devicePanel               = new DevicePanel();
-        const detailsTiles              = new IpTiles(ipDetailsTiles);
-        const barChart                  = new BaseBarChart(chartParams);
-        const usersGrid                 = new UsersGrid(usersGridParams);
-        const eventsGrid                = new EventsGrid(eventsGridParams);
-        const devicesGrid               = new DevicesGrid(devicesGridParams);
-        const reenrichment              = new ReenrichmentButton();
+        new EventPanel();
+        new DevicePanel();
+        new IpTiles(ipDetailsTiles);
+        new BaseBarChart(chartParams);
+        new UsersGrid(usersGridParams);
+        new EventsGrid(eventsGridParams);
+        new DevicesGrid(devicesGridParams);
+        new ReenrichmentButton();
     }
 }

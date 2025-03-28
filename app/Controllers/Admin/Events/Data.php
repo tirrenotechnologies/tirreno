@@ -70,4 +70,10 @@ class Data extends \Controllers\Base {
 
         return $model->getEventDetails($id, $apiKey);
     }
+
+    public function getAllEventTypes() {
+        $model = new \Models\EventType();
+
+        return $model->getAll();
+    }
 }

@@ -27,8 +27,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        $dataController->updateTotalsByResourceId($resourceId);
-
         $resource = $dataController->getResourceById($resourceId);
 
         $pageTitle = $resource['url'];

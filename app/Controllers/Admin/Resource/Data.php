@@ -32,10 +32,4 @@ class Data extends \Controllers\Base {
 
         return $result;
     }
-
-    public function updateTotalsByResourceId(int $resourceId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Resource();
-        $model->updateTotalsByEntityIds([$resourceId], $apiKey);
-    }
 }

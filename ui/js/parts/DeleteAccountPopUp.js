@@ -1,4 +1,3 @@
-import {Loader} from './Loader.js?v=2';
 import {fireEvent} from './utils/Event.js?v=2';
 
 export class DeleteAccountPopUp {

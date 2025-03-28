@@ -16,6 +16,25 @@
 namespace Utils;
 
 class Constants {
+    public static function get(string $key): array|string {
+        $reflection = new \ReflectionClass(__CLASS__);
+        $constants = $reflection->getConstants();
+
+        if (!array_key_exists($key, $constants)) {
+            trigger_error("Undefined constant: " . $key, E_USER_ERROR);
+        }
+
+        $value = $constants[$key];
+
+        $f3 = \Base::instance();
+        $f3Key = 'EXTRA_' . $key;
+        if ($f3->exists($f3Key)) {
+            $value = is_array($value) ? array_merge($value, $f3->get($f3Key)) : $f3->get($f3Key);
+        }
+
+        return $value;
+    }
+
     // TODO: rewrite context so event amount limit will not be needed
     public const RULE_EVENT_CONTEXT_LIMIT               = 25;
     public const RULE_CHECK_USERS_PASSED_TO_CLIENT      = 25;
@@ -93,7 +112,7 @@ class Constants {
     public const MAIL_HOST      = 'smtp.eu.mailgun.org';
     public const MAIL_SEND_BIN  = '/usr/sbin/sendmail';
 
-    public const PAGE_TITLE_POSTFIX = '| Tirreno';
+    public const PAGE_TITLE_POSTFIX = '| tirreno';
 
     public const DEFAULT_RULES = [
         // Positive
@@ -208,12 +227,12 @@ class Constants {
     ];
 
     public const TOP_TEN_MODELS_MAP = [
-        'mostActiveUsers'       => \Models\TopTen\UsersByEvents::class,
-        'mostActiveCountries'   => \Models\TopTen\CountriesByUsers::class,
-        'mostActiveUrls'        => \Models\TopTen\ResourcesByUsers::class,
-        'ipsWithTheMostUsers'   => \Models\TopTen\IpsByUsers::class,
-        'ipsWithTorOne'         => \Models\TopTen\IpsWithTorOne::class,
-        'usersWithMostIps'      => \Models\TopTen\UsersByIps::class,
+        'mostActiveUsers'           => \Models\TopTen\UsersByEvents::class,
+        'mostActiveCountries'       => \Models\TopTen\CountriesByUsers::class,
+        'mostActiveUrls'            => \Models\TopTen\ResourcesByUsers::class,
+        'ipsWithTheMostUsers'       => \Models\TopTen\IpsByUsers::class,
+        'usersWithMostLoginFail'    => \Models\TopTen\UsersByLoginFail::class,
+        'usersWithMostIps'          => \Models\TopTen\UsersByIps::class,
     ];
 
     public const RULES_TOTALS_MODELS = [
@@ -237,5 +256,52 @@ class Constants {
         'domain'    => \Models\Domain::class,
         'phone'     => \Models\Phone::class,
         //'ua'        => \Models\Device::class,
+    ];
+
+    public const ADMIN_PAGES = [
+        'AdminIsps',
+        'AdminIsp',
+        'AdminUsers',
+        'AdminUser',
+        'AdminIps',
+        'AdminIp',
+        'AdminDomains',
+        'AdminDomain',
+        'AdminCountries',
+        'AdminCountry',
+        'AdminBots',
+        'AdminBot',
+        'AdminResources',
+        'AdminResource',
+        'AdminLogbook',
+        'AdminHome',
+        'AdminApi',
+        'AdminReviewQueue',
+        'AdminRules',
+        'AdminSettings',
+        'AdminWatchlist',
+        'AdminBlacklist',
+        'AdminManualCheck',
+        'AdminEvents',
+    ];
+
+    public const IP_TYPES = [
+        'Blacklisted',
+        'Spam list',
+        'Localhost',
+        'TOR',
+        'Starlink',
+        'AppleRelay',
+        'VPN',
+        'Datacenter',
+        'Unknown',
+        'Residential',
+    ];
+
+    public const ALERT_EVENT_TYPES = [
+        'page_delete',
+        'account_login_fail',
+        'account_email_change',
+        'account_password_change',
     ];
 }

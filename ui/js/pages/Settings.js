@@ -10,6 +10,6 @@ export class SettingsPage extends BasePage {
     }
 
     initUi() {
-        const deleteAccountPopUp = new DeleteAccountPopUp();
+        new DeleteAccountPopUp();
     }
 }

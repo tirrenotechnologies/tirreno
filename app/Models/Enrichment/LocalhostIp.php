@@ -31,7 +31,7 @@ class LocalhostIp extends \Models\Enrichment\Base {
     public function init(array $data): void {
         $this->ip = $data['value'];
 
-        if (!$this->validateIP($this->ip) || $data['error'] !== \Utils\Constants::ENRICHMENT_IP_IS_BOGON) {
+        if (!$this->validateIP($this->ip) || $data['error'] !== \Utils\Constants::get('ENRICHMENT_IP_IS_BOGON')) {
             throw new \Exception('Validation failed');
         }
     }

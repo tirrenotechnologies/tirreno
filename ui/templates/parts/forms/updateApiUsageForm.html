@@ -8,17 +8,22 @@
             <div class="field"><p>{{ @AdminApi_form_confirmationMessage | raw }}</p></div>
             <textarea class="textarea" name="apiToken" placeholder="{{ @AdminApi_form_field_token_placeholder }}" rows="2" cols="84" required>{{ @API_KEY.apiToken }}</textarea>
 
-            <repeat group="{{ @API_KEY.enrichedAttributes }}" key="{{ @attribute }}"
-                value="{{ @enabled }}">
+            <repeat group="{{ @API_KEY.enrichedAttributes }}" key="{{ @attribute }}" value="{{ @enabled }}">
                 <div class="field">
-                    <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute]
-                        }}</label>
+                    <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
                     <div class="control">
-                        <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]"
-                            value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
+                        <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
                     </div>
                 </div>
             </repeat>
+{***
+            <div class="field">
+                <label class="label">{{ @AdminApi_data_alert_list_exchange }}</label>
+                <div class="control">
+                    <input type="checkbox" name="exchangeBlacklist" {{ @API_KEY.skip_blacklist_sync ? '' : 'checked' }} />
+                </div>
+            </div>
+***}
         </div>
     </div>
     <footer class="card-footer">

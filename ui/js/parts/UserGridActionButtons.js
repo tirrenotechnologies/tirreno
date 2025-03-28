@@ -97,11 +97,11 @@ export class UserGridActionButtons {
             }
 
             const counterUpdated    = twoButtonsContainer.getAttribute('counterUpdated');
-            const wasCounterUpdated = parseInt(counterUpdated);
+            const wasCounterUpdated = parseInt(counterUpdated, 10);
             if (!wasCounterUpdated) {
                 const card = target.closest('.card');
                 const span = card.querySelector('.card-header-title span');
-                let total  = parseInt(span.innerHTML);
+                let total  = parseInt(span.innerHTML, 10);
 
                 if (total > 0) {
                     total -= 1;

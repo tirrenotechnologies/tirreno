@@ -55,7 +55,7 @@ class Signup extends Base {
         $data = [
             'quote' => $this->f3->get('DEFAULT_API_KEY_QUOTE'),
             'operator_id' => $operatorId,
-            'skip_enriching_attributes' => \json_encode(array_keys(\Utils\Constants::ENRICHING_ATTRIBUTES)),
+            'skip_enriching_attributes' => \json_encode(array_keys(\Utils\Constants::get('ENRICHING_ATTRIBUTES'))),
             'skip_blacklist_sync' => true,
         ];
 
@@ -66,7 +66,7 @@ class Signup extends Base {
 
     private function addDefaultRules(int $apiKey): void {
         $model = new \Models\Rules();
-        $defaultRules = \Utils\Constants::DEFAULT_RULES;
+        $defaultRules = \Utils\Constants::get('DEFAULT_RULES');
 
         foreach ($defaultRules as $key => $value) {
             $model->updateRule($key, $value, $apiKey);

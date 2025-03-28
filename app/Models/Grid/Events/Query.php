@@ -35,6 +35,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_account.userid AS accounttitle,
                 event_account.score_updated_at,
                 event_account.score,
+                event_account.fraud,
 
                 event_url.url,
                 event_url.id as url_id,
@@ -111,6 +112,8 @@ class Query extends \Models\Grid\Base\Query {
         );
 
         $this->applySearch($query, $queryParams);
+        $this->applyEventTypes($query, $queryParams);
+        $this->applyRules($query, $queryParams);
         $this->applyOrder($query);
         $this->applyLimit($query, $queryParams);
 
@@ -188,6 +191,8 @@ class Query extends \Models\Grid\Base\Query {
             );
 
             $this->applySearch($query, $queryParams);
+            $this->applyEventTypes($query, $queryParams);
+            $this->applyRules($query, $queryParams);
         }
 
         return [$query, $queryParams];
@@ -281,6 +286,33 @@ class Query extends \Models\Grid\Base\Query {
         //Add search and ids into request
         if ($searchConditions !== null) {
             $query = sprintf($query, $searchConditions);
+        }
+    }
+
+    private function applyEventTypes(string &$query, array &$queryParams): void {
+        $eventTypeIds = $this->f3->get('REQUEST.eventTypeIds');
+        if ($eventTypeIds === null || !count($eventTypeIds)) {
+            return;
+        }
+
+        $clauses = [];
+        foreach ($eventTypeIds as $key => $eventTypeId) {
+            $clauses[] = 'event.type = :event_type_id_' . $key;
+            $queryParams[':event_type_id_' . $key] = $eventTypeId;
+        }
+
+        $query .= ' AND (' . implode(' OR ', $clauses) . ')';
+    }
+
+    private function applyRules(string &$query, array &$queryParams): void {
+        $ruleIds = $this->f3->get('REQUEST.ruleIds');
+        if ($ruleIds === null) {
+            return;
+        }
+
+        foreach ($ruleIds as $key => $ruleId) {
+            $query .= ' AND score_details LIKE :rule_id_' . $key;
+            $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
         }
     }
 }

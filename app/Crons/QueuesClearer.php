@@ -17,7 +17,7 @@ namespace Crons;
 
 class QueuesClearer extends AbstractCron {
     public function clearQueues(): void {
-        $daysAgo = \Utils\Constants::ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS;
+        $daysAgo = \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS');
         $clearBefore = new \DateTime(sprintf('%s days ago', $daysAgo));
 
         $actionTypes = [

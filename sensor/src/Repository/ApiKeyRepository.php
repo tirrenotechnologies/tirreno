@@ -34,12 +34,12 @@ class ApiKeyRepository {
             return $this->cache[$apiKey];
         }
 
-        $sql = 'SELECT id, key, token, skip_enriching_attributes FROM dshb_api WHERE key = :api_key LIMIT 1';
+        $sql = 'SELECT id, key, token, skip_blacklist_sync, skip_enriching_attributes FROM dshb_api WHERE key = :api_key LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':api_key', $apiKey);
         $stmt->execute();
 
-        /** @var array{id: int, key: string, token: string, skip_enriching_attributes: string}|false $result */
+        /** @var array{id: int, key: string, token: string, skip_blacklist_sync: bool, skip_enriching_attributes: string}|false $result */
         $result = $stmt->fetch();
 
         if ($result === false) {
@@ -54,6 +54,7 @@ class ApiKeyRepository {
             (int) $result['id'],
             $result['key'],
             $result['token'],
+            !$result['skip_blacklist_sync'],
             \in_array(SkippedEnrichingAttributeType::Domain, $skipEnrichingAttributes, true),
             \in_array(SkippedEnrichingAttributeType::Email, $skipEnrichingAttributes, true),
             \in_array(SkippedEnrichingAttributeType::Ip, $skipEnrichingAttributes, true),

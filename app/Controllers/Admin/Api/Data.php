@@ -31,7 +31,6 @@ class Data extends \Controllers\Base {
 
         return match ($cmd) {
             'resetKey'                      => $this->resetApiKey($params),
-            'updateInterSystemDataExchange' => $this->updateInterSystemDataExchange($params),
             'updateApiUsage'                => $this->updateApiUsage($params),
             'enrichAll'                     => $this->enrichAll($params),
             default => []
@@ -272,6 +271,9 @@ class Data extends \Controllers\Base {
             $skipEnrichingAttributes = \array_diff($this->ENRICHED_ATTRIBUTES, \array_keys($enrichedAttributes));
             $model->updateSkipEnrichingAttributes($skipEnrichingAttributes);
 
+            $skipBlacklistSynchronisation = !isset($params['exchangeBlacklist']);
+            $model->updateSkipBlacklistSynchronisation($skipBlacklistSynchronisation);
+
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_data_enrichment_success_message');
         }
 
@@ -299,48 +301,6 @@ class Data extends \Controllers\Base {
         $unknownAttributes = \array_diff(\array_keys($enrichedAttributes), $this->ENRICHED_ATTRIBUTES);
         if ($unknownAttributes) {
             return \Utils\ErrorCodes::UNKNOWN_ENRICHMENT_ATTRIBUTES;
-        }
-
-        return false;
-    }
-
-    public function updateInterSystemDataExchange(array $params): array {
-        $errorCode = $this->validateUpdateInterSystemDataExchange($params);
-        $pageParams = [];
-
-        if ($errorCode) {
-            $pageParams['ERROR_CODE'] = $errorCode;
-        } else {
-            $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-            //  TODO: return alert_list back in next release
-            $skipBlacklistSynchronisation = true;
-            //$skipBlacklistSynchronisation = !isset($params['exchangeBlacklist']);
-
-            $model = new \Models\ApiKeys();
-            $model->getKeyById($keyId);
-            $model->updateSkipBlacklistSynchronisation($skipBlacklistSynchronisation);
-
-            $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_exchange_blacklist_success_message');
-        }
-
-        return $pageParams;
-    }
-
-    public function validateUpdateInterSystemDataExchange(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-        if (!$keyId) {
-            return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
-        }
-
-        $currentOperator = $this->f3->get('CURRENT_USER');
-        $operatorId = $currentOperator->id;
-        if (!$this->validateApiKeyAccess($keyId, $operatorId)) {
-            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
         }
 
         return false;

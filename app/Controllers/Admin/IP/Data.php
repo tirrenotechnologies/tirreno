@@ -70,12 +70,6 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function updateTotalsByIpId(int $ipId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Ip();
-        $model->updateTotalsByEntityIds([$ipId], $apiKey);
-    }
-
     public function isEnrichable(): bool {
         $apiKey = $this->getCurrentOperatorApiKeyId();
         $model = new \Models\ApiKeys();

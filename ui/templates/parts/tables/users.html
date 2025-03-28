@@ -21,21 +21,8 @@
         <div class="content">
             <check if="false !== strpos(@CURRENT_PATH, 'id')">
                 <true>
-                <include href="templates/parts/forms/searchForm.html" />
-                <div id="rule-selectors" class="settings-page">
-                    <div class="field">
-                        <div class="control">
-                            <div class="selector">
-                                <select class="input" name="version" multiple>
-                                    <option placeholder>{{ @AdminUsers_rules_search_placeholder }}</option>
-                                    <repeat group="{{ @RULES }}" value="{{ @record }}">
-                                        <option value="{{ @record['id'] }}">{{ @record['uid'] }}|{{ \Utils\Rules::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
-                                    </repeat>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/choices/rules.html" />
                 </true>
             </check>
             <table class="table" id="users-table">

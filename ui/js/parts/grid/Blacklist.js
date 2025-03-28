@@ -1,8 +1,7 @@
 import { BaseGrid } from './Base.js?v=2';
 import {
-    renderTime, renderDefaultIfEmpty,
-    renderBlacklistButtons, renderBlacklistItem,
-    renderBlacklistType,
+    renderTime, renderBlacklistButtons,
+    renderBlacklistItem, renderBlacklistType,
     renderClickableImportantUserWithScore
 } from '../DataRenderers.js?v=2';
 
@@ -60,7 +59,7 @@ export class BlacklistGrid extends BaseGrid {
             },
             {
                 data: 'value',
-                render: (data, type, record) => {
+                render: (data, _ype, record) => {
                     return renderBlacklistItem(record);
                 }
             },

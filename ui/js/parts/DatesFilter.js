@@ -1,13 +1,12 @@
 import {fireEvent} from './utils/Event.js?v=2';
 import {formatStringTime, addDays, addHours} from './utils/Date.js?v=2';
 import {debounce} from './utils/Functions.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {DAYS_IN_RANGE} from './utils/Constants.js?v=2';
 
 export class DatesFilter {
     constructor() {
         this.setupXhrPool();
-        this.offset = (this.offsetField) ? parseInt(this.offsetField.value) : 0;
+        this.offset = (this.offsetField) ? parseInt(this.offsetField.value, 10) : 0;
 
         if (this.isDateFilterUnavailable) {
             return true;
@@ -84,7 +83,6 @@ export class DatesFilter {
 
         $.xhrPool.abortAll();
 
-        const type  = input.type;
         const value = input.value;
         const name  = input.name;
 
@@ -141,7 +139,6 @@ export class DatesFilter {
 
         $.xhrPool.abortAll();
 
-        const type  = link.dataset.type;
         const value = link.dataset.value;
 
         if (value == 0) {

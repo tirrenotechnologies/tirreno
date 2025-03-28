@@ -14,6 +14,9 @@ export class IspsPage extends BasePage {
     }
 
     initUi() {
+        const datesFilter  = new DatesFilter();
+        const searchFilter = new SearchFilter();
+
         const gridParams = {
             url         : '/admin/loadIsps',
             tileId      : 'totalIsps',
@@ -44,9 +47,7 @@ export class IspsPage extends BasePage {
             }
         };
 
-        const datesFilter  = new DatesFilter();
-        const searchFilter = new SearchFilter();
-        const ispsChart    = new IspsChart(chartParams);
-        const ispsGrid     = new IspsGrid(gridParams);
+        new IspsChart(chartParams);
+        new IspsGrid(gridParams);
     }
 }

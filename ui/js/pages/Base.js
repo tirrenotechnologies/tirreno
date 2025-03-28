@@ -7,7 +7,8 @@ export class BasePage {
     }
 
     initCommonUi() {
-        const autocomplete = new AutocompleteBlock();
+        new AutocompleteBlock();
+
         document.addEventListener('keyup', e => {
             if (e.key !== '/' || e.ctrlKey || e.metaKey) return;
             if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return;

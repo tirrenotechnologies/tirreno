@@ -46,6 +46,8 @@ trait Navigation {
             '/logbook',
         ];
 
+        $allowedPages = array_merge($allowedPages, $this->f3->get('EXTRA_ALLOWED_PAGES') ?? []);
+
         $isPageAllowed = in_array($route, $allowedPages);
 
         return !$isPageAllowed && ($message['id'] === \Utils\ErrorCodes::THERE_ARE_NO_EVENTS_YET);

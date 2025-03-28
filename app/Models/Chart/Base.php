@@ -80,7 +80,7 @@ abstract class Base extends \Models\BaseSql {
         $data = array_fill(0, $n, []);
 
         $request = $this->f3->get('REQUEST');
-        $step = \Utils\Constants::CHART_RESOLUTION[$this->getResolution($request)];
+        $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
         $dateRange = $this->getDatesRange($request, $offset);

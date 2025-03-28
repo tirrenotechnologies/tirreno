@@ -11,13 +11,6 @@ import {
 
 export class UsersGrid extends BaseGrid {
 
-    constructor(gridParams) {
-        super(gridParams);
-
-        const onRulesFilterChanged = this.onRulesFilterChanged.bind(this);
-        window.addEventListener('rulesFilterChanged', onRulesFilterChanged, false);
-    }
-
     get orderConfig() {
         return [[4, 'desc']];
     }
@@ -109,9 +102,5 @@ export class UsersGrid extends BaseGrid {
         ];
 
         return columns;
-    }
-
-    onRulesFilterChanged() {
-        this.reloadData();
     }
 }

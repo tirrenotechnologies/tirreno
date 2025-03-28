@@ -27,8 +27,6 @@ class Page extends \Controllers\Pages\Base {
             $this->f3->error(404);
         }
 
-        $dataController->updateTotalsByIpId($ipId);
-
         $ip = $dataController->getFullIpInfoById($ipId);
         $pageTitle = $this->getInternalPageTitleWithPostfix($ip['ip']);
         $isEnrichable = $dataController->isEnrichable();

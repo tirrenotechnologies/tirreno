@@ -63,7 +63,7 @@ export class BlacklistGridActionButtons {
         const card  = target.closest('.card');
         const span  = card.querySelector('.card-header-title span');
 
-        let total = parseInt(span.innerHTML);
+        let total = parseInt(span.innerHTML, 10);
 
         if (total > 0) {
             total -= 1;
