@@ -100,9 +100,9 @@ function formHtml() {
 }
 
 function finishOk($site) {
-    $out = "\n======================== Setup completed! ========================";
+    $out = "\n\n======================== Setup completed! ========================";
     $out .= "\n* Please delete the ./install directory and all its included files.";
-    $out .= "\n* Visit <a href=\"http://$site/signup\">http://$site/signup</a> to create your account.";
+    $out .= "\n* Visit <a href=\"/signup\">/signup</a> to create your account.";
 
     return $out;
 }
@@ -340,7 +340,7 @@ function printTasks(array $tasks) {
     $side = intdiv(64 - strlen($tasks['description']), 2);
     $extra = (64 - strlen($tasks['description'])) % 2;
     $header = str_repeat('=', $side) . ' ' . $tasks['description'] . ' ' . str_repeat('=', $side);
-    $out .= "\n" . $header;
+    $out .= "\n\n" . $header;
     foreach ($tasks['tasks'] as $task) {
         $st = ($task['status'] === true) ? $okTile : (($task['status'] === false) ? $failTile : $nullTile);
         $err = array_key_exists('error', $task) ? ' (' . $task['error'] . ')' : '';
