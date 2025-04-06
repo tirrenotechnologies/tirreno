@@ -1,5 +1,7 @@
 # tirreno
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ec30c28f67de476f8b98d2798079bdf0)](https://app.codacy.com/gh/TirrenoTechnologies/tirreno/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 <p align="center">
     <a href="https://www.tirreno.com/" target="_blank">
         <img src="https://www.tirreno.com/double-screen.jpg" alt="tirreno screenshot" />
