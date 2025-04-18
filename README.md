@@ -1,6 +1,7 @@
 # tirreno
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ec30c28f67de476f8b98d2798079bdf0)](https://app.codacy.com/gh/TirrenoTechnologies/tirreno/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Docker Pulls](https://img.shields.io/docker/pulls/tirreno/tirreno?style=flat)](https://hub.docker.com/r/tirreno/tirreno/)
 
 <p align="center">
     <a href="https://www.tirreno.com/" target="_blank">
@@ -12,10 +13,10 @@ tirreno is an open-source fraud prevention platform.
 
 tirreno is a universal analytic tool for monitoring online platforms, web applications, SaaS, communities, mobile applications, intranets, and e-commerce websites.
 
-* **For Website Owners**: Protect your user areas from account takeovers, malicious bots, and common web vulnerabilities caused by user behavior.
-* **For Online Communities**: Combat spam, prevent fake registrations, and stop re-registration from the same IP addresses.
-* **For Startups, SaaS, and E-commerce**: Get a ready-made boilerplate for client security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
-* **For Platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
+* **For website owners**: Protect your user areas from account takeovers, malicious bots, and common web vulnerabilities caused by user behavior.
+* **For online communities**: Combat spam, prevent fake registrations, and stop re-registration from the same IP addresses.
+* **For startups, SaaS, and e-commerce**: Get a ready-made boilerplate for client security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
+* **For platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
 
 tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time analytics.
 
@@ -27,13 +28,13 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 
 * **PHP**: Version 8.0 to 8.3
 * **PostgreSQL**: Version 12 or greater
-* **PHP Extensions**: `PDO_PGSQL`, `cURL`
-* **HTTP Web Server**: `Apache` with `mod_rewrite` and `mod_headers` enabled
-* **Operating System**: A Unix-like system is recommended
-* **Minimum Hardware Requirements**:
-    * **PostgreSQL**: 512 MB RAM (2 GB recommended)
+* **PHP extensions**: `PDO_PGSQL`, `cURL`
+* **HTTP web server**: `Apache` with `mod_rewrite` and `mod_headers` enabled
+* **Operating system**: A Unix-like system is recommended
+* **Minimum hardware requirements**:
+    * **PostgreSQL**: 2 GB RAM (4 GB recommended)
     * **Application**: 512 MB RAM (1 GB recommended)
-    * **Storage**: Approximately 1 GB PostgreSQL storage per 1 million events
+    * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
 
 ## Quickstart install
 
