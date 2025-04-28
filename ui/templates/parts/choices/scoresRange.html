@@ -1,0 +1,17 @@
+{~
+    $scores = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+~}
+<div id="scores-range-selectors" class="settings-page choices-selector">
+    <div class="field">
+        <div class="control">
+            <div class="selector">
+                <select class="input" name="version" multiple>
+                    <option placeholder>{{ @AdminUsers_scores_range_search_placeholder }}</option>
+                    <repeat group="{{ @scores }}" key="{{ @key }}" value="{{ @value }}">
+                        <option value="{{ @value }}">{{ @value }}|{{ min(@value + 10, 99) }}</option>
+                    </repeat>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>

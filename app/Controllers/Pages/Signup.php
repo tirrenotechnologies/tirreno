@@ -43,7 +43,7 @@ class Signup extends Base {
                 $apiKey = $this->addDefaultApiKey($operatorId);
                 $this->addDefaultRules($apiKey);
 
-                $this->sendActivationEmail($operatorModel);
+                //$this->sendActivationEmail($operatorModel);
                 $pageParams['SUCCESS_CODE'] = \Utils\ErrorCodes::ACCOUNT_CREATED;
             }
         }

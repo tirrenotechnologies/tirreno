@@ -306,6 +306,34 @@ const renderIpTypeSelectorChoice = (classNames, data, itemSelectText) => {
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
+const renderEntityTypeSelectorItem = (classNames, data) => {
+    const value = data.label;
+    const innerHtml = `<span>${value}</span>`;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderEntityTypeSelectorChoice = (classNames, data, itemSelectText) => {
+    const value = data.label;
+    const innerHtml = `<span>${value}</span>`;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
+const renderScoresRangeSelectorItem = (classNames, data) => {
+    const [bottom, top] = data.label.split('|');
+    const innerHtml = `<span>${bottom} - ${top}</span>`;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderScoresRangeSelectorChoice = (classNames, data, itemSelectText) => {
+    const [bottom, top] = data.label.split('|');
+    const innerHtml = `<span>${bottom} - ${top}</span>`;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
 const renderHttpCode = record => {
     let html;
     const code = record.http_code;
@@ -568,20 +596,11 @@ const renderUserLastname = record => {
 };
 
 const renderUserReviewedStatus = record => {
-    let reviewStatus = '<span class="reviewstatus">Not reviewed</span>';
+    let html = '<span class="reviewstatus">Not reviewed</span>';
     let latestDecision = renderDate(record.latest_decision);
 
-    let html = reviewStatus;
-
-    if (record.reviewed && record.fraud !== null) {
-        if (true === record.fraud) {
-            reviewStatus = 'Blacklisted';
-        }
-
-        if (false === record.fraud) {
-            reviewStatus = 'Whitelisted';
-        }
-
+    if (record.fraud !== null) {
+        const reviewStatus = (record.fraud) ? 'Blacklisted' : 'Whitelisted';
         html = `<span class="tooltip reviewstatus ${reviewStatus}" title="${latestDecision}">${reviewStatus}</span>`;
     }
 
@@ -1387,6 +1406,10 @@ export {
     renderEventTypeSelectorChoice,
     renderIpTypeSelectorItem,
     renderIpTypeSelectorChoice,
+    renderEntityTypeSelectorItem,
+    renderEntityTypeSelectorChoice,
+    renderScoresRangeSelectorItem,
+    renderScoresRangeSelectorChoice,
 
     //User
     renderUser,                                 //! only internal usage

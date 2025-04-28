@@ -1045,7 +1045,7 @@ svg {
 }
 
 .main {
-    padding-top: 1.14em;
+    padding-top: 0.57rem;
     margin-left: 206px;
     position: relative;
     width: 995px;
@@ -1777,14 +1777,14 @@ article.tile .columns {
 .menu-logo {
     display: block;
     position: relative;
-    height: 59px;
+    height: 53px;
     border-bottom: 1px solid #131220;
 }
 
 .menu-logo img {
     position: absolute;
     left: 1.71rem;
-    bottom: 8px;
+    bottom: 12px;
 }
 
 .headline {
@@ -2362,7 +2362,7 @@ input:is([type="button"], [type="submit"], [type="reset"]):disabled {
 .autocomplete-group {
     padding: 0.34em 0.75em;
     border-bottom: 1px solid #2b2a3d;
-    color: #fff;
+    color: #8180a0;
 }
 
 .autocomplete-group strong {

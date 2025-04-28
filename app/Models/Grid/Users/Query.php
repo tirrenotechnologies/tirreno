@@ -60,6 +60,7 @@ class Query extends \Models\Grid\Base\Query {
 
         $this->applySearch($query, $queryParams);
         $this->applyRules($query, $queryParams);
+        $this->applyScore($query, $queryParams);
         $this->applyOrder($query);
         $this->applyLimit($query, $queryParams);
 
@@ -86,6 +87,7 @@ class Query extends \Models\Grid\Base\Query {
 
         $this->applySearch($query, $queryParams);
         $this->applyRules($query, $queryParams);
+        $this->applyScore($query, $queryParams);
 
         return [$query, $queryParams];
     }
@@ -129,5 +131,20 @@ class Query extends \Models\Grid\Base\Query {
             $query .= ' AND score_details LIKE :rule_id_' . $key;
             $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
         }
+    }
+
+    private function applyScore(string &$query, array &$queryParams): void {
+        $scoresRanges = $this->f3->get('REQUEST.scoresRange');
+        if ($scoresRanges  === null) {
+            return;
+        }
+
+        $clauses = [];
+        foreach ($scoresRanges as $key => $scoreBase) {
+            $clauses[] = sprintf('event_account.score >= :score_base_%s AND event_account.score <= :score_base_%s + 10', $key, $key);
+            $queryParams[':score_base_' . $key] = intval($scoreBase);
+        }
+
+        $query .= ' AND (' . implode(' OR ', $clauses) . ')';
     }
 }

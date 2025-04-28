@@ -1,6 +1,6 @@
 <check if="{{ isset(@SYSTEM_MESSAGES) && count(@SYSTEM_MESSAGES) }}">
     {~ foreach (@SYSTEM_MESSAGES as @id=>@message): ~}
-        <div class="notification system is-warning" id="system-notification-{{ @id }}">
+        <div class="notification system {{ @message.class ?? 'is-warning'}}" id="system-notification-{{ @id }}">
             <span class="faded">[{{ \Utils\ElapsedDate::short(@message.created_at) }}]</span>&nbsp;&nbsp;{{ @message.text | raw }}<button class="delete"></button>
         </div>
     {~ endforeach ~}

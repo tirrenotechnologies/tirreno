@@ -47,9 +47,9 @@ $errors = addExerciseError($errors, \Utils\ErrorCodes::ACTIVATION_KEY_IS_NOT_COR
 $errors = addExerciseError($errors, \Utils\ErrorCodes::EMAIL_OR_PASSWORD_IS_NOT_CORRECT, 'Error: Permission denied.');
 
 $errors = addExerciseError($errors, \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST, 'API key does not exist');
-$errors = addExerciseError($errors, \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER, 'Incorrect API key ID');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER, 'Incorrect Tracking ID');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::OPERATOR_ID_DOES_NOT_EXIST, 'Operator ID does not exist');
-$errors = addExerciseError($errors, \Utils\ErrorCodes::OPERATOR_IS_NOT_A_CO_OWNER, 'Operator is not a co-owner of this API key');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::OPERATOR_IS_NOT_A_CO_OWNER, 'Operator is not a co-owner of this Tracking ID');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::UNKNOWN_ENRICHMENT_ATTRIBUTES, 'Unknown event attributes for data enrichment');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::INVALID_API_RESPONSE, 'Unexpected API response');
 
@@ -88,6 +88,8 @@ $errors = addExerciseError($errors, \Utils\ErrorCodes::USER_FRAUD_FLAG_HAS_BEEN_
 $errors = addExerciseError($errors, \Utils\ErrorCodes::USER_REVIEWED_FLAG_HAS_BEEN_SET, 'User has been successfully marked as reviewed');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::USER_REVIEWED_FLAG_HAS_BEEN_UNSET, 'User has been successfully marked as not reviewed');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::USER_DELETION_FAILED, 'User deletion was unsuccessful.');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::USER_BLACKLISTING_FAILED, 'User blacklisting was unsuccessful.');
+$errors = addExerciseError($errors, \Utils\ErrorCodes::USER_BLACKLISTING_QUEUED, 'This user and all associated IPs are currently queued for blacklisting.');
 
 $errors = addExerciseError($errors, \Utils\ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST, 'Change email key does not exist');
 $errors = addExerciseError($errors, \Utils\ErrorCodes::CHANGE_EMAIL_KEY_IS_NOT_CORRECT, 'Change email key is incorrect');

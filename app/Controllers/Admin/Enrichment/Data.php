@@ -191,6 +191,7 @@ class Data extends \Controllers\Base {
             'header' => [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $subscriptionKeyString,
+                'User-Agent: ' . $this->f3->get('USER_AGENT'),
             ],
             'content' => \json_encode($postFields),
         ];

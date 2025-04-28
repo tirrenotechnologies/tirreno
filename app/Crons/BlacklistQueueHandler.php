@@ -43,6 +43,12 @@ class BlacklistQueueHandler extends AbstractQueueCron {
             $item['key'],
         );
 
+        $model = new \Models\User();
+        $username = $model->getUser($item['event_account'], $item['key'])['userid'] ?? '';
+
+        $logger = new \Log('blacklist.log');
+        $logger->write('[BlacklistQueue] ' . $username . ' added to blacklist.');
+
         $model = new \Models\ApiKeys();
         $model->getKeyById($item['key']);
 
@@ -89,6 +95,7 @@ class BlacklistQueueHandler extends AbstractQueueCron {
             'header' => [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $subscriptionKeyString,
+                'User-Agent: ' . $this->f3->get('USER_AGENT'),
             ],
             'content' => \json_encode($postFields),
         ];

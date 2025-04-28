@@ -27,6 +27,7 @@ use Sensor\Exception\RateLimitException;
 class DataEnrichmentCurlClient implements DataEnrichmentClientInterface {
     public function __construct(
         private string $baseUrl,
+        private ?string $userAgent,
     ) {
     }
 
@@ -40,6 +41,7 @@ class DataEnrichmentCurlClient implements DataEnrichmentClientInterface {
             //'Authorization: Bearer '.$this->apiKey,
             'Authorization: Bearer ' . $token,
             'Content-Type: application/json',
+            'User-Agent: ' . $this->userAgent,
         ];
 
         $payload = json_encode($data);

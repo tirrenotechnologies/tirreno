@@ -83,6 +83,8 @@ class ErrorCodes {
     public const USER_REVIEWED_FLAG_HAS_BEEN_SET = 685;
     public const USER_REVIEWED_FLAG_HAS_BEEN_UNSET = 686;
     public const USER_DELETION_FAILED = 687;
+    public const USER_BLACKLISTING_FAILED = 688;
+    public const USER_BLACKLISTING_QUEUED = 689;
 
     //Change email
     public const EMAIL_CHANGED = 690;

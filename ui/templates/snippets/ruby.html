@@ -5,7 +5,7 @@ require 'cgi'
 url = URI.parse('{{ @apiUrl }}')  # sensor URL
 headers = {
     'Content-Type' => 'application/x-www-form-urlencoded',
-    'Api-Key' => '{{ @apiKey }}' # API key
+    'Api-Key' => '{{ @apiKey }}' # Tracking ID
 }
 # Replace each key value with actual info
 data = {

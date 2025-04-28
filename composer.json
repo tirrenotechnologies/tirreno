@@ -1,7 +1,7 @@
 {
     "name": "tirreno/tirreno",
     "type": "project",
-    "description": "User security analytics for mission-critical web applications",
+    "description": "Open-source security platform",
     "keywords": [
         "tirreno",
         "fraud-detection",
@@ -30,7 +30,7 @@
         "bcosca/fatfree-core": "3.9.0",
         "phpmailer/phpmailer": "6.9.3",
         "ruler/ruler": "0.4.0",
-        "matomo/device-detector": "^6.4.1"
+        "matomo/device-detector": "^6.4.5"
     },
     "extra": {
         "paas": {

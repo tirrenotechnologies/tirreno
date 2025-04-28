@@ -9,16 +9,14 @@
     </a>
 </p>
 
-tirreno is an open-source fraud prevention platform.
+tirreno is an open-source security platform. It monitors and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app. 
 
-tirreno is a universal analytic tool for monitoring online platforms, web applications, SaaS, communities, mobile applications, intranets, and e-commerce websites.
+* **For web applications**: Protect your user areas from account takeovers, brute-force attacks, fake accounts, malicious bots, and common web vulnerabilities caused by user behavior.
+* **For online platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
+* **For startups, SaaS, and e-commerce**: Get a ready-made boilerplate for account security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
+* **For online communities**: Combat spam, prevent fake registrations and account sharing.
 
-* **For website owners**: Protect your user areas from account takeovers, malicious bots, and common web vulnerabilities caused by user behavior.
-* **For online communities**: Combat spam, prevent fake registrations, and stop re-registration from the same IP addresses.
-* **For startups, SaaS, and e-commerce**: Get a ready-made boilerplate for client security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
-* **For platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
-
-tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time analytics.
+tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time threat analytics.
 
 ## Online demo
 
@@ -32,8 +30,8 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 * **HTTP web server**: `Apache` with `mod_rewrite` and `mod_headers` enabled
 * **Operating system**: A Unix-like system is recommended
 * **Minimum hardware requirements**:
-    * **PostgreSQL**: 2 GB RAM (4 GB recommended)
-    * **Application**: 512 MB RAM (1 GB recommended)
+    * **PostgreSQL**: 512 MB RAM (4 GB recommended)
+    * **Application**: 128 MB RAM (1 GB recommended)
     * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
 
 ## Quickstart install
@@ -62,19 +60,21 @@ See the [User Guide](https://docs.tirreno.com/) for details on how to use tirren
 
 ## Optional non-free capabilities
 
-The open-sourced tirreno code is intended to be used for free as a standalone application. It provides general statistics and an extended audit log of user requests to a monitored system. As is, this tooling may be sufficient for bringing insights about user activity and behavioral patterns in a wide range of use cases, especially as a solution for small and medium-sized organizations.
+The open-sourced tirreno code is intended to be used for free as a standalone application. It provides general statistics, rule engine and risk-based alerting to a monitored system. As is, this tooling may be sufficient for bringing insights about user activity and behavioral patterns in a wide range of use cases, especially as a solution for small and medium-sized organizations.
 
-However, if you are looking to cover more advanced usage scenarios, such as fraud prevention, the additional tirreno API enrichment capabilities can be enabled via [monthly-paid subscription](https://www.tirreno.com/pricing/). Depending on the subscription plan, it supplies extended information on any of the following: IP address, email address, domain, and phone number. Enabling all the data enrichment types augments tirreno into a fully-fledged enterprise solution for an online fraud prevention system.
+However, if you are looking to cover more advanced usage scenarios, such as cyber fraud prevention, the additional tirreno API enrichment capabilities can be enabled via [monthly-paid subscription](https://www.tirreno.com/pricing/). It supplies extended information on any of the following: IP address, email address, domain, and phone number. Enabling all the data enrichment types augments tirreno into a fully-fledged enterprise solution for an online fraud prevention system.
 
-## Background
+## About
 
-The business behind this platform is tirreno technologies sàrl, operated in Vaud (Switzerland). It is a privately owned, for-profit company with no venture capital involved. The tirreno project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
+The tirreno project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
-The idea for tirreno arose from a challenge: an online platform was in need of a fraud prevention tool. We were looking for a product that could work on-premises and would not share user data with third-party vendors. Since the available solutions did not meet all our requirements, we created our own tool.
+Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in online business operations. We solve real people's challenges through love in ascétique code and sovereign technologies.
 
-While building tirreno, we concentrated on **privacy**, **trust**, and true **sovereignty**. As a result, we have built tirreno in a secure and independent manner. The application does not have a long list of development dependencies, nor does it rely on heavy frameworks. This approach minimizes the potential attack surface.
+tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine protection that has never existed before.
 
-### Why the name tirreno?
+The tirreno wordmark stands beyond the horizon line, as a metaphor for the evolutionary cycle of the threat landscape, and our commitment to stay ahead of it.
+
+## Why the name tirreno?
 
 History suggests that the Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as 800 BC. The term "Tyrrhenian” became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name — a name still in use today. This name is believed to be an exonym, possibly meaning “tower”.
 
@@ -110,3 +110,7 @@ The name "tirreno" is a registered trademark of tirreno technologies sàrl, and 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License along with this program. If not, see [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.txt).
+
+## Authors
+
+tirreno Copyright (C) 2025 tirreno technologies sàrl, Vaud, Switzerland. (License AGPLv3)

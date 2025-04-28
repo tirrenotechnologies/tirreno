@@ -114,13 +114,6 @@
             </li>
 
             <li>
-                <set LOGBOOK_ACTIVE_CLASS="{{ '/logbook' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@LOGBOOK_ACTIVE_CLASS }}"  href="/logbook">
-                    <include href="images/icons/rules.svg" />{{ @LeftMenu_logbook_link }}
-                </a>
-            </li>
-
-            <li>
                 <set API_KEYS_ACTIVE_CLASS="{{ '/api' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
                 <a class="{{@API_KEYS_ACTIVE_CLASS }}"  href="/api">
                     <include href="images/icons/apikeys.svg" />{{ @LeftMenu_api_keys_link }}
@@ -128,9 +121,16 @@
             </li>
 
             <li>
-                <set API_KEYS_ACTIVE_CLASS="{{ '/settings' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@API_KEYS_ACTIVE_CLASS }}"  href="/settings">
+                <set SETTINGS_ACTIVE_CLASS="{{ '/settings' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
+                <a class="{{@SETTINGS_ACTIVE_CLASS }}"  href="/settings">
                     <include href="images/icons/settings.svg" />{{ @LeftMenu_settings_link }}
+                </a>
+            </li>
+
+            <li>
+                <set LOGBOOK_ACTIVE_CLASS="{{ '/logbook' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
+                <a class="{{@LOGBOOK_ACTIVE_CLASS }}"  href="/logbook">
+                    <include href="images/icons/rules.svg" />{{ @LeftMenu_logbook_link }}
                 </a>
             </li>
 

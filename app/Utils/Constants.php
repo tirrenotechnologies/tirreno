@@ -304,4 +304,10 @@ class Constants {
         'account_email_change',
         'account_password_change',
     ];
+
+    public const ENTITY_TYPES = [
+        'IP',
+        'Email',
+        'Phone',
+    ];
 }

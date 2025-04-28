@@ -22,8 +22,6 @@ class Query extends \Models\Grid\Base\Query {
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
-        $queryParams[':reviewed'] = false;
-
         $query = (
             'SELECT
                 event_account.id        AS accountid,
@@ -45,12 +43,9 @@ class Query extends \Models\Grid\Base\Query {
             ON (event_account.lastemail = event_email.id)
 
             WHERE
-                event_account.key = :api_key
-                AND (
-                    event_account.reviewed = :reviewed
-                    OR event_account.fraud IS NULL
-                )
-                AND event_account.score <= :low_score
+                event_account.key = :api_key AND
+                event_account.fraud IS NULL AND
+                event_account.score <= :low_score
                 %s'
         );
 
@@ -65,8 +60,6 @@ class Query extends \Models\Grid\Base\Query {
     public function getTotal(): array {
         $queryParams = $this->getQueryParams();
 
-        $queryParams[':reviewed'] = false;
-
         $query = (
             'SELECT
                 COUNT (event_account.id)
@@ -78,12 +71,9 @@ class Query extends \Models\Grid\Base\Query {
             ON (event_account.lastemail = event_email.id)
 
             WHERE
-                event_account.key = :api_key
-                AND (
-                    event_account.reviewed = :reviewed
-                    OR event_account.fraud IS NULL
-                )
-                AND event_account.score <= :low_score
+                event_account.key = :api_key AND
+                event_account.fraud IS NULL AND
+                event_account.score <= :low_score
                 %s'
         );
 
@@ -96,8 +86,6 @@ class Query extends \Models\Grid\Base\Query {
     public function getTotalOverall(): array {
         $queryParams = $this->getQueryParams();
 
-        $queryParams[':reviewed'] = false;
-
         $query = (
             'SELECT
                 COUNT(event_account.id) AS count
@@ -106,22 +94,18 @@ class Query extends \Models\Grid\Base\Query {
                 event_account
 
             WHERE
-                event_account.key = :api_key
-                AND (
-                    event_account.reviewed = :reviewed
-                    OR event_account.fraud IS NULL
-                )
-                AND event_account.score <= :low_score'
+                event_account.key = :api_key AND
+                event_account.fraud IS NULL AND
+                event_account.score <= :low_score'
         );
 
         return [$query, $queryParams];
     }
 
     protected function getQueryParams(): array {
-        // $model = new \Models\ApiKeys();
-        // $model->getKeyById($this->apiKey);
-        // $reviewQueueThreshold = $model->review_queue_threshold;
-        $reviewQueueThreshold = \Utils\Constants::USER_LOW_SCORE_SUP;
+        $model = new \Models\ApiKeys();
+        $model->getKeyById($this->apiKey);
+        $reviewQueueThreshold = $model->review_queue_threshold;
 
         return [
             ':api_key'      => $this->apiKey,

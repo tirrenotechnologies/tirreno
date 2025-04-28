@@ -66,6 +66,13 @@ class NotificationsHandler extends AbstractCron {
     }
 
     private function sendUnreviewedItemsReminderEmail(string $recipientFirstName, string $recipientEmail, int $reviewCount): void {
+        $audit = \Audit::instance();
+        if (!$audit->email($recipientEmail, true)) {
+            $this->log(sprintf('Username `%s` is not email; review count is %s', $recipientEmail, $reviewCount));
+
+            return;
+        }
+
         $subject = $this->f3->get('UnreviewedItemsReminder_email_subject');
         $subject = sprintf($subject, $reviewCount);
 

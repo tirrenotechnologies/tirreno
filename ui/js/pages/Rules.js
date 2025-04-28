@@ -3,6 +3,7 @@ import {Tooltip} from '../parts/Tooltip.js?v=2';
 import {renderClickableUser, renderProportion} from '../parts/DataRenderers.js?v=2';
 import {handleAjaxError} from '../parts/utils/ErrorHandler.js?v=2';
 import {getRuleClass} from '../parts/utils/String.js?v=2';
+import {ThresholdsForm} from '../parts/ThresholdsForm.js?v=2';
 
 export class RulesPage extends BasePage {
 
@@ -13,6 +14,8 @@ export class RulesPage extends BasePage {
     }
 
     initUi() {
+        new ThresholdsForm();
+
         const searchTable = this.searchTable.bind(this);
         this.searchInput.addEventListener('keyup', searchTable, false);
 

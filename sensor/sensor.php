@@ -33,7 +33,7 @@ spl_autoload_register(fn (string $c) => @include_once __DIR__ . '/src/' . str_re
 
 $requestStartTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
-$di = new DI(__DIR__ . '/config.php');
+$di = new DI();
 $profiler = $di->getProfiler();
 $logger = $di->getLogger();
 $logbookManager = $di->getLogbookManager();

@@ -13,18 +13,18 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Updates;
+namespace Controllers\Api;
 
-class Update001 extends Base {
-    public static $version = 'v0.9.5';
+class Blacklist extends Endpoint {
+    public function search(): void {
+        $value = $this->getBodyProp('value', 'string');
 
-    public static function up($db) {
-        $queries = [
-            'ALTER TABLE dshb_api ADD COLUMN blacklist_threshold INTEGER DEFAULT -1',
-            'ALTER TABLE dshb_api ADD COLUMN review_queue_threshold INTEGER DEFAULT 33',
+        $model = new \Models\BlacklistItems();
+        $itemFound = $model->searchBlacklistedItem($value, $this->apiKey->id);
+
+        $this->data = [
+            'value'         => $value,
+            'blacklisted'   => $itemFound,
         ];
-        foreach ($queries as $sql) {
-            $db->exec($sql);
-        }
     }
 }

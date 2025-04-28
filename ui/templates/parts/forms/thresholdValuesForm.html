@@ -15,33 +15,39 @@
                 <div class="field">
                     <label class="label">{{ @AdminThresholdValues_form_field_review_queue_threshold_label }}</label>
                     <div class="control">
-                        <div class="selector">
-                            <select class="input" name="review-queue-threshold" id="review-queue-threshold">
-                                <option value="11" {{ @reviewQueueThreshold === 11 ? 'selected' : '' }}>11</option>
-                                <option value="22" {{ @reviewQueueThreshold === 22 ? 'selected' : '' }}>22</option>
-                                <option value="33" {{ @reviewQueueThreshold === 33 ? 'selected' : '' }}>33</option>
-                                <option value="44" {{ @reviewQueueThreshold === 44 ? 'selected' : '' }}>44</option>
-                                <option value="55" {{ @reviewQueueThreshold === 55 ? 'selected' : '' }}>55</option>
-                            </select>
-                        </div>
+                        <input type="radio" id="review0" name="review-queue-threshold" value="0" {{ @reviewQueueThreshold === 0 ? 'checked' : ( @blacklistThreshold >= 0 ? 'disabled' : '') }}>
+                        <label for="review0">{{ @AdminThresholdValues_form_value_zero_prefix }} 0</label><br>
+
+                        <input type="radio" id="review6" name="review-queue-threshold" value="6" {{ @reviewQueueThreshold === 6 ? 'checked' : ( @blacklistThreshold >= 6 ? 'disabled' : '') }}>
+                        <label for="review6">{{ @AdminThresholdValues_form_value_prefix }} 6</label><br>
+
+                        <input type="radio" id="review18" name="review-queue-threshold" value="18" {{ @reviewQueueThreshold === 18 ? 'checked' : ( @blacklistThreshold >= 18 ? 'disabled' : '') }}>
+                        <label for="review18">{{ @AdminThresholdValues_form_value_prefix }} 18</label><br>
+
+                        <input type="radio" id="review24" name="review-queue-threshold" value="24" {{ @reviewQueueThreshold === 24 ? 'checked' : ( @blacklistThreshold >= 24 ? 'disabled' : '') }}>
+                        <label for="review24">{{ @AdminThresholdValues_form_value_prefix }} 24</label><br>
+
+                        <input type="radio" id="review33" name="review-queue-threshold" value="33" {{ @reviewQueueThreshold === 33 ? 'checked' : ( @blacklistThreshold >= 33 ? 'disabled' : '') }}>
+                        <label for="review33">{{ @AdminThresholdValues_form_value_prefix }} 33</label>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="card-content">
-            <div class="content">
                 <div class="field">
                     <label class="label">{{ @AdminThresholdValues_form_field_blacklist_threshold_label }}</label>
                     <div class="control">
-                        <div class="selector">
-                            <select class="input" name="blacklist-threshold" id="blacklist-threshold">
-                                <option value="-1" {{ @blacklistThreshold === -1 ? 'selected' : '' }}>No blacklist threshold</option>
-                                <option value="0" {{ @blacklistThreshold === 0 ? 'selected' : '' }}>0</option>
-                                <option value="6" {{ @blacklistThreshold === 6 ? 'selected' : '' }}>6</option>
-                                <option value="12" {{ @blacklistThreshold === 12 ? 'selected' : '' }}>12</option>
-                                <option value="18" {{ @blacklistThreshold === 18 ? 'selected' : '' }}>18</option>
-                            </select>
-                        </div>
+                        <input type="radio" id="blacklist-1" name="blacklist-threshold" value="-1" {{ @blacklistThreshold === -1 ? 'checked' : '' }}>
+                        <label for="blacklist-1">Off (recommended)</label><br>
+
+                        <input type="radio" id="blacklist0" name="blacklist-threshold" value="0" {{ @blacklistThreshold === 0 ? 'checked' : '' }}>
+                        <label for="blacklist0">{{ @AdminThresholdValues_form_value_zero_prefix }} 0</label><br>
+
+                        <input type="radio" id="blacklist6" name="blacklist-threshold" value="6" {{ @blacklistThreshold === 6 ? 'checked' : ( @reviewQueueThreshold <= 6 ? 'disabled' : '') }}>
+                        <label for="blacklist6">{{ @AdminThresholdValues_form_value_prefix }} 6</label><br>
+
+                        <input type="radio" id="blacklist12" name="blacklist-threshold" value="12" {{ @blacklistThreshold === 12 ? 'checked' : ( @reviewQueueThreshold <= 12 ? 'disabled' : '') }}>
+                        <label for="blacklist12">{{ @AdminThresholdValues_form_value_prefix }} 12</label><br>
+
+                        <input type="radio" id="blacklist18" name="blacklist-threshold" value="18" {{ @blacklistThreshold === 18 ? 'checked' : ( @reviewQueueThreshold <= 18 ? 'disabled' : '') }}>
+                        <label for="blacklist18">{{ @AdminThresholdValues_form_value_prefix }} 18</label>
                     </div>
                 </div>
             </div>

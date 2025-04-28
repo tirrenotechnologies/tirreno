@@ -3,6 +3,7 @@ import {BasePage} from './Base.js';
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
 import {RulesFilter} from '../parts/choices/RulesFilter.js?v=2';
+import {ScoresRangeFilter} from '../parts/choices/ScoresRangeFilter.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
 import {UsersChart} from '../parts/chart/Users.js?v=2';
 
@@ -18,6 +19,7 @@ export class UsersPage extends BasePage {
         const datesFilter       = new DatesFilter();
         const searchFilter      = new SearchFilter();
         const rulesFilter       = new RulesFilter();
+        const scoresRangeFilter = new ScoresRangeFilter();
 
         const chartParams = {
             getParams: function() {
@@ -41,14 +43,15 @@ export class UsersPage extends BasePage {
                 columns: ['total_visit'],
             },
 
-            choicesFilterEvents: [rulesFilter.getEventType()],
+            choicesFilterEvents: [rulesFilter.getEventType(), scoresRangeFilter.getEventType()],
 
             getParams: function() {
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
-                const ruleIds = rulesFilter.getValues();
+                const ruleIds     = rulesFilter.getValues();
+                const scoresRange = scoresRangeFilter.getValues();
 
-                return {dateRange, searchValue, ruleIds};
+                return {dateRange, searchValue, ruleIds, scoresRange};
             }
         };
 

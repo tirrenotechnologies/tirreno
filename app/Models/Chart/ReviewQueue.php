@@ -27,7 +27,6 @@ class ReviewQueue extends Base {
         for ($i = 0; $i < count($data1); ++$i) {
             $item = $data1[$i];
             $ts = $item['ts'];
-            $reviewed = $item['reviewed'];
             $fraud = $item['fraud'];
 
             if (!isset($data0[$ts])) {
@@ -39,9 +38,9 @@ class ReviewQueue extends Base {
                 ];
             }
 
-            if ($fraud === false && $reviewed) {
+            if ($fraud === false) {
                 ++$data0[$ts]['ts_new_users_whitelisted'];
-            } elseif ($fraud === true && $reviewed) {
+            } elseif ($fraud === true) {
                 ++$data0[$ts]['ts_new_users_blacklisted'];
             } else {
                 ++$data0[$ts]['ts_new_users_on_review'];

@@ -86,67 +86,24 @@ class BlacklistItems extends \Models\BaseSql {
         return $this->execQuery($query, $params);
     }
 
-    public function searchBlacklistedItem(int $apiKey, string $type, string $value): ?bool {
+    public function searchBlacklistedItem(string $value, int $apiKey): ?bool {
         $query = '';
         $params = [
-            ':value' => $value,
-            ':api_key' => $apiKey,
+            ':value'    => $value,
+            ':api_key'  => $apiKey,
         ];
 
-        switch ($type) {
-            case 'account':
-                $query = ('
-                    SELECT 1
-                    FROM event_account
-                    WHERE
-                        userid = :value AND
-                        fraud IS TRUE AND
-                        key = :api_key
-                    LIMIT 1');
-                break;
+        $query = ('
+            SELECT 1
+            FROM event_account
+            WHERE
+                userid = :value AND
+                fraud IS TRUE AND
+                key = :api_key
+            LIMIT 1');
 
-            case 'ip':
-                if (filter_var($value, FILTER_VALIDATE_IP)) {
-                    $query = ('
-                        SELECT 1
-                        FROM event_ip
-                        WHERE
-                            ip = :value AND
-                            fraud_detected IS TRUE AND
-                            key = :api_key
-                        LIMIT 1');
-                }
-                break;
+        $results = $this->execQuery($query, $params);
 
-            case 'email':
-                $query = ('
-                    SELECT 1
-                    FROM event_email
-                    WHERE
-                        email = :value AND
-                        fraud_detected IS TRUE AND
-                        key = :api_key
-                    LIMIT 1');
-                break;
-
-            case 'phone':
-                $query = ('
-                    SELECT 1
-                    FROM event_phone
-                    WHERE
-                        phone_number = :value AND
-                        fraud_detected IS TRUE AND
-                        key = :api_key
-                    LIMIT 1');
-                break;
-        }
-
-        if ($query) {
-            $results = $this->execQuery($query, $params);
-
-            return (bool) count($results);
-        }
-
-        return null;
+        return (bool) count($results);
     }
 }

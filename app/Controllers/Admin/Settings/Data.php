@@ -149,7 +149,12 @@ class Data extends \Controllers\Base {
 
             $result = \Web::instance()->request(
                 url: \Utils\Variables::getEnrichtmentApi() . '/version',
-                options: ['method' => 'GET'],
+                options: [
+                    'method' => 'GET',
+                    'header' => [
+                        'User-Agent: ' . $this->f3->get('USER_AGENT'),
+                    ],
+                ],
             );
             $matches = [];
             preg_match('/^HTTP\/(\d+)(?:\.\d)? (\d{3})/', $result['headers'][0], $matches);
@@ -212,11 +217,9 @@ class Data extends \Controllers\Base {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
             $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-
             $model = new \Models\ApiKeys();
             $model->getKeyById($keyId);
             $model->updateRetentionPolicy((int) ($params['retention-policy'] ?? 0));
-
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminRetentionPolicy_changeTimeZone_success_message');
         }
 
@@ -232,6 +235,10 @@ class Data extends \Controllers\Base {
         $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
         if (!$keyId) {
             return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
+        }
+
+        if ($keyId !== $this->getCurrentOperatorApiKeyId()) {
+            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
         }
 
         $retentionPolicy = (int) ($params['retention-policy'] ?? 0);

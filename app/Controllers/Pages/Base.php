@@ -108,6 +108,20 @@ abstract class Base {
         $page = $this->page;
         \Utils\DictManager::load($page);
 
+        $code = $this->f3->get('SESSION.extra_message_code');
+        if ($code !== null) {
+            $this->f3->clear('SESSION.extra_message_code');
+
+            if (!isset($params['SYSTEM_MESSAGES'])) {
+                $params['SYSTEM_MESSAGES'] = [];
+            }
+
+            $params['SYSTEM_MESSAGES'][] = [
+                'text' => $this->f3->get('error_' . $code),
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+
         $extra = $this->f3->get('EXTRA_APPLY_PAGE_PARAMS');
         if ($extra && is_callable($extra)) {
             $params = $extra($params, $page);

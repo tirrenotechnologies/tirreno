@@ -14,10 +14,10 @@
  */
 
 return [
-    'AdminApi_page_title' => 'API key',
+    'AdminApi_page_title' => 'Tracking ID',
     'AdminApi_breadcrumb_title' => 'Api',
 
-    'AdminApi_table_title_tooltip' => 'Use the API key to access the API. Include it in the HTTP header when sending event information to the endpoint, as shown in the examples below.',
+    'AdminApi_table_title_tooltip' => 'Use the Tracking ID to access the API. Include it in the HTTP header when sending event information to the endpoint, as shown in the examples below.',
 
     'AdminApi_http_endpoint' => 'Tracking code',
     'AdminApi_server_language' => 'Server language',
@@ -35,10 +35,10 @@ return [
     'AdminApi_table_column_created_at' => 'Created at',
 
     'AdminApi_table_column_action' => 'Action',
-    'AdminApi_table_column_action_tooltip' => 'To renew the API key value, click the "Reset" button. Note that this action cancels the validity of the previously used key.',
+    'AdminApi_table_column_action_tooltip' => 'To renew the Tracking ID value, click the "Reset" button. Note that this action cancels the validity of the previously used key.',
 
     'AdminApi_table_button_reset' => 'Reset',
-    'AdminApi_reset_success_message' => 'The API key has been reset successfully.',
+    'AdminApi_reset_success_message' => 'The Tracking ID has been reset successfully.',
 
     'AdminApi_data_enrichment_title' => 'Data enrichment',
     'AdminApi_data_enrichment_title_tooltip' => 'Choose the components of event information to enhance by additionally applying internal, external, and open-sourced data.',

@@ -33,7 +33,7 @@ export class Tooltip {
     static addTooltipsToGridRecords(tableId) {
         const path1   = `#${tableId} td .tooltip:not(.iptype)`;
         const items1  = document.querySelectorAll(path1);
-        const config1 = this.getConfig(false);
+        const config1 = this.getConfig(true);
 
         const path2   = `#${tableId} td .tooltip.iptype`;
         const items2  = document.querySelectorAll(path2);

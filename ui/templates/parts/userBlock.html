@@ -14,7 +14,7 @@
     </true>
     <false>
         <div class="head-button">
-            <button class="button is-warning dark-loader" data-type="reviewed" id="reviewed-button" type="button">{{ @AdminUsers_remove_reviewed_flag }}</button>
+            <button class="button is-warning dark-loader" data-type="reviewed" id="reviewed-button" type="button">{{ (@USER.fraud === true) ? @AdminUsers_auto_blocked : @AdminUsers_remove_reviewed_flag }}</button>
         </div>
     </false>
 </check>

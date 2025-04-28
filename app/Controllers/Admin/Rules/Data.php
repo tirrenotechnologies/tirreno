@@ -67,6 +67,10 @@ class Data extends \Controllers\Base {
             return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
         }
 
+        if ($keyId !== $this->getCurrentOperatorApiKeyId()) {
+            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
+        }
+
         $blacklistThreshold = (int) ($params['blacklist-threshold'] ?? -1);
         if ($blacklistThreshold < -1 || $blacklistThreshold > 18) {
             return \Utils\ErrorCodes::BLACKLIST_THRESHOLD_DOES_NOT_EXIST;
@@ -155,8 +159,7 @@ class Data extends \Controllers\Base {
         $model = new \Models\ApiKeys();
         $model->getKeyById($apiKey);
 
-        // $blacklistThreshold = $model->blacklist_threshold;
-        $blacklistThreshold = -1;
+        $blacklistThreshold = $model->blacklist_threshold;
         if ($total <= $blacklistThreshold) {
             (new \Controllers\Admin\User\Data())->addToBlacklistQueue($accountId, true, $apiKey);
         }

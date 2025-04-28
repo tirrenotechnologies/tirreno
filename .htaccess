@@ -1,7 +1,7 @@
 Options -Indexes
 RewriteEngine On
 
-RewriteRule ^(\..+|Dockerfile|.+\.sh|.+\.yml|.+\.conf|.+\.ini|.+\.log|.+\.sql|.+\.json|.+\.md|composer\.lock|phpcs\.xml)$ - [R=404,L]
+RewriteRule ^(\..+|Dockerfile|.+\.sh|.+\.yml|.+\.conf|.+\.ini|.+\.log|.+\.sql|.+\.json|.+\.md|.+\.diz|composer\.lock|phpcs\.xml)$ - [R=404,L]
 RewriteRule ^(app|config|logs|db|tmp|vendor|libs|sensor/src|sensor/tests|ui/templates).*$ - [R=404,L]
 
 # Exclude /sensor path from general rules

@@ -27,17 +27,24 @@ use Sensor\Exception\RateLimitException;
 class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
     public function __construct(
         private string $baseUrl,
+        private ?string $userAgent,
     ) {
     }
 
     public function query(array $data, string $token): array {
         $options = [
             'http' => [
-                'method' => 'POST',
+                'method'    => 'POST',
                 //'header' => sprintf("Authorization: Bearer %s\r\nContent-Type: application/json", $this->apiKey),
-                'header' => sprintf("Authorization: Bearer %s\r\nContent-Type: application/json", $token),
-                'content' => json_encode($data, \JSON_THROW_ON_ERROR),
-                'timeout' => 30,
+                'header'    => sprintf(
+                    "Authorization: Bearer %s\r\n" .
+                    "Content-Type: application/json\r\n" .
+                    "User-Agent: %s\r\n",
+                    $token,
+                    $this->userAgent
+                ),
+                'content'   => json_encode($data, \JSON_THROW_ON_ERROR),
+                'timeout'   => 30,
             ],
         ];
 

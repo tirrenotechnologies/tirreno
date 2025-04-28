@@ -75,7 +75,7 @@ class Data extends \Controllers\Base {
                 $accountOperationQueueModel->add($accountId, $apiKey);
             }
 
-            $this->f3->set('SESSION.deleteUserOperationCode', $code);
+            $this->f3->set('SESSION.extra_message_code', $code);
             $this->f3->reroute('/id');
         }
     }
@@ -233,6 +233,16 @@ class Data extends \Controllers\Base {
         [$scheduled, $status] = $accountOperationQueueModel->isInQueueStatus($userId, $apiKey);
 
         return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::Failed) ? \Utils\ErrorCodes::USER_DELETION_FAILED : null];
+    }
+
+    public function getScheduledForBlacklist(int $userId): array {
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
+        $accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+
+        [$scheduled, $status] = $accountOperationQueueModel->isInQueueStatus($userId, $apiKey);
+
+        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::Failed) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
     }
 
     public function getPayloadColumns($userId) {

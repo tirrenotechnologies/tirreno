@@ -61,11 +61,6 @@ class DI {
     private ?Profiler $profiler = null;
     private ?Config $config = null;
 
-    public function __construct(
-        private string $configPath,
-    ) {
-    }
-
     public function getController(): CreateEventController {
         $pdo = $this->getPdo();
         $profiler = $this->getProfiler();
@@ -184,9 +179,9 @@ class DI {
      * @return array<string, string>
      */
     private function loadConfigFromFile(): array {
-        $path = __DIR__ . '/../../../config/config.*.ini';
+        $path = __DIR__ . '/../../../config/{config.ini,config.*.ini}';
         /** @var string[] $iniFiles */
-        $iniFiles = glob($path);
+        $iniFiles = glob($path, GLOB_BRACE);
         $config = [];
 
         foreach ($iniFiles as $file) {
@@ -239,20 +234,16 @@ class DI {
         $config = array_merge($config, getenv());
         $dbConfig = $this->parseDatabaseConfig($config);
 
-        if (
-            isset($dbConfig)
-        ) {
+        if (isset($dbConfig)) {
             $this->config = new Config(
                 databaseConfig: $dbConfig,
                 enrichmentApiUrl: $config['ENRICHMENT_API'] ?? null,
                 scoreApiUrl: $config['SCORE_API_URL'] ?? null,
+                userAgent: $config['USER_AGENT'] ?? null,
                 debugLog: isset($config['DEBUG']) ? (bool) $config['DEBUG'] : false,
             );
 
             $this->getLogger()->logDebug('Config loaded from ENV variables: ' . json_encode($this->config, \JSON_THROW_ON_ERROR));
-        } else {
-            $this->config = include $this->configPath;
-            $this->getLogger()->logDebug('Config loaded from config.php file: ' . json_encode($this->config, \JSON_THROW_ON_ERROR));
         }
 
         if (empty($this->config->enrichmentApiUrl)) {
@@ -270,9 +261,9 @@ class DI {
         }
 
         if (function_exists('curl_init')) {
-            return new DataEnrichmentCurlClient($config->enrichmentApiUrl);
+            return new DataEnrichmentCurlClient($config->enrichmentApiUrl, $config->userAgent);
         } else {
-            return new DataEnrichmentPhpClient($config->enrichmentApiUrl);
+            return new DataEnrichmentPhpClient($config->enrichmentApiUrl, $config->userAgent);
         }
     }
 }

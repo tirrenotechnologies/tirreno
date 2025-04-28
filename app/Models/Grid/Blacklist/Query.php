@@ -32,6 +32,7 @@ class Query extends \Models\Grid\Base\Query {
                 blacklist.score,
                 blacklist.account_email AS email,
                 extra.type,
+                TRUE AS fraud,
                 CASE extra.type
                     WHEN 'ip'    THEN blacklist.ip
                     WHEN 'email' THEN blacklist.email
@@ -106,6 +107,7 @@ class Query extends \Models\Grid\Base\Query {
         ");
 
         $this->applySearch($query, $queryParams);
+        $this->applyEntityTypes($query, $queryParams);
         $this->applyOrder($query);
         $this->applyLimit($query, $queryParams);
 
@@ -176,6 +178,7 @@ class Query extends \Models\Grid\Base\Query {
         ");
 
         $this->applySearch($query, $queryParams);
+        $this->applyEntityTypes($query, $queryParams);
 
         return [$query, $queryParams];
     }
@@ -203,6 +206,24 @@ class Query extends \Models\Grid\Base\Query {
         }
 
         //Add search into request
-        $query = sprintf($query, $searchConditions);
+        $query = sprintf($query, $searchConditions . ' %s');
+    }
+
+    private function applyEntityTypes(string &$query, array &$queryParams): void {
+        $searchCondition = '';
+
+        $entityTypeIds = $this->f3->get('REQUEST.entityTypeIds');
+        if ($entityTypeIds !== null && count($entityTypeIds)) {
+            $clauses = [];
+
+            foreach ($entityTypeIds as $key => $entityTypeId) {
+                $clauses[] = 'extra.type = :entity_type_' . $key;
+                $queryParams[':entity_type_' . $key] = strtolower(\Utils\Constants::get('ENTITY_TYPES')[$entityTypeId]);
+            }
+
+            $searchCondition = ' AND (' . implode(' OR ', $clauses) . ')';
+        }
+
+        $query = sprintf($query, $searchCondition);
     }
 }

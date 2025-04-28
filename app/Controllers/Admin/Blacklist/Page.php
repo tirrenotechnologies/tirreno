@@ -25,9 +25,11 @@ class Page extends \Controllers\Pages\Base {
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
             'LOAD_UPLOT'            => true,
             'LOAD_DATATABLE'        => true,
+            'LOAD_CHOICES'          => true,
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/blacklist.html',
             'JS'                    => 'admin_blacklist.js',
+            'ENTITY_TYPES'          => \Utils\Constants::get('ENTITY_TYPES'),
             'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 

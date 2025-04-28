@@ -61,6 +61,11 @@ class Page extends \Controllers\Pages\Base {
             $pageParams['USER'] = $dataController->getUserById($userId);
         }
 
+        [$scheduledForBlacklist, $errorCode] = $dataController->getScheduledForBlacklist($userId);
+        if ($scheduledForBlacklist) {
+            $this->f3->set('SESSION.extra_message_code', $errorCode ?? \Utils\ErrorCodes::USER_BLACKLISTING_QUEUED);
+        }
+
         return parent::applyPageParams($pageParams);
     }
 }

@@ -38,7 +38,7 @@ const USER_COUNTRIES_CRITICAL_VALUE = 3;
 
 const MAX_HOURS_CHART = 96;
 const MIN_HOURS_CHART = 3;
-const DAYS_IN_RANGE = 7;
+const DAYS_IN_RANGE = 1;
 const X_AXIS_SERIFS = 8;
 
 const ASN_OVERRIDE = {

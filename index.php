@@ -56,11 +56,12 @@ $f3->set('HOST', \Utils\Variables::getSite());
 
 //Load routes configuration
 $f3->config('config/routes.ini');
+$f3->config('config/apiEndpoints.ini');
 
 //Use custom onError function
 $f3->set('ONERROR', \Utils\ErrorHandler::getOnErrorHandler());
 
-// \Utils\Updates::syncUpdates();
+\Utils\Updates::syncUpdates();
 
 //Load dictionary file
 $f3->set('LOCALES', 'app/Dictionary/');

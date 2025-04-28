@@ -41,31 +41,6 @@ class Page extends \Controllers\Pages\Base {
             'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
-        $pageParams = parent::applyPageParams($pageParams);
-
-        return $this->applySessionMessageToPageParams($pageParams);
-    }
-
-    private function applySessionMessageToPageParams(array $pageParams): array {
-        $code = $this->f3->get('SESSION.deleteUserOperationCode');
-
-        if ($code) {
-            $this->f3->clear('SESSION.deleteUserOperationCode');
-
-            if (!isset($pageParams['SYSTEM_MESSAGES'])) {
-                $pageParams['SYSTEM_MESSAGES'] = [];
-            }
-
-            $message = sprintf('error_%s', $code);
-            $message = $this->f3->get($message);
-
-            $createdAt = date('Y-m-d H:i:s');
-            $pageParams['SYSTEM_MESSAGES'][] = [
-                'text' => $message,
-                'created_at' => $createdAt,
-            ];
-        }
-
-        return $pageParams;
+        return parent::applyPageParams($pageParams);
     }
 }

@@ -33,10 +33,9 @@ class Dashboard extends \Models\BaseSql {
         $this->API_KEY = $apiKey;
         $this->USE_DATES = $useDates;
 
-        // $model = new \Models\ApiKeys();
-        // $model->getKeyById($apiKey);
-        // $reviewQueueThreshold = $model->review_queue_threshold;
-        $reviewQueueThreshold = \Utils\Constants::USER_LOW_SCORE_SUP;
+        $model = new \Models\ApiKeys();
+        $model->getKeyById($apiKey);
+        $reviewQueueThreshold = $model->review_queue_threshold;
 
         $ips = $this->getTotalIps();
         $users = $this->getTotalUsers();

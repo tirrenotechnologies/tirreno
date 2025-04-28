@@ -42,6 +42,7 @@ class SystemMessages {
 
                     $m['text'] = $text;
                     $m['created_at'] = $time;
+                    $m['class'] = 'is-warning';
                 }
 
                 $msg[] = $m;

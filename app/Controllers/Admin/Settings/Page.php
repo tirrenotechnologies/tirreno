@@ -33,8 +33,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_AUTOCOMPLETE' => true,
             'HTML_FILE'         => 'admin/settings.html',
             'JS'                => 'admin_settings.js',
-            'API_KEYS'          => $apiKeys,
-            'IS_OWNER'          => $isOwner,
             'CURRENT_VERSION'   => \Utils\VersionControl::fullVersionString(),
         ];
 
@@ -49,9 +47,14 @@ class Page extends \Controllers\Pages\Base {
             //$this->f3->reroute('/account');
         }
 
-        // set shared_operatos param after proccessing POST request
+        // set shared_operatos and api_keys params after proccessing POST request
         $coOwners = $dataController->getSharedApiKeyOperators($operatorId);
         $pageParams['SHARED_OPERATORS'] = $coOwners;
+
+        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+
+        $pageParams['IS_OWNER'] = $isOwner;
+        $pageParams['API_KEYS'] = $apiKeys;
 
         $operatorModel = new \Models\Operator();
         $operatorModel->getOperatorById($operatorId);

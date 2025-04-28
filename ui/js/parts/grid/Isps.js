@@ -68,13 +68,13 @@ export class IspsGrid extends BaseGrid {
                 render: this.renderTotalsLoader
             },
             {
-                data: 'total_account',
-                name: 'total_account',
+                data: 'total_ip',
+                name: 'total_ip',
                 render: this.renderTotalsLoader
             },
             {
-                data: 'total_ip',
-                name: 'total_ip',
+                data: 'total_account',
+                name: 'total_account',
                 render: this.renderTotalsLoader
             },
             {

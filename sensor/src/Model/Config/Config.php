@@ -24,6 +24,7 @@ class Config implements \JsonSerializable {
         #[\SensitiveParameter]
         public ?string $enrichmentApiKey = null,
         public ?string $scoreApiUrl = null,
+        public ?string $userAgent = null,
         public bool $debugLog = false,
     ) {
     }

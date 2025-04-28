@@ -28,8 +28,6 @@ class Page extends \Controllers\Pages\Base {
         $currentOperator = $this->f3->get('CURRENT_USER');
         $operatorId = $currentOperator->id;
 
-        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
-
         $ruleValues = [
             ['value' => -20, 'text' => $this->f3->get('AdminRules_weight_minus20')],
             ['value' => 0,   'text' => $this->f3->get('AdminRules_weight_0')],
@@ -46,7 +44,6 @@ class Page extends \Controllers\Pages\Base {
             'RULE_VALUES'           => $ruleValues,
             'RULES'                 => $rules,
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
-            'IS_OWNER'              => $isOwner,
         ];
 
         if ($this->isPostRequest()) {
@@ -58,6 +55,10 @@ class Page extends \Controllers\Pages\Base {
             $pageParams['CMD'] = $params['cmd'];
         }
 
+        // set api_keys param after proccessing POST request
+        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+
+        $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;
 
         return parent::applyPageParams($pageParams);

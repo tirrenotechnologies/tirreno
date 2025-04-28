@@ -1,5 +1,15 @@
 # tirreno changelog
 
+## tirreno v0.9.5
+
+* new search filters for blacklist and users
+* review queue and automated blacklisting thresholds
+* device detector update
+* database updates module
+* improved notifications
+* default 1D range for grids
+* blacklist API
+
 ## tirreno v0.9.4
 
 * new search filters for types of events and IPs

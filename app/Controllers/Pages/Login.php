@@ -41,6 +41,10 @@ class Login extends Base {
                     $controller->getNumberOfNotReviewedUsers(true, true);    // use cache, overall count
 
                     $this->f3->set('SESSION.active_user_id', $operatorsModel->id);
+                    $extra = $this->f3->get('EXTRA_LOGIN');
+                    if ($extra && is_callable($extra)) {
+                        $params = $extra();
+                    }
                     $this->f3->reroute('/');
                 } else {
                     $errorCode = \Utils\ErrorCodes::EMAIL_OR_PASSWORD_IS_NOT_CORRECT;

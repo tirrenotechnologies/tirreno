@@ -127,7 +127,8 @@ class Data extends \Controllers\Base {
         $options = [
             'method' => 'GET',
             'header' => [
-                sprintf('Authorization: Bearer %s', $token),
+                'Authorization: Bearer ' . $token,
+                'User-Agent: ' . $this->f3->get('USER_AGENT'),
             ],
         ];
 
@@ -210,10 +211,7 @@ class Data extends \Controllers\Base {
             return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
         }
 
-        $currentOperator = $this->f3->get('CURRENT_USER');
-        $operatorId = $currentOperator->id;
-
-        if (!$this->validateApiKeyAccess($keyId, $operatorId)) {
+        if ($keyId !== $this->getCurrentOperatorApiKeyId()) {
             return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
         }
 
