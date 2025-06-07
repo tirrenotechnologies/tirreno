@@ -9,11 +9,14 @@
     </a>
 </p>
 
-tirreno is an open-source security platform. It monitors and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app. 
+tirreno is an open-source security platform for integrated cyberfraud and abuse protection. 
 
+It monitors, analyzes and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app. 
+
+* **For mission-critical applications**: Secure your user environments from account takeovers, brute-force attacks, insider threats, and vulnerabilities driven by user behavior.
 * **For web applications**: Protect your user areas from account takeovers, brute-force attacks, fake accounts, malicious bots, and common web vulnerabilities caused by user behavior.
 * **For online platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
-* **For startups, SaaS, and e-commerce**: Get a ready-made boilerplate for account security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
+* **For SaaS, client portals and e-commerce**: Get a ready-made boilerplate for account security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
 * **For online communities**: Combat spam, prevent fake registrations and account sharing.
 
 tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time threat analytics.
