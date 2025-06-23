@@ -28,7 +28,7 @@ trait ApiKeys {
         return $key ? $key->key : null;
     }
 
-    public function getCurrentOperatorSubscriptionKeyString(): ?string {
+    public function getCurrentOperatorEnrichmentKeyString(): ?string {
         $key = $this->getCurrentOperatorApiKeyObject();
 
         return $key ? $key->token : null;

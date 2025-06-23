@@ -23,8 +23,9 @@ class ErrorHandler {
         $errorTraceArray = preg_split('/$\R?^/m', $errorTraceString);
         $maximalStringIndex = 0;
         $maximalStringLength = 0;
+        $iters = count($errorTraceArray);
 
-        for ($i = 0, $l = count($errorTraceArray); $i < $l; ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $currentStringLength = strlen($errorTraceArray[$i]);
             if ($maximalStringLength < $currentStringLength) {
                 $maximalStringIndex = $i;
@@ -32,11 +33,12 @@ class ErrorHandler {
             }
         }
 
-        if (count($errorTraceArray) > 1) {
+        if ($iters > 1) {
             array_splice($errorTraceArray, $maximalStringIndex, 1);
         }
 
-        for ($i = 0, $l = count($errorTraceArray); $i < $l; ++$i) {
+        $iters = count($errorTraceArray);
+        for ($i = 0; $i < $iters; ++$i) {
             $errorTraceArray[$i] = strip_tags($errorTraceArray[$i]);
             $errorTraceArray[$i] = str_replace(['&gt;', '&lt;'], ['>', '<'], $errorTraceArray[$i]);
         }
@@ -61,7 +63,9 @@ class ErrorHandler {
         $errorTraceArray = explode('<br>', $errorData['trace']);
         $printErrorTraceToLog = $f3->get('PRINT_ERROR_TRACE_TO_LOG');
         if ($printErrorTraceToLog) {
-            for ($i = 0, $l = count($errorTraceArray); $i < $l; ++$i) {
+            $iters = count($errorTraceArray);
+
+            for ($i = 0; $i < $iters; ++$i) {
                 \Utils\Logger::log(null, $errorTraceArray[$i]);
             }
         }

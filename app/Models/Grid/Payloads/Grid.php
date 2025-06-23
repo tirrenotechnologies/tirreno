@@ -48,9 +48,10 @@ class Grid extends \Models\Grid\Base\Grid {
         //TODO: $userId inside that model
         $data = $this->getGrid([$userId]);
         $records = $data['data'];
+        $iters = count($records);
         $payloads = [];
 
-        for ($i = 0; $i < count($records); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $record = $records[$i];
 
             $payload = $record['payload'];

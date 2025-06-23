@@ -15,17 +15,18 @@ export class BotsPage extends BasePage {
 
     initUi() {
         const gridParams = {
-            url     : '/admin/loadBots',
-            //tileId  : 'totalDevices',
-            tableId : 'bots-table',
-            dateRangeGrid: true,
+            url:        '/admin/loadBots',
+            // tileId:  'totalDevices',
+            tableId:    'bots-table',
+
+            dateRangeGrid:  true,
 
             getParams: function() {
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
                 return {dateRange, searchValue};
-            }
+            },
         };
 
         const chartParams = {
@@ -36,7 +37,7 @@ export class BotsPage extends BasePage {
                 const searchValue = searchFilter.getValue();
 
                 return {mode, chartType, dateRange, searchValue};
-            }
+            },
         };
 
         const datesFilter  = new DatesFilter();

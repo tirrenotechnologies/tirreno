@@ -33,11 +33,12 @@ export class UsersPage extends BasePage {
         };
 
         const gridParams = {
-            url     : '/admin/loadUsers',
-            tileId  : 'totalUsers',
-            tableId : 'users-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:            '/admin/loadUsers',
+            tileId:         'totalUsers',
+            tableId:        'users-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'user',
                 columns: ['total_visit'],
@@ -48,11 +49,11 @@ export class UsersPage extends BasePage {
             getParams: function() {
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
-                const ruleIds     = rulesFilter.getValues();
+                const ruleUids    = rulesFilter.getValues();
                 const scoresRange = scoresRangeFilter.getValues();
 
-                return {dateRange, searchValue, ruleIds, scoresRange};
-            }
+                return {dateRange, searchValue, ruleUids, scoresRange};
+            },
         };
 
         new UsersGrid(gridParams);

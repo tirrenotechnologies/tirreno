@@ -27,62 +27,65 @@ export class DomainPage extends BasePage {
         };
 
         const usersGridParams = {
-            url         : '/admin/loadUsers',
-            tileId      : 'totalUsers',
-            tableId     : 'users-table',
+            url:        '/admin/loadUsers',
+            tileId:     'totalUsers',
+            tableId:    'users-table',
 
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:        '/admin/loadEvents',
+            tileId:     'totalEvents',
+            tableId:    'user-events-table',
+            panelType:  'event',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams: getParams,
         };
 
         const ipsGridParams = {
-            url    : '/admin/loadIps',
-            tileId : 'totalIps',
-            tableId: 'ips-table',
+            url:        '/admin/loadIps',
+            tileId:     'totalIps',
+            tableId:    'ips-table',
 
-            isSortable: false,
-            orderByLastseen: true,
+            isSortable:         false,
+            orderByLastseen:    true,
 
-            getParams: getParams
+            getParams: getParams,
         };
 
         const ispsGridParams = {
-            url       : '/admin/loadIsps',
-            tableId   : 'isps-table',
-            getParams : getParams,
-            isSortable: false
-        };
-
-        const domainsGridParams = {
-            url     : '/admin/loadDomains',
-            tileId  : 'totalDomains',
-            tableId : 'domains-table',
+            url:        '/admin/loadIsps',
+            tableId:    'isps-table',
 
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
+        };
+
+        const domainsGridParams = {
+            url:        '/admin/loadDomains',
+            tileId:     'totalDomains',
+            tableId:    'domains-table',
+
+            isSortable: false,
+
+            getParams: getParams,
         };
 
 
         const mapParams = {
-            getParams    : getParams,
-            tooltipString: 'event',
-            tooltipField : 'total_visit'
+            getParams:      getParams,
+            tooltipString:  'event',
+            tooltipField:   'total_visit',
         };
 
         const domainDetailsTiles = {
-            getParams: getParams
+            getParams: getParams,
         };
 
         const chartParams = {

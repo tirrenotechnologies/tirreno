@@ -16,19 +16,19 @@
 namespace Controllers\Admin\Enrichment;
 
 class Data extends \Controllers\Base {
-    public function enrichEntity(string $type, ?string $search, ?int $entityId, int $apiKey, ?string $subscriptionKeyString): array {
-        if ($subscriptionKeyString === null) {
+    public function enrichEntity(string $type, ?string $search, ?int $entityId, int $apiKey, ?string $enrichmentKey): array {
+        if ($enrichmentKey === null) {
             return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_KEY_DOES_NOT_EXIST];
         }
         set_error_handler([\Utils\ErrorHandler::class, 'exceptionErrorHandler']);
         $search = $search !== null ? ['value' => $search] : null;
-        $result = $this->enrichEntityProcess($type, $search, $entityId, $apiKey, $subscriptionKeyString);
+        $result = $this->enrichEntityProcess($type, $search, $entityId, $apiKey, $enrichmentKey);
         restore_error_handler();
 
         return $result;
     }
 
-    private function enrichEntityProcess(string $type, ?array $search, ?int $entityId, int $apiKey, ?string $subscriptionKeyString): array {
+    private function enrichEntityProcess(string $type, ?array $search, ?int $entityId, int $apiKey, ?string $enrichmentKey): array {
         $processErrorMessage = ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_UNKNOWN_ERROR];
 
         if ($type === 'device') {
@@ -95,7 +95,7 @@ class Data extends \Controllers\Base {
         $apiError = null;
 
         try {
-            [$statusCode, $response,] = $this->enrichEntityByValue($type, $value, $subscriptionKeyString);
+            [$statusCode, $response,] = $this->enrichEntityByValue($type, $value, $enrichmentKey);
             $error = \Utils\ApiResponseFormats::getErrorResponseFormat();
             $apiError = \Utils\ApiResponseFormats::matchResponse($response[$type] ?? [], $error) ? $response[$type]['error'] : null;
         } catch (\ErrorException $e) {
@@ -110,7 +110,7 @@ class Data extends \Controllers\Base {
             // do not raise on bogon ip
             if ($apiError === \Utils\Constants::get('ENRICHMENT_IP_IS_NOT_FOUND')) {
                 return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_IP_NOT_FOUND];
-            } elseif ($apiError !== null && $apiError !== \Utils\Constants::get('ENRICHMENT_IP_IS_BOGON')) {
+            } elseif ($apiError !== null && $apiError !== \Utils\Constants::get('ENRICHMENT_IP_IS_BOGON') || $statusCode !== 200 || $response[$type] === null) {
                 return $processErrorMessage;
             }
         } elseif ($apiError !== null || $statusCode !== 200 || $response[$type] === null) {
@@ -180,17 +180,17 @@ class Data extends \Controllers\Base {
         return $messages;
     }
 
-    private function enrichEntityByValue(string $type, array $value, string $subscriptionKeyString): array {
+    private function enrichEntityByValue(string $type, array $value, string $enrichmentKey): array {
         $apiUrl = \Utils\Variables::getEnrichtmentApi();
         $postFields = [
-            $type => array_key_exists('hash', $value) ? $value : $value['value'],
+            $type => $value['value'],
         ];
 
         $options = [
             'method' => 'POST',
             'header' => [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $subscriptionKeyString,
+                'Authorization: Bearer ' . $enrichmentKey,
                 'User-Agent: ' . $this->f3->get('USER_AGENT'),
             ],
             'content' => \json_encode($postFields),

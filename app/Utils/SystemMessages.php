@@ -30,7 +30,9 @@ class SystemMessages {
         $messages[] = self::getCustomErrorMessage($apiKey);
         $msg = [];
 
-        for ($i = 0; $i < count($messages); ++$i) {
+        $iters = count($messages);
+
+        for ($i = 0; $i < $iters; ++$i) {
             $m = $messages[$i];
             if ($m !== null) {
                 if ($m['id'] !== \Utils\ErrorCodes::CUSTOM_ERROR_FROM_DSHB_MESSAGES) {

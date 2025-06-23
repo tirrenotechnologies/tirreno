@@ -2,8 +2,7 @@
     <header class="card-header">
         <div class="card-header-title">
             {{ @AdminRules_table_title }}
-            <span>{{ count(@RULES) }}</span><p class="tooltip-info tooltip" title="{{ @AdminRules_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
-            </p>
+            <span>{{ count(@RULES) }}</span><p class="tooltip-info tooltip" title="{{ @AdminRules_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
         </div>
     </header>
 
@@ -24,45 +23,71 @@
                 <tbody>
                     <loop from="{{ @I }}=0" to="{{ @I }} < {{ count(@RULES) }}" step="{{ @I }}++">
                         <SET VALUE="{{ @RULES[@I].value ?? 0}}" />
+                        <SET BROKEN="{{ !@RULES[@I].validated || @RULES[@I].missing }}" />
                         <SET PROPORTION="{{ @RULES[@I].proportion !== null ? (@RULES[@I].proportion < 1.0 && @RULES[@I].proportion > 0.0 ? '<1%' : strval(intval(@RULES[@I].proportion)).'%') : '&minus;' }}"/>
                         <SET PROPORTION_UPD="{{ @RULES[@I].proportion_updated_at !== null ? 'Last updated: '.(new DateTime(@RULES[@I].proportion_updated_at))->format('d/m/Y') : '&minus;' }}"/>
                         <tr data-rule-uid="{{ @RULES[@I].uid }}">
                             <td align="right">
-                                <a href="/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ \Utils\Rules::getRuleClass($VALUE) }}">{{@RULES[@I].uid}}</h3></a>
-                            </td>
-                            <td>{{@RULES[@I].type}}</td>
-                            <td>
-                                <b>{{@RULES[@I].name}}</b>
-                                <p>{{@RULES[@I].description}}</p>
-                            </td>
-                            <td align="center"><span class="tooltip" title="{{ @PROPORTION_UPD }}">{{ @PROPORTION }}</span></td>
-                            <td>
-                                <div class="selector">
-                                <select class="input rulescore" name="{{@RULES[@I].uid}}_{{@RULES[@I].id}}" data-initial-value="{{ @VALUE }}">
-                                    <loop from="{{ @J }}=0" to="{{ @J }} < {{ count(@RULE_VALUES) }}" step="{{ @J }}++">
-                                        <SET RULE_VALUE="{{ @RULE_VALUES[@J] }}" />
-                                        <set IS_RULE_ACTIVE="{{ @VALUE === @RULE_VALUE['value'] }} " />
-                                        <option value="{{ @RULE_VALUE.value }}" {{ @IS_RULE_ACTIVE ? 'selected' : '' }}>{{ @RULE_VALUE.text }}</option>
-                                    </loop>
-                                </select>
-                                </div>
+                                <a href="/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ @BROKEN ? 'broken' : \Utils\RulesClasses::getRuleClass($VALUE) }}">{{@RULES[@I].uid}}</h3></a>
                             </td>
                             <td>
-                                <button class="button dark-loader" data-rule-id="{{ @RULES[@I].id }}" data-rule-uid="{{ @RULES[@I].uid }}">
-                                    <span class="icon ruleIcon">
-                                        <include href="images/icons/play.svg" />
-                                    </span>
-                                </button>
-                                <button class="button dark-loader is-primary is-hidden" type="button">
-                                    <span class="icon ruleIcon">
-                                        <include href="images/icons/save.svg" />
-                                    </span>
-                                </button>
+                                <check if="{{ !@BROKEN }}">
+                                    <true>
+                                        {{@RULES[@I].type}}
+                                    </true>
+                                    <false>
+                                        <p class="addlight">{{@RULES[@I].type}}</p>
+                                    </false>
+                                </check>
+                            </td>
+                            <td>
+                                <p {{@BROKEN ? 'class="inactive-rulename"' : ''}}>{{@RULES[@I].name}}</p>
+                                <p class="addlight">{{@RULES[@I].descr}}</p>
+                            </td>
+
+                            <td align="center">
+                                <check if="{{ !@BROKEN }}">
+                                    <true>
+                                        <span class="tooltip" title="{{ @PROPORTION_UPD }}">{{ @PROPORTION }}</span>
+                                    </true>
+                                </check>
+                            </td>
+                            <td>
+                                <check if="{{ !@BROKEN }}">
+                                    <true>
+                                        <div class="selector">
+                                        <select class="input rulescore" name="{{@RULES[@I].uid}}" data-initial-value="{{ @VALUE }}">
+                                            <loop from="{{ @J }}=0" to="{{ @J }} < {{ count(@RULE_VALUES) }}" step="{{ @J }}++">
+                                                <SET RULE_VALUE="{{ @RULE_VALUES[@J] }}" />
+                                                <set IS_RULE_ACTIVE="{{ @VALUE === @RULE_VALUE['value'] }} " />
+                                                <option value="{{ @RULE_VALUE.value }}" {{ @IS_RULE_ACTIVE ? 'selected' : '' }}>{{ @RULE_VALUE.text }}</option>
+                                            </loop>
+                                        </select>
+                                        </div>
+                                    </true>
+                                </check>
+                            </td>
+                            <td>
+                                <check if="{{ !@BROKEN }}">
+                                    <true>
+                                        <button class="button dark-loader" data-rule-uid="{{ @RULES[@I].uid }}">
+                                            <span class="icon ruleIcon">
+                                                <include href="images/icons/play.svg" />
+                                            </span>
+                                        </button>
+                                        <button class="button dark-loader is-primary is-hidden" type="button">
+                                            <span class="icon ruleIcon">
+                                                <include href="images/icons/save.svg" />
+                                            </span>
+                                        </button>
+                                    </true>
+                                </check>
                             </td>
                         </tr>
                     </loop>
                 </tbody>
             </table>
+            <include href="templates/parts/forms/reloadRulesForm.html">
         </div>
     </div>
 </div>

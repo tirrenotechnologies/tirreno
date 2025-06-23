@@ -16,7 +16,7 @@
 return [
     'AdminBlacklist_page_title' => 'Blacklist',
     'AdminBlacklist_breadcrumb_title' => 'Blacklist',
-    'AdminBlacklist_search_placeholder' => 'User Email, Identity, Type and Added',
+    'AdminBlacklist_search_placeholder' => 'User Email, Name, Identity, Type and Added',
     'AdminBlacklist_entity_type_search_placeholder' => '+ Add another entity type',
     'AdminBlacklst_table_title' => 'Blacklist',
     'AdminBlacklst_table_title_tooltip' => 'This page lists user identities that were added to a blacklist during a selected period of time. The chart visualizes the daily number of blacklisted identities. To open a page with extended user analytics, click on a table row.',

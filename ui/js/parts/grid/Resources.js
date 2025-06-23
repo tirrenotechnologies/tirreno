@@ -1,12 +1,13 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 import {
     renderClickableResourceWithoutQuery,
-    renderHttpCode, renderBoolean
+    renderHttpCode,
+    renderBoolean,
 } from '../DataRenderers.js?v=2';
 
 export class ResourcesGrid extends BaseGrid {
     get orderConfig() {
-        return [[0, 'asc']];
+        return [[7, 'desc']];
     }
 
     get columnDefs() {

@@ -1,0 +1,7 @@
+<form action="" method="POST" class="reenrichment" id="reload-rules-form">
+    <input type="hidden" name="token" value="{{ @CSRF }}">
+    <input type="hidden" name="cmd" value="refreshRules">
+    <footer class="card-footer">
+        <input type="submit" class="button is-primary" value="{{ @AdminRules_reload_rules }}" >
+    </footer>
+</form>

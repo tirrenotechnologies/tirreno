@@ -23,17 +23,17 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
         parent::__construct();
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
-        $this->accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         $this->apiKeysModel = new \Models\ApiKeys();
         $this->controller = new \Controllers\Admin\Enrichment\Data();
     }
 
     public function processQueue(): void {
-        if ($this->accountOperationQueueModel->isExecuting() && !$this->accountOperationQueueModel->unclog()) {
+        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
             $this->log('Enrchment queue is already being executed by another cron job.');
         } else {
-            $this->processItems($this->accountOperationQueueModel);
+            $this->processItems($this->accountOpQueueModel);
         }
     }
 
@@ -42,7 +42,6 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
         $apiKey = $item['key'];
         $userId = $item['event_account'];
 
-        $model = new \Models\ApiKeys();
         $subscriptionKey = $this->apiKeysModel->getKeyById($apiKey)->token;
         $entities = $this->controller->getNotCheckedEntitiesByUserId($userId, $apiKey);
 

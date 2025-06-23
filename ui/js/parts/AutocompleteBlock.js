@@ -20,8 +20,7 @@ export class AutocompleteBlock {
             noSuggestionNotice: 'Sorry, no matching results',
 
             onSelect: function(suggestion) {
-                const url = `/${suggestion.entityId}/${suggestion.id}`;
-                window.open(url, '_self');
+                window.open(`/${suggestion.entityId}/${suggestion.id}`, '_self');
             },
 
             onSearchStart: function(params) {

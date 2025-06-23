@@ -181,9 +181,9 @@ class Data extends \Controllers\Base {
             $accountsForEnrichment = $model->notCheckedUsers($apiKey);
 
             $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
-            $accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+            $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
-            $accountOperationQueueModel->addBatch($accountsForEnrichment);
+            $accountOpQueueModel->addBatch($accountsForEnrichment);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_manual_enrichment_success_message');
         }
@@ -269,8 +269,8 @@ class Data extends \Controllers\Base {
             $skipEnrichingAttributes = \array_diff($this->ENRICHED_ATTRIBUTES, \array_keys($enrichedAttributes));
             $model->updateSkipEnrichingAttributes($skipEnrichingAttributes);
 
-            $skipBlacklistSynchronisation = !isset($params['exchangeBlacklist']);
-            $model->updateSkipBlacklistSynchronisation($skipBlacklistSynchronisation);
+            $skipBlacklistSync = !isset($params['exchangeBlacklist']);
+            $model->updateSkipBlacklistSynchronisation($skipBlacklistSync);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_data_enrichment_success_message');
         }
@@ -314,9 +314,9 @@ class Data extends \Controllers\Base {
     public function getScheduledForEnrichment(): bool {
         $apiKey = $this->getCurrentOperatorApiKeyId();
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
-        $accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         // do not use isInQueue() to prevent true on failed state
-        return $accountOperationQueueModel->actionIsInQueueProcessing($apiKey);
+        return $accountOpQueueModel->actionIsInQueueProcessing($apiKey);
     }
 }

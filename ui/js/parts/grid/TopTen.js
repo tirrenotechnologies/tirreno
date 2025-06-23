@@ -1,5 +1,5 @@
-import { BaseGrid } from './Base.js?v=2';
-import { renderDefaultIfEmpty }  from '../DataRenderers.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
+import {renderDefaultIfEmpty}  from '../DataRenderers.js?v=2';
 
 export class TopTenGrid extends BaseGrid {
     get columnDefs() {

@@ -2,7 +2,11 @@ import {Loader} from '../Loader.js?v=2';
 import {getQueryParams}  from '../utils/DataSource.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 import {formatIntTimeUtc} from '../utils/Date.js?v=2';
-import {MAX_HOURS_CHART, MIN_HOURS_CHART, X_AXIS_SERIFS} from '../utils/Constants.js?v=2';
+import {
+    MAX_HOURS_CHART,
+    MIN_HOURS_CHART,
+    X_AXIS_SERIFS,
+} from '../utils/Constants.js?v=2';
 
 export class BaseChart {
 
@@ -112,12 +116,80 @@ export class BaseChart {
         return series;
     }
 
+    getAxisConfig() {
+        const xAxis = {
+            scale: 'DAY',
+            stroke: '#8180a0',
+            grid: {
+                width: 1 / devicePixelRatio,
+                stroke: '#2b2a3d',
+            },
+            ticks: {
+                width: 1 / devicePixelRatio,
+                stroke: '#2b2a3d',
+            },
+            values: [
+                //Copied from https://github.com/leeoniya/uPlot/tree/master/docs#axis--grid-opts
+                // tick incr     default        year        month    day        hour     min        sec       mode
+                [3600 * 24,     '{D}/{M}',  '\n{YYYY}',     null,    null,      null,    null,      null,        1],
+            ],
+        };
+        const yAxis = {
+            stroke: '#8180a0',
+            values: (u, vals, space) => vals.map(v => this.formatKiloValue(u, v)),
+            grid: {
+                width: 1 / devicePixelRatio,
+                stroke: '#2b2a3d',
+            },
+            ticks: {
+                width: 1 / devicePixelRatio,
+                stroke: '#2b2a3d',
+            },
+        };
+
+        return {
+            x: xAxis,
+            y: yAxis,
+        };
+    }
+
+    getOptions(resolution = 'day', nullChar = '0') {
+        const tooltipsPlugin = this.tooltipsPlugin({cursorMemo: this.cursorMemo}, resolution, nullChar);
+        const axes = this.getAxisConfig();
+        const series = this.seriesResolutionShift(this.getSeries(), resolution);
+        const xAxis = this.xAxisResolutionShift(axes.x, resolution);
+        const yAxis = axes.y;
+
+        const opts = {
+            width: 995,
+            height: 200,
+
+            tzDate: ts => uPlot.tzDate(new Date(ts * 1000), 'Etc/UTC'),
+            series: series,
+
+            legend: {
+                show: false
+            },
+            cursor: this.cursorMemo.get(),
+            plugins: [tooltipsPlugin],
+            scales: {
+                x: {time: false},
+            },
+            axes: [
+                xAxis,
+                yAxis,
+            ]
+        };
+
+        return opts;
+    }
+
     xAxisResolutionShift(xAxis, resolution) {
         if (resolution === 'hour') {
             xAxis.scale = 'HOUR';
             xAxis.values = [
-                // tick incr    default           year              month       day         hour     min        sec     mode
-                [3600,          '{HH}:{mm}',     '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
+                // tick incr default            year        month       day         hour     min        sec     mode
+                [3600,      '{HH}:{mm}', '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeHours   = (scaleMax - scaleMin) / 3600;
@@ -129,8 +201,8 @@ export class BaseChart {
         } else if (resolution === 'minute') {
             xAxis.scale = 'MINUTE';
             xAxis.values = [
-                // tick incr    default           year            month       day         hour     min        sec     mode
-                [60,          '{HH}:{mm}',     '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
+                // tick incr default            year        month       day         hour     min        sec     mode
+                [60,        '{HH}:{mm}', '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeMinutes   = (scaleMax - scaleMin) / 60;
@@ -176,7 +248,7 @@ export class BaseChart {
             tt.textContent = '';
             tt.style.pointerEvents = 'none';
             tt.style.position = 'absolute';
-            tt.style.background = 'rgba(0,0,0,0.5)';
+            tt.style.background = 'rgba(0,0,0,1)';
             over.appendChild(tt);
             seriestt = tt;
 
@@ -219,6 +291,8 @@ export class BaseChart {
                 let top;
                 let html = [];
 
+                html.push(ts.replace(/\./g, '/'));
+
                 if (u.data.length > 1) {
                     let s1 = u.series[1];
                     let yVal1 = u.data[1][idx];
@@ -252,8 +326,7 @@ export class BaseChart {
                     html.push(`<span style="border-radius: 3px; color:#131220; padding: 2px 3px; background: ${color}">${s4.label}: ${yVal4}</span>`);
                 }
 
-                if (html.length) {
-                    html.push(ts.replace(/\./g, '/'));
+                if (html.length > 1) {
                     seriestt.innerHTML = html.join('<br>');
                     let left = u.valToPos(xVal, vtp);
                     seriestt.style.top = Math.round(top) + 'px';
@@ -270,8 +343,8 @@ export class BaseChart {
         return {
             hooks: {
                 init,
-                setCursor
-            }
+                setCursor,
+            },
         };
     }
 }

@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'ed.lastseen DESC';
     protected $dateRangeField = 'ed.lastseen';
 
+    protected $allowedColumns = ['id', 'device', 'os_name', 'modified'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 

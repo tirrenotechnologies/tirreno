@@ -75,4 +75,11 @@ const formatStringTime = (dt) => {
     return `${y}-${m}-${d}T${h}:${i}:${s}`;
 };
 
-export {formatIntTimeUtc, formatStringTime, notificationTime, padZero, addDays, addHours};
+export {
+    formatIntTimeUtc,
+    formatStringTime,
+    notificationTime,
+    padZero,
+    addDays,
+    addHours,
+};

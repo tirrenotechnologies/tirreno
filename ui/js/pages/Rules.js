@@ -37,7 +37,7 @@ export class RulesPage extends BasePage {
 
         const ruleUid = currentPlayButton.dataset.ruleUid;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        const params  = {ruleId: currentPlayButton.dataset.ruleId, token: token};
+        const params  = {ruleUid: currentPlayButton.dataset.ruleUid, token: token};
 
         $.ajax({
             url: '/admin/checkRule',
@@ -162,11 +162,11 @@ export class RulesPage extends BasePage {
     }
 
     searchTable() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById('search');
-        filter = input.value.toLowerCase();
-        table = document.getElementById('rules-table');
-        tr = table.getElementsByTagName('tr');
+        let td, i, txtValue;
+        const input =   document.getElementById('search');
+        const filter =  input.value.toLowerCase();
+        const table =   document.getElementById('rules-table');
+        const tr =      table.getElementsByTagName('tr');
 
         // i = 1 because search must skip first line with column names
         for (i = 1; i < tr.length; i++) {
@@ -199,7 +199,7 @@ export class RulesPage extends BasePage {
     }
 
     get playButtons() {
-        return document.querySelectorAll('td button[data-rule-id]');
+        return document.querySelectorAll('td button[data-rule-uid]');
     }
 
     get searchInput() {

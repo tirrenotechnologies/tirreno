@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_device.created DESC';
     protected $dateRangeField = 'event_device.lastseen';
 
+    protected $allowedColumns = ['created', 'device', 'os_name', 'browser_name', 'lang', 'modified', 'id'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
@@ -72,7 +74,7 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        $search = $this->f3->get('REQUEST.search');
+        //$search = $this->f3->get('REQUEST.search');
         $searchConditions = $this->injectIdQuery('event_device.id', $queryParams);
 
         //Add ids into request

@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = null;
     protected $dateRangeField = 'event_account.lastseen';
 
+    protected $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
@@ -127,8 +129,9 @@ class Query extends \Models\Grid\Base\Query {
                             COALESCE(event_account.firstname, '') ||
                             COALESCE(event_account.lastname, '') ||
                             COALESCE(event_account.firstname, ''),
-                            ' ', '')) LIKE LOWER(REPLACE(:search_value, ' ', '')) OR
-                    LOWER(event_email.email)       LIKE LOWER(:search_value) OR
+                            ' ', ''))               LIKE LOWER(REPLACE(:search_value, ' ', '')) OR
+                    LOWER(event_email.email)        LIKE LOWER(:search_value) OR
+                    LOWER(event_account.userid)     LIKE LOWER(:search_value) OR
 
                     TO_CHAR(event_account.lastseen::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value OR
                     TO_CHAR(event_account.created::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
@@ -143,14 +146,17 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleIds = $this->f3->get('REQUEST.ruleIds');
-        if ($ruleIds === null) {
+        $ruleUids = $this->f3->get('REQUEST.ruleUids');
+        if ($ruleUids === null) {
             return;
         }
 
-        foreach ($ruleIds as $key => $ruleId) {
-            $query .= ' AND score_details LIKE :rule_id_' . $key;
-            $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
+        $uids = [];
+        foreach ($ruleUids as $key => $ruleUid) {
+            $uids[] = ['uid' => $ruleUid];
         }
+
+        $query .= ' AND score_details @> :rules_uids::jsonb';
+        $queryParams[':rules_uids'] = json_encode($uids);
     }
 }

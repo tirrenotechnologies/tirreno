@@ -28,57 +28,61 @@ export class ResourcePage extends BasePage {
         };
 
         const devicesGridParams = {
-            url    : '/admin/loadDevices',
-            tileId : 'totalDevices',
-            tableId: 'devices-table',
-            panelType: 'device',
+            url:        '/admin/loadDevices',
+            tileId:     'totalDevices',
+            tableId:    'devices-table',
+            panelType:  'device',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:        '/admin/loadEvents',
+            tileId:     'totalEvents',
+            tableId:    'user-events-table',
+            panelType:  'event',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const ipsGridParams = {
-            url    : '/admin/loadIps',
-            tileId : 'totalIps',
-            tableId: 'ips-table',
+            url:                '/admin/loadIps',
+            tileId:             'totalIps',
+            tableId:            'ips-table',
 
-            isSortable: false,
-            orderByLastseen: true,
+            isSortable:         false,
+            orderByLastseen:    true,
 
-            getParams: getParams
+            getParams:          getParams,
         };
 
         const usersGridParams = {
-            url         : '/admin/loadUsers',
-            tileId      : 'totalUsers',
-            tableId     : 'users-table',
+            url:        '/admin/loadUsers',
+            tileId:     'totalUsers',
+            tableId:    'users-table',
 
             isSortable: false,
 
-            getParams: getParams
+            getParams: getParams,
         };
 
         const ispsGridParams = {
-            url       : '/admin/loadIsps',
-            tableId   : 'isps-table',
-            getParams : getParams,
-            isSortable: false
+            url:        '/admin/loadIsps',
+            tableId:    'isps-table',
+
+            isSortable: false,
+
+            getParams:  getParams,
         };
 
         const mapParams = {
-            getParams    : getParams,
+            getParams:  getParams,
             tooltipString: 'event',
-            tooltipField : 'total_visit'
+            tooltipField : 'total_visit',
         };
 
         const chartParams = {

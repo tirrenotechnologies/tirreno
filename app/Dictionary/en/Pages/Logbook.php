@@ -19,4 +19,6 @@ return [
     'AdminLogbook_table_title' => 'Logbook',
     'AdminLogbook_table_title_tooltip' => 'This page lists the processing statuses of the recent API requests for troubleshooting purposes.',
     'AdminLogbook_search_placeholder' => 'Raw POST data, IP, Error, Timestamp',
+    'AdminLogbook_column_ip' => 'Source IP',
+    'AdminLogbook_column_ip_tooltip' => 'An IP address originated the request to /sensor/.',
 ];

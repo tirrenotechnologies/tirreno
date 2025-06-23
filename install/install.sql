@@ -14,13 +14,8 @@ SET default_table_access_method = heap;
 
 -- Extensions --
 CREATE EXTENSION IF NOT EXISTS citext;
-COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings';
-
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
-COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
-
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 -- Types --

@@ -18,9 +18,9 @@ export class ApiPage extends BasePage {
         this.snippetTextareas.forEach(txt => txt.addEventListener('click', onTextAreaClick, false));
 
         const gridParams = {
-            url    : '/admin/loadUsageStats',
-            tableId: 'usage-stats-table',
-            tileId : 'totalUsageStats',
+            url:        '/admin/loadUsageStats',
+            tableId:    'usage-stats-table',
+            tileId:     'totalUsageStats',
 
             isSortable: false,
 
@@ -34,7 +34,7 @@ export class ApiPage extends BasePage {
     }
 
     onTextAreaClick(e) {
-        const txt   = e.target;
+        const txt = e.target;
         const value = txt.value;
 
         txt.setSelectionRange(0, value.length);

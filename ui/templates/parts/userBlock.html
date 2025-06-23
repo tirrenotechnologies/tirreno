@@ -34,7 +34,7 @@
     if ($USER['fraud'] !== null) {
         [$score, $cls] = $USER['fraud'] ? ['X', 'low'] : ['OK', 'high'];
     } else {
-        [$score, $cls] = \Utils\Rules::getUserScoreClass($USER['score']);
+        [$score, $cls] = \Utils\RulesClasses::getUserScoreClass($USER['score']);
     }
 ~}
 

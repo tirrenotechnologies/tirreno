@@ -18,6 +18,7 @@ namespace Utils;
 class Updates {
     private const UPDATES_LIST = [
         \Updates\Update001::class,
+        \Updates\Update002::class,
     ];
 
     public static function syncUpdates() {

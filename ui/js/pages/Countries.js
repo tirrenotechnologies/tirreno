@@ -18,16 +18,17 @@ export class CountriesPage extends BasePage {
         const searchFilter  = new SearchFilter();
 
         const getMapParams = () => {
-            const dateRange   = datesFilter.getValue();
+            const dateRange = datesFilter.getValue();
             return {dateRange};
         };
 
         const gridParams = {
-            url         : '/admin/loadCountries',
-            tileId      : 'totalCountries',
-            tableId     : 'countries-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:        '/admin/loadCountries',
+            tileId:     'totalCountries',
+            tableId:    'countries-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'country',
                 columns: ['total_visit', 'total_account', 'total_ip'],
@@ -42,9 +43,9 @@ export class CountriesPage extends BasePage {
         };
 
         const mapParams = {
-            getParams    : getMapParams,
-            tooltipString: 'user',
-            tooltipField : 'total_account'
+            getParams:      getMapParams,
+            tooltipString:  'user',
+            tooltipField:   'total_account'
         };
 
         new Map(mapParams);

@@ -1,6 +1,10 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {Tooltip} from '../Tooltip.js?v=2';
-import {renderBoolean, renderClickableCountryTruncated, renderClickableAsn} from '../DataRenderers.js?v=2';
+import {
+    renderBoolean,
+    renderClickableCountryTruncated,
+    renderClickableAsn,
+} from '../DataRenderers.js?v=2';
 
 const URL   = '/admin/loadIpDetails';
 const ELEMS = ['country', 'asn', 'blocklist', 'blacklist', 'dc', 'vpn', 'tor', 'ar'];

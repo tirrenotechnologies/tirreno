@@ -32,19 +32,19 @@ export class ReviewQueuePage extends BasePage {
         };
 
         const gridParams = {
-            url     : '/admin/loadReviewQueue',
-            tileId  : 'totalUsers',
-            tableId : 'review-queue-table',
-            dateRangeGrid: true,
+            url:            '/admin/loadReviewQueue',
+            tileId:         'totalUsers',
+            tableId:        'review-queue-table',
+            dateRangeGrid:  true,
 
             choicesFilterEvents: [rulesFilter.getEventType()],
 
             getParams: function() {
                 const dateRange     = datesFilter.getValue();
                 const searchValue   = searchFilter.getValue();
-                const ruleIds       = rulesFilter.getValues();
+                const ruleUids      = rulesFilter.getValues();
 
-                return {dateRange, searchValue, ruleIds};
+                return {dateRange, searchValue, ruleUids};
             }
         };
 

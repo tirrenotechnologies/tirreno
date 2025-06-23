@@ -20,8 +20,9 @@ abstract class Base extends \Models\BaseSql {
 
     protected function concatDataLines(array $data1, string $field1, array $data2, string $field2, array $data3 = [], ?string $field3 = null): array {
         $data0 = [];
+        $iters = count($data1);
 
-        for ($i = 0; $i < count($data1); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $data1[$i];
             $ts = $item['ts'];
 
@@ -36,7 +37,9 @@ abstract class Base extends \Models\BaseSql {
             }
         }
 
-        for ($i = 0; $i < count($data2); ++$i) {
+        $iters = count($data2);
+
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $data2[$i];
             $ts = $item['ts'];
 
@@ -51,7 +54,9 @@ abstract class Base extends \Models\BaseSql {
             $data0[$ts][$field2] = $item[$field2];
         }
 
-        for ($i = 0; $i < count($data3); ++$i) {
+        $iters = count($data3);
+
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $data3[$i];
             $ts = $item['ts'];
 
@@ -76,8 +81,8 @@ abstract class Base extends \Models\BaseSql {
     }
 
     protected function addEmptyDays(array $params): array {
-        $n = count($params);
-        $data = array_fill(0, $n, []);
+        $cnt = count($params);
+        $data = array_fill(0, $cnt, []);
 
         $request = $this->f3->get('REQUEST');
         $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
@@ -115,7 +120,7 @@ abstract class Base extends \Models\BaseSql {
 
             $data[0][] = $startTs;
 
-            for ($i = 1; $i < $n; ++$i) {
+            for ($i = 1; $i < $cnt; ++$i) {
                 $data[$i][] = ($itemIdx !== false) ? $params[$i][$itemIdx] : 0;
             }
 

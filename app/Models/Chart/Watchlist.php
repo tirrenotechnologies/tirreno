@@ -16,7 +16,7 @@
 namespace Models\Chart;
 
 class Watchlist extends Base {
-    private $usersIds = [];
+    private $userIds = [];
     protected $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {

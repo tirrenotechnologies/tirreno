@@ -1,8 +1,13 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
-    renderBoolean, renderDate, renderDefaultIfEmpty,
-    renderReputation, renderUserId, renderUserFirstname,
-    renderUserLastname, renderUserReviewedStatus
+    renderBoolean,
+    renderDate,
+    renderDefaultIfEmpty,
+    renderReputation,
+    renderUserId,
+    renderUserFirstname,
+    renderUserLastname,
+    renderUserReviewedStatus,
 } from '../DataRenderers.js?v=2';
 
 const URL   = '/admin/loadUserDetails';

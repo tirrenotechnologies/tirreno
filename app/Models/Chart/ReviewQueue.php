@@ -23,8 +23,9 @@ class ReviewQueue extends Base {
     public function getData(int $apiKey): array {
         $data0 = [];
         $data1 = $this->getFirstLine($apiKey);
+        $iters = count($data1);
 
-        for ($i = 0; $i < count($data1); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $data1[$i];
             $ts = $item['ts'];
             $fraud = $item['fraud'];
@@ -47,13 +48,13 @@ class ReviewQueue extends Base {
             }
         }
 
-        $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'ts');
-        $l1 = array_column($indexedData, 'ts_new_users_whitelisted');
-        $l2 = array_column($indexedData, 'ts_new_users_on_review');
-        $l3 = array_column($indexedData, 'ts_new_users_blacklisted');
+        $indexedData    = array_values($data0);
+        $timestamps     = array_column($indexedData, 'ts');
+        $line1          = array_column($indexedData, 'ts_new_users_whitelisted');
+        $line2          = array_column($indexedData, 'ts_new_users_on_review');
+        $line3          = array_column($indexedData, 'ts_new_users_blacklisted');
 
-        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey): array {

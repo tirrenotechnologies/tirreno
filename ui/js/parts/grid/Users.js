@@ -5,7 +5,7 @@ import {
     renderUserFirstname,
     renderUserId,
     renderUserLastname,
-    renderUserReviewedStatus
+    renderUserReviewedStatus,
 } from '../DataRenderers.js?v=2';
 
 

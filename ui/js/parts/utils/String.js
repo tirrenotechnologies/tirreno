@@ -110,4 +110,11 @@ const openJson = (str) => {
     }
 };
 
-export {truncateWithHellip, replaceAll, escapeForHTMLAttribute, getRuleClass, formatTime, openJson};
+export {
+    truncateWithHellip,
+    replaceAll,
+    escapeForHTMLAttribute,
+    getRuleClass,
+    formatTime,
+    openJson,
+};

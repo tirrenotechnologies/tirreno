@@ -1,5 +1,9 @@
 import {fireEvent} from './utils/Event.js?v=2';
-import {formatStringTime, addDays, addHours} from './utils/Date.js?v=2';
+import {
+    formatStringTime,
+    addDays,
+    addHours,
+} from './utils/Date.js?v=2';
 import {debounce} from './utils/Functions.js?v=2';
 import {DAYS_IN_RANGE} from './utils/Constants.js?v=2';
 

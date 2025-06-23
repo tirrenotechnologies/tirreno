@@ -1,6 +1,7 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 import {
-    renderClickableAsn, renderNetName,
+    renderClickableAsn,
+    renderNetName,
     renderUserCounter,
 } from '../DataRenderers.js?v=2';
 

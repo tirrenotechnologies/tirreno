@@ -30,7 +30,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 
         foreach ($libs as $namespace => $path) {
             if (str_starts_with($className, $namespace)) {
-                require __DIR__ . $path.str_replace([$namespace, '\\'], ['', '/'], $className).'.php';
+                require __DIR__ . $path . str_replace([$namespace, '\\'], ['', '/'], $className) . '.php';
                 break;
             }
         }

@@ -19,6 +19,9 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_email.lastseen DESC';
     protected $dateRangeField = 'event_email.lastseen';
 
+    protected $allowedColumns = ['email', 'reputation', 'free_email_provider', 'data_breach',
+        'data_breaches', 'disposable_domains', 'blockemails', 'fraud_detected'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 

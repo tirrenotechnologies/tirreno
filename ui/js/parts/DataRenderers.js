@@ -64,7 +64,7 @@ const wrapWithCountryDiv = html => {
 
 const wrapWithImportantSpan = (html, record) => {
     if (record.is_important) {
-        html = `<span class="importantUser">${html}</span>`;
+        html = `<span class="important-user">${html}</span>`;
     }
 
     return html;
@@ -550,7 +550,7 @@ const renderUserForEvent = (record, length, sessionGroup, singleUser) => {
 };
 
 const renderTimestampForEvent = (record, sessionGroup, singleUser) => {
-    if (sessionGroup && !singleUser && record.session_cnt) return renderSession(record);  // events on /event page on session-end rows
+    if (sessionGroup && !singleUser && record.session_cnt && record.session_cnt > 1) return renderSession(record);  // events on /event page on session-end rows
 
     return renderTime(record.time); // events on other pages and on /event page in a middle of the session
 };
@@ -700,7 +700,7 @@ const renderScoreDetails = record => {
         let part = '';
         for (let i = 0; i < details.length; i++) {
             uid = (details[i].uid !== null && details[i].uid !== undefined) ? details[i].uid : '';
-            descr = (details[i].description !== null && details[i].description !== undefined) ? details[i].description : '';
+            descr = (details[i].descr !== null && details[i].descr !== undefined) ? details[i].descr : '';
             name = (details[i].name!== null && details[i].name !== undefined) ? details[i].name : '';
             part = `<p><span class="ruleHighlight ${getRuleClass(details[i].score)}"
                 >${uid}</span>&nbsp;<span class="ruleName tooltip" title="${descr}">${name}</span></p>`;

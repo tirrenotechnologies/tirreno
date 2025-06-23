@@ -1,8 +1,10 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 import {
-    renderTime, renderBlacklistButtons,
-    renderBlacklistItem, renderBlacklistType,
-    renderClickableImportantUserWithScore
+    renderTime,
+    renderBlacklistButtons,
+    renderBlacklistItem,
+    renderBlacklistType,
+    renderClickableImportantUserWithScore,
 } from '../DataRenderers.js?v=2';
 
 export class BlacklistGrid extends BaseGrid {

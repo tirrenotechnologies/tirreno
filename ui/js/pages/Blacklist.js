@@ -21,20 +21,21 @@ export class BlacklistPage extends BasePage {
         const entityTypeFilter  = new EntityTypeFilter();
 
         const gridParams = {
-            url     : '/admin/loadBlacklist',
-            tileId  : 'totalBlacklist',
-            tableId : 'blacklist-table',
-            dateRangeGrid: true,
+            url:            '/admin/loadBlacklist',
+            tileId:         'totalBlacklist',
+            tableId:        'blacklist-table',
+
+            dateRangeGrid:  true,
 
             choicesFilterEvents: [entityTypeFilter.getEventType()],
 
             getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
+                const dateRange     = datesFilter.getValue();
+                const searchValue   = searchFilter.getValue();
                 const entityTypeIds = entityTypeFilter.getValues();
 
                 return {dateRange, searchValue, entityTypeIds};
-            }
+            },
         };
 
         const chartParams = {

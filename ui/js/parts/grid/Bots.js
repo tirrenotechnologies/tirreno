@@ -1,5 +1,10 @@
-import { BaseGrid } from './Base.js?v=2';
-import * as Renderers from '../DataRenderers.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
+import {
+    renderClickableBotId,
+    renderDevice,
+    renderOs,
+    renderBoolean,
+} from '../DataRenderers.js?v=2';
 
 export class BotsGrid extends BaseGrid {
     get columnDefs() {
@@ -30,24 +35,24 @@ export class BotsGrid extends BaseGrid {
             {
                 data: 'id',
                 render: (data, type, record) => {
-                    return Renderers.renderClickableBotId(record);
+                    return renderClickableBotId(record);
                 }
             },
             {
                 data: 'device',
                 render: (data, type, record) => {
-                    return Renderers.renderDevice(record);
+                    return renderDevice(record);
                 }
             },
             {
                 data: 'os_name',
                 render: (data, type, record) => {
-                    return Renderers.renderOs(record);
+                    return renderOs(record);
                 }
             },
             {
                 data: 'modified',
-                render: Renderers.renderBoolean
+                render: renderBoolean
             }
         ];
 

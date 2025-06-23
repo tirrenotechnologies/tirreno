@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_account.id DESC';
     protected $dateRangeField = 'event_account.lastseen';
 
+    protected $allowedColumns = ['score', 'accounttitle', 'firstname', 'lastname', 'created', 'total_visit', 'fraud', 'id'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
@@ -122,15 +124,18 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleIds = $this->f3->get('REQUEST.ruleIds');
-        if ($ruleIds === null) {
+        $ruleUids = $this->f3->get('REQUEST.ruleUids');
+        if ($ruleUids === null) {
             return;
         }
 
-        foreach ($ruleIds as $key => $ruleId) {
-            $query .= ' AND score_details LIKE :rule_id_' . $key;
-            $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
+        $uids = [];
+        foreach ($ruleUids as $key => $ruleUid) {
+            $uids[] = ['uid' => $ruleUid];
         }
+
+        $query .= ' AND score_details @> (:rules_uids)::jsonb';
+        $queryParams[':rules_uids'] = json_encode($uids);
     }
 
     private function applyScore(string &$query, array &$queryParams): void {

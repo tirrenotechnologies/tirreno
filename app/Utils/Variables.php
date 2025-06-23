@@ -25,7 +25,7 @@ class Variables {
     }
 
     public static function getConfigFile(): string {
-        return getenv('CONFIG_FILE') ?: 'config.local.ini';
+        return getenv('CONFIG_FILE') ?: 'local/config.local.ini';
     }
 
     public static function getSite(): string {

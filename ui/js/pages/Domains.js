@@ -18,11 +18,12 @@ export class DomainsPage extends BasePage {
         const searchFilter = new SearchFilter();
 
         const gridParams = {
-            url     : '/admin/loadDomains',
-            tileId  : 'totalDomains',
-            tableId : 'domains-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:        '/admin/loadDomains',
+            tileId:     'totalDomains',
+            tableId:    'domains-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'domain',
                 columns: ['total_account'],

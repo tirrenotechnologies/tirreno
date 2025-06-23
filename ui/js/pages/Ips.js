@@ -20,18 +20,19 @@ export class IpsPage extends BasePage {
         const ipTypeFilter = new IpTypeFilter();
 
         const gridParams = {
-            url         : '/admin/loadIps',
-            tileId      : 'totalIps',
-            tableId     : 'ips-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:        '/admin/loadIps',
+            tileId:     'totalIps',
+            tableId:    'ips-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'ip',
                 columns: ['total_visit'],
             },
 
-            isSortable  : true,
-            orderByLastseen: false,
+            isSortable:         true,
+            orderByLastseen:    false,
 
             choicesFilterEvents: [ipTypeFilter.getEventType()],
 

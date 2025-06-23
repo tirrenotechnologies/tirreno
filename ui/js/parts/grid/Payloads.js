@@ -1,4 +1,4 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 
 export class PayloadsGrid extends BaseGrid {
 

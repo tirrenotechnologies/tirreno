@@ -25,37 +25,39 @@ export class IpPage extends BasePage {
         };
 
         const usersGridParams = {
-            url         : '/admin/loadUsers',
-            tileId      : 'totalUsers',
-            tableId     : 'users-table',
+            url:        '/admin/loadUsers',
+            tileId:     'totalUsers',
+            tableId:    'users-table',
 
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const devicesGridParams = {
-            url    : '/admin/loadDevices',
-            tileId : 'totalDevices',
-            tableId: 'devices-table',
-            panelType: 'device',
+            url:        '/admin/loadDevices',
+            tileId:     'totalDevices',
+            tableId:    'devices-table',
+            panelType:  'device',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:        '/admin/loadEvents',
+            tileId:     'totalEvents',
+            tableId:    'user-events-table',
+            panelType:  'event',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const ipDetailsTiles = {
-            getParams: getParams
+            getParams: getParams,
         };
 
         const chartParams = {

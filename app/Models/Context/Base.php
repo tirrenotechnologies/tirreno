@@ -27,8 +27,9 @@ abstract class Base extends \Models\BaseSql {
 
     protected function groupRecordsByAccount(array $records): array {
         $recordsByAccount = [];
+        $iters = count($records);
 
-        for ($i = 0; $i < count($records); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $records[$i];
             $accountId = $item['accountid'];
 

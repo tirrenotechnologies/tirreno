@@ -1,6 +1,4 @@
-import {
-    renderUserActionButtons
-} from './DataRenderers.js?v=2';
+import {renderUserActionButtons} from './DataRenderers.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 
 export class UserGridActionButtons {

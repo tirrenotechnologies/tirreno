@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_logbook.error_type DESC, event_logbook.id DESC';
     protected $dateRangeField = 'event_logbook.raw_time';
 
+    protected $allowedColumns = ['ip', 'raw_time', 'error_type', 'error_text'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 

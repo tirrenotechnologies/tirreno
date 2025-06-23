@@ -17,7 +17,7 @@ namespace Crons;
 
 class BatchedNewEvents extends AbstractCron {
     private \Models\Queue\QueueNewEventsCursor $cursorModel;
-    private \Models\Queue\AccountOperationQueue $accountOperationQueueModel;
+    private \Models\Queue\AccountOperationQueue $accountOpQueueModel;
     private \Models\Events $eventsModel;
 
     public function __construct() {
@@ -27,7 +27,7 @@ class BatchedNewEvents extends AbstractCron {
         $this->eventsModel = new \Models\Events();
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
-        $this->accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 
     public function gatherNewEventsBatch(): void {
@@ -44,7 +44,7 @@ class BatchedNewEvents extends AbstractCron {
             if ($next) {
                 $accounts = $this->eventsModel->getDistinctAccounts($cursor, $next);
 
-                $this->accountOperationQueueModel->addBatch($accounts);
+                $this->accountOpQueueModel->addBatch($accounts);
                 $this->cursorModel->updateCursor($next);
 
                 // Log new events cursor to database.

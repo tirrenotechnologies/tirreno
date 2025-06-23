@@ -1,9 +1,11 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 import {
-    renderTime, renderDate,
-    renderUserFirstname, renderUserLastname,
+    renderTime,
+    renderDate,
+    renderUserFirstname,
+    renderUserLastname,
     renderUserActionButtons,
-    renderClickableImportantUserWithScore
+    renderClickableImportantUserWithScore,
 } from '../DataRenderers.js?v=2';
 
 export class ReviewQueueGrid extends BaseGrid {

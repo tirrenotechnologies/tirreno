@@ -94,7 +94,10 @@ class DataEnrichmentCurlClient implements DataEnrichmentClientInterface {
             throw new \RuntimeException('Error cURL init');
         }
 
-        $headers = ['Authorization: Bearer ' . $token];
+        $headers = [
+            'Authorization: Bearer ' . $token,
+            'User-Agent: ' . $this->userAgent,
+        ];
 
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, null);

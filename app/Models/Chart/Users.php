@@ -23,8 +23,9 @@ class Users extends Base {
     public function getData(int $apiKey): array {
         $data0 = [];
         $data1 = $this->getFirstLine($apiKey);
+        $iters = count($data1);
 
-        for ($i = 0; $i < count($data1); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $item = $data1[$i];
             $ts = $item['ts'];
             $score = $item['score'];
@@ -56,13 +57,13 @@ class Users extends Base {
             }
         }
 
-        $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'ts');
-        $l1 = array_column($indexedData, 'ts_new_users_with_trust_score_high');
-        $l2 = array_column($indexedData, 'ts_new_users_with_trust_score_medium');
-        $l3 = array_column($indexedData, 'ts_new_users_with_trust_score_low');
+        $indexedData    = array_values($data0);
+        $timestamps     = array_column($indexedData, 'ts');
+        $line1          = array_column($indexedData, 'ts_new_users_with_trust_score_high');
+        $line2          = array_column($indexedData, 'ts_new_users_with_trust_score_medium');
+        $line3          = array_column($indexedData, 'ts_new_users_with_trust_score_low');
 
-        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey) {

@@ -21,12 +21,12 @@ class Resources extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'ts');
-        $l1 = array_column($data, 'count_200');
-        $l2 = array_column($data, 'count_404');
-        $l3 = array_column($data, 'count_500');
+        $timestamps = array_column($data, 'ts');
+        $line1      = array_column($data, 'count_200');
+        $line2      = array_column($data, 'count_404');
+        $line3      = array_column($data, 'count_500');
 
-        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey): array {

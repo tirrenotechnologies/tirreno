@@ -5,8 +5,8 @@
                 <select class="input" name="version" multiple>
                     <option placeholder>{{ @AdminUsers_rules_search_placeholder }}</option>
                     <repeat group="{{ @RULES }}" value="{{ @record }}">
-                        <option value="{{ @record['id'] }}" {{ isset(@DEFAULT_RULE) && @DEFAULT_RULE === @record['uid'] ? 'selected' : '' }}
-                            >{{ @record['uid'] }}|{{ \Utils\Rules::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
+                        <option value="{{ @record['uid'] }}" {{ isset(@DEFAULT_RULE) && @DEFAULT_RULE === @record['uid'] ? 'selected' : '' }}
+                            >{{ @record['uid'] }}|{{ \Utils\RulesClasses::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
                     </repeat>
                 </select>
             </div>

@@ -30,12 +30,11 @@ class Navigation extends \Controllers\Base {
     public function saveRule(): array {
         $params = $this->f3->get('POST');
         $key = explode('_', $params['rule']);
-        $ruleId = end($key);
+        $ruleUid = end($key);
         $score = $params['value'];
 
         $dataController = new Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $dataController->saveUserRule($ruleId, $score);
+        $dataController->saveUserRule($ruleUid, $score);
 
         return ['success' => true];
     }
@@ -45,12 +44,12 @@ class Navigation extends \Controllers\Base {
         ini_set('max_execution_time', 0);
 
         $params = $this->f3->get('GET');
-        $ruleId = $params['ruleId'];
+        $ruleUid = $params['ruleUid'];
 
         $dataController = new Data();
-        [$allUsersCnt, $users] = $dataController->checkRule($ruleId);
+        [$allUsersCnt, $users] = $dataController->checkRule($ruleUid);
         $proportion = $dataController->getRuleProportion($allUsersCnt, count($users));
-        $dataController->saveRuleProportion($ruleId, $proportion);
+        $dataController->saveRuleProportion($ruleUid, $proportion);
 
         return [
             'users'                 => array_slice($users, 0, \Utils\Constants::get('RULE_CHECK_USERS_PASSED_TO_CLIENT')),

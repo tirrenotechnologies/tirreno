@@ -99,7 +99,7 @@ function formHtml() {
     return $installerHead . $formBody . '</html>';
 }
 
-function finishOk($site) {
+function finishOk() {
     $out = "\n\n======================== Setup completed! ========================";
     $out .= "\n* Please delete the ./install directory and all its included files.";
     $out .= "\n* Visit <a href=\"/signup\">/signup</a> to create your account.";
@@ -169,9 +169,10 @@ function proceed() {
         $out .= resultHtmlStart();
         [$status, $result, $config] = execute($_POST);
         $out .= $result;
-        $out .= $status ? finishOk($config['SITE']) : finishError();
+        $out .= $status ? finishOk() : finishError();
         $out .= resultHtmlEnd();
     } else {
+        substituteFormWithEnv();
         $out .= formHtml();
     }
 
@@ -201,10 +202,12 @@ function execute(array $values) {
         return [false, $out, null];
     }
 
-    $config = saveConfig(3, $values, $steps);
-    $out .= printTasks($steps[3]);
-    if (!tasksCompleted($steps[3])) {
-        return [false, $out, null];
+    if (strval($values['mode'] ?? '') !== 'schema') {
+        $config = saveConfig(3, $values, $steps);
+        $out .= printTasks($steps[3]);
+        if (!tasksCompleted($steps[3])) {
+            return [false, $out, null];
+        }
     }
 
     return [true, $out, $config];
@@ -212,6 +215,41 @@ function execute(array $values) {
 
 function configAlreadyExists(): bool {
     return (getenv('SITE') && getenv('DATABASE_URL')) || file_exists('../config/config.local.ini');
+}
+
+function substituteFormWithEnv(): void {
+    global $formBody;
+
+    if (strval($_GET['mode'] ?? '') === 'schema') {
+        $formBody = preg_replace(
+            '/(<form\b[^>]*>)/i',
+            '$1<input type="hidden" name="mode" value="schema">',
+            $formBody
+        );
+    }
+
+    $dbUrl = getenv('DATABASE_URL');
+    if ($dbUrl) {
+        $parts = parse_url($dbUrl);
+        if ($parts) {
+            $values = [
+                'db_user' => $parts['user'] ?? '',
+                'db_pass' => $parts['pass'] ?? '',
+                'db_host' => $parts['host'] ?? '',
+                'db_port' => $parts['port'] ?? '',
+                'db_name' => trim(($parts['path'] ?? ''), '/'),
+            ];
+
+            foreach ($values as $key => $value) {
+                $safe = htmlspecialchars($value, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+                $formBody = preg_replace(
+                    '/(<input\b[^>]*\bname="' . preg_quote($key, '/') . '"(?![^>]*\bvalue=)[^>]*)(>)/i',
+                    '$1 value="' . $safe . '"$2',
+                    $formBody
+                );
+            }
+        }
+    }
 }
 
 function compatibilityCheck(int $step, array &$steps) {
@@ -262,7 +300,7 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
     try {
         $httpHost = strtolower(filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL));
         if (strpos($httpHost, 'www.') === 0) {
-            $httpHosts = substr($httpHost, 4);
+            $httpHost = substr($httpHost, 4);
         } elseif (substr_count($httpHost, '.') == 1) {
             $httpHost = 'www.' . $httpHost;
         }
@@ -282,7 +320,7 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
             $config .= "\n$key=$value";
         }
 
-        $configPath = '../config/config.local.ini';
+        $configPath = '../config/local/config.local.ini';
         $configFile = fopen($configPath, 'w');
         fwrite($configFile, $config);
         fclose($configFile);

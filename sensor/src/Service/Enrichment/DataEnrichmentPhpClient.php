@@ -86,7 +86,12 @@ class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
         $options = [
             'http' => [
                 'method' => 'POST',
-                'header' => "Authorization: Bearer " . $token,
+                'header' => sprintf(
+                    "Authorization: Bearer %s\r\n" .
+                    "User-Agent: %s\r\n",
+                    $token,
+                    $this->userAgent,
+                ),
             ],
         ];
 

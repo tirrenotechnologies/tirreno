@@ -30,33 +30,53 @@ class Data extends \Controllers\Base {
     }
 
     public function getStat(int $apiKey): array {
+        $request = $this->f3->get('REQUEST');
+        $dateRange = $this->getDatesRange($request);
+        $mode = $request['mode'];
+
         $model = new \Models\Dashboard();
 
-        $statByPeriod = $model->getStatWithDateRange($apiKey);
-        $allTimeStat = $model->getStatWithoutDateRange($apiKey);
-
-        return [
-            'events' => $statByPeriod['events'],
-            'eventsAllTime' => $allTimeStat['events'],
-
-            'users' => $statByPeriod['users'],
-            'usersAllTime' => $allTimeStat['users'],
-
-            'ips' => $statByPeriod['ips'],
-            'ipsAllTime' => $allTimeStat['ips'],
-
-            'countries' => $statByPeriod['countries'],
-            'countriesAllTime' => $allTimeStat['countries'],
-
-            'resources' => $statByPeriod['resources'],
-            'resourcesAllTime' => $allTimeStat['resources'],
-
-            'blockedUsers' => $statByPeriod['blockedUsers'],
-            'blockedUsersAllTime' => $allTimeStat['blockedUsers'],
-
-            'usersForReview' => $statByPeriod['usersForReview'],
-            'usersForReviewAllTime' => $allTimeStat['usersForReview'],
+        $result = [
+            'total'         => null,
+            'allTimeTotal'  => null,
         ];
+
+        switch ($mode) {
+            case 'totalEvents':
+                $result['total']        = $model->getTotalEvents($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalEvents(null, $apiKey);
+                break;
+            case 'totalUsers':
+                $result['total']        = $model->getTotalUsers($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalUsers(null, $apiKey);
+                break;
+            case 'totalIps':
+                $result['total']        = $model->getTotalIps($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalIps(null, $apiKey);
+                break;
+            case 'totalCountries':
+                $result['total']        = $model->getTotalCountries($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalCountries(null, $apiKey);
+                break;
+            case 'totalUrls':
+                $result['total']        = $model->getTotalResources($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalResources(null, $apiKey);
+                break;
+            case 'totalUsersForReview':
+                $keyModel = new \Models\ApiKeys();
+                $keyModel->getKeyById($apiKey);
+                $reviewQueueThreshold = $keyModel->review_queue_threshold;
+
+                $result['total']        = $model->getTotalUsersForReview($reviewQueueThreshold, $dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalUsersForReview($reviewQueueThreshold, null, $apiKey);
+                break;
+            case 'totalBlockedUsers':
+                $result['total']        = $model->getTotalBlockedUsers($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalBlockedUsers(null, $apiKey);
+                break;
+        }
+
+        return $result;
     }
 
     public function getTopTen(int $apiKey): array {

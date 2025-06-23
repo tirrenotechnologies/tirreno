@@ -17,7 +17,9 @@ namespace Traits\Enrichment;
 
 trait Devices {
     public function applyDeviceParams(array &$records): void {
-        for ($i = 0; $i < count($records); ++$i) {
+        $iters = count($records);
+
+        for ($i = 0; $i < $iters; ++$i) {
             $r = $records[$i];
 
             $device = $r['device'] ?? 'unknown';

@@ -25,9 +25,9 @@ export class BotPage extends BasePage {
         };
 
         const usersGridParams = {
-            url         : '/admin/loadUsers',
-            tileId      : 'totalUsers',
-            tableId     : 'users-table',
+            url:        '/admin/loadUsers',
+            tileId:     'totalUsers',
+            tableId:    'users-table',
 
             isSortable: false,
 
@@ -35,19 +35,20 @@ export class BotPage extends BasePage {
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:        '/admin/loadEvents',
+            tileId:     'totalEvents',
+            tableId:    'user-events-table',
+            panelType:  'event',
+
             isSortable: false,
 
             getParams: getParams
         };
 
         const ipsGridParams = {
-            url    : '/admin/loadIps',
-            tileId : 'totalIps',
-            tableId: 'ips-table',
+            url:        '/admin/loadIps',
+            tileId:     'totalIps',
+            tableId:    'ips-table',
 
             isSortable: false,
             orderByLastseen: true,
@@ -70,9 +71,9 @@ export class BotPage extends BasePage {
         };
 
         const mapParams = {
-            getParams    : getParams,
-            tooltipString: 'event',
-            tooltipField : 'total_visit'
+            getParams:      getParams,
+            tooltipString:  'event',
+            tooltipField:   'total_visit'
         };
 
         new EventPanel();

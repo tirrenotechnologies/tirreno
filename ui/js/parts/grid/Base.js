@@ -5,7 +5,10 @@ import {getQueryParams} from '../utils/DataSource.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 import {TotalTile} from '../TotalTile.js?v=2';
 import {renderTotalFrame} from '../DataRenderers.js?v=2';
-import {HORIZONTAL_ELLIPSIS, LOADER_PLACEHOLDER} from '../utils/Constants.js?v=2';
+import {
+    HORIZONTAL_ELLIPSIS,
+    LOADER_PLACEHOLDER,
+} from '../utils/Constants.js?v=2';
 
 export class BaseGrid {
 

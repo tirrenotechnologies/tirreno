@@ -1,13 +1,18 @@
-import * as Constants from './utils/Constants.js?v=2';
+import {
+    USER_IPS_CRITICAL_VALUE,
+    USER_EVENTS_CRITICAL_VALUE,
+    USER_DEVICES_CRITICAL_VALUE,
+    USER_COUNTRIES_CRITICAL_VALUE,
+} from './utils/Constants.js?v=2';
 
 export class TotalTile {
 
     constructor() {
         this.criticalValues = {
-            totalIps:       Constants.USER_IPS_CRITICAL_VALUE,
-            totalEvents:    Constants.USER_EVENTS_CRITICAL_VALUE,
-            totalDevices:   Constants.USER_DEVICES_CRITICAL_VALUE,
-            totalCountries: Constants.USER_COUNTRIES_CRITICAL_VALUE
+            totalIps:       USER_IPS_CRITICAL_VALUE,
+            totalEvents:    USER_EVENTS_CRITICAL_VALUE,
+            totalDevices:   USER_DEVICES_CRITICAL_VALUE,
+            totalCountries: USER_COUNTRIES_CRITICAL_VALUE
         };
     }
 

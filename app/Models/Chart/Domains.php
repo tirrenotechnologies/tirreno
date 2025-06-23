@@ -27,12 +27,12 @@ class Domains extends Base {
 
         $data0 = $this->concatDataLines($data1, $field1, $data2, $field2);
 
-        $indexedData = array_values($data0);
-        $ox = array_column($indexedData, 'ts');
-        $l1 = array_column($indexedData, $field1);
-        $l2 = array_column($indexedData, $field2);
+        $indexedData    = array_values($data0);
+        $timestamps     = array_column($indexedData, 'ts');
+        $line1          = array_column($indexedData, $field1);
+        $line2          = array_column($indexedData, $field2);
 
-        return $this->addEmptyDays([$ox, $l1, $l2]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2]);
     }
 
     private function getFirstLine(int $apiKey): array {

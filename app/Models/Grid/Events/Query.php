@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event.time DESC, event.id DESC';
     protected $dateRangeField = 'event.time';
 
+    protected $allowedColumns = ['userid', 'time', 'type', 'ip', 'ip_type', 'device', 'session_id', 'time', 'id'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
@@ -226,7 +228,7 @@ class Query extends \Models\Grid\Base\Query {
                     (
                         LOWER(event_email.email)            LIKE LOWER(:search_value) OR
                         LOWER(event_account.userid)         LIKE LOWER(:search_value) OR
-                        LOWER(event_type.name)              LIKE LOWER(:search_value) OR
+                        event.http_code::text               LIKE LOWER(:search_value) OR
 
                         CASE WHEN event.http_code >= 400 THEN
                             CONCAT('error ', event.http_code)
@@ -305,14 +307,17 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleIds = $this->f3->get('REQUEST.ruleIds');
-        if ($ruleIds === null) {
+        $ruleUids = $this->f3->get('REQUEST.ruleUids');
+        if ($ruleUids === null) {
             return;
         }
 
-        foreach ($ruleIds as $key => $ruleId) {
-            $query .= ' AND score_details LIKE :rule_id_' . $key;
-            $queryParams[':rule_id_' . $key] = '%"id":' . $ruleId . ',%';
+        $uids = [];
+        foreach ($ruleUids as $key => $ruleUid) {
+            $uids[] = ['uid' => $ruleUid];
         }
+
+        $query .= ' AND score_details @> :rules_uids::jsonb';
+        $queryParams[':rules_uids'] = json_encode($uids);
     }
 }

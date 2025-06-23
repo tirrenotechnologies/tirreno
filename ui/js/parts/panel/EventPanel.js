@@ -1,5 +1,40 @@
-import * as Renderers from '../DataRenderers.js?v=2';
 import {BasePanel} from './BasePanel.js?v=2';
+import {
+    renderTime,
+    renderHttpCode,
+    renderHttpMethod,
+    renderClickableImportantUserWithScore,
+    renderUserId,
+    renderUserReviewedStatus,
+    renderDate,
+    renderScoreDetails,
+    renderEmail,
+    renderReputation,
+    renderBoolean,
+    renderDefaultIfEmpty,
+    renderClickableDomain,
+    renderPhone,
+    renderFullCountry,
+    renderPhoneCarrierName,
+    renderPhoneType,
+    renderUserCounter,
+    renderClickableResourceWithoutQuery,
+    renderDeviceWithOs,
+    // renderClickableDeviceId,
+    renderBrowser,
+    renderLanguage,
+    renderCidr,
+    renderNetName,
+    renderClickableIpWithCountry,
+    renderClickableCountryName,
+    renderReferer,
+    renderUserAgent,
+    renderQuery,
+    renderClickableAsn,
+    renderUserFirstname,
+    renderUserLastname,
+    renderIpType,
+} from '../DataRenderers.js?v=2';
 
 export class EventPanel extends BasePanel {
 
@@ -22,9 +57,9 @@ export class EventPanel extends BasePanel {
             http_code:      data.event_http_code,
             http_method:    data.event_http_method_name,
         };
-        data.event_time                 = Renderers.renderTime(event_record.time);
-        data.event_http_code            = Renderers.renderHttpCode(event_record);
-        data.event_http_method          = Renderers.renderHttpMethod(event_record);
+        data.event_time                 = renderTime(event_record.time);
+        data.event_http_code            = renderHttpCode(event_record);
+        data.event_http_method          = renderHttpMethod(event_record);
         //data.event_type_name            = data.event_type_name;
 
         //Convert to boolean if number exists
@@ -55,37 +90,37 @@ export class EventPanel extends BasePanel {
             score:              data.score,
             fraud:              data.fraud,
         };
-        data.user_id              = Renderers.renderClickableImportantUserWithScore(current_email_record, 'long');
-        data.accounttitle         = Renderers.renderUserId(data.accounttitle);
-        data.reviewed_status      = Renderers.renderUserReviewedStatus(data);
-        data.latest_decision      = Renderers.renderDate(data.latest_decision);
-        data.score_details        = Renderers.renderScoreDetails(data);
+        data.user_id              = renderClickableImportantUserWithScore(current_email_record, 'long');
+        data.accounttitle         = renderUserId(data.accounttitle);
+        data.reviewed_status      = renderUserReviewedStatus(data);
+        data.latest_decision      = renderDate(data.latest_decision);
+        data.score_details        = renderScoreDetails(data);
 
-        data.email                = Renderers.renderEmail(data, 'long');
-        data.reputation           = Renderers.renderReputation(data);
-        //data.email_profiles       = Renderers.renderBoolean(data.email_profiles);
-        data.free_provider        = Renderers.renderBoolean(data.free_email_provider);
-        data.data_breach          = Renderers.renderBoolean(data.data_breach);
-        data.data_breaches        = Renderers.renderDefaultIfEmpty(data.data_breaches);
-        data.blockemails          = Renderers.renderBoolean(data.blockemails);
-        data.email_fraud_detected = Renderers.renderBoolean(data.email_fraud_detected);
+        data.email                = renderEmail(data, 'long');
+        data.reputation           = renderReputation(data);
+        //data.email_profiles       = renderBoolean(data.email_profiles);
+        data.free_provider        = renderBoolean(data.free_email_provider);
+        data.data_breach          = renderBoolean(data.data_breach);
+        data.data_breaches        = renderDefaultIfEmpty(data.data_breaches);
+        data.blockemails          = renderBoolean(data.blockemails);
+        data.email_fraud_detected = renderBoolean(data.email_fraud_detected);
         //  TODO: return alert_list back in next release
-        //data.email_alert_list     = Renderers.renderBoolean(data.email_alert_list);
-        data.email_earliest_breach= Renderers.renderDate(data.email_earliest_breach);
+        //data.email_alert_list     = renderBoolean(data.email_alert_list);
+        data.email_earliest_breach= renderDate(data.email_earliest_breach);
 
         const domain_record = {
             domain:     data.domain,
             id:         data.domainid,
             http_code:  data.domain_return_code,
         };
-        data.domain                 = Renderers.renderClickableDomain(domain_record, 'long');
-        data.tranco_rank            = Renderers.renderDefaultIfEmpty(data.tranco_rank);
-        data.blockdomains           = Renderers.renderBoolean(data.blockdomains);
-        data.disposable_domains     = Renderers.renderBoolean(data.disposable_domains);
-        data.domain_disabled        = Renderers.renderBoolean(data.domain_disabled);
-        data.domain_creation_date   = Renderers.renderDate(data.domain_creation_date);
-        data.domain_expiration_date = Renderers.renderDate(data.domain_expiration_date);
-        data.domain_return_code     = Renderers.renderHttpCode(domain_record);
+        data.domain                 = renderClickableDomain(domain_record, 'long');
+        data.tranco_rank            = renderDefaultIfEmpty(data.tranco_rank);
+        data.blockdomains           = renderBoolean(data.blockdomains);
+        data.disposable_domains     = renderBoolean(data.disposable_domains);
+        data.domain_disabled        = renderBoolean(data.domain_disabled);
+        data.domain_creation_date   = renderDate(data.domain_creation_date);
+        data.domain_expiration_date = renderDate(data.domain_expiration_date);
+        data.domain_return_code     = renderHttpCode(domain_record);
 
         const phone_record = {
             phonenumber:    data.phonenumber,
@@ -94,18 +129,18 @@ export class EventPanel extends BasePanel {
             carrier_name:   data.carrier_name,
             type:           data.phone_type
         };
-        data.phonenumber          = Renderers.renderPhone(phone_record);
-        data.phone_country        = Renderers.renderFullCountry(data.phone_full_country);
-        data.carrier_name         = Renderers.renderPhoneCarrierName(phone_record);
-        data.phone_type           = Renderers.renderPhoneType(phone_record);
-        data.phone_users          = Renderers.renderUserCounter(data.phone_users, 2);
-        data.phone_invalid        = Renderers.renderBoolean(data.phone_invalid);
-        data.phone_fraud_detected = Renderers.renderBoolean(data.phone_fraud_detected);
-        //data.phone_profiles       = Renderers.renderBoolean(data.phone_profiles);
+        data.phonenumber          = renderPhone(phone_record);
+        data.phone_country        = renderFullCountry(data.phone_full_country);
+        data.carrier_name         = renderPhoneCarrierName(phone_record);
+        data.phone_type           = renderPhoneType(phone_record);
+        data.phone_users          = renderUserCounter(data.phone_users, 2);
+        data.phone_invalid        = renderBoolean(data.phone_invalid);
+        data.phone_fraud_detected = renderBoolean(data.phone_fraud_detected);
+        //data.phone_profiles       = renderBoolean(data.phone_profiles);
         //  TODO: return alert_list back in next release
-        //data.phone_alert_list     = Renderers.renderBoolean(data.phone_alert_list);
+        //data.phone_alert_list     = renderBoolean(data.phone_alert_list);
 
-        data.url                  = Renderers.renderClickableResourceWithoutQuery(data);
+        data.url                  = renderClickableResourceWithoutQuery(data);
 
         const browser_name      = (data.browser_name !== null && data.browser_name !== undefined) ? data.browser_name : '';
         const browser_version   = (data.browser_version !== null && data.browser_version !== undefined) ? data.browser_version : '';
@@ -118,13 +153,13 @@ export class EventPanel extends BasePanel {
             browser:        `${browser_name} ${browser_version}`,
             lang:           data.lang
         };
-        data.device               = Renderers.renderDeviceWithOs(device_record);
-        //data.device_id            = Renderers.renderClickableDeviceId(device_record);
-        data.browser              = Renderers.renderBrowser(device_record);
-        data.lang                 = Renderers.renderLanguage(device_record);
-        data.device_created       = Renderers.renderDate(data.device_created);
+        data.device               = renderDeviceWithOs(device_record);
+        //data.device_id            = renderClickableDeviceId(device_record);
+        data.browser              = renderBrowser(device_record);
+        data.lang                 = renderLanguage(device_record);
+        data.device_created       = renderDate(data.device_created);
 
-        data.ua_modified          = Renderers.renderBoolean(data.ua_modified);
+        data.ua_modified          = renderBoolean(data.ua_modified);
         const ip_country_record = {
             isp_name:       data.netname,
             ipid:           data.ipid,
@@ -134,33 +169,33 @@ export class EventPanel extends BasePanel {
             serial:         data.serial             // should be named serial for app/Traits/Enrichment/Ips.php calculations
         };
 
-        data.cidr                 = Renderers.renderCidr(data);
-        data.netname              = Renderers.renderNetName(data);
+        data.cidr                 = renderCidr(data);
+        data.netname              = renderNetName(data);
 
-        data.ip                   = Renderers.renderClickableIpWithCountry(ip_country_record);
-        data.ip_country           = Renderers.renderClickableCountryName(ip_country_record);
+        data.ip                   = renderClickableIpWithCountry(ip_country_record);
+        data.ip_country           = renderClickableCountryName(ip_country_record);
 
-        data.referer              = Renderers.renderReferer(data);
-        data.ua                   = Renderers.renderUserAgent(data);
-        data.query                = Renderers.renderQuery(data);
+        data.referer              = renderReferer(data);
+        data.ua                   = renderUserAgent(data);
+        data.query                = renderQuery(data);
 
-        data.asn                  = Renderers.renderClickableAsn(data);
+        data.asn                  = renderClickableAsn(data);
 
-        data.firstname            = Renderers.renderUserFirstname(data);
-        data.lastname             = Renderers.renderUserLastname(data);
+        data.firstname            = renderUserFirstname(data);
+        data.lastname             = renderUserLastname(data);
 
-        data.ip_users             = Renderers.renderUserCounter(data.ip_users, 2);
+        data.ip_users             = renderUserCounter(data.ip_users, 2);
         //data.ip_events            = data.ip_events;
-        data.ip_spamlist          = Renderers.renderBoolean(data.spamlist);
-        data.ip_type              = Renderers.renderIpType(data);
+        data.ip_spamlist          = renderBoolean(data.spamlist);
+        data.ip_type              = renderIpType(data);
         //  TODO: return alert_list back in next release
-        //data.ip_alert_list        = Renderers.renderBoolean(data.ip_alert_list);
+        //data.ip_alert_list        = renderBoolean(data.ip_alert_list);
 
         /***
-        data.tor                  = Renderers.renderBoolean(data.tor);
-        data.vpn                  = Renderers.renderBoolean(data.vpn);
-        data.relay                = Renderers.renderBoolean(data.relay);
-        data.data_center          = Renderers.renderBoolean(data.data_center);
+        data.tor                  = renderBoolean(data.tor);
+        data.vpn                  = renderBoolean(data.vpn);
+        data.relay                = renderBoolean(data.relay);
+        data.data_center          = renderBoolean(data.data_center);
         ***/
         return data;
     }

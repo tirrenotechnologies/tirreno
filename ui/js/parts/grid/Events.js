@@ -1,8 +1,11 @@
-import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
 import {
-    renderResourceWithQueryAndEventType, renderDeviceWithOs,
-    renderIpType, renderIpWithCountry, renderUserForEvent,
-    renderTimestampForEvent
+    renderResourceWithQueryAndEventType,
+    renderDeviceWithOs,
+    renderIpType,
+    renderIpWithCountry,
+    renderUserForEvent,
+    renderTimestampForEvent,
 } from '../DataRenderers.js?v=2';
 
 export class EventsGrid extends BaseGridWithPanel {

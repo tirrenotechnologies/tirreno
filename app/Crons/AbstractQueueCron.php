@@ -16,7 +16,7 @@
 namespace Crons;
 
 abstract class AbstractQueueCron extends AbstractCron {
-    protected \Models\Queue\AccountOperationQueue $accountOperationQueueModel;
+    protected \Models\Queue\AccountOperationQueue $accountOpQueueModel;
 
     protected function processItems(): void {
         $this->log('Start processing queue.');
@@ -28,7 +28,7 @@ abstract class AbstractQueueCron extends AbstractCron {
 
         do {
             $this->log(sprintf('Fetching next batch (%s) in queue.', \Utils\Variables::getAccountOperationQueueBatchSize()));
-            $items = $this->accountOperationQueueModel->getNextBatchInQueue(\Utils\Variables::getAccountOperationQueueBatchSize());
+            $items = $this->accountOpQueueModel->getNextBatchInQueue(\Utils\Variables::getAccountOperationQueueBatchSize());
 
             if (!count($items)) {
                 break;
@@ -36,7 +36,7 @@ abstract class AbstractQueueCron extends AbstractCron {
 
             $items = \array_reverse($items); // to use array_pop later.
 
-            $this->accountOperationQueueModel->setExecutingForBatch(\array_column($items, 'id'));
+            $this->accountOpQueueModel->setExecutingForBatch(\array_column($items, 'id'));
 
             while (time() - $start < \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {
                 $item = \array_pop($items); // array_pop has O(1) complexity, array_shift has O(n) complexity.
@@ -55,9 +55,9 @@ abstract class AbstractQueueCron extends AbstractCron {
             }
         } while (time() - $start < \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')); // allow another batch to be fetched if time permits.
 
-        $this->accountOperationQueueModel->setCompletedForBatch(\array_column($success, 'id'));
-        $this->accountOperationQueueModel->setFailedForBatch(\array_column($failed, 'id'));
-        $this->accountOperationQueueModel->setWaitingForBatch(\array_column($items, 'id')); // unfinished items back to waiting.
+        $this->accountOpQueueModel->setCompletedForBatch(\array_column($success, 'id'));
+        $this->accountOpQueueModel->setFailedForBatch(\array_column($failed, 'id'));
+        $this->accountOpQueueModel->setWaitingForBatch(\array_column($items, 'id')); // unfinished items back to waiting.
 
         if (count($errors)) {
             $errObj = [

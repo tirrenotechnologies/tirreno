@@ -17,5 +17,5 @@ return [
     'Welcome_hello_with_name' => 'Hello, ',
     'Welcome_hello_without_name' => 'Hello',
     'Welcome_how_are_you_doing' => 'I hope you are having a great day!',
-    'Welcome_global_search_placeholder' => 'Search with tirreno: user ID / email / IP / ASN / domain / phone',
+    'Welcome_global_search_placeholder' => 'Search User ID, Email, IP, ASN, Domain, Phone',
 ];

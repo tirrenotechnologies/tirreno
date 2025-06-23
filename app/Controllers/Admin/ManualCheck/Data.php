@@ -28,8 +28,8 @@ class Data extends \Controllers\Base {
         ];
 
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $subscriptionKeyString = $this->getCurrentOperatorSubscriptionKeyString();
-        $errorCode = $this->validateSearch($params, $subscriptionKeyString);
+        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
+        $errorCode = $this->validateSearch($params, $enrichmentKey);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
@@ -40,7 +40,7 @@ class Data extends \Controllers\Base {
         $type = $params['type'];
 
         $controller = new \Controllers\Admin\Enrichment\Data();
-        $result = $controller->enrichEntity($type, $params['search'], null, $apiKey, $subscriptionKeyString);
+        $result = $controller->enrichEntity($type, $params['search'], null, $apiKey, $enrichmentKey);
 
         if (isset($result['ERROR_CODE'])) {
             $pageParams['ERROR_CODE'] = $result['ERROR_CODE'];
@@ -69,7 +69,7 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    private function validateSearch(array $params, string $subscriptionKeyString): bool|int {
+    private function validateSearch(array $params, string $enrichmentKey): bool|int {
         $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
         if ($errorCode) {
             return $errorCode;
@@ -77,7 +77,7 @@ class Data extends \Controllers\Base {
 
         $api = \Utils\Variables::getEnrichtmentApi();
 
-        if (!$subscriptionKeyString || !$api) {
+        if (!$enrichmentKey || !$api) {
             return \Utils\ErrorCodes::ENRICHMENT_API_KEY_DOES_NOT_EXIST;
         }
 

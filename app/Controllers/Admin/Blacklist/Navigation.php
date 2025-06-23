@@ -34,7 +34,6 @@ class Navigation extends \Controllers\Base {
     }
 
     public function removeItemFromList(): array {
-        $params = $this->f3->get('POST');
         $dataController = new Data();
 
         $apiKey = $this->getCurrentOperatorApiKeyId();

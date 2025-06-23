@@ -223,28 +223,30 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
 
         $query = (
             "SELECT
-                (score_element ->> 'score')::int AS score,
-                event_account.score              AS total_score,
-                (score_element ->> 'id')::int    AS id
+                (score_element ->> 'score')::int    AS score,
+                event_account.score                 AS total_score,
+                dshb_rules.uid,
+                dshb_rules.name,
+                dshb_rules.descr,
+                dshb_rules.validated
 
             FROM
                 event_account
 
-            JOIN jsonb_array_elements(event_account.score_details::jsonb) AS score_element
+            JOIN jsonb_array_elements(event_account.score_details) AS score_element
             ON true
+
+            LEFT JOIN dshb_rules
+            ON (dshb_rules.uid = (score_element ->> 'uid')::varchar)
 
             WHERE
                 event_account.id = :account_id AND
-                event_account.key = :api_key"
+                event_account.key = :api_key AND
+                (score_element ->> 'score')::int != 0 AND
+                uid IS NOT NULL"
         );
 
         $results = $this->execQuery($query, $params);
-
-        // do not filter attributes
-        $results = \Utils\Rules::ruleInfoById($results);
-        $results = array_values(array_filter($results, static function ($el) {
-            return $el['score'] !== 0;
-        }));
 
         usort($results, static function ($a, $b): int {
             return $b['score'] <=> $a['score'];

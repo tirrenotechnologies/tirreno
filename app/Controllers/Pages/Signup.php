@@ -65,7 +65,7 @@ class Signup extends Base {
     }
 
     private function addDefaultRules(int $apiKey): void {
-        $model = new \Models\Rules();
+        $model = new \Models\OperatorsRules();
         $defaultRules = \Utils\Constants::get('DEFAULT_RULES');
 
         foreach ($defaultRules as $key => $value) {

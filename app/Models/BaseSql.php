@@ -53,12 +53,14 @@ abstract class BaseSql extends \DB\SQL\Mapper {
         echo $this->f3->get('API_DATABASE')->log();
     }
 
-    public function getArrayPlaceholders(array $ids): array {
+    public function getArrayPlaceholders(array $ids, string $postfix = ''): array {
         $params = [];
         $placeHolders = [];
 
+        $postfix = $postfix !== '' ? '_' . $postfix : '';
+
         foreach ($ids as $i => $id) {
-            $key = sprintf(':item_id_%s', $i);
+            $key = sprintf(':item_id_%s%s', $i, $postfix);
             $placeHolders[] = $key;
             $params[$key] = $id;
         }

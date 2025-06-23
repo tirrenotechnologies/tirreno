@@ -29,6 +29,8 @@ class Query {
     protected $defaultOrder = null;
     protected $dateRangeField = 'event_country.lastseen';
 
+    protected $allowedColumns = [];
+
     public function __construct(int $apiKey) {
         $this->f3 = \Base::instance();
         $this->apiKey = $apiKey;
@@ -49,18 +51,26 @@ class Query {
         $order = $request['order'] ?? [];
         $columns = $request['columns'] ?? [];
 
+        $orderCondition = $this->defaultOrder;
+
         if (count($order) && count($columns)) {
             $orderClauses = [];
             foreach ($order as $orderData) {
                 $sortDirection = $orderData['dir'] === 'asc' ? 'ASC' : 'DESC';
                 $columnIndex = $orderData['column'];
                 $sortColumn = $columns[$columnIndex]['data'];
-                $orderClauses[] = sprintf('%s %s', $sortColumn, $sortDirection);
+                if (in_array($sortColumn, $this->allowedColumns)) {
+                    $orderClauses[] = sprintf('%s %s', $sortColumn, $sortDirection);
+                }
             }
 
-            $query .= ' ORDER BY ' . implode(', ', $orderClauses);
-        } elseif ($this->defaultOrder) {
-            $query .= sprintf(' ORDER BY %s', $this->defaultOrder);
+            if (count($orderClauses)) {
+                $orderCondition = implode(', ', $orderClauses);
+            }
+        }
+
+        if ($orderCondition) {
+            $query .= sprintf(' ORDER BY %s', $orderCondition);
         }
     }
 

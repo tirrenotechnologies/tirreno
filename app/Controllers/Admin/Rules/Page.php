@@ -53,6 +53,7 @@ class Page extends \Controllers\Pages\Base {
 
             $pageParams = array_merge($pageParams, $operationResponse);
             $pageParams['CMD'] = $params['cmd'];
+            $pageParams['RULES'] = $dataController->getRulesForLoggedUser();
         }
 
         // set api_keys param after proccessing POST request

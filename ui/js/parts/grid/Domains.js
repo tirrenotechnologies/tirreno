@@ -1,10 +1,10 @@
-import { BaseGrid } from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=2';
 import {
     renderClickableDomain,
     renderBoolean,
     renderDate,
     renderDefaultIfEmpty,
-    renderUserCounter
+    renderUserCounter,
 } from '../DataRenderers.js?v=2';
 
 export class DomainsGrid extends BaseGrid {

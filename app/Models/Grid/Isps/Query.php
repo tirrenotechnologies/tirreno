@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_isp.id DESC';
     protected $dateRangeField = 'event_isp.lastseen';
 
+    protected $allowedColumns = ['asn', 'name', 'total_visit', 'total_ip', 'total_account', 'fraud', 'id'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 

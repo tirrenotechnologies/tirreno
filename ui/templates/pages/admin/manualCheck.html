@@ -1,31 +1,31 @@
 <include href="templates/parts/headerAdmin.html" />
 <div id="wrap">
-<include href="templates/parts/leftMenu.html" />
+    <include href="templates/parts/leftMenu.html" />
 
-<div class="main">
-    <include href="templates/parts/forms/globalSearchForm.html" />
-    <include href="templates/parts/systemNotification.html" />
-    <include href="templates/parts/welcomeMessage.html" />
-    <include href="templates/parts/notification.html" />
+    <div class="main">
+        <include href="templates/parts/forms/globalSearchForm.html" />
+        <include href="templates/parts/systemNotification.html" />
+        <include href="templates/parts/welcomeMessage.html" />
+        <include href="templates/parts/notification.html" />
 
-    <div class="columns">
-        <div class="column manual-check-page">
-            <include href="templates/parts/forms/manualCheckForm.html" />
+        <div class="columns">
+            <div class="column manual-check-page">
+                <include href="templates/parts/forms/manualCheckForm.html" />
+            </div>
         </div>
-    </div>
 
-    <check if="{{ isset(@RESULT) }}">
-        <true>
-            <repeat group="{{ @RESULT }}" key="{{ @type }}" value="{{ @results }}">
-                <include href="templates/parts/tables/manualCheckResult.html" />
-            </repeat>
-        </true>
-    </check>
-    <check if="{{ count(@HISTORY) > 0 }}">
-        <true>
-            <include href="templates/parts/tables/manualCheckHistory.html" />
-        </true>
-    </check>
+        <check if="{{ isset(@RESULT) }}">
+            <true>
+                <repeat group="{{ @RESULT }}" key="{{ @type }}" value="{{ @results }}">
+                    <include href="templates/parts/tables/manualCheckResult.html" />
+                </repeat>
+            </true>
+        </check>
+        <check if="{{ count(@HISTORY) > 0 }}">
+            <true>
+                <include href="templates/parts/tables/manualCheckHistory.html" />
+            </true>
+        </check>
+    </div>
 </div>
 <include href="templates/parts/footerAdmin.html" />
-</div>

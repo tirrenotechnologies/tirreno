@@ -34,15 +34,15 @@ export class EventsPage extends BasePage {
         };
 
         const gridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
-            dateRangeGrid: true,
+            url:            '/admin/loadEvents',
+            tileId:         'totalEvents',
+            tableId:        'user-events-table',
+            panelType:      'event',
+            dateRangeGrid:  true,
 
-            sessionGroup: true,
-            singleUser: false,
-            isSortable: true,
+            sessionGroup:   true,
+            singleUser:     false,
+            isSortable:     true,
 
             choicesFilterEvents: [eventTypeFilter.getEventType(), rulesFilter.getEventType()],
 
@@ -50,9 +50,9 @@ export class EventsPage extends BasePage {
                 const dateRange     = datesFilter.getValue();
                 const searchValue   = searchFilter.getValue();
                 const eventTypeIds  = eventTypeFilter.getValues();
-                const ruleIds       = rulesFilter.getValues();
+                const ruleUids      = rulesFilter.getValues();
 
-                return {dateRange, searchValue, eventTypeIds, ruleIds};
+                return {dateRange, searchValue, eventTypeIds, ruleUids};
             }
         };
 

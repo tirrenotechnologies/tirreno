@@ -20,17 +20,17 @@ class BlacklistQueueHandler extends AbstractQueueCron {
         parent::__construct();
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
-        $this->accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 
     public function processQueue(): void {
-        if ($this->accountOperationQueueModel->isExecuting() && !$this->accountOperationQueueModel->unclog()) {
+        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
             $this->log('Blacklist queue is already being executed by another cron job.');
 
             return;
         }
 
-        $this->processItems($this->accountOperationQueueModel);
+        $this->processItems($this->accountOpQueueModel);
     }
 
     protected function processItem(array $item): void {
@@ -86,7 +86,7 @@ class BlacklistQueueHandler extends AbstractQueueCron {
     /**
      * @param array<array{type: string, value: string}> $hashes
      */
-    private function sendBlacklistReportPostRequest(array $hashes, string $subscriptionKeyString): string {
+    private function sendBlacklistReportPostRequest(array $hashes, string $enrichmentKey): string {
         $postFields = [
             'data' => $hashes,
         ];
@@ -94,7 +94,7 @@ class BlacklistQueueHandler extends AbstractQueueCron {
             'method' => 'POST',
             'header' => [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $subscriptionKeyString,
+                'Authorization: Bearer ' . $enrichmentKey,
                 'User-Agent: ' . $this->f3->get('USER_AGENT'),
             ],
             'content' => \json_encode($postFields),

@@ -1,6 +1,8 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
-    renderBoolean, renderDefaultIfEmpty, renderDate
+    renderBoolean,
+    renderDefaultIfEmpty,
+    renderDate,
 } from '../DataRenderers.js?v=2';
 
 const URL   = '/admin/loadDomainDetails';

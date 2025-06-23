@@ -24,6 +24,8 @@ return [
     'Base_table_column_user_lastname_tooltip' => 'A user’s last name.',
     'Base_table_column_user_risk_score_and_email' => 'Trust score & email',
     'Base_table_column_user_risk_score_and_email_tooltip' => 'Displays two values. The trust score on the left side is a calculated per-user value. It ranges from 0 (lowest trust) to 99 (highest trust). The value on the right side is a user email provided by a client platform.',
+    'Base_table_column_session' => 'Session',
+    'Base_table_column_session_tooltip' => 'Session parameters.',
     'Base_table_column_user_email' => 'Email',
     'Base_table_column_user_email_tooltip' => 'A user’s email address.',
 
@@ -187,7 +189,7 @@ return [
 
     'Base_table_column_error_type' => 'Status',
     'Base_table_column_error_type_tooltip' => 'A request processing status.',
-    'Base_table_column_error_text' => 'Description',
+    'Base_table_column_error_text' => 'Warning message',
     'Base_table_column_error_text_tooltip' => 'An error message returned by an unsuccessful request processing.',
     'Base_table_column_event_timestamp' => 'Timestamp',
     'Base_table_column_event_timestamp_tooltip' => 'The date and time passed in the eventTime field of an API request.',

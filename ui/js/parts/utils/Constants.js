@@ -63,6 +63,25 @@ const UNDEFINED_RULES_MSG = {
 const HORIZONTAL_ELLIPSIS = '&#8943;';
 const LOADER_PLACEHOLDER = '<span class="loading-table-total">&#8943;</span>';
 
+const COLOR_MAP = {
+    'red':      {
+        'main':     COLOR_RED,
+        'light':    COLOR_LIGHT_RED,
+    },
+    'yellow':   {
+        'main':     COLOR_YELLOW,
+        'light':    COLOR_LIGHT_YELLOW,
+    },
+    'green':    {
+        'main':     COLOR_GREEN,
+        'light':    COLOR_LIGHT_GREEN,
+    },
+    'purple':   {
+        'main':     COLOR_PURPLE,
+        'light':    COLOR_LIGHT_PURPLE,
+    },
+};
+
 export {
     MAX_STRING_LONG_NETNAME_IN_TABLE,
     MAX_STRING_SHORT_NETNAME_IN_TABLE,
@@ -116,4 +135,6 @@ export {
 
     HORIZONTAL_ELLIPSIS,
     LOADER_PLACEHOLDER,
+
+    COLOR_MAP,
 };

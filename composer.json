@@ -6,7 +6,11 @@
         "tirreno",
         "fraud-detection",
         "audit-trail",
-        "analytics"
+        "analytics",
+        "monitoring",
+        "bot-detection",
+        "antispam",
+        "application-monitoring"
     ],
     "license": "AGPL-3.0+",
     "homepage": "https://www.tirreno.com",
@@ -25,12 +29,15 @@
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=8.0",
+        "ext-mbstring": "*",
         "bcosca/fatfree-core": "3.9.0",
         "phpmailer/phpmailer": "6.9.3",
         "ruler/ruler": "0.4.0",
-        "matomo/device-detector": "^6.4.5"
+        "matomo/device-detector": "^6.4.6"
     },
     "extra": {
         "paas": {
@@ -47,6 +54,8 @@
         "compile": [
             "chmod 755 tmp",
             "chmod 755 logs",
+            "chmod 755 assets",
+            "chmod 755 assets/rules",
             "chmod 640 composer.json",
             "chmod 640 composer.lock",
             "chmod -R 750 config"

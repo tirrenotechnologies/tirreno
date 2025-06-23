@@ -18,11 +18,12 @@ export class ResourcesPage extends BasePage {
         const searchFilter  = new SearchFilter();
 
         const gridParams = {
-            url         : '/admin/loadResources',
-            tileId      : 'totalResources',
-            tableId     : 'resources-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:            '/admin/loadResources',
+            tileId:         'totalResources',
+            tableId:        'resources-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'resource',
                 columns: ['total_visit', 'total_account', 'total_ip', 'total_country'],

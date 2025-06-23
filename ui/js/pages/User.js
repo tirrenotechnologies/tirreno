@@ -35,76 +35,81 @@ export class UserPage extends BasePage {
         };
 
         const devicesGridParams = {
-            url    : '/admin/loadDevices',
-            tileId : 'totalDevices',
-            tableId: 'devices-table',
-            panelType: 'device',
+            url:        '/admin/loadDevices',
+            tileId:     'totalDevices',
+            tableId:    'devices-table',
+            panelType:  'device',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:            '/admin/loadEvents',
+            tileId:         'totalEvents',
+            tableId:        'user-events-table',
+            panelType:      'event',
 
-            sessionGroup: true,
-            singleUser: true,
-            isSortable: false,
+            sessionGroup:   true,
+            singleUser:     true,
+            isSortable:     false,
 
-            getParams: getParams
+            getParams:      getParams,
         };
 
         const ipsGridParams = {
-            url    : '/admin/loadIps',
-            tileId : 'totalIps',
-            tableId: 'ips-table',
+            url:        '/admin/loadIps',
+            tileId:     'totalIps',
+            tableId:    'ips-table',
 
-            isSortable: false,
-            orderByLastseen: true,
+            isSortable:         false,
+            orderByLastseen:    true,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const emailsGridParams = {
-            url     : '/admin/loadEmails',
-            tableId : 'emails-table',
-            getParams: getParams,
-            panelType: 'email',
+            url:        '/admin/loadEmails',
+            tableId:    'emails-table',
+            panelType:  'email',
 
-            isSortable: false
+            isSortable: false,
+
+            getParams:  getParams,
         };
 
         const phonesGridParams = {
-            url     : '/admin/loadPhones',
-            tableId : 'phones-table',
-            getParams: getParams,
-            panelType: 'phone',
+            url:        '/admin/loadPhones',
+            tableId:    'phones-table',
+            panelType:  'phone',
 
-            isSortable: false
+            isSortable: false,
+
+            getParams:  getParams,
         };
 
         const ispsGridParams = {
-            url       : '/admin/loadIsps',
-            tableId   : 'isps-table',
-            getParams : getParams,
-            isSortable: false
+            url:        '/admin/loadIsps',
+            tableId:    'isps-table',
+
+            isSortable: false,
+
+            getParams:  getParams,
         };
 
         const mapParams = {
-            getParams    : getParams,
-            tooltipString: 'event',
-            tooltipField : 'total_visit'
+            getParams:      getParams,
+            tooltipString:  'event',
+            tooltipField:   'total_visit',
         };
 
         const userDetailsTiles = {
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const userScoreDetails = {
-            userId:     ACCOUNT_ID
+            userId:     ACCOUNT_ID,
         };
 
         const chartParams = {

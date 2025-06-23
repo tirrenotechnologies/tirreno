@@ -29,9 +29,8 @@ JAVASCRIPT AND ADDITIONAL COMPONENTS
       URL: https://github.com/Choices-js/Choices
 
       jVectorMap
+      License: AGPL-3.0
       URL: https://jvectormap.com/
-      License: An extended license allows an item to be used in unlimited projects for either personal or commercial use.
-      The item cannot be offered for resale "as-is". It is allowed to distribute/sublicense the source files as part of a larger project.
 
       TinyCode's "Cross My Heart" game
       URL: https://github.com/KilledByAPixel/TinyCode/blob/master/games/CrossMyHeart/index256.html

@@ -1,5 +1,15 @@
-import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
-import * as Renderers from '../DataRenderers.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {
+    renderClickableBotId,
+    renderDevice,
+    renderOs,
+    renderBoolean,
+    renderPhone,
+    renderFullCountry,
+    renderPhoneCarrierName,
+    renderPhoneType,
+    renderUserCounter,
+} from '../DataRenderers.js?v=2';
 
 export class PhonesGrid extends BaseGridWithPanel {
     get orderConfig() {
@@ -51,44 +61,44 @@ export class PhonesGrid extends BaseGridWithPanel {
             {
                 data: 'phonenumber',
                 render: (data, type, record) => {
-                    return Renderers.renderPhone(record);
+                    return renderPhone(record);
                 }
             },
             {
                 data: 'invalid',
-                render: Renderers.renderBoolean
+                render: renderBoolean
             },
             {
                 data: 'full_country',
-                render: Renderers.renderFullCountry
+                render: renderFullCountry
             },
             {
                 data: 'carrier_name',
                 render: (data, type, record) => {
-                    return Renderers.renderPhoneCarrierName(record);
+                    return renderPhoneCarrierName(record);
                 }
             },
             {
                 data: 'type',
                 render: (data, type, record) => {
-                    return Renderers.renderPhoneType(record);
+                    return renderPhoneType(record);
                 }
             },
             {
                 data: 'shared',
                 name: 'shared',
                 render: (data, type, record) => {
-                    return Renderers.renderUserCounter(data, 2);
+                    return renderUserCounter(data, 2);
                 }
             },
             {
                 data: 'fraud_detected',
-                render: Renderers.renderBoolean
+                render: renderBoolean
             },
             //  TODO: return alert_list back in next release
             //{
             //    data: 'alert_list',
-            //    render: Renderers.renderBoolean
+            //    render: renderBoolean
             //}
         ];
 

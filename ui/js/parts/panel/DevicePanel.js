@@ -1,5 +1,12 @@
-import * as Renderers from '../DataRenderers.js?v=2';
 import {BasePanel} from './BasePanel.js?v=2';
+import {
+    renderDeviceWithOs,
+    renderBrowser,
+    renderLanguage,
+    renderDate,
+    renderBoolean,
+    renderUserAgent,
+} from '../DataRenderers.js?v=2';
 
 export class DevicePanel extends BasePanel {
 
@@ -27,13 +34,13 @@ export class DevicePanel extends BasePanel {
             browser:        `${browser_name} ${browser_version}`,
             lang:           data.lang
         };
-        data.device               = Renderers.renderDeviceWithOs(device_record);
-        data.browser              = Renderers.renderBrowser(device_record);
-        data.lang                 = Renderers.renderLanguage(device_record);
-        data.device_created       = Renderers.renderDate(data.created);
+        data.device               = renderDeviceWithOs(device_record);
+        data.browser              = renderBrowser(device_record);
+        data.lang                 = renderLanguage(device_record);
+        data.device_created       = renderDate(data.created);
 
-        data.ua_modified          = Renderers.renderBoolean(data.modified);
-        data.ua                   = Renderers.renderUserAgent(data);
+        data.ua_modified          = renderBoolean(data.modified);
+        data.ua                   = renderUserAgent(data);
 
         return data;
     }

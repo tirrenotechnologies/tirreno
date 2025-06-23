@@ -57,6 +57,10 @@ To run tirreno within docker container you may use image published on [dockerhub
 docker pull tirreno/tirreno:latest
 ```
 
+## Using Heroku (optional)
+
+Click [here](https://www.heroku.com/deploy) to launch heroku deployment.
+
 ## Documentation
 
 See the [User Guide](https://docs.tirreno.com/) for details on how to use tirreno.

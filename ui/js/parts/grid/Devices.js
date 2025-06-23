@@ -1,5 +1,12 @@
-import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
-import * as Renderers from '../DataRenderers.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {
+    renderDate,
+    renderBoolean,
+    renderDevice,
+    renderOs,
+    renderBrowser,
+    renderLanguage,
+} from '../DataRenderers.js?v=2';
 
 export class DevicesGrid extends BaseGridWithPanel {
     get columnDefs() {
@@ -42,36 +49,36 @@ export class DevicesGrid extends BaseGridWithPanel {
             {
                 data: 'created',
                 render: (data, type, record) => {
-                    return Renderers.renderDate(data);
+                    return renderDate(data);
                 },
             },
             {
                 data: 'device',
                 render: (data, type, record) => {
-                    return Renderers.renderDevice(record);
+                    return renderDevice(record);
                 }
             },
             {
                 data: 'os_name',
                 render: (data, type, record) => {
-                    return Renderers.renderOs(record);
+                    return renderOs(record);
                 }
             },
             {
                 data: 'browser_name',
                 render: (data, type, record) => {
-                    return Renderers.renderBrowser(record);
+                    return renderBrowser(record);
                 }
             },
             {
                 data: 'lang',
                 render: (data, type, record) => {
-                    return Renderers.renderLanguage(record);
+                    return renderLanguage(record);
                 },
             },
             {
                 data: 'modified',
-                render: Renderers.renderBoolean
+                render: renderBoolean
             },
             {
                 data: 'id',

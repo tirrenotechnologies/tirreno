@@ -43,8 +43,9 @@ class Data extends \Controllers\Base {
         $result7 = $model->searchByPhone($query, $apiKey);
 
         $result = array_merge($result1, $result2, $result3, $result4, $result5, $result6, $result7);
+        $iters = count($result);
 
-        for ($i = 0; $i < count($result); ++$i) {
+        for ($i = 0; $i < $iters; ++$i) {
             $result[$i]['data'] = ['category' => $result[$i]['groupName']];
         }
 

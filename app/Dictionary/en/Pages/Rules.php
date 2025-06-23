@@ -40,6 +40,9 @@ return [
     'AdminRules_weight_20' => 'High',
     'AdminRules_weight_70' => 'Extreme',
 
+    'AdminRules_reload_rules' => 'Refresh',
+    'AdminRules_reload_rules_warning' => 'Click to upload new local rules.',
+
     'AdminThresholdValues_form_title' => 'Thresholds settings',
     'AdminThresholdValues_form_title_tooltip' => 'Manage and set thresholds for review queue and automated user blacklisting.',
     'AdminThresholdValues_form_field_warning' => 'Set the threshold for user scores to trigger manual review or automatic blacklisting. Use auto-blacklisting with caution and only when truly necessary, as it could negatively impact the user experience due to potential misconfigurations.',

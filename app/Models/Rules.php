@@ -16,105 +16,82 @@
 namespace Models;
 
 class Rules extends \Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_operators_rules';
+    protected $DB_TABLE_NAME = 'dshb_rules';
 
-    // returns associative array
     public function getAll(): array {
-        $params = [];
-
         $query = (
             'SELECT
-                dshb_rules.id
+                dshb_rules.uid,
+                dshb_rules.validated,
+                dshb_rules.name,
+                dshb_rules.descr,
+                dshb_rules.attributes,
+                dshb_rules.missing
 
             FROM
                 dshb_rules'
         );
 
-        $results = $this->execQuery($query, $params);
-
-        return \Utils\Rules::activeRulesIds($results);
+        return $this->execQuery($query, null);
     }
 
-    public function getAllByOperator(int $apiKey): array {
+    public function addRule(string $uid, string $name, string $descr, array $attr, bool $validated): void {
         $params = [
-            ':api_key' => $apiKey,
+            ':validated'    => $validated,
+            ':uid'          => $uid,
+            ':name'         => $name,
+            ':descr'        => $descr,
+            ':attributes'   => json_encode($attr),
         ];
 
         $query = (
-            'SELECT
-                dshb_rules.id,
-                dshb_operators_rules.value,
-                dshb_operators_rules.proportion,
-                dshb_operators_rules.proportion_updated_at
-
-            FROM
-                dshb_rules
-
-            LEFT JOIN dshb_operators_rules
-            ON (dshb_rules.id = dshb_operators_rules.rule_id AND dshb_operators_rules.key = :api_key)'
+            'INSERT INTO dshb_rules (uid, name, descr, validated, attributes)
+            VALUES (:uid, :name, :descr, :validated, :attributes)
+            ON CONFLICT (uid) DO UPDATE
+            SET name = EXCLUDED.name, descr = EXCLUDED.descr, validated = EXCLUDED.validated,
+            attributes = EXCLUDED.attributes, updated = now(), missing = null'
         );
 
-        $results = $this->execQuery($query, $params);
-
-        // attribues filter applied in controller
-        return \Utils\Rules::ruleInfoById($results);
+        $this->execQuery($query, $params);
     }
 
-    public function getAllRulesWithOperatorValues(int $apiKey): array {
+    public function setInvalidByUid(string $uid): void {
         $params = [
-            ':api_key' => $apiKey,
+            ':uid'   => $uid,
         ];
 
         $query = (
-            'SELECT
-                dshb_rules.id,
-                COALESCE(dshb_operators_rules.value, 0) AS value
-
-            FROM
-                dshb_rules
-
-            LEFT JOIN dshb_operators_rules
-            ON (dshb_rules.id = dshb_operators_rules.rule_id AND dshb_operators_rules.key = :api_key)'
+            'UPDATE dshb_rules
+            SET validated = false, updated = now()
+            WHERE dshb_rules.uid = :uid'
         );
 
-        $results = $this->execQuery($query, $params);
-
-        // attribues filter applied in controller
-        return \Utils\Rules::ruleInfoById($results);
+        $this->execQuery($query, $params);
     }
 
-    public function updateRule(int $ruleId, int $score, int $apiKey): void {
-        $found = $this->load(
-            ['"key"=? AND "rule_id"=?', $apiKey, $ruleId],
+    public function setMissingByUid(string $uid): void {
+        $params = [
+            ':uid'   => $uid,
+        ];
+
+        $query = (
+            'UPDATE dshb_rules
+            SET missing = true, updated = now()
+            WHERE dshb_rules.uid = :uid'
         );
 
-        if (!$found) {
-            $this->key = $apiKey;
-            $this->rule_id = $ruleId;
-            $this->proportion = null;
-        }
-
-        $this->value = $score;
-        // do not change proportion
-
-        $this->save();
+        $this->execQuery($query, $params);
     }
 
-    public function updateRuleProportion(int $ruleId, float $proportion, int $apiKey): void {
-        $found = $this->load(
-            ['"key"=? AND "rule_id"=?', $apiKey, $ruleId],
+    public function deleteByUid(string $uid): void {
+        $params = [
+            ':uid'   => $uid,
+        ];
+
+        $query = (
+            'DELETE FROM dshb_rules WHERE uid = :uid'
         );
 
-        // set value if record is new
-        if (!$found) {
-            $this->key = $apiKey;
-            $this->rule_id = $ruleId;
-            $this->value = 0;
-        }
-
-        $this->proportion = $proportion;
-        $this->proportion_updated_at = date('Y-m-d H:i:s');
-
-        $this->save();
+        $this->execQuery($query, $params);
     }
 }

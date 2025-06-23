@@ -16,21 +16,21 @@
 namespace Crons;
 
 class RiskScoreQueueHandler extends AbstractQueueCron {
-    private \Models\Rules $rulesModel;
+    private \Models\OperatorsRules $rulesModel;
 
     public function __construct() {
         parent::__construct();
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
-        $this->accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $this->rulesModel = new \Models\Rules();
+        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $this->rulesModel = new \Models\OperatorsRules();
     }
 
     public function processQueue(): void {
-        if ($this->accountOperationQueueModel->isExecuting() && !$this->accountOperationQueueModel->unclog()) {
+        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
             $this->log('Risk score queue is already being executed by another cron job.');
         } else {
-            $this->processItems($this->accountOperationQueueModel);
+            $this->processItems($this->accountOpQueueModel);
         }
     }
 

@@ -18,11 +18,12 @@ export class IspsPage extends BasePage {
         const searchFilter = new SearchFilter();
 
         const gridParams = {
-            url         : '/admin/loadIsps',
-            tileId      : 'totalIsps',
-            tableId     : 'isps-table',
-            dateRangeGrid: true,
-            calculateTotals: true,
+            url:        '/admin/loadIsps',
+            tileId:     'totalIsps',
+            tableId:    'isps-table',
+
+            dateRangeGrid:      true,
+            calculateTotals:    true,
             totals: {
                 type: 'isp',
                 columns: ['total_visit', 'total_account', 'total_ip'],

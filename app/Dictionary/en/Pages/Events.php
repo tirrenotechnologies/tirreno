@@ -16,7 +16,7 @@
 return [
     'AdminEvents_page_title' => 'Events',
     'AdminEvents_breadcrumb_title' => 'Events',
-    'AdminEvents_search_placeholder' => 'User Email, Timestamp, Event Type, IP',
+    'AdminEvents_search_placeholder' => 'User Email, Timestamp, IP, HTTP Code',
     'AdminEvents_event_type_search_placeholder' => '+ Add another event type',
 
     'AdminEvents_table_title' => 'Events',

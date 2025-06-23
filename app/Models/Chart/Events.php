@@ -21,12 +21,12 @@ class Events extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'ts');
-        $l1 = array_column($data, 'event_count');
-        $l2 = array_column($data, 'users_count');
-        $l3 = array_column($data, 'event_alert_type_count');
+        $timestamps = array_column($data, 'ts');
+        $line1      = array_column($data, 'normal_event_count');
+        $line2      = array_column($data, 'event_editing_type_count');
+        $line3      = array_column($data, 'event_alert_type_count');
 
-        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey): array {
@@ -39,7 +39,8 @@ class Events extends Base {
             ];
         }
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        [$typesParams, $flatIds] = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES);
+        [$alertTypesParams, $alertFlatIds] = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
+        [$editTypesParams, $editFlatIds]   = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
@@ -47,14 +48,15 @@ class Events extends Base {
             ':resolution'   => $this->getResolution($request),
             ':offset'       => strval($offset),
         ];
-        $params = array_merge($params, $typesParams);
+        $params = array_merge($params, $alertTypesParams);
+        $params = array_merge($params, $editTypesParams);
 
         $query = (
             "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(event.id) AS event_count,
-                COUNT(DISTINCT event.account) AS users_count,
-                COUNT(CASE WHEN event_type.value IN ({$flatIds}) THEN TRUE END) AS event_alert_type_count
+                COUNT(CASE WHEN event.http_code IS NULL OR event.http_code < 400 THEN TRUE END) AS normal_event_count,
+                COUNT(CASE WHEN event_type.value IN ({$editFlatIds}) AND (event.http_code IS NULL OR event.http_code < 400) THEN TRUE END) AS event_editing_type_count,
+                COUNT(CASE WHEN event.http_code >= 400 OR event_type.value IN ({$alertFlatIds}) THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event

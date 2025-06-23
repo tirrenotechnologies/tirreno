@@ -1,5 +1,16 @@
 # tirreno changelog
 
+## tirreno v0.9.6
+
+* flexible rule system
+* heroku automated deployment
+* improved main page load
+* sorting columns whitelists for prevention of ajax blind sql injections
+* blacklist chart improvements + chart class reorganization
+* add `B23` and `B24` rules
+* device detector updates
+* /config/local dir for custom configs and extensions
+
 ## tirreno v0.9.5
 
 * new search filters for blacklist and users

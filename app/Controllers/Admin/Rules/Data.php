@@ -21,8 +21,184 @@ class Data extends \Controllers\Base {
     public function proceedPostRequest(array $params): array {
         return match ($params['cmd']) {
             'changeThresholdValues' => $this->changeThresholdValues($params),
+            'refreshRules' => $this->refreshRules($params),
             default => []
         };
+    }
+
+    private function refreshRules(array $params): array {
+        $pageParams = [];
+        $errorCode = $this->validateRefreshRules($params);
+
+        if ($errorCode) {
+            $pageParams['ERROR_CODE'] = $errorCode;
+        } else {
+            $model = new \Models\Rules();
+
+            // get all rules from db by uid; will not return classes with filename mismatch or invalid classname
+            $currentRules   = $model->getAll();
+
+            $sortedRules = [];
+            foreach ($currentRules as $rule) {
+                $sortedRules[$rule['uid']] = $rule;
+            }
+
+            $localClasses   = \Utils\RulesClasses::getRulesClasses(false);
+            $mainClasses    = \Utils\RulesClasses::getRulesClasses(true);
+
+            $iterates       = [[], [], [], [], [], []];
+            $metUids        = [];
+
+            $parentClass = \Controllers\Admin\Rules\Set\BaseRule::class;
+            $mtd         = 'defineCondition';
+
+            // local classes first to keep ability to override default classes
+            $allClassesFromFiles = $localClasses['imported'] + $mainClasses['imported'];
+
+            foreach ($allClassesFromFiles as $uid => $cls) {
+                $valid = true;
+
+                $name   = constant("$cls::NAME") ?? '';
+                $descr  = constant("$cls::DESCRIPTION") ?? '';
+                $attr   = constant("$cls::ATTRIBUTES") ?? [];
+
+                $obj = [
+                    'uid'           => $uid,
+                    'name'          => $name,
+                    'descr'         => $descr,
+                    'attributes'    => $attr,
+                ];
+
+                // check constants
+                if (!is_string($name) || !is_string($descr) || !is_array($attr)) {
+                    $valid = false;
+                    $obj['name']        = '';
+                    $obj['descr']       = '';
+                    $obj['attributes']  = [];
+                // check if rule is child class of BaseRule and defineCondition() was implemented
+                } elseif (!is_subclass_of($cls, $parentClass) || (new \ReflectionMethod($cls, $mtd))->isAbstract()) {
+                    $valid = false;
+                }
+
+                $status = $this->addRule($sortedRules, $obj, $valid, $model);
+                $iterates[($status === null ? 0 : 1 + intval($status)) * 2 + intval($valid)][] = $uid;
+                $metUids[] = $uid;
+            }
+
+            $flipMetUids = array_flip($metUids);
+            $newMissingRules = [];
+            $oldMissingCnt = 0;
+            foreach ($sortedRules as $uid => $rule) {
+                if (!array_key_exists($uid, $flipMetUids)) {
+                    if (!$rule['missing']) {
+                        $newMissingRules[$uid] = $rule;
+                        $model->setMissingByUid($uid);
+                    } else {
+                        $oldMissingCnt += 1;
+                    }
+                }
+            }
+
+            //$successCnt = count($iterates[5]) + count($iterates[3]);
+            //$warningCnt = count($iterates[4]) + count($iterates[2]);
+
+            $newValidCnt    = count($iterates[5]);
+            $newInvalidCnt  = count($iterates[4]);
+            $updValidCnt    = count($iterates[3]);
+            $updInvalidCnt  = count($iterates[2]);
+            $missingCnt     = count($newMissingRules);
+
+            $messages = [];
+
+            $messages[] = $this->getStatusNotification($newValidCnt, 'Added %s rule%s: %s', $iterates[5]);
+            $messages[] = $this->getStatusNotification($updValidCnt, 'Updated %s rule%s: %s', $iterates[3]);
+
+            $msg = join(';\n', array_filter($messages));
+
+            if ($msg) {
+                $pageParams['SUCCESS_MESSAGE'] = $msg;
+            }
+
+            $messages = [];
+
+            $messages[] = $this->getStatusNotification($newInvalidCnt, 'Added %s invalid rule%s: %s', $iterates[4]);
+            $messages[] = $this->getStatusNotification($updInvalidCnt, 'Updated %s invalid rule%s: %s', $iterates[2]);
+            $messages[] = $this->getStatusNotification($missingCnt, 'Missing %s rule%s: %s', array_column($newMissingRules, 'uid'));
+
+            $msg = join(';\n', array_filter($messages));
+
+            if ($msg) {
+                $pageParams['ERROR_MESSAGE'] = $msg;
+            }
+
+            if (!array_key_exists('ERROR_MESSAGE', $pageParams) && !array_key_exists('SUCCESS_MESSAGE', $pageParams)) {
+                $activeCnt      = count($iterates[1]);
+                $invalidCnt     = count($iterates[0]);
+
+                $msg = sprintf('Rules refreshed (%s rule%s active', $activeCnt, ($activeCnt > 1 ? 's' : ''));
+                if ($invalidCnt) {
+                    $msg .= sprintf(', %s invalid', $invalidCnt);
+                }
+                if ($oldMissingCnt) {
+                    $msg .= sprintf(', %s missing', $oldMissingCnt);
+                }
+
+                $msg .= ')';
+                $pageParams['SUCCESS_MESSAGE'] = $msg;
+            }
+        }
+
+        return $pageParams;
+    }
+
+    private function getStatusNotification(int $cnt, string $template, array $data): ?string {
+        if (!$cnt) {
+            return null;
+        }
+
+        $s = join(', ', array_slice($data, 0, 10, true)) . ($cnt > 10 ? '&hellip;' : '.');
+
+        return sprintf($template, strval($cnt), ($cnt > 1 ? 's' : ''), $s);
+    }
+
+    private function addRule(array $existingArray, array $obj, bool $valid, \Models\Rules $model): ?bool {
+        $data = $existingArray[$obj['uid']] ?? null;
+        $r = null;
+
+        sort($obj['attributes']);
+
+        if ($data === null) {
+            $r = true;
+        } else {
+            $data['attributes'] = json_decode($data['attributes']);
+            sort($data['attributes']);
+
+            foreach ($obj as $key => $value) {
+                if ($value !== $data[$key]) {
+                    $r = false;
+                    break;
+                }
+            }
+
+            if ($r !== false && $data['validated'] !== $valid) {
+                $r = false;
+            }
+        }
+
+        if ($r !== null || $data['missing']) {
+            $model->addRule($obj['uid'], $obj['name'], $obj['descr'], $obj['attributes'], $valid);
+        }
+
+        return ($data !== null && $data['missing']) ? true : $r;
+    }
+
+    private function validateRefreshRules(array $params): int|false {
+        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
+        if ($errorCode) {
+            return $errorCode;
+        }
+
+        return false;
     }
 
     public function changeThresholdValues(array $params): array {
@@ -109,19 +285,19 @@ class Data extends \Controllers\Base {
     public function getRulesForLoggedUser(): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
 
-        return $this->getAllRulesByApiKey($apiKey);
+        return $this->getAllAttrFilteredRulesByApiKey($apiKey);
     }
 
-    public function saveUserRule(int $ruleId, int $score): void {
+    public function saveUserRule(string $ruleUid, int $score): void {
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Rules();
-        $model->updateRule($ruleId, $score, $apiKey);
+        $model = new \Models\OperatorsRules();
+        $model->updateRule($ruleUid, $score, $apiKey);
     }
 
-    public function saveRuleProportion(int $ruleId, float $proportion): void {
+    public function saveRuleProportion(string $ruleUid, float $proportion): void {
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Rules();
-        $model->updateRuleProportion($ruleId, $proportion, $apiKey);
+        $model = new \Models\OperatorsRules();
+        $model->updateRuleProportion($ruleUid, $proportion, $apiKey);
     }
 
     public function getRuleProportion(int $totalUsers, int $ruleUsers): float {
@@ -135,11 +311,11 @@ class Data extends \Controllers\Base {
         return abs($proportion) < 0.001 ? 0.001 : $proportion;
     }
 
-    public function updateScoreByAccountId(int $accountId, int $apiKey, ?\Models\Rules $rulesModel = null): void {
+    public function updateScoreByAccountId(int $accountId, int $apiKey, ?\Models\OperatorsRules $rulesModel = null): void {
         $dataController = new \Controllers\Admin\Context\Data();
 
         if ($rulesModel === null) {
-            $rulesModel = new \Models\Rules();
+            $rulesModel = new \Models\OperatorsRules();
         }
 
         $this->updateTotalsByAccountIds([$accountId], $apiKey);
@@ -170,14 +346,16 @@ class Data extends \Controllers\Base {
     public function calculateScore(array $context, array $rules): array {
         $details = [];
 
+        \Utils\RulesClasses::loadAllRules();
+
         if (count($context)) {
             $ruler = new Ruler();
             foreach ($rules as $rule) {
-                $score = $ruler->calculate($rule, $context);
-                if ($score !== -1) {
+                $executed = $ruler->calculateByUid($rule['uid'], $context);
+                if ($executed) {
                     $details[] = [
-                        'id' => $rule['id'],
-                        'score' => $score,
+                        'uid' => $rule['uid'],
+                        'score' => $rule['value'],
                     ];
                 }
             }
@@ -204,12 +382,18 @@ class Data extends \Controllers\Base {
     private function suspiciousUsers(Ruler $ruler, array $rule, array $users, array $context): array {
         $suspiciousUsers = [];
 
+        $ruleObj = $ruler->buildRuleObj($rule['uid'], []);
+
+        if ($ruleObj === null) {
+            return $suspiciousUsers;
+        }
+
         foreach ($users as $user) {
             $record = $context[$user['accountid']] ?? null;
             if ($record !== null && count($record)) {
-                $score = $ruler->calculate($rule, $record);
-                if ($score > 0) {
-                    $user['score'] = $score;
+                $executed = $ruler->calculateByRule($ruleObj, $record);
+                if ($executed) {
+                    $user['score'] = $rule['value'];
                     $suspiciousUsers[] = $user;
                 }
             }
@@ -218,25 +402,25 @@ class Data extends \Controllers\Base {
         return $suspiciousUsers;
     }
 
-    public function checkRule(int $ruleId): array {
+    public function checkRule(string $ruleUid): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
 
         $model = new \Models\Users();
         $users = $model->getAllUsersIdsOrdered($apiKey);
 
-        $model = new \Models\Rules();
-        $rules = $model->getAll();
+        $model = new \Models\OperatorsRules();
+        $targetRule = $model->getRuleWithOperatorValue($ruleUid, $apiKey);
 
-        $targetRule = [];
-        if (isset($rules[$ruleId])) {
-            $targetRule = $rules[$ruleId];
-            $targetRule['value'] = 1;
+        if ($targetRule === []) {
+            return [0, []];
         }
 
         $suspiciousUsers = [];
         $accountIds = [];
         $preparedContext = [];
         $ruler = new Ruler();
+
+        \Utils\RulesClasses::loadAllRules();
 
         foreach (array_chunk($users, \Utils\Variables::getRuleUsersBatchSize()) as $usersBatch) {
             $accountIds = array_column($usersBatch, 'accountid');
@@ -259,30 +443,78 @@ class Data extends \Controllers\Base {
         }
     }
 
-    private function getAllRulesWithOperatorValues(\Models\Rules $rulesModel, int $apiKey): array {
+    // only valid, not missing, with fitting attributes, returning associative array
+    private function getAllRulesWithOperatorValues(\Models\OperatorsRules $rulesModel, int $apiKey): array {
         $model = new \Models\ApiKeys();
         $skipAttributes = $model->getSkipEnrichingAttributes($apiKey);
-        $rules = $rulesModel->getAllRulesWithOperatorValues($apiKey);
 
-        return \Utils\Rules::filterRulesByAttributes($rules, $skipAttributes);
+        $rules = $rulesModel->getAllValidRulesByOperator($apiKey);
+
+        $results = $this->filterRulesByAttributesAddTypes($rules, $skipAttributes);
+
+        return $results;
     }
 
-    public function getAllRulesByApiKey(int $apiKey): array {
+    // with fitting attributes and sorted, returning as regular array
+    private function getAllAttrFilteredRulesByApiKey(int $apiKey): array {
         $model = new \Models\ApiKeys();
         $skipAttributes = $model->getSkipEnrichingAttributes($apiKey);
 
-        $model = new \Models\Rules();
-        $results = $model->getAllByOperator($apiKey);
+        $model = new \Models\OperatorsRules();
+        $rules = $model->getAllRulesByOperator($apiKey);
 
-        $results = \Utils\Rules::filterRulesByAttributes($results, $skipAttributes);
+        $results = $this->filterRulesByAttributesAddTypes($rules, $skipAttributes);
 
-        for ($i = 0; $i < count($results); ++$i) {
-            $results[$i]['type'] = \Utils\Rules::getRuleTypeByUid($results[$i]['uid']);
+        usort($results, static function ($a, $b): int {
+            if ($a['validated'] !== $b['validated']) {
+                return ($b['validated'] <=> $a['validated']);
+            }
+
+            if ((int) ($a['missing'] === true) !== (int) ($b['missing'] === true)) {
+                return ((int) $a['missing'] <=> (int) $b['missing']);
+            }
+
+            return $a['uid'] <=> $b['uid'];
+        });
+
+        return $results;
+    }
+
+    // do not filter by attributes if data is needed only for rendering info
+    public function getAllRulesByApiKey(int $apiKey): array {
+        $model = new \Models\OperatorsRules();
+        $rules = $model->getAllRulesByOperator($apiKey);
+
+        $results = [];
+        foreach ($rules as $rule) {
+            $rule['type'] = \Utils\RulesClasses::getRuleTypeByUid($rule['uid']);
+            $results[] = $rule;
         }
 
         usort($results, static function ($a, $b): int {
+            if ($a['validated'] !== $b['validated']) {
+                return ($b['validated'] <=> $a['validated']);
+            }
+
+            if ((int) ($a['missing'] === true) !== (int) ($b['missing'] === true)) {
+                return ((int) $a['missing'] <=> (int) $b['missing']);
+            }
+
             return $a['uid'] <=> $b['uid'];
         });
+
+        return $results;
+    }
+
+    private function filterRulesByAttributesAddTypes(array $rules, array $skipAttributes): array {
+        $results = [];
+
+        foreach ($rules as $id => $row) {
+            if (!count(array_intersect(json_decode($row['attributes']), $skipAttributes))) {
+                $row['type'] = \Utils\RulesClasses::getRuleTypeByUid($row['uid']);
+                $results[$id] = $row;
+            }
+        }
 
         return $results;
     }

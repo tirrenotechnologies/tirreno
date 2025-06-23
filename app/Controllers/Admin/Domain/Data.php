@@ -28,12 +28,12 @@ class Data extends \Controllers\Base {
     public function enrichEntity(array $params): array {
         $dataController = new \Controllers\Admin\Enrichment\Data();
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $subscriptionKeyString = $this->getCurrentOperatorSubscriptionKeyString();
+        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
         $type = $params['type'];
         $search = $params['search'] ?? null;
         $entityId = isset($params['entityId']) ? (int) $params['entityId'] : null;
 
-        return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $subscriptionKeyString);
+        return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
     public function checkIfOperatorHasAccess(int $domainId): bool {

@@ -16,66 +16,9 @@
 namespace Models;
 
 class Dashboard extends \Models\BaseSql {
-    use \Traits\DateRange;
-
-    private $API_KEY = null;
     protected $DB_TABLE_NAME = 'event_account';
 
-    public function getStatWithDateRange(int $apiKey): array {
-        return $this->getStat($apiKey, true);
-    }
-
-    public function getStatWithoutDateRange(int $apiKey): array {
-        return $this->getStat($apiKey, false);
-    }
-
-    private function getStat(int $apiKey, bool $useDates): array {
-        $this->API_KEY = $apiKey;
-        $this->USE_DATES = $useDates;
-
-        $model = new \Models\ApiKeys();
-        $model->getKeyById($apiKey);
-        $reviewQueueThreshold = $model->review_queue_threshold;
-
-        $ips = $this->getTotalIps();
-        $users = $this->getTotalUsers();
-        $events = $this->getTotalEvents();
-        $countries = $this->getTotalCountries();
-        $resources = $this->getTotalResources();
-        $blockedUsers = $this->getTotalBlockedUsers();
-        $usersForReview = $this->getTotalUsersForReview($reviewQueueThreshold);
-
-        return [
-            'ips' => $ips,
-            'users' => $users,
-            'events' => $events,
-            'countries' => $countries,
-            'resources' => $resources,
-            'blockedUsers' => $blockedUsers,
-            'usersForReview' => $usersForReview,
-        ];
-    }
-
-    private function getTotalBlockedUsers(): int {
-        $query = (
-            'SELECT
-                COUNT(*)
-
-            FROM
-                event_account
-
-            WHERE
-                event_account.key = :api_key AND
-                event_account.fraud IS TRUE
-                %s'
-        );
-
-        $field = 'event_account.latest_decision';
-
-        return $this->getTotal($query, $field);
-    }
-
-    private function getTotalUsersForReview(int $lowScore): int {
+    public function getTotalBlockedUsers(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
                 COUNT(event_account.id)
@@ -84,63 +27,73 @@ class Dashboard extends \Models\BaseSql {
                 event_account
 
             WHERE
-                event_account.key = :api_key
-                AND
-                (
-                    event_account.reviewed = :reviewed
-                    OR event_account.fraud IS NULL
-                )
-                AND event_account.score <= :low_score
-                %s'
+                event_account.key = :api_key AND
+                event_account.fraud IS TRUE'
+        );
+
+        $field = 'event_account.latest_decision';
+
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
+    }
+
+    public function getTotalUsersForReview(int $lowScore, ?array $dateRange, int $apiKey): int {
+        $query = (
+            'SELECT
+                COUNT(event_account.id)
+
+            FROM
+                event_account
+
+            WHERE
+                event_account.key = :api_key AND
+                event_account.fraud IS NULL AND
+                event_account.score <= :low_score'
         );
 
         $additionalParams = [
-            ':reviewed'     => false,
             ':low_score'    => $lowScore,
         ];
 
-        $field = 'event_account.created';
+        $field = 'event_account.lastseen';
 
-        return $this->getTotal($query, $field, $additionalParams);
+        return $this->getTotal($query, $field, $dateRange, $apiKey, $additionalParams);
     }
 
-    private function getTotalEvents(): int {
+    public function getTotalEvents(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
-                COUNT(event.id)
+                COUNT(*)
 
             FROM
                 event
 
             WHERE
-                event.key = :api_key
-                %s'
+                event.key = :api_key'
         );
 
         $field = 'event.time';
 
-        return $this->getTotal($query, $field);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotalResources(): int {
+    public function getTotalResources(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
-                COUNT(event_url.id)
+                COUNT(*)
 
             FROM
                 event_url
 
             WHERE
-                event_url.key = :api_key
-                %s'
+                event_url.key = :api_key'
         );
 
         $field = 'event_url.lastseen';
 
-        return $this->getTotal($query, $field);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotalCountries(): int {
+    public function getTotalCountries(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
                 COUNT(event_country.id)
@@ -149,73 +102,57 @@ class Dashboard extends \Models\BaseSql {
                 event_country
 
             WHERE
-                event_country.key = :api_key
-                %s'
+                event_country.key = :api_key'
         );
 
         $field = 'event_country.lastseen';
 
-        return $this->getTotal($query, $field);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotalIps(): int {
+    public function getTotalIps(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
-                COUNT (event_ip.ip)
+                COUNT (*)
 
             FROM
                 event_ip
 
             WHERE
-                event_ip.key = :api_key
-                %s'
+                event_ip.key = :api_key'
         );
 
         $field = 'event_ip.lastseen';
 
-        return $this->getTotal($query, $field);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotalUsers(): int {
+    public function getTotalUsers(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
-                COUNT (event_account.id)
+                COUNT (*)
 
             FROM
                 event_account
 
             WHERE
-                event_account.key = :api_key
-                %s'
+                event_account.key = :api_key'
         );
 
         $field = 'event_account.lastseen';
 
-        return $this->getTotal($query, $field);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotal(string $query, string $dateField, array $additionalParams = []): int {
-        $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
+    private function getTotal(string $query, string $dateField, ?array $dateRange, int $apiKey, array $params = []): int {
+        $params[':api_key'] = $apiKey;
 
-        $apiKey = $this->API_KEY;
-        $useDates = $this->USE_DATES;
-
-        $search = '';
-        $params = [':api_key' => $apiKey];
-        $params = array_merge($params, $additionalParams);
-
-        if ($useDates && $dateRange) {
+        if ($dateRange) {
             $params[':end_time'] = $dateRange['endDate'];
             $params[':start_time'] = $dateRange['startDate'];
 
-            $search = ("
-                AND {$dateField} >= :start_time
-                AND {$dateField} <= :end_time
-            ");
+            $query .= " AND {$dateField} >= :start_time AND {$dateField} <= :end_time";
         }
-
-        $query = sprintf($query, $search);
 
         $results = $this->execQuery($query, $params);
 

@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'created DESC, type ASC, value ASC';
     protected $dateRangeField = 'blacklist.created';
 
+    protected $allowedColumns = ['score', 'created', 'type', 'value'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
@@ -122,6 +124,7 @@ class Query extends \Models\Grid\Base\Query {
             FROM (
                 SELECT DISTINCT
                     blacklist.accountid,
+                    blacklist.accounttitle,
                     blacklist.created,
                     extra.type,
                     CASE extra.type
@@ -134,6 +137,7 @@ class Query extends \Models\Grid\Base\Query {
                     (
                     SELECT
                         event_account.id                AS accountid,
+                        event_account.userid            AS accounttitle,
                         event_account.latest_decision   AS created,
                         CASE WHEN event_ip.fraud_detected THEN split_part(event_ip.ip::text, '/', 1) ELSE NULL END AS ip,
                         event_ip.fraud_detected AS ip_fraud,
@@ -192,6 +196,7 @@ class Query extends \Models\Grid\Base\Query {
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND (
+                    LOWER(blacklist.accounttitle)           LIKE LOWER(:search_value) OR
                     LOWER(extra.type)                       LIKE LOWER(:search_value) OR
                     LOWER(CASE extra.type
                         WHEN 'ip'    THEN blacklist.ip

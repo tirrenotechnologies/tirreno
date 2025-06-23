@@ -20,14 +20,14 @@ class DeletionQueueHandler extends AbstractQueueCron {
         parent::__construct();
 
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Delete);
-        $this->accountOperationQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 
     public function processQueue(): void {
-        if ($this->accountOperationQueueModel->isExecuting() && !$this->accountOperationQueueModel->unclog()) {
+        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
             $this->log('Deletion queue is already being executed by another cron job.');
         } else {
-            $this->processItems($this->accountOperationQueueModel);
+            $this->processItems($this->accountOpQueueModel);
         }
     }
 

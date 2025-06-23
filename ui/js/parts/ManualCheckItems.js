@@ -1,4 +1,13 @@
-import * as Renderers from '../parts/DataRenderers.js?v=2';
+import {
+    renderDefaultIfEmpty,
+    renderBoolean,
+    renderDate,
+    renderCountryIso,
+    renderHttpCode,
+    renderPhoneType,
+    renderPhoneCarrierName,
+    renderAsn,
+} from '../parts/DataRenderers.js?v=2';
 
 export class ManualCheckItems {
 
@@ -109,7 +118,7 @@ export class ManualCheckItems {
         item = 'asn';
         value = this.getItem(item);
         value = {asn: value};
-        value = Renderers.renderAsn(value);
+        value = renderAsn(value);
         this.setItem(item, value);
 
         item = 'hosting';
@@ -145,14 +154,14 @@ export class ManualCheckItems {
             }
 
             if (isNaN(value)) {
-                value = Renderers.renderDefaultIfEmpty(value);
+                value = renderDefaultIfEmpty(value);
             } else {
                 value = !!value;
-                value = Renderers.renderBoolean(value);
+                value = renderBoolean(value);
             }
 
         } else {
-            value = Renderers.renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmpty(value);
         }
         this.setItem(item, value);
     }
@@ -182,11 +191,11 @@ export class ManualCheckItems {
         value = this.getItem(itemId);
 
         if (null === value) {
-            value = Renderers.renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmpty(value);
         } else {
             //Revert databreach to "No databreach"
             value = !value;
-            value = Renderers.renderBoolean(value);
+            value = renderBoolean(value);
         }
 
         this.setItem(itemId, value);
@@ -199,7 +208,7 @@ export class ManualCheckItems {
         value = parseInt(value, 10);
 
         if (isNaN(value)) {
-            value = Renderers.renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmpty(value);
         } else {
             //Convert to boolean
             value = !!value;
@@ -207,7 +216,7 @@ export class ManualCheckItems {
             //Revert profiles to "No profiles"
             value = !value;
 
-            value = Renderers.renderBoolean(value);
+            value = renderBoolean(value);
         }
 
         this.setItem(itemId, value);
@@ -217,7 +226,7 @@ export class ManualCheckItems {
         let value;
 
         value = this.getItem(itemId);
-        value = Renderers.renderDate(value);
+        value = renderDate(value);
         this.setItem(itemId, value);
     }
 
@@ -226,7 +235,7 @@ export class ManualCheckItems {
 
         value = this.getItem(itemId);
         value = {country: value, full_country: value};
-        value = Renderers.renderCountryIso(value);
+        value = renderCountryIso(value);
         this.setItem(itemId, value);
     }
 
@@ -235,7 +244,7 @@ export class ManualCheckItems {
 
         value = this.getItem(itemId);
         value = {http_code: value};
-        value = Renderers.renderHttpCode(value);
+        value = renderHttpCode(value);
         this.setItem(itemId, value);
     }
 
@@ -244,7 +253,7 @@ export class ManualCheckItems {
 
         value = this.getItem(itemId);
         value = {type: value};
-        value = Renderers.renderPhoneType(value);
+        value = renderPhoneType(value);
         this.setItem(itemId, value);
     }
 
@@ -253,7 +262,7 @@ export class ManualCheckItems {
 
         value = this.getItem(itemId);
         value = {carrier_name: value};
-        value = Renderers.renderPhoneCarrierName(value);
+        value = renderPhoneCarrierName(value);
         this.setItem(itemId, value);
 
     }
@@ -262,7 +271,7 @@ export class ManualCheckItems {
         let value;
 
         value = this.getItem(itemId);
-        value = Renderers.renderBoolean(value);
+        value = renderBoolean(value);
         this.setItem(itemId, value);
     }
 
@@ -270,7 +279,7 @@ export class ManualCheckItems {
         let value;
 
         value = this.getItem(itemId);
-        value = Renderers.renderDefaultIfEmpty(value);
+        value = renderDefaultIfEmpty(value);
         this.setItem(itemId, value);
     }
 

@@ -21,12 +21,12 @@ class Ips extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'ts');
-        $l1 = array_column($data, 'residence_ip_count');
-        $l2 = array_column($data, 'total_privacy');
-        $l3 = array_column($data, 'suspicious_ip_count');
+        $timestamps = array_column($data, 'ts');
+        $line1      = array_column($data, 'residence_ip_count');
+        $line2      = array_column($data, 'total_privacy');
+        $line3      = array_column($data, 'suspicious_ip_count');
 
-        return $this->addEmptyDays([$ox, $l1, $l2, $l3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey): array {

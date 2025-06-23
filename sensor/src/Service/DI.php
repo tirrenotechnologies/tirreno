@@ -179,9 +179,11 @@ class DI {
      * @return array<string, string>
      */
     private function loadConfigFromFile(): array {
-        $path = __DIR__ . '/../../../config/{config.ini,config.*.ini}';
         /** @var string[] $iniFiles */
-        $iniFiles = glob($path, GLOB_BRACE);
+        $iniFiles = array_merge(
+            glob(__DIR__ . '/../../../config/config.ini') ?: [],
+            glob(__DIR__ . '/../../../config/local/config.local.ini') ?: [],
+        );
         $config = [];
 
         foreach ($iniFiles as $file) {

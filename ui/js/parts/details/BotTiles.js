@@ -1,7 +1,9 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
-    renderBoolean, renderDefaultIfEmpty,
-    renderBrowser, renderOs
+    renderBoolean,
+    renderDefaultIfEmpty,
+    renderBrowser,
+    renderOs,
 } from '../DataRenderers.js?v=2';
 
 const URL   = '/admin/loadBotDetails';

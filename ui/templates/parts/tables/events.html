@@ -1,19 +1,18 @@
-    <set SHOW_FILTERS_FORM = "{{ '/event' === @CURRENT_PATH || '/watchlist' === @CURRENT_PATH }}" />
-    <set SHOW_USERS_TAGS = "{{'/watchlist' === @CURRENT_PATH }}" />
+<set SHOW_FILTERS_FORM = "{{ '/event' === @CURRENT_PATH || '/watchlist' === @CURRENT_PATH }}" />
+<set SHOW_USERS_TAGS = "{{'/watchlist' === @CURRENT_PATH }}" />
 
-    <check if="@SHOW_FILTERS_FORM">
-    <check if="{{ isset(@showChart) && 1 === @showChart }}">
-        <div class="main-graph separate-graph">
-            <check if="@SHOW_FILTERS_FORM">
-                <true>
-                    <include href="templates/parts/forms/filtersForm.html" />
-                </true>
-            </check>
-            <div class="statChart"></div>
-        </div>
-    </check>
-    </check>
-
+<check if="@SHOW_FILTERS_FORM">
+<check if="{{ isset(@showChart) && 1 === @showChart }}">
+    <div class="main-graph separate-graph">
+        <check if="@SHOW_FILTERS_FORM">
+            <true>
+                <include href="templates/parts/forms/filtersForm.html" />
+            </true>
+        </check>
+        <div class="statChart"></div>
+    </div>
+</check>
+</check>
 
 <div class="card events-card">
     <header class="card-header">
@@ -64,7 +63,14 @@
             <table class="table" id="user-events-table">
                 <thead>
                     <tr>
-                        <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
+                        <check if="{{ isset(@USER) }}">
+                            <true>
+                                <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_session_tooltip }}">{{ @Base_table_column_session }}</th>
+                            </true>
+                            <false>
+                                <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
+                            </false>
+                        </check>
                         <th class="tooltip timestamp-col" title="{{ @Base_table_column_last_action_timestamp_tooltip }}">{{ @Base_table_column_last_action_timestamp }}</th>
                         <th class="tooltip event-type-col" title="{{ @Base_table_column_event_type_tooltip }}">{{ @Base_table_column_event_type }}</th>
                         <th class="tooltip ip-col" title="{{ @Base_table_column_ip_tooltip }}">{{ @Base_table_column_ip }}</th>

@@ -19,20 +19,20 @@ export class WatchlistPage extends BasePage {
         const searchFilter  = new SearchFilter();
 
         const gridParams = {
-            url    : '/admin/loadEvents?watchlist=true',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
-            dateRangeGrid: true,
+            url:            '/admin/loadEvents?watchlist=true',
+            tileId:         'totalEvents',
+            tableId:        'user-events-table',
+            panelType:      'event',
 
-            isSortable: false,
+            dateRangeGrid:  true,
+            isSortable:     false,
 
             getParams: function() {
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
                 return {dateRange, searchValue};
-            }
+            },
         };
 
         new EventPanel();

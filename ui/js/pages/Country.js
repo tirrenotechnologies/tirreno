@@ -24,39 +24,42 @@ export class CountryPage extends BasePage {
         };
 
         const usersGridParams = {
-            url         : '/admin/loadUsers',
-            tileId      : 'totalUsers',
-            tableId     : 'users-table',
+            url:        '/admin/loadUsers',
+            tileId:     'totalUsers',
+            tableId:    'users-table',
 
             isSortable: false,
 
-            getParams: getParams
+            getParams:  getParams,
         };
 
         const eventsGridParams = {
-            url    : '/admin/loadEvents',
-            tileId : 'totalEvents',
-            tableId: 'user-events-table',
-            panelType: 'event',
+            url:        '/admin/loadEvents',
+            tileId:     'totalEvents',
+            tableId:    'user-events-table',
+            panelType:  'event',
+
             isSortable: false,
 
-            getParams: getParams
+            getParams: getParams,
         };
 
         const ispsGridParams = {
-            url       : '/admin/loadIsps',
-            tableId   : 'isps-table',
-            getParams : getParams,
-            isSortable: false
+            url:        '/admin/loadIsps',
+            tableId:    'isps-table',
+
+            isSortable: false,
+
+            getParams:  getParams,
         };
 
         const ipsGridParams = {
-            url    : '/admin/loadIps',
-            tileId : 'totalIps',
-            tableId: 'ips-table',
+            url:        '/admin/loadIps',
+            tileId:     'totalIps',
+            tableId:    'ips-table',
 
-            isSortable: false,
-            orderByLastseen: true,
+            isSortable:         false,
+            orderByLastseen:    true,
 
             getParams: getParams
         };

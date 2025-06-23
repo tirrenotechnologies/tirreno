@@ -1,6 +1,9 @@
-import { BaseGridWithPanel } from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
 import {
-    renderBoolean, renderReputation, renderEmail, renderDefaultIfEmpty
+    renderBoolean,
+    renderReputation,
+    renderEmail,
+    renderDefaultIfEmpty,
 } from '../DataRenderers.js?v=2';
 
 export class EmailsGrid extends BaseGridWithPanel {

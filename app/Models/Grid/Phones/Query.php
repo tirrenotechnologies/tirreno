@@ -19,6 +19,8 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_phone.lastseen DESC';
     protected $dateRangeField = 'event_phone.lastseen';
 
+    protected $allowedColumns = ['phonenumber', 'invalid', 'full_country', 'carrier_name', 'type', 'shared', 'fraud_detected'];
+
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 

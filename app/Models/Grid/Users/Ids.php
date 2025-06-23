@@ -66,7 +66,7 @@ class Ids extends \Models\Grid\Base\Ids {
         );
     }
 
-    public function getUsersIdsByDeviceId(int $deviceId): string {
+    public function getUsersIdsByDeviceId(): string {
         return (
             'SELECT DISTINCT
                 event.account AS itemid

@@ -17,7 +17,9 @@ namespace Traits\Enrichment;
 
 trait Ips {
     private function calculateIpType(array &$records): void {
-        for ($i = 0; $i < count($records); ++$i) {
+        $iters = count($records);
+
+        for ($i = 0; $i < $iters; ++$i) {
             $r = $records[$i];
 
             $type = null;

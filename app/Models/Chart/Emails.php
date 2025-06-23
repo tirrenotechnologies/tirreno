@@ -21,11 +21,11 @@ class Emails extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'ts');
-        $l1 = array_column($data, 'email_count');
-        $l2 = array_column($data, 'blockemails_count');
+        $timestamps = array_column($data, 'ts');
+        $line1      = array_column($data, 'email_count');
+        $line2      = array_column($data, 'blockemails_count');
 
-        return $this->addEmptyDays([$ox, $l1, $l2]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2]);
     }
 
     private function getFirstLine(int $apiKey): array {

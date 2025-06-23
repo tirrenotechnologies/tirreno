@@ -1,0 +1,47 @@
+{
+    "name": "tirreno",
+    "description": "Open-source user intelligence platform. Monitor, analyze, and protect your app from cyber and account threats. ",
+    "website": "https://www.tirreno.com",
+    "repository": "https://github.com/tirrenotechnologies/tirreno",
+    "logo": "https://www.tirreno.com/tirreno-logo-public.png",
+    "keywords": [
+        "tirreno",
+        "fraud-detection",
+        "audit-trail",
+        "analytics",
+        "monitoring",
+        "bot-detection",
+        "antispam",
+        "application-monitoring"
+    ],
+    "success_url": "/install/index.php?mode=schema",
+    "addons": [
+        {
+            "plan": "heroku-postgresql",
+            "options": {
+                "version": "14"
+            }
+        },
+        {
+            "plan": "scheduler"
+        }
+    ],
+    "formation": {
+        "web": {
+            "quantity": 1,
+            "size": "basic"
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/php"
+        }
+    ],
+    "env": {
+        "FORCE_HTTPS": {
+            "description": "Secure HTTP for SITE variable",
+            "required": true,
+            "value": "True"
+        }
+    }
+}

@@ -1,5 +1,5 @@
 import {AutocompleteBlock} from '../parts/AutocompleteBlock.js';
-import {Tooltip}           from '../parts/Tooltip.js?v=2';
+import {Tooltip} from '../parts/Tooltip.js?v=2';
 
 export class BasePage {
     constructor() {
@@ -25,14 +25,16 @@ export class BasePage {
         const closeNotificationButtons = this.closeNotificationButtons;
         if (closeNotificationButtons && closeNotificationButtons.length) {
             const onCloseNotificationButtonClick = this.onCloseNotificationButtonClick.bind(this);
-            closeNotificationButtons.forEach(button => button.addEventListener('click', onCloseNotificationButtonClick, false));
+            closeNotificationButtons.forEach(
+                button => button.addEventListener('click', onCloseNotificationButtonClick, false)
+            );
         }
 
-        const procedureNotification = this.procedureNotification;
-        if (procedureNotification) {
-            const onCloseProcedureNotificationButtonClick = this.onCloseProcedureNotificationButtonClick.bind(this);
-            this.closeProcedureNotificationButton.addEventListener('click', onCloseProcedureNotificationButtonClick, false);
-        }
+        this.procedureNotifications.forEach(notification => {
+            const btn = notification.querySelector('.delete');
+            if (!btn) return;
+            btn.addEventListener('click', () => {notification.remove();}, false);
+        });
     }
 
     onCloseNotificationButtonClick() {
@@ -40,10 +42,6 @@ export class BasePage {
         if (notification) {
             notification.remove();
         }
-    }
-
-    onCloseProcedureNotificationButtonClick() {
-        this.procedureNotification.remove();
     }
 
     get initTooltip() {
@@ -54,11 +52,7 @@ export class BasePage {
         return document.querySelectorAll('.notification.system:not(.is-hidden) .delete');
     }
 
-    get procedureNotification() {
-        return document.querySelector('#procedure-notification');
-    }
-
-    get closeProcedureNotificationButton() {
-        return document.querySelector('#procedure-notification .delete');
+    get procedureNotifications() {
+        return document.querySelectorAll('#success-procedure-notification, #error-procedure-notification');
     }
 }

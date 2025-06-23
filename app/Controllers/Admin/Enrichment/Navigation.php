@@ -22,13 +22,13 @@ class Navigation extends \Controllers\Base {
     public function enrichEntity(): array {
         $dataController = new Data();
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $subscriptionKeyString = $this->getCurrentOperatorSubscriptionKeyString();
+        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
         $params = $this->f3->get('POST');
         $type = $params['type'];
         $search = $params['search'] ?? null;
         $entityId = $params['entityId'] ?? null;
 
-        return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $subscriptionKeyString);
+        return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
     public function getNotCheckedEntitiesCount(): array {

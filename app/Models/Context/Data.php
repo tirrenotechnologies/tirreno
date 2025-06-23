@@ -101,6 +101,7 @@ class Data {
 
             $user['event_ip']               = $events['event_ip'] ?? [];
             $user['event_url_string']       = $events['event_url_string'] ?? [];
+            $user['event_empty_referer']    = $events['event_empty_referer'] ?? [];
             $user['event_device']           = $events['event_device'] ?? [];
             $user['event_type']             = $events['event_type'] ?? [];
             $user['event_http_method']      = $events['event_http_method'] ?? [];
@@ -130,7 +131,8 @@ class Data {
         $fullName       = $this->getUserFullName($record);
 
         $record['le_local_part_len']                = $localPartLen;
-        $record['ea_fullnameHasNumbers']            = preg_match('~[0-9]+~', $fullName) > 0;
+        $record['ea_fullname_has_numbers']          = preg_match('~[0-9]+~', $fullName) > 0;
+        $record['ea_fullname_has_spaces_hyphens']   = preg_match('~[\-\s]~', $fullName) > 0;
         $record['ea_days_since_account_creation']   = $this->getDaysSinceAccountCreation($record);
         $record['ea_days_since_last_visit']         = $this->getDaysSinceLastVisit($record);
 
@@ -217,13 +219,15 @@ class Data {
 
         //$accountLoginFailId = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
         $accountEmailChangeId               = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_EMAIL_CHANGE');
-        $accountPasswordChangeId            = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
+        $accountPwdChangeId                 = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
 
         //$record['event_failed_login_attempts'] = $eventTypeCount[$accountLoginFailId] ?? 0;
         $record['event_email_changed']      = array_key_exists($accountEmailChangeId, $eventTypeCount);
-        $record['event_password_changed']   = array_key_exists($accountPasswordChangeId, $eventTypeCount);
+        $record['event_password_changed']   = array_key_exists($accountPwdChangeId, $eventTypeCount);
 
-        $record['event_http_method_head']  = in_array(\Utils\Constants::get('EVENT_REQUEST_TYPE_HEAD'), $record['event_http_method']);
+        $record['event_http_method_head']   = in_array(\Utils\Constants::get('EVENT_REQUEST_TYPE_HEAD'), $record['event_http_method']);
+
+        $record['event_empty_referer']      = in_array(true, $record['event_empty_referer'], true);
 
         $clientErrors = 0;
         $serverErrors = 0;

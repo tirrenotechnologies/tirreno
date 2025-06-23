@@ -16,21 +16,21 @@ export class LogbookPage extends BasePage {
         const searchFilter = new SearchFilter();
 
         const gridParams = {
-            url    : '/admin/loadLogbook',
-            tileId : 'totalLogbook',
-            tableId: 'logbook-table',
-            panelType: 'logbook',
+            url:            '/admin/loadLogbook',
+            tileId:         'totalLogbook',
+            tableId:        'logbook-table',
+            panelType:      'logbook',
 
-            sessionGroup: false,
-            singleUser: false,
-            isSortable: true,
+            sessionGroup:   false,
+            singleUser:     false,
+            isSortable:     true,
 
             getParams: function() {
                 const dateRange = {dateTo: null, dateFrom: null};
                 const searchValue = searchFilter.getValue();
 
                 return {dateRange, searchValue};
-            }
+            },
         };
 
         new LogbookPanel();

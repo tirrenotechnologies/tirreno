@@ -98,8 +98,9 @@ return [
     //Logbook
     'Details_event_timestamp' => 'Event timestamp',
     'Details_error_type' => 'Status',
-    'Details_error_text' => 'Description',
+    'Details_error_text' => 'Warning message',
     'Details_request' => 'Raw POST data',
+    'Details_source_ip' => 'Source IP',
 
     //Enrichment
     'Details_calculation' => 'The list of entities and the number of records that require enrichment. Billing will be calculated based on API consumption rates.',

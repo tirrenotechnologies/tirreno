@@ -2,16 +2,16 @@
     <set MESSAGE_TYPE="is-warning" />
     <set MESSAGE="{{ @ERROR_MESSAGE }}" />
     <set TS="{{ @ERROR_MESSAGE_TIMESTAMP }}" />
+    <div class="notification {{ @MESSAGE_TYPE }}" id="error-procedure-notification"><span class="faded"
+        >[{{ \Utils\ElapsedDate::short(@TS) }}]</span>&nbsp;&nbsp;{{ @MESSAGE | raw }}<button class="delete"
+    ></button></div>
 </check>
 
 <check if="{{ isset(@SUCCESS_MESSAGE) }}">
     <set MESSAGE_TYPE="is-primary" />
     <set MESSAGE="{{ @SUCCESS_MESSAGE }}" />
     <set TS="{{ @SUCCESS_MESSAGE_TIMESTAMP }}" />
-</check>
-
-<check if="{{ isset(@MESSAGE) }}">
-    <div class="notification {{ @MESSAGE_TYPE }}" id="procedure-notification"><span class="faded"
+    <div class="notification {{ @MESSAGE_TYPE }}" id="success-procedure-notification"><span class="faded"
         >[{{ \Utils\ElapsedDate::short(@TS) }}]</span>&nbsp;&nbsp;{{ @MESSAGE | raw }}<button class="delete"
     ></button></div>
 </check>
