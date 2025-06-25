@@ -9,9 +9,9 @@
     </a>
 </p>
 
-tirreno is an open-source security platform for integrated cyberfraud and abuse protection. 
+tirreno is an open-source security platform.
 
-It monitors, analyzes and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app. 
+It monitors, analyzes and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app.
 
 * **For mission-critical applications**: Secure your user environments from account takeovers, brute-force attacks, insider threats, and vulnerabilities driven by user behavior.
 * **For web applications**: Protect your user areas from account takeovers, brute-force attacks, fake accounts, malicious bots, and common web vulnerabilities caused by user behavior.
@@ -59,7 +59,7 @@ docker pull tirreno/tirreno:latest
 
 ## Using Heroku (optional)
 
-Click [here](https://www.heroku.com/deploy) to launch heroku deployment.
+Click [here](https://www.heroku.com/deploy?template=https://github.com/tirrenotechnologies/tirreno) to launch heroku deployment.
 
 ## Documentation
 
