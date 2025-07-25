@@ -101,10 +101,10 @@ class Events extends \Models\BaseSql {
                 event_account.userid AS accounttitle,
                 event_account.score,
 
-                countries.serial,
-                countries.id AS country,
-                countries.value AS full_country,
-                event_device.id AS deviceId,
+                countries.id            AS country_id,
+                countries.iso           AS country_iso,
+                countries.value         AS full_country,
+                event_device.id         AS deviceId,
                 event_ua_parsed.device,
                 event_ua_parsed.ua,
                 event_ua_parsed.browser_name,
@@ -137,7 +137,7 @@ class Events extends \Models\BaseSql {
             LEFT JOIN event_isp
             ON (event_ip.isp = event_isp.id)
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             WHERE
                 event.account   = :user_id AND
@@ -178,7 +178,7 @@ class Events extends \Models\BaseSql {
             INNER JOIN event_ip
             ON (event.ip = event_ip.id)
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             WHERE
                 event.account   = :user_id AND

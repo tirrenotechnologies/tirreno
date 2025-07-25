@@ -16,7 +16,7 @@
 return [
     'AdminLogbook_page_title' => 'Logbook',
     'AdminLogbook_breadcrumb_title' => 'Logbook',
-    'AdminLogbook_table_title' => 'Logbook',
+    'AdminLogbook_table_title' => 'API requests',
     'AdminLogbook_table_title_tooltip' => 'This page lists the processing statuses of the recent API requests for troubleshooting purposes.',
     'AdminLogbook_search_placeholder' => 'Raw POST data, IP, Error, Timestamp',
     'AdminLogbook_column_ip' => 'Source IP',

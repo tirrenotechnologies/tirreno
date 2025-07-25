@@ -1,5 +1,0 @@
-RewriteEngine On
-
-# Handle /sensor/ with a trailing slash
-RewriteRule .* sensor.php [L,QSA]
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]

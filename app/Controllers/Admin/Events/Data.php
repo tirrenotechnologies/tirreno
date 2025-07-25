@@ -63,15 +63,20 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function getEventDetails(int $apiKey) {
+    public function getEventDetails(int $apiKey): array {
         $params = $this->f3->get('GET');
         $id = $params['id'];
         $model = new \Models\Event();
 
-        return $model->getEventDetails($id, $apiKey);
+        $result = $model->getEventDetails($id, $apiKey);
+
+        $tsColumns = ['device_created', 'latest_decision', 'added_to_review', 'score_updated_at', 'event_time'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $result);
+
+        return $result;
     }
 
-    public function getAllEventTypes() {
+    public function getAllEventTypes(): array {
         $model = new \Models\EventType();
 
         return $model->getAll();

@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Phone extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getPhoneDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         foreach ($recordsByAccount as $key => $value) {
@@ -43,7 +43,7 @@ class Phone extends Base {
         return $recordsByAccount;
     }
 
-    private function getPhoneDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $query = (

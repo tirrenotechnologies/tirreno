@@ -17,9 +17,9 @@ export class UsageStatsGrid extends BaseGrid {
     // do not use pagination
     updateTableFooter(dataTable) {
         const tableId = this.config.tableId;
-        const pagerId = `#${tableId}_paginate`;
+        const pagerSelector = `#${tableId}_wrapper .dt-paging`;
 
-        $(pagerId).hide();
+        $(pagerSelector).hide();
     }
 
     get columnDefs() {

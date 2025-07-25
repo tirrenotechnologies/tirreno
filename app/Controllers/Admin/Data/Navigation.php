@@ -66,6 +66,10 @@ class Navigation extends \Controllers\Base {
         $this->response->data = $this->dataController->getCountries();
     }
 
+    public function getMap(): void {
+        $this->response->data = $this->dataController->getMap();
+    }
+
     public function getIps(): void {
         $this->response->data = $this->dataController->getIps();
     }
@@ -124,6 +128,10 @@ class Navigation extends \Controllers\Base {
 
     public function getUserDetails(): void {
         $this->response->data = $this->dataController->getUserDetails();
+    }
+
+    public function getUserEnrichmentDetails(): void {
+        $this->response->data = $this->dataController->getUserEnrichmentDetails();
     }
 
     public function getNotCheckedEntitiesCount(): void {

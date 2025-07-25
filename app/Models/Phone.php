@@ -45,14 +45,14 @@ class Phone extends \Models\BaseSql {
                 event_phone.iso_country_code,
                 event_phone.invalid,
                 event_phone.checked,
-                countries.serial              AS phone_serial,
-                countries.id                  AS phone_country,
-                countries.value               AS phone_full_country
+                countries.id                  AS country_id,
+                countries.iso                 AS country_iso,
+                countries.value               AS full_country
 
             FROM
                 event_phone
             LEFT JOIN countries
-            ON (countries.serial = event_phone.country_code)
+            ON (countries.id = event_phone.country_code)
 
             WHERE
                 event_phone.id = :id AND

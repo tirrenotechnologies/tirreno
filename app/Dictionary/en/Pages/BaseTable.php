@@ -94,6 +94,9 @@ return [
     'Base_table_column_lastseen_tooltip' => 'The date and time of the last event.',
     'Base_table_column_lastseen_tooltip_users' => 'The date and time of the last user request.',
 
+    'Base_table_column_added_to_review' => 'Added to review',
+    'Base_table_column_added_to_review_tooltip' => 'The date and time of directing user to review queue.',
+
     'Base_table_column_asn' => 'ASN',
     'Base_table_column_asn_tooltip' => 'An autonomous system number. Identifies a detected network.',
     'Base_table_column_netname' => 'Network operator',
@@ -191,6 +194,6 @@ return [
     'Base_table_column_error_type_tooltip' => 'A request processing status.',
     'Base_table_column_error_text' => 'Warning message',
     'Base_table_column_error_text_tooltip' => 'An error message returned by an unsuccessful request processing.',
-    'Base_table_column_event_timestamp' => 'Timestamp',
-    'Base_table_column_event_timestamp_tooltip' => 'The date and time passed in the eventTime field of an API request.',
+    'Base_table_column_local_timestamp' => 'Local timestamp',
+    'Base_table_column_local_timestamp_tooltip' => 'Server time when API request was received.',
 ];

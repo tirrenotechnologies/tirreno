@@ -25,7 +25,8 @@ class Signup extends Base {
         }
 
         $pageParams = [
-            'HTML_FILE' => 'signup.html',
+            'HTML_FILE'     => 'signup.html',
+            'TIMEZONES'     => \Utils\TimeZones::timeZonesList(),
         ];
 
         if ($this->isPostRequest()) {

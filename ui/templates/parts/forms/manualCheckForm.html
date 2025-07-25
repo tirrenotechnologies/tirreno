@@ -27,7 +27,7 @@
                         <td>
                             <div class="field">
                                 <set SEARCH="{{ isset(@SEARCH_VALUES) ? @SEARCH_VALUES.search : '' }}" />
-                                <input class="input" name="search" type="text" value="{{ @SEARCH }}" />
+                                <input class="input" name="search" type="text" value="{{ @SEARCH }}" autocomplete="off"/>
                                 </label>
                             </div>
                         </td>
@@ -61,7 +61,7 @@
                     <label class="label">{{ @AdminManualCheck_form_field_search_query_label }}</label>
                     <div class="control">
                         <set SEARCH="{{ isset(@SEARCH_VALUES) ? @SEARCH_VALUES.search : '' }}" />
-                        <input class="input" name="search" type="text" value="{{ @SEARCH }}" />
+                        <input class="input" name="search" type="text" value="{{ @SEARCH }}" autocomplete="off"/>
                     </div>
                 </div>
             </div>

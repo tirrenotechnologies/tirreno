@@ -12,14 +12,6 @@ export class BaseLineChart extends BaseChart {
         ];
     }
 
-    getDaySeries() {
-        return {
-            label: 'Day',
-            scale: 'DAY',
-            value: '{YYYY}-{MM}-{DD}'
-        };
-    }
-
     getSingleSeries(label, color) {
         return {
             label: label,
@@ -57,5 +49,26 @@ export class BaseLineChart extends BaseChart {
 
     getOptions(resolution = 'day') {
         return super.getOptions(resolution, '—');
+    }
+
+    // invert lines order to keep originally first line on top layer
+    seriesResolutionShift(series, resolution) {
+        if (resolution === 'hour') {
+            series[0].label = 'Hour';
+            series[0].scale = 'HOUR';
+            series[0].value = '{YYYY}-{MM}-{DD} {HH}:{mm}';
+        } else if (resolution === 'minute') {
+            series[0].label = 'Minute';
+            series[0].scale = 'MINUTE';
+            series[0].value = '{YYYY}-{MM}-{DD} {HH}:{mm}';
+        }
+
+        const inverted = [series[0]].concat(series.slice(1).reverse());
+
+        return inverted;
+    }
+
+    getData(data) {
+        return [data[0]].concat(data.slice(1).reverse());
     }
 }

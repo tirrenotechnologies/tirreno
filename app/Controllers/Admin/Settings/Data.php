@@ -33,24 +33,6 @@ class Data extends \Controllers\Base {
         };
     }
 
-    public function getOperatorApiKeys(int $operatorId): array {
-        $model = new \Models\ApiKeys();
-        $apiKeys = $model->getKeys($operatorId);
-
-        $isOwner = true;
-        if (!$apiKeys) {
-            $coOwnerModel = new \Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
-
-            if ($coOwnerModel->loaded()) {
-                $isOwner = false;
-                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
-            }
-        }
-
-        return [$isOwner, $apiKeys];
-    }
-
     public function getSharedApiKeyOperators(int $operatorId): array {
         $model = new \Models\ApiKeyCoOwner();
 
@@ -64,6 +46,9 @@ class Data extends \Controllers\Base {
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
+            $currentOperator = $this->f3->get('CURRENT_USER');
+            $params['id'] = $currentOperator->id;
+
             $model = new \Models\Operator();
             $model->updatePassword($params);
 
@@ -106,8 +91,15 @@ class Data extends \Controllers\Base {
             $pageParams['TIME_ZONE_VALUES'] = $params;
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
+            $currentOperator = $this->f3->get('CURRENT_USER');
+            $params['id'] = $currentOperator->id;
+
             $model = new \Models\Operator();
             $model->updateTimeZone($params);
+
+            // update operator in f3 hive for clock
+            $this->f3->set('CURRENT_USER', null);
+            $this->f3->set('CURRENT_USER', $this->getLoggedInOperator());
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminTimeZone_changeTimeZone_success_message');
         }
@@ -122,12 +114,9 @@ class Data extends \Controllers\Base {
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $operatorId = $data['id'];
-            $apiKey = $this->getCurrentOperatorApiKeyId();
-
-            $model = new \Models\Operator();
-            $model->closeAccount($operatorId);
-            $model->removeData($operatorId);
+            $currentOperator = $this->f3->get('CURRENT_USER');
+            $currentOperator->closeAccount();
+            $currentOperator->removeData();
 
             $this->f3->clear('SESSION');
             session_commit();
@@ -194,13 +183,9 @@ class Data extends \Controllers\Base {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
             $unreviewedItemsReminderFrequency = $params['review-reminder-frequency'];
-            $operatorId = $params['id'];
+            $currentOperator = $this->f3->get('CURRENT_USER');
 
-            $operatorModel = new \Models\Operator();
-            $operatorModel->updateNotificationPreferences(
-                \Type\UnreviewedItemsReminderFrequencyType::from($unreviewedItemsReminderFrequency),
-                $operatorId,
-            );
+            $currentOperator->updateNotificationPreferences(\Type\UnreviewedItemsReminderFrequencyType::from($unreviewedItemsReminderFrequency));
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminSettings_notificationPreferences_success_message');
         }
@@ -286,15 +271,23 @@ class Data extends \Controllers\Base {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
             $operatorId = isset($params['operatorId']) ? (int) $params['operatorId'] : null;
+
             $coOwnerModel = new \Models\ApiKeyCoOwner();
             $coOwnerModel->getCoOwnership($operatorId);
-            $coOwnerModel->deleteCoOwnership();
 
-            $operatorModel = new \Models\Operator();
-            $operatorModel->getOperatorById($operatorId);
-            $operatorModel->deleteAccount();
+            $apiKeyObj = $this->getCurrentOperatorApiKeyObject();
 
-            $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_remove_co_owner_success_message');
+            if ($apiKeyObj->id === $coOwnerModel->api && $this->f3->get('CURRENT_USER')->id === $apiKeyObj->creator) {
+                $coOwnerModel->deleteCoOwnership();
+
+                $operatorModel = new \Models\Operator();
+                $operatorModel->getOperatorById($operatorId);
+                $operatorModel->deleteAccount();
+
+                $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_remove_co_owner_success_message');
+            } else {
+                $pageParams['ERROR_MESSAGE'] = $this->f3->get('AdminApi_remove_co_owner_error_message');
+            }
         }
 
         return $pageParams;

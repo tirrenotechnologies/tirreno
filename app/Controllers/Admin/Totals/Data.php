@@ -19,7 +19,7 @@ class Data extends \Controllers\Base {
     public function getTimeFrameTotal(array $ids, string $type, string $startDate, string $endDate, int $apiKey): array {
         $processErrorMessage = ['ERROR_CODE' => \Utils\ErrorCodes::TOTALS_INVALID_TYPE];
 
-        if (!in_array($type, ['ip', 'isp', 'domain', 'user', 'country', 'resource'])) {
+        if (!in_array($type, ['ip', 'isp', 'domain', 'country', 'resource'])) {
             return $processErrorMessage;
         }
 
@@ -34,9 +34,6 @@ class Data extends \Controllers\Base {
                 break;
             case 'domain':
                 $model = new \Models\Domain();
-                break;
-            case 'user':
-                $model = new \Models\User();
                 break;
             case 'country':
                 $model = new \Models\Country();

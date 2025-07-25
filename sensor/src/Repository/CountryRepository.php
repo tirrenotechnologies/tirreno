@@ -24,9 +24,9 @@ class CountryRepository {
     }
 
     public function getCountryIdByCode(string $code): int {
-        $sql = 'SELECT serial FROM countries WHERE "id" = :id LIMIT 1';
+        $sql = 'SELECT id FROM countries WHERE iso = :iso LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':id', $code);
+        $stmt->bindValue(':iso', $code);
         $stmt->execute();
 
         $result = $stmt->fetchColumn();

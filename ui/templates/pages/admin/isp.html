@@ -29,17 +29,7 @@
 
             if($pageTitle) {
                 $regex1 = '/-|_/i';
-                $regex2 = '/\b\w+/';
-
                 $pageTitle = preg_replace($regex1, ' ', $pageTitle);
-                $pageTitle = preg_replace_callback(
-                    $regex2,
-                    function ($matches) {
-                        $pageTitle = $matches[0];
-                        return ucfirst(strtolower($pageTitle));
-                    },
-                    $pageTitle
-                );
             }
         ~}
 

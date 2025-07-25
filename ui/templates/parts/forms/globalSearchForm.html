@@ -1,4 +1,13 @@
 <div class="searchline">
+    <div class="field day-tile">
+        <input class="input" id="clock-day" placeholder="{{ @DAY }}" disabled>
+    </div>
+
+    <div class="field time-tile">
+        <input class="input" id="clock-time" placeholder="{{ @TIME }} {{ @TIMEZONE }}" disabled>
+    </div>
+
+    <input type="hidden" id="offset" value="{{ @OFFSET }}">
 
     <form onsubmit="document.getElementById('auto-complete').focus(); return false;">
         <input type="hidden" name="token" value="{{ @CSRF }}">

@@ -18,7 +18,25 @@ namespace Controllers\Admin\Countries;
 class Data extends \Controllers\Base {
     public function getList(int $apiKey): array {
         $result = [];
+
         $model = new \Models\Grid\Countries\Grid($apiKey);
+
+        $result = $model->getAllCountries();
+
+        $ids = array_column($result['data'], 'id');
+        if ($ids) {
+            $model = new \Models\Country();
+            $model->updateTotalsByEntityIds($ids, $apiKey);
+            $result['data'] = $model->refreshTotals($result['data'], $apiKey);
+        }
+
+        return $result;
+    }
+
+    public function getMap(int $apiKey): array {
+        $result = [];
+
+        $model = new \Models\Map();
 
         $ispId = $this->f3->get('REQUEST.ispId');
         $userId = $this->f3->get('REQUEST.userId');
@@ -27,36 +45,33 @@ class Data extends \Controllers\Base {
         $resourceId = $this->f3->get('REQUEST.resourceId');
 
         if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getCountriesByUserId($userId);
+            $result = $model->getCountriesByUserId($userId, $apiKey);
         }
 
-        if (isset($ispId)) {
-            $result = $model->getCountriesByIspId($ispId);
+        if (isset($ispId) && is_numeric($ispId)) {
+            $result = $model->getCountriesByIspId($ispId, $apiKey);
         }
 
         if (isset($domainId) && is_numeric($domainId)) {
-            $result = $model->getCountriesByDomainId($domainId);
+            $result = $model->getCountriesByDomainId($domainId, $apiKey);
         }
 
         if (isset($botId) && is_numeric($botId)) {
-            $result = $model->getCountriesByDeviceId($botId);
+            $result = $model->getCountriesByBotId($botId, $apiKey);
         }
 
         if (isset($resourceId) && is_numeric($resourceId)) {
-            $result = $model->getCountriesByResourceId($resourceId);
+            $result = $model->getCountriesByResourceId($resourceId, $apiKey);
         }
 
         if (!$result) {
-            $result = $model->getAllCountries();
-            // refresh totals only for grid
-            if ($this->f3->get('REQUEST.draw')) {
-                $ids = array_column($result['data'], 'id');
-                if ($ids) {
-                    $model = new \Models\Country();
-                    $model->updateTotalsByEntityIds($ids, $apiKey);
-                    $result['data'] = $model->refreshTotals($result['data'], $apiKey);
-                }
-            }
+            $dateFrom = $this->f3->get('REQUEST.dateFrom');
+            $dateTo = $this->f3->get('REQUEST.dateTo');
+
+            $dateFrom = ($dateFrom) ? date('Y-m-d H:i:s', strtotime($dateFrom)) : null;
+            $dateTo = ($dateTo) ? date('Y-m-d H:i:s', strtotime($dateTo)) : null;
+
+            $result = $model->getAllCountries($dateFrom, $dateTo, $apiKey);
         }
 
         return $result;

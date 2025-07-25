@@ -36,14 +36,15 @@ class Query extends \Models\Grid\Base\Query {
                 event_phone.alert_list,
                 event_phone.fraud_detected,
 
-                countries.id AS country,
+                countries.id    AS country_id,
+                countries.iso   AS country_iso,
                 countries.value AS full_country
 
             FROM
                 event_phone
 
             LEFT JOIN countries
-            ON (event_phone.country_code = countries.serial)
+            ON (event_phone.country_code = countries.id)
 
             WHERE
                 event_phone.key = :api_key

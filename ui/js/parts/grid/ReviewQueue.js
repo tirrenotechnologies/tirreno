@@ -55,7 +55,7 @@ export class ReviewQueueGrid extends BaseGrid {
                 }
             },
             {
-                data: 'lastseen',
+                data: 'added_to_review',
                 render: renderTime
             },
             {
@@ -82,7 +82,7 @@ export class ReviewQueueGrid extends BaseGrid {
                 render: (data, type, record) => {
                     return renderUserActionButtons(record);
                 },
-            }
+            },
         ];
 
         return columns;

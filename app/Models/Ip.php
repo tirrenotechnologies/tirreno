@@ -72,9 +72,9 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 event_isp.name,
                 event_isp.description,
 
-                countries.value AS country,
-                countries.id AS abbr_country,
-                countries.serial
+                countries.value AS full_country,
+                countries.id    AS country_id,
+                countries.iso   AS country_iso
 
             FROM
                 event_ip
@@ -83,7 +83,7 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             ON (event_ip.isp = event_isp.id)
 
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             WHERE
                 event_ip.id = :ipid'

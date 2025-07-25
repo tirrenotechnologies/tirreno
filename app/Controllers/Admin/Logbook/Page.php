@@ -22,12 +22,12 @@ class Page extends \Controllers\Pages\Base {
         $searchPlacholder = $this->f3->get('AdminLogbook_search_placeholder');
 
         $pageParams = [
-            'SEARCH_PLACEHOLDER' => $searchPlacholder,
-            'LOAD_ACCEPT_LANGUAGE_PARSER' => true,
-            'LOAD_DATATABLE' => true,
-            'LOAD_AUTOCOMPLETE' => true,
-            'HTML_FILE' => 'admin/logbook.html',
-            'JS' => 'admin_logbook.js',
+            'SEARCH_PLACEHOLDER'    => $searchPlacholder,
+            'LOAD_UPLOT'            => true,
+            'LOAD_DATATABLE'        => true,
+            'LOAD_AUTOCOMPLETE'     => true,
+            'HTML_FILE'             => 'admin/logbook.html',
+            'JS'                    => 'admin_logbook.js',
         ];
 
         return parent::applyPageParams($pageParams);

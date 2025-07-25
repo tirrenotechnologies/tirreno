@@ -18,6 +18,13 @@ namespace Controllers\Admin\Rules;
 class Data extends \Controllers\Base {
     use \Traits\ApiKeys;
 
+    private \Controllers\Admin\Context\Data $contextController;
+    private \Controllers\Admin\User\Data $userController;
+    private \Models\OperatorsRules $rulesModel;
+
+    private array $totalModels;
+    private array $rulesMap;
+
     public function proceedPostRequest(array $params): array {
         return match ($params['cmd']) {
             'changeThresholdValues' => $this->changeThresholdValues($params),
@@ -264,24 +271,6 @@ class Data extends \Controllers\Base {
         return false;
     }
 
-    public function getOperatorApiKeys(int $operatorId): array {
-        $model = new \Models\ApiKeys();
-        $apiKeys = $model->getKeys($operatorId);
-
-        $isOwner = true;
-        if (!$apiKeys) {
-            $coOwnerModel = new \Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
-
-            if ($coOwnerModel->loaded()) {
-                $isOwner = false;
-                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
-            }
-        }
-
-        return [$isOwner, $apiKeys];
-    }
-
     public function getRulesForLoggedUser(): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
 
@@ -311,59 +300,128 @@ class Data extends \Controllers\Base {
         return abs($proportion) < 0.001 ? 0.001 : $proportion;
     }
 
-    public function updateScoreByAccountId(int $accountId, int $apiKey, ?\Models\OperatorsRules $rulesModel = null): void {
-        $dataController = new \Controllers\Admin\Context\Data();
+    // return array of uids on each account of triggered rules
+    private function evaluateRules(array $accountIds, array $rules, int $apiKey): array {
+        $result = array_fill_keys($accountIds, []);
 
-        if ($rulesModel === null) {
-            $rulesModel = new \Models\OperatorsRules();
-        }
+        $context = [];
+        $record = [];
 
-        $this->updateTotalsByAccountIds([$accountId], $apiKey);
-
-        $context = $dataController->getContextByAccountId($accountId, $apiKey);
-        $rules = $this->getAllRulesWithOperatorValues($rulesModel, $apiKey);
-
-        [$total, $details] = $this->calculateScore($context, $rules);
-
-        $data = [
-            'apiKey'    => $apiKey,
-            'score'     => $total,
-            'details'   => json_encode($details),
-            'accountId' => $accountId,
-        ];
-
-        $model = new \Models\ApiKeys();
-        $model->getKeyById($apiKey);
-
-        $blacklistThreshold = $model->blacklist_threshold;
-        if ($total <= $blacklistThreshold) {
-            (new \Controllers\Admin\User\Data())->addToBlacklistQueue($accountId, true, $apiKey);
-        }
-
-        $dataController->updateScoreDetails($data);
-    }
-
-    public function calculateScore(array $context, array $rules): array {
-        $details = [];
-
-        \Utils\RulesClasses::loadAllRules();
-
-        if (count($context)) {
-            $ruler = new Ruler();
-            foreach ($rules as $rule) {
-                $executed = $ruler->calculateByUid($rule['uid'], $context);
-                if ($executed) {
-                    $details[] = [
-                        'uid' => $rule['uid'],
-                        'score' => $rule['value'],
-                    ];
+        foreach (array_chunk($accountIds, \Utils\Variables::getRuleUsersBatchSize()) as $batch) {
+            $context = $this->contextController->getContextByAccountIds($batch, $apiKey);
+            foreach ($batch as $user) {
+                $record = $context[$user] ?? null;
+                if ($record) {
+                    foreach ($rules as $rule) {
+                        if ($this->executeRule($rule, $record)) {
+                            $result[$user][] = $rule->uid;
+                        }
+                    }
                 }
             }
         }
 
-        $total = $this->normalizeScore($details);
+        return $result;
+    }
 
-        return [$total, $details];
+    private function executeRule(Set\BaseRule $rule, array $params): bool {
+        $executed = false;
+
+        try {
+            $rule->updateParams($params);
+            $executed = $rule->execute();
+        } catch (\Throwable $e) {
+            if (defined($rule->uid)) {
+                $model = new \Models\Rules();
+                $model->setInvalidByUid($rule->uid);
+            }
+
+            error_log('Failed to execute rule class ' . $rule->uid . ': ' . $e->getMessage());
+        }
+
+        return $executed;
+    }
+
+    public function checkRule(string $ruleUid): array {
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+
+        $model = new \Models\Users();
+        $users = $model->getAllUsersIdsOrdered($apiKey);
+        $accounts = [];
+        foreach ($users as $user) {
+            $accounts[$user['accountid']] = $user;
+        }
+        $accountIds = array_keys($accounts);
+
+        $this->buildEvaluationModels($ruleUid);
+
+        $targetRule = $this->rulesModel->getRuleWithOperatorValue($ruleUid, $apiKey);
+
+        if ($targetRule === [] || !array_key_exists($ruleUid, $this->rulesMap)) {
+            return [0, []];
+        }
+
+        $results = $this->evaluateRules($accountIds, [$this->rulesMap[$ruleUid]], $apiKey);
+        $matchingAccountIds = array_keys(array_filter($results, static function ($value): bool {
+            return $value !== [];
+        }));
+
+        $result = [];
+        foreach ($matchingAccountIds as $id) {
+            if (array_key_exists($id, $accounts)) {
+                $result[$id] = $accounts[$id];
+            }
+        }
+
+        return [count($accountIds), $result];
+    }
+
+    public function evaluateUser(int $accountId, int $apiKey, bool $preparedModels = false): void {
+        if (!$preparedModels || !$this->rulesModel) {
+            $this->buildEvaluationModels();
+        }
+
+        foreach ($this->totalModels as $model) {
+            $model->updateTotalsByAccountIds([$accountId], $apiKey);
+        }
+
+        $operatorRules = $this->getAllRulesWithOperatorValues($this->rulesModel, $apiKey);
+        $rules = array_intersect_key($this->rulesMap, $operatorRules);
+
+        $result = $this->evaluateRules([$accountId], $rules, $apiKey);
+        $uids = $result[$accountId];
+        $details = [];
+
+        foreach ($uids as $uid) {
+            $details[] = ['uid' => $uid, 'score' => $operatorRules[$uid]['value']];
+        }
+
+        $data = [
+            'score'     => $this->normalizeScore($details),
+            'details'   => json_encode($details),
+        ];
+
+        $this->userController->updateUserStatus($accountId, $data, $apiKey);
+    }
+
+    public function buildEvaluationModels(?string $uid = null): void {
+        $this->totalModels = [];
+        foreach (\Utils\Constants::get('RULES_TOTALS_MODELS') as $className) {
+            $this->totalModels[] = new $className();
+        }
+
+        $this->contextController    = new \Controllers\Admin\Context\Data();
+        $this->userController       = new \Controllers\Admin\User\Data();
+        $this->rulesModel           = new \Models\OperatorsRules();
+
+        $rb = new \Ruler\RuleBuilder();
+
+        if ($uid) {
+            $ruleObj = \Utils\RulesClasses::getSingleRuleObject($uid, $rb);
+            $this->rulesMap = $ruleObj ? [$uid => $ruleObj] : [];
+        } else {
+            $this->rulesMap = \Utils\RulesClasses::getAllRulesObjects($rb);
+        }
     }
 
     private function normalizeScore(array $data): int {
@@ -377,70 +435,6 @@ class Data extends \Controllers\Base {
         $matches = count($filterScores);
 
         return max((int) (99 - ($totalScore * (pow($matches, 1.1) - $matches + 1))), 0);
-    }
-
-    private function suspiciousUsers(Ruler $ruler, array $rule, array $users, array $context): array {
-        $suspiciousUsers = [];
-
-        $ruleObj = $ruler->buildRuleObj($rule['uid'], []);
-
-        if ($ruleObj === null) {
-            return $suspiciousUsers;
-        }
-
-        foreach ($users as $user) {
-            $record = $context[$user['accountid']] ?? null;
-            if ($record !== null && count($record)) {
-                $executed = $ruler->calculateByRule($ruleObj, $record);
-                if ($executed) {
-                    $user['score'] = $rule['value'];
-                    $suspiciousUsers[] = $user;
-                }
-            }
-        }
-
-        return $suspiciousUsers;
-    }
-
-    public function checkRule(string $ruleUid): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        $model = new \Models\Users();
-        $users = $model->getAllUsersIdsOrdered($apiKey);
-
-        $model = new \Models\OperatorsRules();
-        $targetRule = $model->getRuleWithOperatorValue($ruleUid, $apiKey);
-
-        if ($targetRule === []) {
-            return [0, []];
-        }
-
-        $suspiciousUsers = [];
-        $accountIds = [];
-        $preparedContext = [];
-        $ruler = new Ruler();
-
-        \Utils\RulesClasses::loadAllRules();
-
-        foreach (array_chunk($users, \Utils\Variables::getRuleUsersBatchSize()) as $usersBatch) {
-            $accountIds = array_column($usersBatch, 'accountid');
-            $preparedContext = $this->getContextByAccountIds($accountIds, $apiKey);
-            $suspiciousUsers = array_merge($suspiciousUsers, $this->suspiciousUsers($ruler, $targetRule, $usersBatch, $preparedContext));
-        }
-
-        return [count($users), $suspiciousUsers];
-    }
-
-    public function getContextByAccountIds(array $accountsIds, $apiKey): array {
-        $dataController = new \Controllers\Admin\Context\Data();
-
-        return $dataController->getContextByAccountIds($accountsIds, $apiKey);
-    }
-
-    public function updateTotalsByAccountIds(array $accountsIds, int $apiKey): void {
-        foreach (\Utils\Constants::get('RULES_TOTALS_MODELS') as $model) {
-            (new $model())->updateTotalsByAccountIds($accountsIds, $apiKey);
-        }
     }
 
     // only valid, not missing, with fitting attributes, returning associative array

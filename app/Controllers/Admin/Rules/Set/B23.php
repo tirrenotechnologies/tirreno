@@ -4,7 +4,7 @@ namespace Controllers\Admin\Rules\Set;
 
 class B23 extends BaseRule {
     public const NAME = 'User\'s full name contains space or hyphen';
-    public const DESCRIPTION = 'Full name contains space or hyphen, which is a rare behaviour for regular users';
+    public const DESCRIPTION = 'Full name contains space or hyphen, which is a rare behaviour for regular users.';
     public const ATTRIBUTES = [];
 
     protected function defineCondition() {

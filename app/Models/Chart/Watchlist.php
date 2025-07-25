@@ -40,7 +40,7 @@ class Watchlist extends Base {
             ON (event.ip = event_ip.id)
 
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             WHERE
                 event.key = :api_key

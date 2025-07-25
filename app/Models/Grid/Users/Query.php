@@ -19,7 +19,7 @@ class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_account.id DESC';
     protected $dateRangeField = 'event_account.lastseen';
 
-    protected $allowedColumns = ['score', 'accounttitle', 'firstname', 'lastname', 'created', 'total_visit', 'fraud', 'id'];
+    protected $allowedColumns = ['score', 'accounttitle', 'firstname', 'lastname', 'created', 'lastseen', 'fraud', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -39,12 +39,13 @@ class Query extends \Models\Grid\Base\Query {
                 event_account.reviewed,
                 event_account.firstname,
                 event_account.lastname,
-                event_account.lastseen as lastseen,
+                event_account.lastseen,
                 event_account.total_visit,
                 event_account.total_ip,
                 event_account.total_device,
                 event_account.total_country,
                 event_account.latest_decision,
+                event_account.added_to_review,
 
                 event_email.email,
                 event_email.blockemails

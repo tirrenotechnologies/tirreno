@@ -49,7 +49,7 @@ trait DateRange {
 
     public function getLatest180DatesRange(int $offset = 0): array {
         return [
-            'endDate' => date('Y-m-d 23:59:59', time() + $offset),
+            'endDate'   => date('Y-m-d 23:59:59', time() + $offset),
             'startDate' => date('Y-m-d 00:00:01', time() - (180 * 24 * 60 * 60) + $offset),
         ];
     }

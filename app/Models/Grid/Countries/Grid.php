@@ -24,36 +24,6 @@ class Grid extends \Models\Grid\Base\Grid {
         $this->query = new Query($apiKey);
     }
 
-    public function getCountriesByUserId(int $userId): array {
-        $params = ['userId' => $userId];
-
-        return $this->getGrid($this->idsModel->getCountriesIdsByUserId(), $params);
-    }
-
-    public function getCountriesByIspId(int $ispId): array {
-        $params = ['ispId' => $ispId];
-
-        return $this->getGrid($this->idsModel->getCountriesIdsByIspId(), $params);
-    }
-
-    public function getCountriesByDomainId(int $domainId): array {
-        $params = ['domainId' => $domainId];
-
-        return $this->getGrid($this->idsModel->getCountriesIdsByDomainId(), $params);
-    }
-
-    public function getCountriesByDeviceId(int $deviceId): array {
-        $params = ['deviceId' => $deviceId];
-
-        return $this->getGrid($this->idsModel->getCountriesIdsByDeviceId(), $params);
-    }
-
-    public function getCountriesByResourceId(int $resourceId): array {
-        $params = ['resourceId' => $resourceId];
-
-        return $this->getGrid($this->idsModel->getCountriesIdsByResourceId(), $params);
-    }
-
     public function getAllCountries(): array {
         return $this->getGrid();
     }

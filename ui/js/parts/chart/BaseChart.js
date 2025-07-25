@@ -2,6 +2,8 @@ import {Loader} from '../Loader.js?v=2';
 import {getQueryParams}  from '../utils/DataSource.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 import {formatIntTimeUtc} from '../utils/Date.js?v=2';
+import {fireEvent} from '../utils/Event.js?v=2';
+import {renderChartTooltipPart} from '../DataRenderers.js?v=2';
 import {
     MAX_HOURS_CHART,
     MIN_HOURS_CHART,
@@ -9,7 +11,6 @@ import {
 } from '../utils/Constants.js?v=2';
 
 export class BaseChart {
-
     constructor(chartParams) {
         this.config = chartParams;
 
@@ -54,8 +55,12 @@ export class BaseChart {
     }
 
     updateTimer() {
+        const el = document.createElement('p');
+        el.className = 'text-loader';
+
         this.loaderBlock.classList.remove('is-hidden');
-        this.loaderBlock.innerHTML = '<p class="text-loader"></p>';
+        this.loaderBlock.replaceChildren(el);
+
         const p = this.loaderBlock.querySelector('p');
 
         this.loader.start(p);
@@ -82,12 +87,17 @@ export class BaseChart {
             }
         }
 
+        fireEvent('dateFilterChangedCaught');
+
         $.ajax({
             url: '/admin/loadChart',
             type: 'get',
             data: data,
             success: (responseData, status) => this.onChartLoaded(responseData, status, data['resolution']),
             error: handleAjaxError,
+            complete: function() {
+                fireEvent('dateFilterChangedCompleted');
+            },
         });
     }
 
@@ -96,7 +106,8 @@ export class BaseChart {
             if (this.chart) {
                 this.chart.destroy();
             }
-            this.chart = new uPlot(this.getOptions(resolution), data, this.chartBlock);
+            const prepData = this.getData(data);
+            this.chart = new uPlot(this.getOptions(resolution), prepData, this.chartBlock);
 
             this.stopAnimation();
         }
@@ -116,6 +127,14 @@ export class BaseChart {
         return series;
     }
 
+    getDaySeries() {
+        return {
+            label: 'Day',
+            scale: 'DAY',
+            value: '{YYYY}-{MM}-{DD}'
+        };
+    }
+
     getAxisConfig() {
         const xAxis = {
             scale: 'DAY',
@@ -130,8 +149,8 @@ export class BaseChart {
             },
             values: [
                 //Copied from https://github.com/leeoniya/uPlot/tree/master/docs#axis--grid-opts
-                // tick incr     default        year        month    day        hour     min        sec       mode
-                [3600 * 24,     '{D}/{M}',  '\n{YYYY}',     null,    null,      null,    null,      null,        1],
+                // tick incr     default          year        month    day        hour     min        sec       mode
+                [3600 * 24,     '{DD}/{MM}',  '\n{YYYY}',     null,    null,      null,    null,      null,        1],
             ],
         };
         const yAxis = {
@@ -151,6 +170,10 @@ export class BaseChart {
             x: xAxis,
             y: yAxis,
         };
+    }
+
+    getData(data) {
+        return data;
     }
 
     getOptions(resolution = 'day', nullChar = '0') {
@@ -188,8 +211,8 @@ export class BaseChart {
         if (resolution === 'hour') {
             xAxis.scale = 'HOUR';
             xAxis.values = [
-                // tick incr default            year        month       day         hour     min        sec     mode
-                [3600,      '{HH}:{mm}', '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
+                // tick incr default                year         month         day         hour     min        sec     mode
+                [3600,      '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,      null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeHours   = (scaleMax - scaleMin) / 3600;
@@ -201,8 +224,8 @@ export class BaseChart {
         } else if (resolution === 'minute') {
             xAxis.scale = 'MINUTE';
             xAxis.values = [
-                // tick incr default            year        month       day         hour     min        sec     mode
-                [60,        '{HH}:{mm}', '\n{D}/{M}/{YY}',   null,    '\n{D}/{M}',   null,    null,      null,   1]
+                // tick incr default              year           month         day         hour     min        sec     mode
+                [60,        '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,      null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeMinutes   = (scaleMax - scaleMin) / 60;
@@ -234,10 +257,11 @@ export class BaseChart {
     }
 
     get chartBlock() {
-        return document.querySelector('.statChart');
+        return document.querySelector('.stat-chart');
     }
 
     tooltipsPlugin(opts, resolution = 'day', defaultVal = '0') {
+        let self = this;
         let seriestt;
 
         function init(u, opts, data) {
@@ -259,15 +283,10 @@ export class BaseChart {
             });
 
             over.addEventListener('mouseenter', () => {
-                const display = u.data.length > 1 ? null : 'none';
-
-                tt.style.display = display;
+                tt.style.display = u.data.length > 1 ? null : 'none';
             });
 
-            if (u.cursor.left < 0)
-                tt.style.display = 'none';
-            else
-                tt.style.display = null;
+            tt.style.display = (u.cursor.left < 0) ? 'none' : null;
         }
 
         function setCursor(u) {
@@ -288,49 +307,33 @@ export class BaseChart {
                     ts = formatIntTimeUtc(xVal * 1000, useTime);
                 }
 
-                let top;
-                let html = [];
+                let frag = document.createDocumentFragment();
+                frag.appendChild(document.createTextNode(ts.replace(/\./g, '/')));
 
-                html.push(ts.replace(/\./g, '/'));
-
-                if (u.data.length > 1) {
-                    let s1 = u.series[1];
-                    let yVal1 = u.data[1][idx];
-                    yVal1 = (yVal1 !== null && yVal1 != undefined) ? yVal1 : defaultVal;
-                    let color = u.series[1].stroke();
-                    html.push(`<span style="border-radius: 3px; color:#131220; padding: 2px 3px; background: ${color}">${s1.label}: ${yVal1}</span>`);
-                    top = u.valToPos(yVal1, s1.scale);
+                for (let i = 1; i <= 4; i++) {
+                    frag = self.extendTooltipFragment(i, idx, u.data, defaultVal, u, frag);
                 }
 
-                if (u.data.length > 2) {
-                    let s2 = u.series[2];
-                    let yVal2 = u.data[2][idx];
-                    yVal2 = (yVal2 !== null && yVal2 != undefined) ? yVal2 : defaultVal;
-                    let color = u.series[2].stroke();
-                    html.push(`<span style="border-radius: 3px; color:#131220; padding: 2px 3px; background: ${color}">${s2.label}: ${yVal2}</span>`);
-                }
+                if (frag.children.length > 1) {
+                    seriestt.replaceChildren(frag);
 
-                if (u.data.length > 3) {
-                    let s3 = u.series[3];
-                    let yVal3 = u.data[3][idx];
-                    yVal3 = (yVal3 !== null && yVal3 != undefined) ? yVal3 : defaultVal;
-                    let color = u.series[3].stroke();
-                    html.push(`<span style="border-radius: 3px; color:#131220; padding: 2px 3px; background: ${color}">${s3.label}: ${yVal3}</span>`);
-                }
+                    let val = null;
+                    let lvl = 1;
 
-                if (u.data.length > 4) {
-                    let s4 = u.series[4];
-                    let yVal4 = u.data[4][idx];
-                    yVal4 = (yVal4 !== null && yVal4 != undefined) ? yVal4 : defaultVal;
-                    let color = u.series[4].stroke();
-                    html.push(`<span style="border-radius: 3px; color:#131220; padding: 2px 3px; background: ${color}">${s4.label}: ${yVal4}</span>`);
-                }
+                    const lim = Math.min(u.data.length - 1, 4);
 
-                if (html.length > 1) {
-                    seriestt.innerHTML = html.join('<br>');
-                    let left = u.valToPos(xVal, vtp);
-                    seriestt.style.top = Math.round(top) + 'px';
-                    seriestt.style.left = Math.round(left) + 'px';
+                    for (let i = 1; i <= lim; i++) {
+                        if (u.data[i][idx] > val) {
+                            val = u.data[i][idx];
+                            lvl = i;
+                        }
+                    }
+
+                    val = (val !== null && val != undefined) ? val : defaultVal;
+
+                    seriestt.style.top = Math.round(u.valToPos(val, u.series[lvl].scale)) + 'px';
+                    //seriestt.style.top = Math.round(self.getTop(idx, u.data, defaultVal, u)) + 'px';
+                    seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
                     seriestt.style.display = null;
                 } else {
                     seriestt.style.display = 'none';
@@ -346,5 +349,18 @@ export class BaseChart {
                 setCursor,
             },
         };
+    }
+
+    extendTooltipFragment(lvl, idx, data, defaultVal, u, frag) {
+        if (data.length > lvl) {
+            let series = u.series[lvl];
+            let val = (idx !== null) ? data[lvl][idx] : data[lvl];
+            val = (val !== null && val != undefined) ? val : defaultVal;
+
+            frag.appendChild(document.createElement('br'));
+            frag.appendChild(renderChartTooltipPart(series.stroke(), series.label, val));
+        }
+
+        return frag;
     }
 }

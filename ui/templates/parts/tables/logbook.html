@@ -1,3 +1,14 @@
+<check if="{{ isset(@showChart) && 1 === @showChart }}">
+    <div class="main-graph separate-graph">
+        <check if="false !== strpos(@CURRENT_PATH, 'logbook')" >
+            <true>
+                <include href="templates/parts/forms/filtersForm.html" />
+            </true>
+        </check>
+        <div class="stat-chart"></div>
+    </div>
+</check>
+
 <div class="card events-card">
     <header class="card-header">
         <div class="card-header-title">
@@ -9,14 +20,16 @@
 
     <div class="card-table">
         <div class="content">
-
-            <include href="templates/parts/forms/searchForm.html" />
-
+            <check if="false !== strpos(@CURRENT_PATH, 'logbook')">
+                <true>
+                    <include href="templates/parts/forms/searchForm.html" />
+                </true>
+            </check>
             <table class="table" id="logbook-table">
                 <thead>
                     <tr>
                         <th class="tooltip ip-col" title="{{ @AdminLogbook_column_ip_tooltip }}">{{ @AdminLogbook_column_ip }}</th>
-                        <th class="tooltip timestamp-col" title="{{ @Base_table_column_event_timestamp_tooltip }}">{{ @Base_table_column_event_timestamp }}</th>
+                        <th class="tooltip timestamp-col" title="{{ @Base_table_column_local_timestamp_tooltip }}">{{ @Base_table_column_local_timestamp }}</th>
                         <th class="tooltip error-type-col" title="{{ @Base_table_column_error_type_tooltip }}">{{ @Base_table_column_error_type }}</th>
                         <th class="tooltip error-text-col" title="{{ @Base_table_column_error_text_tooltip }}">{{ @Base_table_column_error_text }}</th>
                     </tr>

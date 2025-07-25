@@ -65,7 +65,7 @@ class Grid extends \Models\Grid\Base\Grid {
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
-        $fields = ['time', 'lastseen', 'latest_decision'];
+        $fields = ['time', 'lastseen', 'latest_decision', 'created', 'score_updated_at'];
 
         $this->translateTimeZones($result, $fields);
     }

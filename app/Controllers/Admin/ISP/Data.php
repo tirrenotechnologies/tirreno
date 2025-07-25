@@ -47,11 +47,11 @@ class Data extends \Controllers\Base {
 
         if (array_key_exists('asn', $data)) {
             $result = [
-                'asn' => $data['asn'],
-                'total_fraud' => $data['total_fraud'],
-                'total_visit' => $data['total_visit'],
+                'asn'           => $data['asn'],
+                'total_fraud'   => $data['total_fraud'],
+                'total_visit'   => $data['total_visit'],
                 'total_account' => $data['total_account'],
-                'total_ip' => $this->getNumberOfIpsByIspId($ispId),
+                'total_ip'      => $this->getNumberOfIpsByIspId($ispId),
             ];
         }
 

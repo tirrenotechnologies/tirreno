@@ -35,7 +35,7 @@ class Grid extends \Models\Grid\Base\Grid {
 
     private function extendWithSuspiciousUrl(array $result): array {
         if (is_array($result) && count($result)) {
-            $suspiciousUrlWords = \Utils\SuspiciousUrlWords::getWords();
+            $suspiciousUrlWords = \Utils\SuspiciousWordsUrl::getWords();
             foreach ($result as &$record) {
                 $record['suspicious'] = $this->isUrlSuspicious($suspiciousUrlWords, $record['url']);
             }

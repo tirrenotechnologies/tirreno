@@ -46,7 +46,6 @@ class Page extends \Controllers\Pages\Base {
             'RESOURCE'                      => $resource,
             'PAGE_TITLE'                    => $pageTitle,
             'JS'                            => 'admin_resource.js',
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

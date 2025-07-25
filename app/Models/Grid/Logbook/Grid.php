@@ -27,18 +27,4 @@ class Grid extends \Models\Grid\Base\Grid {
     public function getAllLogbookEvents() {
         return $this->getGrid();
     }
-
-    protected function convertTimeToUserTimezone(array &$result): void {
-        $fields = ['raw_time'];
-
-        // same as translateTimeZones() but with catch to avoid error on non-timestamp values
-        $result = array_map(function ($row) use ($fields) {
-            try {
-                $this->translateTimeZone($row, $fields, true);
-            } catch (\Throwable $e) {
-            }
-
-            return $row;
-        }, $result);
-    }
 }

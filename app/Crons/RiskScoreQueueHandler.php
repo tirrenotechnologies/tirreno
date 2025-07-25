@@ -17,6 +17,7 @@ namespace Crons;
 
 class RiskScoreQueueHandler extends AbstractQueueCron {
     private \Models\OperatorsRules $rulesModel;
+    private \Controllers\Admin\Rules\Data $rulesController;
 
     public function __construct() {
         parent::__construct();
@@ -24,6 +25,9 @@ class RiskScoreQueueHandler extends AbstractQueueCron {
         $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
         $this->rulesModel = new \Models\OperatorsRules();
+
+        $this->rulesController = new \Controllers\Admin\Rules\Data();
+        $this->rulesController->buildEvaluationModels();
     }
 
     public function processQueue(): void {
@@ -35,7 +39,6 @@ class RiskScoreQueueHandler extends AbstractQueueCron {
     }
 
     protected function processItem(array $item): void {
-        $rulesController = new \Controllers\Admin\Rules\Data();
-        $rulesController->updateScoreByAccountId($item['event_account'], $item['key'], $this->rulesModel);
+        $this->rulesController->evaluateUser($item['event_account'], $item['key'], true);
     }
 }

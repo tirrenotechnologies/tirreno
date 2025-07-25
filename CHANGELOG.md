@@ -1,5 +1,20 @@
 # tirreno changelog
 
+## tirreno v0.9.7
+
+* DataTables 2.3.2
+* different type for event bars charts
+* live clock
+* new `page_error` event type
+* chart for logbook page
+* save server time zone timestamp for logbook instead of UTC
+* /assets dir for logs, custom rules and suspicious words lists
+* prevent parallel requests on daterange switch and rule play
+* use only DOM API instead of innerHTML
+* improved counties grid and map queries
+* fix timestamps localization in panels
+* enhanced .htaccess
+
 ## tirreno v0.9.6
 
 * flexible rule system

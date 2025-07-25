@@ -16,6 +16,12 @@
 namespace Controllers\Admin\Context;
 
 class Data extends \Controllers\Base {
+    private \Models\Context\Data $model;
+
+    public function __construct() {
+        $this->model = new \Models\Context\Data();
+    }
+
     public function getContextByAccountIds(array $accountIds, int $apiKey): array {
         return $this->getContext($accountIds, $apiKey);
     }
@@ -28,13 +34,6 @@ class Data extends \Controllers\Base {
     }
 
     private function getContext(array $accountIds, int $apiKey): array {
-        $model = new \Models\Context\Data();
-
-        return $model->getContext($accountIds, $apiKey);
-    }
-
-    public function updateScoreDetails(array $data): void {
-        $model = new \Models\User();
-        $model->updateScoreDetails($data);
+        return $this->model->getContext($accountIds, $apiKey);
     }
 }

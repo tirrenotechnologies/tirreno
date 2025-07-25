@@ -22,7 +22,7 @@ class Events extends Base {
         $data = $this->getFirstLine($apiKey);
 
         $timestamps = array_column($data, 'ts');
-        $line1      = array_column($data, 'normal_event_count');
+        $line1      = array_column($data, 'event_normal_type_count');
         $line2      = array_column($data, 'event_editing_type_count');
         $line3      = array_column($data, 'event_alert_type_count');
 
@@ -39,8 +39,9 @@ class Events extends Base {
             ];
         }
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        [$alertTypesParams, $alertFlatIds] = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
-        [$editTypesParams, $editFlatIds]   = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
+        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
+        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::NORMAL_EVENT_TYPES, 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
@@ -50,13 +51,14 @@ class Events extends Base {
         ];
         $params = array_merge($params, $alertTypesParams);
         $params = array_merge($params, $editTypesParams);
+        $params = array_merge($params, $normalTypesParams);
 
         $query = (
             "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(CASE WHEN event.http_code IS NULL OR event.http_code < 400 THEN TRUE END) AS normal_event_count,
-                COUNT(CASE WHEN event_type.value IN ({$editFlatIds}) AND (event.http_code IS NULL OR event.http_code < 400) THEN TRUE END) AS event_editing_type_count,
-                COUNT(CASE WHEN event.http_code >= 400 OR event_type.value IN ({$alertFlatIds}) THEN TRUE END) AS event_alert_type_count
+                COUNT(CASE WHEN event_type.value IN ({$normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
+                COUNT(CASE WHEN event_type.value IN ({$editFlatIds})    THEN TRUE END) AS event_editing_type_count,
+                COUNT(CASE WHEN event_type.value IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event

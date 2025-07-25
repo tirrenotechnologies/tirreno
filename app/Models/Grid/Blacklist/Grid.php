@@ -29,7 +29,7 @@ class Grid extends \Models\Grid\Base\Grid {
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
-        $fields = ['created'];
+        $fields = ['created', 'score_updated_at'];
 
         $this->translateTimeZones($result, $fields);
     }

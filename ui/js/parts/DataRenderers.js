@@ -1,7 +1,6 @@
 import {padZero} from './utils/Date.js?v=2';
 import {
-    truncateWithHellip,
-    escapeForHTMLAttribute,
+    //truncateWithHellip,
     getRuleClass,
     formatTime,
     openJson,
@@ -23,6 +22,7 @@ import {
     MAX_STRING_USERID_LENGTH_IN_TABLE,
     MAX_STRING_USER_NAME_IN_TABLE,
     MAX_TOOLTIP_URL_LENGTH,
+    MAX_TOOLTIP_LENGTH,
 
     USER_LOW_TRUST_SCORE_INF,
     USER_LOW_TRUST_SCORE_SUP,
@@ -35,7 +35,9 @@ import {
     NORMAL_DEVICES,
     NO_RULES_MSG,
     UNDEFINED_RULES_MSG,
-    HORIZONTAL_ELLIPSIS,
+    MIDLINE_HELLIP,
+    HELLIP,
+    HYPHEN,
 } from './utils/Constants.js?v=2';
 
 const isDashboardPage    = () => !!document.getElementById('mostActiveUsers');
@@ -57,64 +59,132 @@ const getNumberOfSymbols = (length = 'default') => {
     }
 };
 
+const tooltipWrap = (tooltip, value, wrap = true) => {
+    let node = (typeof value === 'string') ? document.createTextNode(value) : value;
+
+    let result = (wrap) ? document.createElement('span') : node;
+
+    if (wrap) {
+        result.appendChild(node);
+    }
+
+    if (tooltip !== null && tooltip !== undefined && tooltip !== '') {
+        result.classList.add('tooltip');
+        result.title = tooltip;
+    }
+
+    return result;
+};
+
+const truncateWithHellip = (value, n) => {
+    let tooltip = value;
+
+    if (value && value.length > (n + 2)) {
+        value = value.slice(0, n) + HELLIP;
+    }
+
+    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
+        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    }
+
+    return tooltipWrap(tooltip, renderDefaultIfEmpty(value), true);
+};
+
 const wrapWithCountryDiv = html => {
-    html = `<div class="flag">${html}</div>`;
-    return html;
+    let node = document.createElement('div');
+    node.className = 'flag';
+    node.appendChild(html);
+
+    return node;
 };
 
-const wrapWithImportantSpan = (html, record) => {
-    if (record.is_important) {
-        html = `<span class="important-user">${html}</span>`;
+const wrapWithImportantSpan = (span, record) => {
+    if (!record.is_important) {
+        return span;
     }
 
-    return html;
+    const el = document.createElement('span');
+    el.className = 'important-user';
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithUserLink = (html, record) => {
-    html = `<a href="/id/${record.accountid}">${html}</a>`;
-    return html;
+const wrapWithUserLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/id/${record.accountid}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithResourceLink = (html, record) => {
-    html = `<a href="/resource/${record.url_id}">${html}</a>`;
-    return html;
+const wrapWithResourceLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/resource/${record.url_id}`;
+    el.appendChild(span);
+
+    return el;
+
 };
 
-const wrapWithIpLink = (html, record) => {
-    html = `<a href="/ip/${record.ipid}">${html}</a>`;
-    return html;
+const wrapWithIpLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/ip/${record.ipid}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithIspLink = (html, record) => {
-    if (record.ispid) {
-        html = `<a href="/isp/${record.ispid}">${html}</a>`;
+const wrapWithIspLink = (span, record) => {
+    if (!record.ispid) {
+        return span;
     }
-    return html;
+
+    const el = document.createElement('a');
+    el.href = `/isp/${record.ispid}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithCountryLink = (html, record) => {
-    html = `<a href="/country/${record.serial}">${html}</a>`;
-    return html;
+const wrapWithCountryLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/country/${record.country_id}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithBotLink = (html, record) => {
-    html = `<a href="/bot/${record.id}">${html}</a>`;
-    return html;
+const wrapWithBotLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/bot/${record.id}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithPhoneLink = (html, record) => {
-    html = `<a href="/phones/${record.id}">${html}</a>`;
-    return html;
+const wrapWithPhoneLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/phones/${record.id}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithDomainLink = (html, record) => {
-    html = `<a href="/domain/${record.id}">${html}</a>`;
-    return html;
+const wrapWithDomainLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `/domain/${record.id}`;
+    el.appendChild(span);
+
+    return el;
 };
 
-const wrapWithRuleLink = (html, ruleUid) => {
-    html = `<a href="/id?ruleUid=${ruleUid}">${html}</a>`;
-    return html;
+const wrapWithRuleLink = (span, ruleUid) => {
+    const el = document.createElement('a');
+    el.href = `/id?ruleUid=${ruleUid}`;
+    el.appendChild(span);
+
+    return el;
 };
 
 /*const wrapWithFraudSpan = (html, record) => {
@@ -133,7 +203,7 @@ const normalizeTimestamp = (ts) => {
     return ts[0];
 };
 
-const renderTime = (data) => {
+const renderTimeString = (data) => {
     if (data) {
         data = normalizeTimestamp(data);
     }
@@ -163,10 +233,17 @@ const renderTime = (data) => {
         data = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
     }
 
-    return escapeForHTMLAttribute(data);
+    return data;
 };
 
-const renderTimeMs = (data) => {
+const renderTime = (data) => {
+    const span = document.createElement('span');
+    span.textContent = renderTimeString(data);
+
+    return span;
+};
+
+const renderTimeMsString = (data) => {
     let milliseconds = 0;
     if (data) {
         //Fix for ie and safari: https://www.linkedin.com/pulse/fix-invalid-date-safari-ie-hatem-ahmad
@@ -207,7 +284,14 @@ const renderTimeMs = (data) => {
     return data;
 };
 
-const renderDate = (data) => {
+const renderTimeMs = (data) => {
+    const span = document.createElement('span');
+    span.textContent = renderTimeMsString(data);
+
+    return span;
+};
+
+const renderDateString = (data) => {
     if (data) {
         data = normalizeTimestamp(data);
     } else {
@@ -231,111 +315,181 @@ const renderDate = (data) => {
         data = `${day}/${month}/${year}`;
     }
 
-    return escapeForHTMLAttribute(data);
+    return data;
+};
+
+const renderDate = (data) => {
+    const span = document.createElement('span');
+    span.textContent = renderDateString(data);
+
+    return span;
 };
 
 const renderChoicesSelectorItem = (classNames, data, innerHtml) => {
     const itemClass = data.highlighted ? classNames.highlightedState : classNames.itemSelectable;
-    const button = `<button type="button" class="${classNames.button}" aria-label="Remove item" data-button="">Remove item</button>`;
-    const html = `<div
-            class="${classNames.item} ${itemClass}"
-            data-item
-            data-id="${data.id}"
-            data-value="${data.value}"
-            ${data.active ? 'aria-selected="true"' : ''}
-            ${data.disabled ? 'aria-disabled="true"' : ''}
-        >${innerHtml}${button}</div>`;
 
-    return html;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = classNames.button;
+    button.textContent = 'Remove item';
+    button.setAttribute('aria-label', 'Remove item');
+    button.setAttribute('data-button', '');
+
+    const div = document.createElement('div');
+    div.className = `${classNames.item} ${itemClass}`;
+
+    div.setAttribute('data-item', true);
+    div.setAttribute('data-id', data.id);
+    div.setAttribute('data-value', data.value);
+
+    if (data.active) {
+        div.setAttribute('aria-selected', 'true');
+    }
+    if (data.disabled) {
+        div.setAttribute('aria-disabled', 'true');
+    }
+
+    div.appendChild(innerHtml);
+    div.appendChild(button);
+
+    return div.outerHTML;
 };
 
 const renderChoicesSelectorChoice = (classNames, data, itemSelectText, innerHtml) => {
     const choiceClass = data.disabled ? classNames.itemDisabled : classNames.itemSelectable;
-    const html = `<div
-            class="${classNames.item} ${classNames.itemChoice} ${choiceClass}"
-            data-select-text="${itemSelectText}"
-            data-choice
-            ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'}
-            data-id="${data.id}"
-            data-value="${data.value}"
-            ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}
-        >${innerHtml}</div>`;
 
-    return html;
+    const div = document.createElement('div');
+    div.className = `${classNames.item} ${classNames.itemChoice} ${choiceClass}`;
+    div.role = (data.groupId > 0) ? 'treeitem' : 'option';
+
+    div.setAttribute('data-select-text', itemSelectText);
+    div.setAttribute('data-choice', true);
+    div.setAttribute('data-id', data.id);
+    div.setAttribute('data-value', data.value);
+
+    if (data.disabled) {
+        div.setAttribute('data-choice-disabled', true);
+        div.setAttribute('aria-disabled', 'true');
+    } else {
+        div.setAttribute('data-choice-selectable', true);
+    }
+
+    div.appendChild(innerHtml);
+
+    return div.outerHTML;
+};
+
+const splitLabel = (label) => {
+    const node = document.createElement('div');
+    node.innerHTML = label;
+
+    return node.textContent.split('|');
 };
 
 const renderRuleSelectorItem = (classNames, data) => {
-    const [uid, className, title] = data.label.split('|');
-    const innerHtml = `<span class="ruleHighlight ${className}">${uid}</span>${title}`;
+    const [uid, className, title] = splitLabel(data.label);
+
+    const innerHtml = document.createDocumentFragment();
+    const span = document.createElement('span');
+    span.className = `ruleHighlight ${className}`;
+    span.textContent = uid;
+    innerHtml.appendChild(span);
+    const el = document.createTextNode(title);
+    innerHtml.appendChild(el);
 
     return renderChoicesSelectorItem(classNames, data, innerHtml);
 };
 
 const renderRuleSelectorChoice = (classNames, data, itemSelectText) => {
-    const [uid, className, title] = data.label.split('|');
-    const innerHtml = `<span class="ruleHighlight ${className}">${uid}</span>${title}`;
+    const [uid, className, title] = splitLabel(data.label);
+
+    const innerHtml = document.createDocumentFragment();
+    const span = document.createElement('span');
+    span.className = `ruleHighlight ${className}`;
+    span.textContent = uid;
+    innerHtml.appendChild(span);
+    const el = document.createTextNode(title);
+    innerHtml.appendChild(el);
 
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderEventTypeSelectorItem = (classNames, data) => {
-    const [value, name] = data.label.split('|');
-    const innerHtml = `<p class="bullet ${value}"></p>${name}`;
+    const [value, name] = splitLabel(data.label);
+
+    const innerHtml = document.createDocumentFragment();
+    const node = document.createElement('p');
+    node.className = `bullet ${value}`;
+    innerHtml.appendChild(node);
+    const el = document.createTextNode(name);
+    innerHtml.appendChild(el);
 
     return renderChoicesSelectorItem(classNames, data, innerHtml);
 };
 
 const renderEventTypeSelectorChoice = (classNames, data, itemSelectText) => {
-    const [value, name] = data.label.split('|');
-    const innerHtml = `<p class="bullet ${value}"></p>${name}`;
+    const [value, name] = splitLabel(data.label);
+
+    const innerHtml = document.createDocumentFragment();
+    const node = document.createElement('p');
+    node.className = `bullet ${value}`;
+    innerHtml.appendChild(node);
+    const el = document.createTextNode(name);
+    innerHtml.appendChild(el);
 
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderIpTypeSelectorItem = (classNames, data) => {
-    const value = data.label;
-    const innerHtml = `<span>${value}</span>`;
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
 
     return renderChoicesSelectorItem(classNames, data, innerHtml);
 };
 
 const renderIpTypeSelectorChoice = (classNames, data, itemSelectText) => {
-    const value = data.label;
-    const innerHtml = `<span>${value}</span>`;
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
 
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderEntityTypeSelectorItem = (classNames, data) => {
-    const value = data.label;
-    const innerHtml = `<span>${value}</span>`;
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
 
     return renderChoicesSelectorItem(classNames, data, innerHtml);
 };
 
 const renderEntityTypeSelectorChoice = (classNames, data, itemSelectText) => {
-    const value = data.label;
-    const innerHtml = `<span>${value}</span>`;
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
 
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderScoresRangeSelectorItem = (classNames, data) => {
-    const [bottom, top] = data.label.split('|');
-    const innerHtml = `<span>${bottom} - ${top}</span>`;
+    const [bottom, top] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = `${bottom} - ${top}`;
 
     return renderChoicesSelectorItem(classNames, data, innerHtml);
 };
 
 const renderScoresRangeSelectorChoice = (classNames, data, itemSelectText) => {
-    const [bottom, top] = data.label.split('|');
-    const innerHtml = `<span>${bottom} - ${top}</span>`;
+    const [bottom, top] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = `${bottom} - ${top}`;
 
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
 const renderHttpCode = record => {
-    let html;
+    let span = null;
     const code = record.http_code;
 
     if (code) {
@@ -363,79 +517,89 @@ const renderHttpCode = record => {
         }
 
         let style = (code < 400) ? 'nolight' : 'highlight';
-        html = `<span class="tooltip ${style} ${record.http_code}" title="${tooltip}">${record.http_code}</span>`;
+
+        span = document.createElement('span');
+        span.className = `${style} ${record.http_code}`;
+        span.textContent = record.http_code;
+
+        span = tooltipWrap(tooltip, span, false);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderHttpMethod = record => {
-    let html;
+    let span = null;
 
     const type = record.http_method;
     if (type) {
         let style = (type === 'POST' || type === 'GET') ? 'nolight' : 'highlight';
-        html = `<span class="${style}">${escapeForHTMLAttribute(type)}</span>`;
+        span = document.createElement('span');
+        span.className = style;
+        span.textContent = type;
     }
 
-    html = renderDefaultIfEmpty(html);
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderTotalFrame = (base, val) => {
-    const rest = (base !== null && base !== undefined && base > 0 && base >= val) ? (base - val) : HORIZONTAL_ELLIPSIS;
-    return (parseInt(base, 10) > parseInt(val, 10)) ? `<span class="addlight">${val}/</span>${rest}` : base;
+    const frag = document.createDocumentFragment();
+
+    if (parseInt(base, 10) > parseInt(val, 10)) {
+        const rest = (base !== null && base !== undefined && base > 0 && base >= val) ? (base - val) : MIDLINE_HELLIP;
+        const span = document.createElement('span');
+        span.className = 'addlight';
+        span.textContent = val + '/';
+
+        frag.appendChild(span);
+        frag.appendChild(document.createTextNode(rest));
+    } else {
+        frag.appendChild(document.createTextNode(base));
+    }
+
+    return frag;
 };
 
 const renderUserCounter = (data, critical = 1) => {
-    let html;
+    let span = null;
 
     if (Number.isInteger(data) && data >= 0) {
         let style = (data >= critical) ? 'highlight' : 'nolight';
-        html = `<span class="${style}">${data}</span>`;
+        span = document.createElement('span');
+        span.className = style;
+        span.textContent = data;
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
-};
-
-const checkErrorEventType = record => {
-    return {
-        event_type_name: (!record.http_code || record.http_code < 400) ? record.event_type_name : `Error ${record.http_code}`,
-        event_type: (!record.http_code || record.http_code < 400) ? record.event_type: 'error'
-    };
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderBoolean = (data) => {
-    let value = null;
+    let node = document.createElement('span');
 
-    if (false === data) {
-        value = '<span class="nolight">No</span>';
+    if (data === false) {
+        node.className = 'nolight';
+        node.textContent = 'No';
+    } else if (data === true) {
+        node.className = 'highlight';
+        node.textContent = 'Yes';
+    } else {
+        node.textContent = HYPHEN;
     }
 
-    if (true === data) {
-        value = '<span class="highlight">Yes</span>';
-    }
-
-    value = renderDefaultIfEmpty(value);
-
-    return value;
+    return node;
 };
 
 const renderProportion = (n, t) => {
     const number = (typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 100)
         ? (n > 0.0 && n < 1.0 ? '<1%' : `${Math.floor(n)}%`)
         : '&minus;';
-    const tooltip = t ? `Last updated: ${renderDate(t)}` : '&minus;';
+    const tooltip = t ? `Last updated: ${renderDateString(t)}` : '\u2212';
 
-    return `<span class="tooltip" title="${tooltip}">${number}</span>`;
+    return tooltipWrap(tooltip, number, true);
 };
 
 const renderUserScore = record => {
-    let score = (record.score !== null && record.score !== undefined) ? record.score : '&minus;';
+    let score = (record.score !== null && record.score !== undefined) ? record.score : '\u2212';
     let cls = 'empty';
 
     if (record.fraud !== undefined && record.fraud !== null) {
@@ -455,40 +619,38 @@ const renderUserScore = record => {
         }
     }
 
-    let html = `<span class="ignore-select score ${cls}">${score}</span>`;
-    const lastUpdate = `Last updated: ${renderDate(record.score_updated_at)}`;
-    html = `<span class="tooltip" title="${lastUpdate}">${html}</span>`;
+    const span = document.createElement('span');
+    span.className = `ignore-select score ${cls}`;
+    span.textContent = score;
 
-    return html;
+    const lastUpdate = `Last updated: ${renderDateString(record.score_updated_at)}`;
+
+    return tooltipWrap(lastUpdate, span, true);
 };
 
 //User
 const renderUserId = (value) => {
-    let html = '';
+    let span = null;
 
     if (value) {
-        html = truncateWithHellip(value, MAX_STRING_USERID_LENGTH_IN_TABLE);
+        span = truncateWithHellip(value, MAX_STRING_USERID_LENGTH_IN_TABLE);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderUser = (record, length = 'default') => {
-    let html;
+    let span = null;
     const n = getNumberOfSymbols(length);
     const email = record.email;
 
     if (email) {
-        html = truncateWithHellip(email, n);
+        span = truncateWithHellip(email, n);
     } else if (record.accounttitle) {
-        html = renderUserId(record.accounttitle);
+        span = renderUserId(record.accounttitle);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderImportantUser = (record, length = 'default') => {
@@ -505,7 +667,7 @@ const renderClickableUser = (record, length = 'long') => {
     return html;
 };
 
-const renderClikableImportantUser = (record, length = 'default') => {
+const renderClickableImportantUser = (record, length = 'default') => {
     const user = renderClickableUser(record, length);
     const html = wrapWithImportantSpan(user, record);
 
@@ -513,13 +675,19 @@ const renderClikableImportantUser = (record, length = 'default') => {
 };
 
 const renderUserWithScore = (record, length = 'default') => {
-    const score = renderUserScore(record);
-    return `${score}${renderUser(record, length)}`;
+    const frag = document.createDocumentFragment();
+    frag.appendChild(renderUserScore(record));
+    frag.appendChild(renderUser(record, length));
+
+    return frag;
 };
 
 const renderClickableImportantUserWithScore = (record, length = 'default') => {
-    const score = renderUserScore(record);
-    return `${score}${renderClikableImportantUser(record, length)}`;
+    const frag = document.createDocumentFragment();
+    frag.appendChild(renderUserScore(record));
+    frag.appendChild(renderClickableImportantUser(record, length));
+
+    return frag;
 };
 
 const renderClickableImportantUserWithScoreTile = (record) => {
@@ -527,26 +695,39 @@ const renderClickableImportantUserWithScoreTile = (record) => {
 };
 
 const renderSession = (record) => {
-    let result = '<span class="angrt">&angrt;</span>';
+    let result = null;
 
     if (record.session_cnt) {
         const cnt = record.session_cnt;
-        const max_t = renderTime(record.session_max_t).split(' ');
-        const min_t = renderTime(record.session_min_t).split(' ');
+        const max_t = renderTimeString(record.session_max_t).split(' ');
+        const min_t = renderTimeString(record.session_min_t).split(' ');
         let value = `${cnt} action`;
         value += (cnt > 1) ? `s (${formatTime(record.session_duration)})` : '';
         const tooltip = (cnt > 1) ? `${min_t[0]} ${min_t[1] || ''} - ${max_t[1] || ''}` : `${max_t[0]} ${max_t[1] || ''}`;
-        result = `<span class="tooltip" title="${tooltip}">${value}</span>`;
+        const el = document.createTextNode(value);
+        result = tooltipWrap(tooltip, el, true);
+    } else {
+        result = renderAngrtSpan();
     }
 
     return result;
+};
+
+const renderAngrtSpan = () => {
+    const span = document.createElement('span');
+    span.className = 'angrt';
+    span.textContent = '\u221F';
+
+    return span;
 };
 
 const renderUserForEvent = (record, length, sessionGroup, singleUser) => {
     if (!sessionGroup) return renderUserWithScore(record, length);  // regular events
     if (singleUser) return renderSession(record);                   // events on /user/abc page
 
-    return (record.session_cnt) ? renderUserWithScore(record, length) : '<span class="angrt">&angrt;</span>'; // events on /event page
+    if (record.session_cnt) return renderUserWithScore(record, length); // events on /event page
+
+    return renderAngrtSpan();
 };
 
 const renderTimestampForEvent = (record, sessionGroup, singleUser) => {
@@ -556,180 +737,207 @@ const renderTimestampForEvent = (record, sessionGroup, singleUser) => {
 };
 
 const renderUserFirstname = record => {
-    let html;
-    const name = record.firstname;
+    let span = null;
+    let name = record.firstname;
 
     if (name) {
-        html = name.replace(
+        name = name.replace(
             /\b\w+/g,
             function(txt) {
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             }
         );
 
-        html = truncateWithHellip(html, MAX_STRING_USER_NAME_IN_TABLE);
+        span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderUserLastname = record => {
-    let html;
-    const name = record.lastname;
+    let span = null;
+    let name = record.lastname;
 
     if (name) {
-        html = name.replace(
+        name = name.replace(
             /\b\w+/g,
             function(txt) {
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             }
         );
 
-        html = truncateWithHellip(html, MAX_STRING_USER_NAME_IN_TABLE);
+        span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderUserReviewedStatus = record => {
-    let html = '<span class="reviewstatus">Not reviewed</span>';
-    let latestDecision = renderDate(record.latest_decision);
+    let span = document.createElement('span');
 
     if (record.fraud !== null) {
         const reviewStatus = (record.fraud) ? 'Blacklisted' : 'Whitelisted';
-        html = `<span class="tooltip reviewstatus ${reviewStatus}" title="${latestDecision}">${reviewStatus}</span>`;
+        const latestDecision = renderDateString(record.latest_decision);
+
+        span.className = `reviewstatus ${reviewStatus}`;
+        span.textContent = reviewStatus;
+        span = tooltipWrap(latestDecision, span, false);
+    } else if (record.added_to_review !== null) {
+        span.className = 'reviewstatus in-review';
+        span.textContent = 'In review';
+    } else {
+        span.className = 'reviewstatus';
+        span.textContent = 'Normal';
     }
 
-    return html;
+    return span;
 };
 
-const renderUserActionButtons = record => {
+const renderUserActionButtons = (record, small = true) => {
     let html;
     if (record.reviewed) {
-        html = getFraudLegitButtons(record);
+        html = getFraudLegitButtons(record, small);
     } else {
-        html = getToBeReviewedButton(record);
+        html = getToBeReviewedButton(record, small);
     }
 
     return html;
 };
 
 const renderBlacklistButtons = record => {
-    const html = `<button
-        class="button is-small dark-loader"
-        data-item-id="${record.entity_id}"
-        data-item-type="${record.type}"
-        data-button-type="deleteButton"
-        type="button">Remove</button>`;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'button is-small dark-loader';
+    button.textContent = 'Remove';
+    button.setAttribute('data-item-id', record.entity_id);
+    button.setAttribute('data-item-type', record.type);
+    button.setAttribute('data-button-type', 'deleteButton');
 
-    return html;
+    return button;
 };
 
-const getFraudLegitButtons = record => {
+const getFraudLegitButtons = (record, small = true) => {
     let fraudBtnCls = 'is-neutral';
     let legitBtnCls = 'is-neutral';
-
-    let fraudBtnDisabled = '';
-    let legitBtnDisabled = '';
 
     if (true === record.fraud) {
         fraudBtnCls = 'is-highlighted';
         legitBtnCls = 'is-neutral';
-
-        fraudBtnDisabled = 'disabled';
-        legitBtnDisabled = '';
     }
 
     if (false === record.fraud) {
         fraudBtnCls = 'is-neutral';
         legitBtnCls = 'is-highlighted';
-
-        fraudBtnDisabled = '';
-        legitBtnDisabled = 'disabled';
     }
 
-    const whitelistButton = `<button
-            class="button is-small light-loader ${legitBtnCls}"
-            data-type="legit"
-            data-user-id="${record.accountid}"
-            data-button-type="fraudButton"
-            ${legitBtnDisabled}
-            type="button">Whitelist</button>`;
-    const blacklistButton = `<button
-            class="button is-small light-loader ${fraudBtnCls}"
-            data-type="fraud"
-            data-user-id="${record.accountid}"
-            data-button-type="fraudButton"
-            ${fraudBtnDisabled}
-            type="button">Blacklist</button>`;
+    const whitelistButton = document.createElement('button');
+    whitelistButton.type = 'button';
+    whitelistButton.className = `button light-loader ${legitBtnCls}` + ((small) ? ' is-small' : '');
+    whitelistButton.textContent = 'Whitelist';
+    if (record.fraud === false) {
+        whitelistButton.disabled = true;
+    }
+    whitelistButton.setAttribute('data-type', 'legit');
+    whitelistButton.setAttribute('data-user-id', record.accountid);
+    whitelistButton.setAttribute('data-button-type', 'fraudButton');
 
-    const html = `<div class="legitfraud">${whitelistButton}${blacklistButton}</div>`;
+    const blacklistButton = document.createElement('button');
+    blacklistButton.type = 'button';
+    blacklistButton.className = `button light-loader ${fraudBtnCls}` + ((small) ? ' is-small' : '');
+    blacklistButton.textContent = 'Blacklist';
+    if (record.fraud === true) {
+        blacklistButton.disabled = true;
+    }
+    blacklistButton.setAttribute('data-type', 'fraud');
+    blacklistButton.setAttribute('data-user-id', record.accountid);
+    blacklistButton.setAttribute('data-button-type', 'fraudButton');
 
-    return html;
+    const div = document.createElement('div');
+    div.className = 'legitfraud';
+    div.appendChild(whitelistButton);
+    div.appendChild(blacklistButton);
+
+    return div;
 };
 
-const getToBeReviewedButton = record => {
-    const html = `<button
-        class="reviewed button is-small dark-loader"
-        data-type="reviewed"
-        data-user-id="${record.accountid}"
-        data-button-type="reviewedButton"
-        type="button">Not reviewed</button>`;
+const getToBeReviewedButton = (record, small = true) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'reviewed button dark-loader' + ((small) ? ' is-small' : '');
+    button.textContent = 'Not reviewed';
 
-    return html;
+    button.setAttribute('data-type', 'reviewed');
+    button.setAttribute('data-user-id', record.accountid);
+    button.setAttribute('data-button-type', 'reviewedButton');
+
+    return button;
 };
 
 const renderScoreDetails = record => {
     if (!record.score_calculated) {
-        return `<span class="tooltip no-rules-tile" title="${UNDEFINED_RULES_MSG.tooltip}">${UNDEFINED_RULES_MSG.value}</span>`;
+        const span = document.createElement('span');
+        span.className = 'no-rules-tile';
+        span.textContent = UNDEFINED_RULES_MSG.value;
+
+        return tooltipWrap(UNDEFINED_RULES_MSG.tooltip, span, true);
     }
 
-    // record should be an array
-    let html = '';
-
+    const frag = document.createDocumentFragment();
     const details = record.score_details;
 
     if (Array.isArray(details)) {
         let uid = '';
         let descr = '';
         let name = '';
-        let part = '';
+        //let part = '';
         for (let i = 0; i < details.length; i++) {
             uid = (details[i].uid !== null && details[i].uid !== undefined) ? details[i].uid : '';
             descr = (details[i].descr !== null && details[i].descr !== undefined) ? details[i].descr : '';
             name = (details[i].name!== null && details[i].name !== undefined) ? details[i].name : '';
-            part = `<p><span class="ruleHighlight ${getRuleClass(details[i].score)}"
-                >${uid}</span>&nbsp;<span class="ruleName tooltip" title="${descr}">${name}</span></p>`;
-            html += wrapWithRuleLink(part, uid);
+
+            const span = document.createElement('span');
+            span.className = `ruleHighlight ${getRuleClass(details[i].score)}`;
+            span.textContent = uid;
+
+            const el = document.createTextNode('\u00A0');
+
+            let t = document.createElement('span');
+            t.className = 'ruleName';
+            t.textContent = name;
+            t = tooltipWrap(descr, t, false);
+
+            const part = document.createElement('p');
+            part.appendChild(span);
+            part.appendChild(el);
+            part.appendChild(t);
+
+            frag.appendChild(wrapWithRuleLink(part, uid));
         }
     }
 
-    if (!html) {
-        html = `<span class="tooltip no-rules-tile" title="${NO_RULES_MSG.tooltip}">${NO_RULES_MSG.value}</span>`;
+    if (!frag.childNodes.length) {
+        const span = document.createElement('span');
+        span.className = 'no-rules-tile';
+        span.textContent = NO_RULES_MSG.value;
+
+        return tooltipWrap(NO_RULES_MSG.tooltip, span, false);
     }
 
-    return html;
+    return frag;
 };
 
 //Email
 const renderEmail = (record, length = MAX_STRING_LENGTH_FOR_EMAIL) => {
-    let html;
+    let span = null;
     const email = record.email;
 
     if (email) {
         const n = (length === MAX_STRING_LENGTH_FOR_EMAIL) ? length : getNumberOfSymbols(length);
 
-        const value = truncateWithHellip(email, n);
-
-        html = `${value}`;
+        span = truncateWithHellip(email, n);
     }
 
-    html = renderDefaultIfEmpty(html);
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderClickableEmail = record => {
@@ -738,9 +946,7 @@ const renderClickableEmail = record => {
     //Overwrite ID attribute, because we are going to wrap it with domain link, not email
     record.id = record.domain_id;
 
-    const html = wrapWithDomainLink(email, record);
-
-    return html;
+    return wrapWithDomainLink(email, record);
 };
 
 const renderReputation = record => {
@@ -754,32 +960,50 @@ const renderReputation = record => {
     if ('medium' === reputation) icon = 'reputation-medium';
     if ('high' === reputation)   icon = 'reputation-high';
 
-    const html = `<img class="tooltip" title="${reputation}" src="/ui/images/icons/${icon}.svg" alt="${reputation}">${text}`;
+    const frag = document.createDocumentFragment();
+    const img = document.createElement('img');
+    img.src = `/ui/images/icons/${icon}.svg`;
+    img.alt = reputation;
+    frag.appendChild(tooltipWrap(reputation, img, false));
 
-    return html;
+    if (reputation !== 'none') {
+        const el = document.createTextNode(reputation.charAt(0).toUpperCase() + reputation.slice(1));
+        frag.appendChild(el);
+    }
+
+    return frag;
 };
 
 //Phone
 const renderPhone = (record) => {
-    let html;
+    let result;
     const phone = record.phonenumber;
 
     if (phone) {
-        const code = !COUNTRIES_EXCEPTIONS.includes(record.country) ? escapeForHTMLAttribute(record.country) : 'lh';
-        const tooltip = (record.full_country !== null && record.full_country !== undefined) ? escapeForHTMLAttribute(record.full_country) : '';
+        const code = !COUNTRIES_EXCEPTIONS.includes(record.country_iso) ? record.country_iso : 'lh';
+        const tooltip = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
 
         const n       = MAX_STRING_LENGTH_FOR_PHONE;
         const number  = truncateWithHellip(phone, n);
 
-        const flag    = `<span class="tooltip" title="${tooltip}"
-            ><img src="/ui/images/flags/${code.toLowerCase()}.svg" alt="${tooltip}"></span>`;
+        const frag = document.createDocumentFragment();
 
-        html = `${flag}${number}`;
-        html = wrapWithCountryDiv(html);
+        const img = document.createElement('img');
+        img.src = `/ui/images/flags/${code.toLowerCase()}.svg`;
+        img.alt = tooltip;
+
+        frag.appendChild(tooltipWrap(tooltip, img, true));
+        frag.appendChild(number);
+
+        result = wrapWithCountryDiv(frag);
+    } else {
+        const div = document.createElement('div');
+        div.textContent = HYPHEN;
+
+        result = div;
     }
 
-    html = renderDefaultIfEmpty(html);
-    return html;
+    return result;
 };
 
 const renderClickablePhone = record => {
@@ -790,52 +1014,52 @@ const renderClickablePhone = record => {
 };
 
 const renderFullCountry = value => {
-    let html = '&#65293;';
-    if (value) {
-        html = truncateWithHellip(value, MAX_STRING_LENGTH_FULL_COUNTRY);
-    }
-    return html;
+    return renderDefaultIfEmptySpan(truncateWithHellip(value, MAX_STRING_LENGTH_FULL_COUNTRY));
 };
 
 const renderPhoneCarrierName = (record, length = 'medium') => {
-    let html;
+    let span = null;
     let carrierName = record.carrier_name;
 
     if (carrierName) {
         const n = getNumberOfSymbols(length);
         carrierName = carrierName.replace(',', '');
-        html = truncateWithHellip(carrierName, n);
+        span = truncateWithHellip(carrierName, n);
     }
 
-    html = renderDefaultIfEmpty(html);
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderPhoneType = record => {
-    let html;
     const type = record.type;
+    let span = null;
 
     if (type) {
         let src = 'smartphone.svg';
         if (['landline', 'FIXED_LINE', 'FIXED_LINE_OR_MOBILE', 'TOLL_FREE', 'SHARED_COST'].includes(type)) src = 'landline.svg';
         if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
 
-        const tooltip = escapeForHTMLAttribute(type.toLowerCase().replace(/_/g, ' '));
+        const tooltip = type.toLowerCase().replace(/_/g, ' ');
 
-        html = `<span class="tooltip" title="${tooltip}"><img src="/ui/images/icons/${src}"/></span>`;
+        const img = document.createElement('img');
+        img.src = `/ui/images/icons/${src}`;
+
+        span = tooltipWrap(tooltip, img, true);
     }
-    html = renderDefaultIfEmpty(html);
 
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderUsersList = (data) => {
     // data should be an array
-    let html = '';
-    if (Array.isArray(data)) {
-        let userHtml = '';
+    //let html = '';
+
+    const frag = document.createDocumentFragment();
+
+    if (Array.isArray(data)) {;
+        let user = null;
         for (let i = 0; i < data.length; i++) {
-            userHtml = renderClickableImportantUserWithScore(
+            user = renderClickableImportantUserWithScore(
                 {
                     accountid:          data[i].accountid,
                     accounttitle:       data[i].accounttitle,
@@ -844,25 +1068,29 @@ const renderUsersList = (data) => {
                     score:              data[i].score,
                 },
                 'long');
-            html += `<div>${userHtml}</div>`;
+            const div = document.createElement('div');
+            div.appendChild(user);
+            frag.append(div);
         }
     }
-    html = renderDefaultIfEmpty(html);
 
-    return html;
+    if (frag.childNodes.length) {
+        return frag;
+    }
+
+    return renderDefaultIfEmptySpan(null);
 };
 
 //Resource
 const renderResource = (value, tooltip) => {
     const n = getNumberOfSymbols();
     value = value ? value : '/';
-    tooltip = tooltip ? escapeForHTMLAttribute(tooltip) : '/';
-    value = truncateWithHellip(value, n);
+    tooltip = tooltip ? tooltip : '/';
 
-    //Create a tooltip data with full url
-    value = value.replace(/title=".*?"/, `title="${tooltip}"`);
+    const el = truncateWithHellip(value, n);
+    el.title = tooltip;
 
-    return value;
+    return el;
 };
 
 const renderResourceWithoutQuery = record => {
@@ -872,9 +1100,8 @@ const renderResourceWithoutQuery = record => {
     }
 
     const tooltip  = record.url;
-    const resource = renderResource(value, tooltip);
 
-    return resource;
+    return renderResource(value, tooltip);
 };
 
 const renderResourceWithQueryAndEventType = record => {
@@ -883,19 +1110,21 @@ const renderResourceWithQueryAndEventType = record => {
         url += record.query;
     }
 
-    let tooltip = '';
-    if (url.length > MAX_TOOLTIP_URL_LENGTH) {
-        tooltip = `${escapeForHTMLAttribute(url.slice(0, MAX_TOOLTIP_URL_LENGTH))}&hellip;`;
-    } else {
-        tooltip = escapeForHTMLAttribute(url);
+    let tooltip = url;
+    if (url && url.length > MAX_TOOLTIP_URL_LENGTH) {
+        tooltip = url.slice(0, MAX_TOOLTIP_URL_LENGTH) + HELLIP;
     }
 
-    const event_type = checkErrorEventType(record);
+    const frag = document.createDocumentFragment();
 
-    const html = `<p class="bullet ${event_type.event_type} tooltip" title="${tooltip}"
-        ></p><span class="tooltip" title="${tooltip}">${event_type.event_type_name}</span>`;
+    const el = document.createElement('p');
+    el.className = `bullet ${record.event_type}`;
+    frag.appendChild(tooltipWrap(tooltip, el, false));
 
-    return html;
+    const text = document.createTextNode(record.event_type_name);
+    frag.appendChild(tooltipWrap(tooltip, text, true));
+
+    return frag;
 };
 
 const renderClickableResourceWithoutQuery = record => {
@@ -909,14 +1138,15 @@ const renderClickableResourceWithoutQuery = record => {
 const renderIp = record => {
     const n = getNumberOfSymbols();
 
-    let html = truncateWithHellip(record.ip, n);
-    let name = escapeForHTMLAttribute(record.isp_name);
-    if (name) {
-        html = html.replace(/title=".*?"/, `title="${name}"`);
+    let span = truncateWithHellip(record.ip, n);
+
+    if (record.isp_name) {
+        span.title = record.isp_name;
     }
+
     //html = wrapWithFraudSpan(html, record);
 
-    return html;
+    return span;
 };
 
 const renderClickableIp = record => {
@@ -927,16 +1157,28 @@ const renderClickableIp = record => {
 };
 
 const renderIpAndFlag = (ip, record) => {
-    const countryCode = record.country;
+    const countryCode = record.country_iso;
     const code = !COUNTRIES_EXCEPTIONS.includes(countryCode) ? countryCode.toLowerCase() : 'lh';
     const iso = (countryCode !== null && countryCode !== undefined) ? countryCode : '';
 
-    const net = escapeForHTMLAttribute(record.isp_name);
+    const net = record.isp_name;
     const tooltip = (net !== null && net !== undefined && net !== '') ? `${iso} - ${net}` : `${iso}`;
     const alternative = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
-    const flag = `<img src="/ui/images/flags/${code}.svg" alt="${alternative}">`;
 
-    return wrapWithCountryDiv(`<span class="tooltip" title="${tooltip}">${flag}<span>${ip}</span>`);
+    const frag = document.createDocumentFragment();
+
+    const img = document.createElement('img');
+    img.src = `/ui/images/flags/${code}.svg`;
+    img.alt = alternative;
+    frag.appendChild(img);
+
+    const span = document.createElement('span');
+    span.appendChild(ip);
+    frag.appendChild(span);
+
+    const result = tooltipWrap(tooltip, frag, true);
+
+    return wrapWithCountryDiv(result);
 };
 
 const renderIpWithCountry = record => {
@@ -944,10 +1186,12 @@ const renderIpWithCountry = record => {
     const n = getNumberOfSymbols();
 
     if (ip && ip.length > n) {
-        ip = `${ip.slice(0, n)}&hellip;`;
+        ip = ip.slice(0, n) + HELLIP;
     }
 
-    return renderIpAndFlag(ip, record);
+    const el = document.createTextNode(ip);
+
+    return renderIpAndFlag(el, record);
 };
 
 const renderClickableIpWithCountry = record => {
@@ -955,12 +1199,12 @@ const renderClickableIpWithCountry = record => {
     const n = getNumberOfSymbols();
 
     if (ip && ip.length > n) {
-        ip = `${ip.slice(0, n)}&hellip;`;
+        ip = ip.slice(0, n) + HELLIP;
     }
 
-    ip = wrapWithIpLink(ip, record);
+    const el = document.createTextNode(ip);
 
-    return renderIpAndFlag(ip, record);
+    return renderIpAndFlag(wrapWithIpLink(el, record), record);
 };
 
 const renderIpType = record => {
@@ -979,20 +1223,23 @@ const renderIpType = record => {
     const ipType  = record.ip_type.toLowerCase().replace(' ', '_');
     const tooltip = (tooltipMap[ipType] !== null && tooltipMap[ipType] !== undefined) ? tooltipMap[ipType] : record.ip_type;
 
-    const html = `<span class="tooltip iptype ${ipType}" title="${tooltip}">${record.ip_type}</span>`;
+    const span = document.createElement('span');
+    span.className = `iptype ${ipType}`;
+    span.textContent = record.ip_type;
 
-    return html;
+    return tooltipWrap(tooltip, span, false);
 };
 
 //Net
 const renderNetName = (record, length = 'default') => {
-    let html = record.netname || record.description || record.asn || '';
+    let name = record.netname || record.description || record.asn || '';
+    let span = null;
 
-    if (html) {
+    if (name) {
         const regex = /-|_/ig;
-        html = html.replace(regex, ' ');
+        name = name.replace(regex, ' ');
 
-        html = html.replace(
+        name = name.replace(
             /\b\w+/g,
             function(txt) {
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -1000,26 +1247,25 @@ const renderNetName = (record, length = 'default') => {
         );
 
         //TODO: move to constants
-        html = truncateWithHellip(html, length == 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE);
+        span = truncateWithHellip(name, length == 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderCidr = record => {
-    let cidr = record.cidr;
-    cidr = renderDefaultIfEmpty(cidr);
+    const span = document.createElement('span');
+    span.textContent = renderDefaultIfEmpty(record.cidr);
 
-    return cidr;
+    return span;
 };
 
 const renderAsn = record => {
-    let asn = (ASN_OVERRIDE[record.asn] !== undefined) ? ASN_OVERRIDE[record.asn] : record.asn;
-    asn = renderDefaultIfEmpty(asn);
+    const asn = (ASN_OVERRIDE[record.asn] !== undefined) ? ASN_OVERRIDE[record.asn] : record.asn;
+    const span = document.createElement('span');
+    span.textContent = renderDefaultIfEmpty(asn);
 
-    return asn;
+    return span;
 };
 
 const renderClickableAsn = record => {
@@ -1033,67 +1279,67 @@ const renderClickableAsn = record => {
 const renderCountry = (code, value, tooltip) => {
     code = !COUNTRIES_EXCEPTIONS.includes(code) ? code : 'lh';
     value = (value !== null && value !== undefined) ? value : '';
-    tooltip = (tooltip !== null && tooltip !== undefined) ? tooltip : '';
 
-    const country = `<img src="/ui/images/flags/${code.toLowerCase()}.svg" alt="${tooltip}"
-        ><span class="tooltip" title="${tooltip}">${value}</span>`;
-    const html = wrapWithCountryDiv(country);
+    const frag = document.createDocumentFragment();
 
-    return html;
+    const img = document.createElement('img');
+    img.src = `/ui/images/flags/${code.toLowerCase()}.svg`;
+    img.alt = tooltip ? tooltip : value;
+    frag.appendChild(img);
+
+    const span = tooltipWrap(tooltip, value, true);
+    frag.appendChild(span);
+
+    return wrapWithCountryDiv(frag);
 };
 
-const renderCountryFull = record => {
-    const code    = record.country;
+const renderCountryFull = (record, applyTooltip = true) => {
+    const code    = record.country_iso;
     const value   = record.full_country;
-    const tooltip = record.full_country;
+    const tooltip = applyTooltip ? record.full_country : null;
 
-    const html = renderCountry(code, value, tooltip);
-
-    return html;
+    return renderCountry(code, value, tooltip);
 };
 
 const renderCountryIso = record => {
-    const code    = record.country;
-    const value   = record.country;
+    const code    = record.country_iso;
+    const value   = record.country_iso;
     const tooltip = record.full_country;
 
-    const html = renderCountry(code, value, tooltip);
-
-    return html;
+    return renderCountry(code, value, tooltip);
 };
 
-const renderClickableCountry = record => {
-    const country = renderCountryFull(record);
-    const html = wrapWithCountryLink(country, record);
+const renderClickableCountry = (record, applyTooltip = true) => {
+    const country = renderCountryFull(record, applyTooltip);
 
-    return html;
+    return wrapWithCountryLink(country, record);
 };
 
 const renderClickableCountryName = record => {
     const value   = record.full_country;
     const country = (value !== null && value !== undefined) ? value : '';
-    const html = wrapWithCountryLink(country, record);
 
-    return html;
+    const el = document.createTextNode(country);
+
+    return wrapWithCountryLink(el, record);
 };
 
 const renderClickableCountryTruncated = record => {
     const fullValue = record.full_country;
     let value   = record.full_country;
     value = (value !== null && value !== undefined) ? value : '';
-    value = value.length <= MAX_STRING_LENGTH_FOR_TILE ? value : record.country;
+    value = value.length <= MAX_STRING_LENGTH_FOR_TILE ? value : record.country_iso;
 
-    const country = `<span class="tooltip" title="${fullValue}">${value}</span>`;
+    const span = tooltipWrap(fullValue, value, true);
 
-    return wrapWithCountryLink(country, record);
+    return wrapWithCountryLink(span, record);
 };
 
 //Device
 const renderClickableBotId = record => {
-    const device = record.id;
-    const html   = wrapWithBotLink(device, record);
+    const device = document.createTextNode(record.id);
 
-    return html;
+    return wrapWithBotLink(device, record);
 };
 
 const renderDevice = record => {
@@ -1102,41 +1348,52 @@ const renderDevice = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = deviceIsNormal ? record.device_name : 'unknown';
 
-    const ua = escapeForHTMLAttribute(record.ua);
-
     let deviceTypeName = 'unknown';
 
     if (record.device_name && record.device_name !== 'unknown') {
         deviceTypeName = deviceIsNormal ? record.device_name : 'other device';
     }
 
-    const html = `<span class="tooltip" title="${deviceTypeTooltip}"><img src="/ui/images/icons/${deviceTypeImg}.svg"
-        /></span><span class="tooltip" title="${ua}">${deviceTypeName}</span>`;
+    const frag = document.createDocumentFragment();
 
-    return html;
+    const img = document.createElement('img');
+    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    frag.appendChild(tooltipWrap(deviceTypeTooltip, img, true));
+
+    const el = document.createTextNode(deviceTypeName);
+    frag.appendChild(tooltipWrap(record.ua, el, true));
+
+    return frag;
 };
 
 const renderDeviceWithOs = record => {
-    const os = record.os_name ? record.os_name : 'N/A';
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = NORMAL_DEVICES.includes(record.device_name) ? record.device_name : 'unknown';
 
-    const ua = escapeForHTMLAttribute(record.ua);
+    let os = record.os_name ? record.os_name : 'N/A';
+    os += record.os_version ? ' ' + record.os_version : '';
 
-    const html = `<span class="tooltip" title="${deviceTypeTooltip}"><img src="/ui/images/icons/${deviceTypeImg}.svg"
-        /></span><span class="tooltip" title="${ua}">${os}</span>`;
+    const frag = document.createDocumentFragment();
 
-    return html;
+    const img = document.createElement('img');
+    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    frag.appendChild(tooltipWrap(deviceTypeTooltip, img, true));
+
+    const el = document.createTextNode(os);
+    frag.appendChild(tooltipWrap(record.ua, el, true));
+
+    return frag;
 };
 
 const renderLanguage = record => {
     const language  = record.lang;
     const languages = parse(language);
 
-    const rec1 = languages.find(record => record.code);
-    const rec2 = languages.find(record => record.region);
+    const rec1 = languages.find(rec => rec.code);
+    const rec2 = languages.find(rec => rec.region);
 
     let codeAndRegion = [];
+    let el = null;
 
     if (rec1) {
         codeAndRegion.push(rec1.code.toUpperCase());
@@ -1148,12 +1405,12 @@ const renderLanguage = record => {
 
     codeAndRegion = codeAndRegion.join('-');
     if (codeAndRegion) {
-        codeAndRegion = `<span class="nolight">${escapeForHTMLAttribute(codeAndRegion)}</span>`;
+        el = document.createElement('span');
+        el.className = 'nolight';
+        el.textContent = codeAndRegion;
     }
 
-    const html = renderDefaultIfEmpty(codeAndRegion);
-
-    return html;
+    return renderDefaultIfEmptySpan(el);
 };
 
 const renderOs = record => {
@@ -1167,36 +1424,33 @@ const renderOs = record => {
         os = truncateWithHellip(os, MAX_STRING_LENGTH_FOR_TILE);
     }
 
-    os = renderDefaultIfEmpty(os);
+    os = renderDefaultIfEmptySpan(os);
 
     return os;
 };
 
 const renderClickableOs = record => {
     const os   = renderOs(record);
-    const html = wrapWithBotLink(os, record);
+    const el   = wrapWithBotLink(os, record);
 
-    return html;
+    return el;
 };
 
 const renderDomain = (record, length = 'short') => {
     let domain = record.domain;
 
     if (domain) {
-        const n = getNumberOfSymbols(length);
-        domain = truncateWithHellip(domain, n);
+        domain = truncateWithHellip(domain, getNumberOfSymbols(length));
     }
 
-    domain = renderDefaultIfEmpty(domain);
-
-    return domain;
+    return renderDefaultIfEmptySpan(domain);
 };
 
 const renderClickableDomain = (record, length = 'short') => {
-    let html = renderDomain(record, length);
-    html = (record.id !== null && record.id !== undefined) ? wrapWithDomainLink(html, record) : html;
+    let span = renderDomain(record, length);
+    const el = (record.id !== null && record.id !== undefined) ? wrapWithDomainLink(span, record) : span;
 
-    return html;
+    return el;
 };
 
 const renderBrowser = record => {
@@ -1213,20 +1467,46 @@ const renderBrowser = record => {
         browser = truncateWithHellip(browser, MAX_STRING_LENGTH_FOR_TILE);
     }
 
-    browser = renderDefaultIfEmpty(browser);
-    return browser;
+    return renderDefaultIfEmptySpan(browser);
 };
 
 const renderQuery = record => {
-    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.query))}</textarea>`;
+    const textarea = document.createElement('textarea');
+    textarea.readonly = true;
+    textarea.rows = 4;
+    textarea.cols = 37;
+    textarea.textContent = record.query;
+
+    return textarea;
+
 };
 
 const renderReferer = record => {
-    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.referer))}</textarea>`;
+    const textarea = document.createElement('textarea');
+    textarea.readonly = true;
+    textarea.rows = 4;
+    textarea.cols = 37;
+    textarea.textContent = record.referer;
+
+    return textarea;
+
 };
 
 const renderUserAgent = record => {
-    return `<textarea readonly rows="5" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(record.ua))}</textarea>`;
+    const textarea = document.createElement('textarea');
+    textarea.readonly = true;
+    textarea.rows = 5;
+    textarea.cols = 37;
+    textarea.textContent = record.ua;
+
+    return textarea;
+};
+
+const renderDefaultIfEmptyElement = (value) => {
+    const span = document.createElement('span');
+    span.textContent = (value) ? value : HYPHEN;
+
+    return span;
 };
 
 const renderDefaultIfEmpty = (value) => {
@@ -1234,11 +1514,23 @@ const renderDefaultIfEmpty = (value) => {
         return value;
     }
 
-    return '&#65293;';
+    return HYPHEN;
+};
+
+const renderDefaultIfEmptySpan = (span) => {
+    if (!span) {
+        span = document.createElement('span');
+    }
+
+    if (!span.childNodes.length) {
+        span.textContent = renderDefaultIfEmpty(span.textContent);
+    }
+
+    return span;
 };
 
 const renderBlacklistItem = record => {
-    let html = '';
+    let span = null;
     let rec = {};
 
     const type = record.type;
@@ -1246,33 +1538,26 @@ const renderBlacklistItem = record => {
     if (type === 'ip') {
         rec.ip = record.value;
         rec.ipid = record.entity_id;
-        html = renderClickableIp(rec);
+        span = renderClickableIp(rec);
     }
-    if (type === 'email') {
+    if (type === 'email' || type === 'phone') {
+        const el = document.createTextNode(renderDefaultIfEmpty(record.value));
         rec.accountid = record.accountid;
-        html = escapeForHTMLAttribute(renderDefaultIfEmpty(record.value));
-        html = wrapWithUserLink(html, rec);
-    }
-    if (type === 'phone') {
-        rec.accountid = record.accountid;
-        html = escapeForHTMLAttribute(renderDefaultIfEmpty(record.value));
-        html = wrapWithUserLink(html, rec);
+        span = wrapWithUserLink(el, rec);
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderBlacklistType = record => {
-    let html = '';
-    const type = record.type;
+    const span = document.createElement('span');
+    let type = record.type;
 
     if (type) {
         if (type.toUpperCase() === 'IP') {
-            html = 'IP';
+            type = 'IP';
         } else {
-            html = type.replace(
+            type = type.replace(
                 /\b\w+/g,
                 function(txt) {
                     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
@@ -1280,34 +1565,57 @@ const renderBlacklistType = record => {
             );
         }
 
-        html = `<span class="typestatus">${html}</span>`;
+        span.textContent = type;
+        span.className = 'typestatus';
     }
 
-    html = renderDefaultIfEmpty(html);
-
-    return html;
+    return renderDefaultIfEmptySpan(span);
 };
 
 const renderSensorErrorColumn = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join('; ') : null;
-    return truncateWithHellip(renderDefaultIfEmpty(s), MAX_STRING_LONG_NETNAME_IN_TABLE);
+    return truncateWithHellip(s, MAX_STRING_LONG_NETNAME_IN_TABLE);
 };
 
 const renderSensorError = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join(';\n') : null;
-    return `<textarea readonly rows="4" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(s))}</textarea>`;
+
+    const textarea = document.createElement('textarea');
+    textarea.readonly = true;
+    textarea.rows = 4;
+    textarea.cols = 37;
+    textarea.textContent = renderDefaultIfEmpty(s);
+
+    return textarea;
 };
 
 const renderRawRequest = record => {
     const obj = openJson(record.raw);
     const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
-    return `<textarea readonly rows="24" cols="37">${escapeForHTMLAttribute(renderDefaultIfEmpty(s))}</textarea>`;
+
+    const textarea = document.createElement('textarea');
+    textarea.readonly = true;
+    textarea.rows = 24;
+    textarea.cols = 37;
+    textarea.textContent = renderDefaultIfEmpty(s);
+
+    return textarea;
 };
 
 const renderErrorType = record => {
-    return `<p class="bullet ${escapeForHTMLAttribute(record.error_value)}"></p><span>${escapeForHTMLAttribute(record.error_name)}</span>`;
+    const frag = document.createDocumentFragment();
+
+    const el = document.createElement('p');
+    el.className = `bullet ${record.error_value}`;
+    frag.appendChild(el);
+
+    const span = document.createElement('span');
+    span.textContent = record.error_name;
+    frag.appendChild(span);
+
+    return frag;
 };
 
 const renderMailto = record => {
@@ -1315,37 +1623,54 @@ const renderMailto = record => {
     const body = record.raw;
 
     const href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    const html = `<a href="${href}">Email request data</a>`;
 
-    return html;
-};
+    const el = document.createElement('a');
+    el.href = href;
+    el.textContent = 'Email request data';
 
-const renderRawTime = record => {
-    return truncateWithHellip(renderDefaultIfEmpty(renderTimeMs(record.raw_time)), MAX_STRING_LONG_NETNAME_IN_TABLE);
+    return el;
 };
 
 const currentPlanRender = (data, type, record, _meta) => {
     const value = record.sub_plan_api_calls;
-    return (value !== null && value !== undefined) ? value + ' API calls' : HORIZONTAL_ELLIPSIS;
+    const text = (value !== null && value !== undefined) ? value + ' API calls' : MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
 };
 
 const currentStatusRender = (data, type, record, meta) => {
     const value = record.sub_status;
-    return (value !== null && value !== undefined) ? value : HORIZONTAL_ELLIPSIS;
+    const text = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
 };
 
 const currentUsageRender = (data, type, record, meta) => {
     let value = record.sub_calls_used;
-    const used = (value !== null && value !== undefined) ? value : HORIZONTAL_ELLIPSIS;
+    const used = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
     value = record.sub_calls_limit;
-    const limit = (value !== null && value !== undefined) ? value : HORIZONTAL_ELLIPSIS;
+    const limit = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
 
-    return used + '/' + limit;
+    const span = document.createElement('span');
+    span.textContent = used + '/' + limit;
+
+    return span;
 };
 
 const currentBillingEndRender = (data, type, record, meta) => {
     const value = record.sub_next_billed;
-    return (value !== null && value !== undefined) ? renderDate(value.replace('T', ' ')) : HORIZONTAL_ELLIPSIS;
+    const text = (value !== null && value !== undefined) ? renderDateString(value.replace('T', ' ')) : MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
 };
 
 const updateCardButtonRender = (data, type, record, meta) => {
@@ -1353,11 +1678,19 @@ const updateCardButtonRender = (data, type, record, meta) => {
     const token = record.apiToken;
     const disabled = (url !== null && url !== undefined && token !== null && token !== undefined) ? '' : 'disabled';
 
-    return `<button
-        class="button is-primary"
-        type="submit"
-        onclick="window.open('${url}', '_blank')"
-        ${disabled}>Update</button>`;
+    const button = document.createElement('button');
+    button.className = 'button is-primary';
+    button.type = 'submit';
+    button.textContent = 'Update';
+    button.onclick = (e) => {
+        window.open(url, '_blank');
+    };
+
+    if (disabled) {
+        button.disabled = true;
+    }
+
+    return button;
 };
 
 const renderEnrichmentCalculation = data => {
@@ -1381,13 +1714,48 @@ const renderEnrichmentCalculation = data => {
     result.push('Total: ' + String(sum));
     const text = result.join('\n');
 
-    return `<textarea readonly rows="6" cols="37">${text}</textarea>`;
+    const textarea = document.createElement('textarea');
+    textarea.readOnly = true;
+    textarea.rows = 6;
+    textarea.cols = 37;
+    textarea.value = text;
+
+    return textarea;
+};
+
+const renderRulePlayResult = (users, count, uid) => {
+    if (!count) {
+        return document.createTextNode(`There are no users that match ${uid} rule.`);
+    }
+
+    const result = document.createDocumentFragment();
+    const txt = (count === 1) ? `One user matching ${uid} rule: ` : `${count} users matching ${uid} rule: `;
+    result.appendChild(document.createTextNode(txt));
+
+    const list = document.createDocumentFragment();
+    users.forEach((record, idx) => {
+        if (idx > 0) list.appendChild(document.createTextNode(', '));
+        list.appendChild(renderClickableUser(record));
+    });
+
+    result.appendChild(list);
+
+    return result;
+};
+
+const renderChartTooltipPart = (color, label, val) => {
+    const span = document.createElement('span');
+    span.className = 'chart-tooltip';
+    span.style.backgroundColor = color;
+    span.textContent = `${label}: ${val}`;
+
+    return span;
 };
 
 export {
     //Primitive
     renderBoolean,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderProportion,
 
     //Event
@@ -1398,6 +1766,7 @@ export {
     //Time
     renderTime,
     renderDate,
+    renderTimeMs,
 
     //Choices selector
     renderRuleSelectorItem,
@@ -1415,7 +1784,7 @@ export {
     renderUser,                                 //! only internal usage
     renderUserId,
     renderUserScore,                            //! only internal usage
-    renderUserWithScore,
+    renderUserWithScore,                        //! only internal usage
     renderClickableImportantUserWithScore,
     renderClickableImportantUserWithScoreTile,
     renderUserForEvent,
@@ -1424,7 +1793,7 @@ export {
     renderUserLastname,
     renderClickableUser,
     renderImportantUser,                        //! not used
-    renderClikableImportantUser,                //! only internal usage
+    renderClickableImportantUser,               //! only internal usage
     renderUserActionButtons,
     renderUserReviewedStatus,
     renderBlacklistButtons,
@@ -1503,7 +1872,6 @@ export {
     renderRawRequest,
     renderErrorType,
     renderMailto,
-    renderRawTime,
 
     //UsageStats
     currentPlanRender,
@@ -1514,4 +1882,10 @@ export {
 
     //Enrichment
     renderEnrichmentCalculation,
+
+    //Rule
+    renderRulePlayResult,
+
+    //Chart
+    renderChartTooltipPart,
 };

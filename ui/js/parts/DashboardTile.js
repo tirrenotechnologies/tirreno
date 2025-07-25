@@ -1,5 +1,6 @@
 import {Loader} from './Loader.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {fireEvent} from './utils/Event.js?v=2';
 
 export class DashboardTile {
 
@@ -25,6 +26,8 @@ export class DashboardTile {
         const el = document.querySelector(`.${this.config.mode} .title`);
         this.loader.start(el);
 
+        fireEvent('dateFilterChangedCaught');
+
         $.ajax({
             url: `/admin/loadDashboardStat?token=${token}`,
             type: 'get',
@@ -32,6 +35,9 @@ export class DashboardTile {
             data: params,
             success: me.onLoad,
             error: handleAjaxError,
+            complete: function() {
+                fireEvent('dateFilterChangedCompleted');
+            },
         });
     }
 
@@ -39,8 +45,27 @@ export class DashboardTile {
         if ('success' == status) {
             this.scope.loader.stop();
 
+            const frag = document.createDocumentFragment();
+
+            const period = document.createElement('p');
+            if (this.scope.config.mode === 'totalUsersForReview') {
+                period.className = 'periodTotalYellow';
+            } else if (this.scope.config.mode === 'totalBlockedUsers') {
+                period.className = 'periodTotalRed';
+            } else {
+                period.className = 'periodTotal';
+            }
+            period.textContent = data.total;
+
+            const total = document.createElement('p');
+            total.className = 'allTimeTotal';
+            total.textContent = data.allTimeTotal;
+
+            frag.appendChild(period);
+            frag.appendChild(total);
+
             const el = document.querySelector(`.${this.scope.config.mode} .title`);
-            el.innerHTML = `<p class="periodTotal">${data.total}</p><p class="allTimeTotal">${data.allTimeTotal}</p>`;
+            el.replaceChildren(frag);
         }
     }
 

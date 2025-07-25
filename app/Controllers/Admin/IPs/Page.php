@@ -30,7 +30,6 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'             => 'admin/ips.html',
             'JS'                    => 'admin_ips.js',
             'IP_TYPES'              => \Utils\Constants::get('IP_TYPES'),
-            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

@@ -103,6 +103,15 @@ abstract class Base {
         if ($currentOperator) {
             $cnt = $currentOperator->review_queue_cnt > 999 ? 999 : ($currentOperator->review_queue_cnt ?? 0);
             $params['NUMBER_OF_NOT_REVIEWED_USERS'] = $cnt;
+
+            $offset = \Utils\TimeZones::getCurrentOperatorOffset();
+            $now = time() + $offset;
+            $day = (int) ceil(($now - mktime(0, 0, 0, 1, 1, gmdate('Y'))) / (60 * 60 * 24));
+
+            $params['OFFSET']   = $offset;
+            $params['DAY']      = ($day < 10 ? '00' : ($day < 100 ? '0' : '')) . strval($day);
+            $params['TIME']     = date('H:i:s', $now);
+            $params['TIMEZONE'] = 'UTC' . (($offset < 0) ? '-' . date('H:i', -$offset) : '+' . date('H:i', $offset));
         }
 
         $page = $this->page;

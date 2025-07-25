@@ -61,13 +61,15 @@ $f3->config('config/apiEndpoints.ini');
 //Use custom onError function
 $f3->set('ONERROR', \Utils\ErrorHandler::getOnErrorHandler());
 
-\Utils\Updates::syncUpdates();
-
-//Load dictionary file
+//Load dictionary files
 $f3->set('LOCALES', 'app/Dictionary/');
 $f3->set('LANGUAGE', 'en');
 
-// Load cron job runner
-$cron = Utils\Cron::instance();
+if (\Utils\Variables::getDB()) {
+    \Utils\Updates::syncUpdates();
+
+    // Load cron job runner
+    $cron = \Utils\Cron::instance();
+}
 
 $f3->run();

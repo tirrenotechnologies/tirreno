@@ -20,12 +20,32 @@ class BaseEventsCount extends \Models\BaseSql {
 
     protected $DB_TABLE_NAME = 'event';
 
+    protected $alertTypesParams;
+    protected $editTypesParams;
+    protected $normalTypesParams;
+
+    protected $alertFlatIds;
+    protected $editFlatIds;
+    protected $normalFlatIds;
+
+    public function __construct() {
+        parent::__construct();
+
+        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
+        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
+        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::NORMAL_EVENT_TYPES, 'normal');
+    }
+
     public function getData(int $apiKey): array {
         $itemsByDate = [];
         $items = $this->getCounts($apiKey);
 
         foreach ($items as $item) {
-            $itemsByDate[$item['ts']] = $item['event_count'];
+            $itemsByDate[$item['ts']] = [
+                $item['event_normal_type_count'],
+                $item['event_editing_type_count'],
+                $item['event_alert_type_count'],
+            ];
         }
         $request = $this->f3->get('REQUEST');
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
@@ -40,7 +60,7 @@ class BaseEventsCount extends \Models\BaseSql {
 
         while ($endTs >= $startTs) {
             if (!isset($itemsByDate[$startTs])) {
-                $itemsByDate[$startTs] = null;
+                $itemsByDate[$startTs] = [null, null, null];
             }
 
             $startTs += $step;
@@ -49,14 +69,18 @@ class BaseEventsCount extends \Models\BaseSql {
         ksort($itemsByDate);
 
         $ox = [];
-        $data = [];
+        $l1 = [];
+        $l2 = [];
+        $l3 = [];
 
         foreach ($itemsByDate as $key => $value) {
             $ox[] = $key;
-            $data[] = $value;
+            $l1[] = $value[0];
+            $l2[] = $value[1];
+            $l3[] = $value[2];
         }
 
-        return [$ox, $data];
+        return [$ox, $l1, $l2, $l3];
     }
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
@@ -73,6 +97,10 @@ class BaseEventsCount extends \Models\BaseSql {
             ':id'           => $request['id'],
             ':offset'       => strval($offset),     // str for postgres
         ];
+
+        $params = array_merge($params, $this->alertTypesParams);
+        $params = array_merge($params, $this->editTypesParams);
+        $params = array_merge($params, $this->normalTypesParams);
 
         return $this->execQuery($query, $params);
     }

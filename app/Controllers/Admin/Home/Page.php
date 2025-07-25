@@ -24,7 +24,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_AUTOCOMPLETE' => true,
             'HTML_FILE'         => 'admin/home.html',
             'JS'                => 'admin_dashboard.js',
-            'OFFSET'            => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

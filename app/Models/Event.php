@@ -86,6 +86,7 @@ class Event extends \Models\BaseSql {
                 event_account.score_updated_at,
                 event_account.fraud,
                 event_account.reviewed,
+                event_account.added_to_review,
                 event_account.firstname,
                 event_account.lastname,
                 event_account.is_important,
@@ -101,8 +102,8 @@ class Event extends \Models\BaseSql {
                 event_phone.shared                 AS phone_users,
                 event_phone.alert_list             AS phone_alert_list,
                 event_phone.fraud_detected         AS phone_fraud_detected,
-                phone_countries.serial              AS phone_serial,
-                phone_countries.id                  AS phone_country,
+                phone_countries.id                  AS phone_country_id,
+                phone_countries.iso                 AS phone_country_iso,
                 phone_countries.value               AS phone_full_country,
 
                 event_email.email,
@@ -127,8 +128,9 @@ class Event extends \Models\BaseSql {
                 event_domain.expiration_date       AS domain_expiration_date,
                 event_domain.return_code           AS domain_return_code,
 
-                ip_countries.serial             AS serial,
-                ip_countries.id                 AS ip_country,
+                ip_countries.id                 AS country_id,
+                ip_countries.id                 AS ip_country_id,
+                ip_countries.iso                AS ip_country_iso,
                 ip_countries.value              AS ip_full_country,
 
                 event_device.lang,
@@ -179,7 +181,7 @@ class Event extends \Models\BaseSql {
             ON (event_ip.isp = event_isp.id)
 
             INNER JOIN countries AS ip_countries
-            ON (event_ip.country = ip_countries.serial)
+            ON (event_ip.country = ip_countries.id)
 
             LEFT JOIN event_email
             ON (event.email = event_email.id)
@@ -194,7 +196,7 @@ class Event extends \Models\BaseSql {
             ON (event_account.lastphone = event_phone.id)
 
             LEFT JOIN countries AS phone_countries
-            ON (phone_countries.serial = event_phone.country_code)
+            ON (phone_countries.id = event_phone.country_code)
 
             LEFT JOIN event_http_method
             ON (event.http_method = event_http_method.id)
@@ -209,7 +211,7 @@ class Event extends \Models\BaseSql {
 
         $this->calculateIpType($results);
         $this->calculateEmailReputation($results);
-        $this->translateTimeZones($results, ['event_time', 'domain_creation_date']);
+        //$this->translateTimeZones($results, ['event_time', 'domain_creation_date']);
 
         if (count($results)) {
             $results = $results[0];

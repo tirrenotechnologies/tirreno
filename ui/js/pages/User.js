@@ -8,6 +8,7 @@ import {DevicesGrid} from '../parts/grid/Devices.js?v=2';
 import {BaseBarChart} from '../parts/chart/BaseBar.js?v=2';
 import {StaticTiles} from '../parts/StaticTiles.js?v=2';
 import {UserTiles} from '../parts/details/UserTiles.js?v=2';
+import {UserEnrichmentTiles} from '../parts/details/UserEnrichmentTiles.js?v=2';
 import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 import {SingleReviewButton} from '../parts/SingleReviewButton.js?v=2';
 import {ScoreDetails} from '../parts/ScoreDetails.js?v=2';
@@ -128,6 +129,9 @@ export class UserPage extends BasePage {
 
         new StaticTiles(tilesParams);
         new UserTiles(userDetailsTiles);
+        new UserEnrichmentTiles(userDetailsTiles);
+        new EmailsGrid(emailsGridParams);
+        new PhonesGrid(phonesGridParams);
         new SingleReviewButton(ACCOUNT_ID);
         new ScoreDetails(userScoreDetails);
 
@@ -142,8 +146,6 @@ export class UserPage extends BasePage {
 
         new IpsGrid(ipsGridParams);
         new IspsGrid(ispsGridParams);
-        new EmailsGrid(emailsGridParams);
-        new PhonesGrid(phonesGridParams);
         new EventsGrid(eventsGridParams);
         new DevicesGrid(devicesGridParams);
     }

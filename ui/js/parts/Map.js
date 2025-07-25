@@ -1,6 +1,7 @@
 import {TotalTile} from './TotalTile.js?v=2';
 import {getQueryParams} from './utils/DataSource.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {fireEvent} from './utils/Event.js?v=2';
 
 export class Map {
 
@@ -68,7 +69,7 @@ export class Map {
 
     onRegionClick(value) {
         if (this.regions[value] !== undefined && this.regions[value][this.config.tooltipField] > 0) {
-            const url = `/country/${this.regions[value]['serial']}`;
+            const url = `/country/${this.regions[value].id}`;
             if (event.ctrlKey || event.metaKey) {
                 window.open(url, '_blank');
             } else {
@@ -84,7 +85,7 @@ export class Map {
         this.regions = {};
 
         records.forEach(rec => {
-            const country = rec.country;
+            const country = rec.iso;
             if (!regions[country]) {
                 regions[country] = 0;
                 this.regions[country] = 0;
@@ -93,8 +94,8 @@ export class Map {
             const value = me.getRegionValue(rec);
             regions[country] = value;
             this.regions[country] = {
-                [this.config.tooltipField]: rec[this.config.tooltipField],
-                serial: rec['serial'],
+                [this.config.tooltipField]: value,
+                id: rec.id,
             };
         });
 
@@ -137,13 +138,18 @@ export class Map {
 
         const data = getQueryParams(params);
 
+        fireEvent('dateFilterChangedCaught');
+
         $.ajax({
             type: 'get',
-            url: `/admin/loadCountries?token=${token}`,
+            url: `/admin/loadMap?token=${token}`,
             data: data,
             scope: me,
             success: me.onCountriesListLoaded,
             error: handleAjaxError,
+            complete: function() {
+                fireEvent('dateFilterChangedCompleted');
+            },
         });
     }
 
@@ -153,12 +159,10 @@ export class Map {
 
             const tileId  = 'totalCountries';
             const tableId = 'countries-table';
-            const total   = data.recordsTotal;
 
-            me.totalTile.update(tableId, tileId, total);
+            me.totalTile.update(tableId, tileId, data.length);
 
-            const records = data.data;
-            const regions = me.getCountriesRegionsFromResponse(records);
+            const regions = me.getCountriesRegionsFromResponse(data);
 
             me.selectRegions(regions);
         }

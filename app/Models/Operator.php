@@ -67,10 +67,7 @@ class Operator extends \Models\BaseSql {
 
     public function updateNotificationPreferences(
         \Type\UnreviewedItemsReminderFrequencyType $unreviewedItemsReminderFrequency,
-        int $operatorId,
     ): void {
-        $this->getOperatorById($operatorId);
-
         if ($this->loaded()) {
             $this->unreviewed_items_reminder_freq = $unreviewedItemsReminderFrequency->value;
 
@@ -101,9 +98,7 @@ class Operator extends \Models\BaseSql {
         }
     }
 
-    public function closeAccount(int $operatorId): void {
-        $this->getOperatorById($operatorId);
-
+    public function closeAccount(): void {
         if ($this->loaded()) {
             $this->is_closed = 1;
 
@@ -117,37 +112,39 @@ class Operator extends \Models\BaseSql {
         }
     }
 
-    public function removeData(int $operatorId): void {
-        $params = [
-            ':operator_id' => $operatorId,
-        ];
+    public function removeData(): void {
+        if ($this->loaded()) {
+            $params = [
+                ':operator_id' => $this->id,
+            ];
 
-        # firstly delete all nested data to not break the cascade
-        $queries = [
-            'DELETE FROM event
-            WHERE event.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-            'DELETE FROM event_account
-            WHERE event_account.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-            'DELETE FROM event_ip
-            WHERE event_ip.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-            'DELETE FROM event_device
-            WHERE event_device.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-            'DELETE FROM event_email
-            WHERE event_email.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-        ];
+            # firstly delete all nested data to not break the cascade
+            $queries = [
+                'DELETE FROM event
+                WHERE event.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+                'DELETE FROM event_account
+                WHERE event_account.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+                'DELETE FROM event_ip
+                WHERE event_ip.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+                'DELETE FROM event_device
+                WHERE event_device.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+                'DELETE FROM event_email
+                WHERE event_email.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+            ];
 
-        try {
-            $this->db->begin();
-            $this->db->exec($queries, array_fill(0, 5, $params));
+            try {
+                $this->db->begin();
+                $this->db->exec($queries, array_fill(0, 5, $params));
 
-            $query = 'DELETE FROM dshb_api WHERE creator = :operator_id';
-            $this->db->exec($query, $params);
+                $query = 'DELETE FROM dshb_api WHERE creator = :operator_id';
+                $this->db->exec($query, $params);
 
-            $this->db->commit();
-        } catch (\Exception $e) {
-            $this->db->rollback();
-            error_log($e->getMessage());
-            throw $e;
+                $this->db->commit();
+            } catch (\Exception $e) {
+                $this->db->rollback();
+                error_log($e->getMessage());
+                throw $e;
+            }
         }
     }
 
@@ -194,7 +191,7 @@ class Operator extends \Models\BaseSql {
     }
 
     public function getAll(): array {
-        return $this->find();
+        return $this->find(null, ['order' => 'email ASC']);
     }
 
     public static function hashPassword(string $password): string {

@@ -31,4 +31,17 @@ class Navigation extends \Controllers\Base {
 
         return $dataController->getUserDetails($userId, $apiKey);
     }
+
+    public function getUserEnrichmentDetails(): array {
+        $dataController = new Data();
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $userId = $this->f3->get('GET.userId');
+        $hasAccess = $dataController->checkIfOperatorHasAccess($userId, $apiKey);
+
+        if (!$hasAccess) {
+            $this->f3->error(404);
+        }
+
+        return $dataController->getUserEnrichmentDetails($userId, $apiKey);
+    }
 }

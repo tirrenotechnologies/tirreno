@@ -129,6 +129,9 @@ class Data extends \Controllers\Base {
         }
         $user['page_title'] = $pageTitle;
 
+        $tsColumns = ['created', 'lastseen', 'score_updated_at', 'latest_decision', 'updated', 'added_to_review'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $user);
+
         return $user;
     }
 
@@ -137,6 +140,10 @@ class Data extends \Controllers\Base {
         $userModel = new \Models\User();
 
         return $userModel->checkAccess($userId, $apiKey);
+    }
+
+    public function checkEnrichmentAvailability(): bool {
+        return $this->getCurrentOperatorEnrichmentKeyString() !== null;
     }
 
     public function addToWatchlist(int $accountId, int $apiKey): void {
@@ -201,7 +208,7 @@ class Data extends \Controllers\Base {
         $rules = [];
 
         $rulesController = new \Controllers\Admin\Rules\Data();
-        $rulesController->updateScoreByAccountId($accountId, $apiKey);
+        $rulesController->evaluateUser($accountId, $apiKey);
 
         $model = new \Models\User();
         $rules = $model->getApplicableRulesByAccountId($accountId, $apiKey);
@@ -285,5 +292,23 @@ class Data extends \Controllers\Base {
         }
 
         return array_merge($ips, $emails, $phones);
+    }
+
+    public function updateUserStatus(int $accountId, array $scoreData, int $apiKey): void {
+        $scoreData['addToReview'] = false;
+
+        $keyModel = new \Models\ApiKeys();
+        $keyModel->getKeyById($apiKey);
+
+        $userModel = new \Models\User();
+
+        if ($scoreData['score'] <= $keyModel->blacklist_threshold) {
+            $this->addToBlacklistQueue($accountId, true, $apiKey);
+        } elseif ($scoreData['score'] < $keyModel->review_queue_threshold) {
+            $data = $userModel->getUser($accountId, $apiKey);
+            $scoreData['addToReview'] = $data['added_to_review'] === null && $data['fraud'] === null;
+        }
+
+        $userModel->updateUserStatus($accountId, $scoreData, $apiKey);
     }
 }

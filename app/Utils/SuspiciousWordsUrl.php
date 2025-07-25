@@ -15,8 +15,10 @@
 
 namespace Utils;
 
-class SuspiciousUrlWords {
-    private static array $words = [
+class SuspiciousWordsUrl extends SuspiciousWords {
+    protected static string $extensionFile = 'url.txt';
+
+    protected static array $words = [
         '%00',
         '%20AND%20',
         '%20OR%20',
@@ -160,8 +162,4 @@ class SuspiciousUrlWords {
         'wp-config',
         'wwwroot',
     ];
-
-    public static function getWords(): array {
-        return self::$words;
-    }
 }

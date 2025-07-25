@@ -52,10 +52,11 @@ class Logger {
     public function logProfilerData(array $data): void {
         return;
         $this->fflush('Profiler: ' . json_encode($data), 'stdout');
-        if (count($this->queries) > 0) {
-            $msg = sprintf('SQL Queries [%d]:\n', count($this->queries));
+        $cnt = count($this->queries);
+        if ($cnt > 0) {
+            $msg = sprintf('SQL Queries [%d]:\n', $cnt);
 
-            for ($i = 0; $i < count($this->queries); $i++) {
+            for ($i = 0; $i < $cnt; $i++) {
                 $query = $this->queries[$i];
                 $msg .= sprintf('Query [%d]: %s; params: %s', $i, $query['sql'], json_encode($query['params'])) . PHP_EOL;
             }

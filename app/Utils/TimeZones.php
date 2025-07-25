@@ -38,6 +38,21 @@ class TimeZones {
         $time = self::localizeTimeStamp($time, $utc, $operatorTimeZone, $useMilliseconds);
     }
 
+    public static function localizeTimestampsForActiveOperator(array $keys, array &$data): void {
+        $f3 = \Base::instance();
+        $currentOperator = $f3->get('CURRENT_USER');
+        $operatorTimeZone = new \DateTimeZone($currentOperator->timezone ?? self::DEFAULT);
+        $utc = new \DateTimeZone(self::DEFAULT);
+
+        $ts = array_intersect_key($data, array_flip($keys));
+
+        foreach ($ts as $key => $t) {
+            if ($t !== null) {
+                $data[$key] = self::localizeTimeStamp($t, $utc, $operatorTimeZone, false);
+            }
+        }
+    }
+
     public static function localizeUnixTimestamps(array &$ts): void {
         $f3 = \Base::instance();
         $currentOperator = $f3->get('CURRENT_USER');
@@ -57,5 +72,80 @@ class TimeZones {
         $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
         return $operatorTimeZone->getOffset($utcTime);
+    }
+
+    public static function getLastNDaysRange(int $days = 1, int $offset = 0): array {
+        $now = time();
+        $daySeconds = 24 * 60 * 60;
+
+        return [
+            'endDate'   => date(self::FORMAT, $now),
+            'startDate' => date(self::FORMAT, $now - ($daySeconds * $days) - (($now + $offset) % $daySeconds)),
+            'offset'    => $offset,
+        ];
+    }
+
+    public static function getCurDayRange(int $offset = 0): array {
+        $now = time();
+
+        $date = new \DateTime();
+        $date->setTimestamp($now + $offset);
+
+        $date->setTime(0, 0, 0);
+
+        return [
+            'endDate'   => date(self::FORMAT, $now),
+            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset),
+            'offset'    => $offset,
+        ];
+    }
+
+    public static function getCurWeekRange(int $offset = 0): array {
+        $now = time();
+
+        $date = new \DateTime();
+        $date->setTimestamp($now + $offset);
+
+        $date->setTime(0, 0, 0);
+
+        $dow = (int) $date->format('N');
+
+        return [
+            'endDate'   => date(self::FORMAT, $now),
+            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset - (($dow - 1) * 24 * 60 * 60)),
+            'offset'    => $offset,
+        ];
+    }
+
+    public static function getCurMonthRange(int $offset = 0): array {
+        $now = time();
+
+        $date = new \DateTime();
+        $date->setTimestamp($now + $offset);
+
+        $date->setTime(0, 0, 0);
+
+        $day = (int) $date->format('j');
+
+        return [
+            'endDate'   => date(self::FORMAT, $now),
+            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset - (($day - 1) * 24 * 60 * 60)),
+            'offset'    => $offset,
+        ];
+    }
+
+    public static function timeZonesList(): array {
+        $timezones = (\Base::instance())->get('timezones');
+        $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $st = microtime(true);
+
+        foreach ($timezones as $key => $value) {
+            $offset = (new \DateTimeZone($key))->getOffset($utcTime);
+            $part = ($offset < 0) ? '-' . date('H:i', -$offset) : '+' . date('H:i', $offset);
+            $timezones[$key] = explode('(', $value)[0] . '(UTC' . $part . ')';
+        }
+
+        return $timezones;
     }
 }

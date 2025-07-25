@@ -1,5 +1,5 @@
 import {
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderBoolean,
     renderDate,
     renderCountryIso,
@@ -75,16 +75,16 @@ export class ManualCheckItems {
         this.renderCountryIso(item);
 
         item = 'web_server';
-        this.renderDefaultIfEmpty(item);
+        this.renderDefaultIfEmptyElement(item);
 
         item = 'hostname';
-        this.renderDefaultIfEmpty(item);
+        this.renderDefaultIfEmptyElement(item);
 
         item = 'emails';
-        this.renderDefaultIfEmpty(item);
+        this.renderDefaultIfEmptyElement(item);
 
         item = 'phone';
-        this.renderDefaultIfEmpty(item);
+        this.renderDefaultIfEmptyElement(item);
 
         item = 'discovery_date';
         this.renderDate(item);
@@ -137,7 +137,7 @@ export class ManualCheckItems {
         this.renderBoolean(item);
 
         item = 'description';
-        this.renderDefaultIfEmpty(item);
+        this.renderDefaultIfEmptyElement(item);
 
         item = 'blocklist';
         this.renderBoolean(item);
@@ -154,14 +154,14 @@ export class ManualCheckItems {
             }
 
             if (isNaN(value)) {
-                value = renderDefaultIfEmpty(value);
+                value = renderDefaultIfEmptyElement(value);
             } else {
                 value = !!value;
                 value = renderBoolean(value);
             }
 
         } else {
-            value = renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmptyElement(value);
         }
         this.setItem(item, value);
     }
@@ -191,7 +191,7 @@ export class ManualCheckItems {
         value = this.getItem(itemId);
 
         if (null === value) {
-            value = renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmptyElement(value);
         } else {
             //Revert databreach to "No databreach"
             value = !value;
@@ -208,7 +208,7 @@ export class ManualCheckItems {
         value = parseInt(value, 10);
 
         if (isNaN(value)) {
-            value = renderDefaultIfEmpty(value);
+            value = renderDefaultIfEmptyElement(value);
         } else {
             //Convert to boolean
             value = !!value;
@@ -275,11 +275,11 @@ export class ManualCheckItems {
         this.setItem(itemId, value);
     }
 
-    renderDefaultIfEmpty(itemId) {
+    renderDefaultIfEmptyElement(itemId) {
         let value;
 
         value = this.getItem(itemId);
-        value = renderDefaultIfEmpty(value);
+        value = renderDefaultIfEmptyElement(value);
         this.setItem(itemId, value);
     }
 
@@ -308,7 +308,11 @@ export class ManualCheckItems {
     setItem(itemId, value) {
         const item = this.getItem(itemId, true);
         if (item) {
-            item.innerHTML = value;
+            if (item instanceof Node) {
+                item.replaceChildren(value);
+            } else {
+                item.innerHTML = value;
+            }
         }
     }
 }

@@ -29,4 +29,10 @@ class Grid extends \Models\Grid\Base\Grid {
 
         return $this->getGrid($this->idsModel->getPhonesIdsByUserId(), $params);
     }
+
+    protected function convertTimeToUserTimezone(array &$result): void {
+        $fields = ['lastseen'];
+
+        $this->translateTimeZones($result, $fields);
+    }
 }

@@ -22,6 +22,9 @@ use Sensor\Entity\EventEntity;
 use Sensor\Model\Validated\Timestamp;
 
 class EventRepository {
+    private const DEFAULT_EVENT_TYPE = 1;
+    private const ERROR_EVENT_TYPE = 12;
+
     public function __construct(
         private AccountRepository $accountRepository,
         private SessionRepository $sessionRepository,
@@ -53,9 +56,16 @@ class EventRepository {
         $phoneId = $this->phoneRepository->insertSwitch($event->phone);
 
         $urlDto = $this->urlRepository->insert($event->url);
-        $eventTypeId = $event->eventType !== null ? ($this->getEventType($event->eventType) ?? 1) : 1;
         $httpMethodId = $event->httpMethod !== null ? $this->getHttpMethod($event->httpMethod) : null;
         $refererId = $event->referer !== null ? $this->refererRepository->insert($event->referer) : null;
+
+        if ($event->httpCode >= 400) {
+            $eventTypeId = self::ERROR_EVENT_TYPE;
+        } elseif ($event->eventType === null) {
+            $eventTypeId = self::DEFAULT_EVENT_TYPE;
+        } else {
+            $eventTypeId = $this->getEventType($event->eventType) ?? self::DEFAULT_EVENT_TYPE;
+        }
 
         $sessionId = $this->sessionRepository->insert($event->session);
 

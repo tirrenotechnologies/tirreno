@@ -88,7 +88,7 @@ class Ip extends \Models\Enrichment\Base {
 
         $previousIpData = $ipModel->getFullIpInfoById($entityId);
         $previousIspId = count($previousIpData) ? $previousIpData['ispid'] : null;
-        $previousCountryId = count($previousIpData) ? $previousIpData['serial'] : 0;
+        $previousCountryId = count($previousIpData) ? $previousIpData['country_id'] : 0;
         // get current isp id
         $this->name = $this->asn !== null ? $this->name : 'N/A';
         $this->asn = $this->asn !== null ? $this->asn : 64496;

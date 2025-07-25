@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Email extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getEmailDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         foreach ($recordsByAccount as $key => $value) {
@@ -30,7 +30,7 @@ class Email extends Base {
         return $recordsByAccount;
     }
 
-    private function getEmailDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $query = (

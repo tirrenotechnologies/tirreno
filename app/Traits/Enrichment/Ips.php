@@ -30,7 +30,7 @@ trait Ips {
             if ($r['blocklist'] && !$type) {
                 $type = 'Spam list';
             }
-            if ($r['serial'] === 0 && $r['checked'] && !$type) {
+            if ($r['country_id'] === 0 && $r['checked'] && !$type) {
                 $type = 'Localhost';
             }
             if ($r['tor'] && !$type) {

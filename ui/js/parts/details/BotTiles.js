@@ -1,7 +1,7 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
     renderBoolean,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderBrowser,
     renderOs,
 } from '../DataRenderers.js?v=2';
@@ -25,10 +25,10 @@ export class BotTiles extends BaseTiles {
             browser: browser.join(' ')
         };
 
-        document.getElementById('title').innerHTML          = renderDefaultIfEmpty(data.title);
-        document.getElementById('os').innerHTML             = renderOs(record);
-        document.getElementById('browser').innerHTML        = renderBrowser(record);
-        document.getElementById('modified').innerHTML       = renderBoolean(data.modified);
+        document.getElementById('title').replaceChildren(renderDefaultIfEmptyElement(data.title));
+        document.getElementById('os').replaceChildren(renderOs(record));
+        document.getElementById('browser').replaceChildren(renderBrowser(record));
+        document.getElementById('modified').replaceChildren(renderBoolean(data.modified));
     }
 
     get elems() {

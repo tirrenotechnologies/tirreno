@@ -31,7 +31,7 @@ export class ScoreDetails {
         let el = this.contentDiv;
 
         if (el) {
-            el.innerHTML = renderScoreDetails(data);
+            el.replaceChildren(renderScoreDetails(data));
         }
 
         this.initTooltips();

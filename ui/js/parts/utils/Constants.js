@@ -60,8 +60,9 @@ const UNDEFINED_RULES_MSG = {
     tooltip:    'Waiting for a score to be calculated.',
 };
 
-const HORIZONTAL_ELLIPSIS = '&#8943;';
-const LOADER_PLACEHOLDER = '<span class="loading-table-total">&#8943;</span>';
+const MIDLINE_HELLIP = '\u22EF';
+const HELLIP = '\u2026';
+const HYPHEN = '\uFF0D';
 
 const COLOR_MAP = {
     'red':      {
@@ -133,8 +134,9 @@ export {
     NO_RULES_MSG,
     UNDEFINED_RULES_MSG,
 
-    HORIZONTAL_ELLIPSIS,
-    LOADER_PLACEHOLDER,
+    MIDLINE_HELLIP,
+    HELLIP,
+    HYPHEN,
 
     COLOR_MAP,
 };

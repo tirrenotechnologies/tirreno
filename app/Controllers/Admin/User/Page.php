@@ -32,8 +32,9 @@ class Page extends \Controllers\Pages\Base {
         [$scheduledForDeletion, $errorCode] = $dataController->getScheduledForDeletion($userId);
         $user = $dataController->getUserById($userId);
 
-        $pageTitle = $this->getInternalPageTitleWithPostfix($user['page_title']);
-        $payload = $dataController->getPayloadColumns($userId);
+        $pageTitle      = $this->getInternalPageTitleWithPostfix($user['page_title']);
+        $payload        = $dataController->getPayloadColumns($userId);
+        $enrichmentOn   = $dataController->checkEnrichmentAvailability();
 
         $pageParams = [
             'LOAD_DATATABLE'                => true,
@@ -46,9 +47,9 @@ class Page extends \Controllers\Pages\Base {
             'SCHEDULED_FOR_DELETION'        => $scheduledForDeletion,
             'PAGE_TITLE'                    => $pageTitle,
             'PAYLOAD'                       => $payload,
+            'ENRICHMENT'                    => $enrichmentOn,
             'JS'                            => 'admin_user.js',
             'ERROR_CODE'                    => $errorCode,
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         if ($this->isPostRequest()) {

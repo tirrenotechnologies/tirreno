@@ -3,7 +3,7 @@ import {
     renderBoolean,
     renderReputation,
     renderEmail,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
 } from '../DataRenderers.js?v=2';
 
 export class EmailsGrid extends BaseGridWithPanel {
@@ -92,7 +92,7 @@ export class EmailsGrid extends BaseGridWithPanel {
             },
             {
                 data: 'data_breaches',
-                render: renderDefaultIfEmpty
+                render: renderDefaultIfEmptyElement
             },
             {
                 data: 'disposable_domains',

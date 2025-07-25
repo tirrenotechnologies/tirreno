@@ -17,9 +17,9 @@ namespace Models\Grid\ReviewQueue;
 
 class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = null;
-    protected $dateRangeField = 'event_account.lastseen';
+    protected $dateRangeField = 'event_account.added_to_review';
 
-    protected $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created'];
+    protected $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created', 'added_to_review'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -35,6 +35,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_account.firstname,
                 event_account.lastname,
                 event_account.lastseen,
+                event_account.added_to_review,
 
                 event_email.email
 
@@ -47,7 +48,7 @@ class Query extends \Models\Grid\Base\Query {
             WHERE
                 event_account.key = :api_key AND
                 event_account.fraud IS NULL AND
-                event_account.score <= :low_score
+                event_account.added_to_review IS NOT NULL
                 %s'
         );
 
@@ -75,7 +76,7 @@ class Query extends \Models\Grid\Base\Query {
             WHERE
                 event_account.key = :api_key AND
                 event_account.fraud IS NULL AND
-                event_account.score <= :low_score
+                event_account.added_to_review IS NOT NULL
                 %s'
         );
 
@@ -98,21 +99,10 @@ class Query extends \Models\Grid\Base\Query {
             WHERE
                 event_account.key = :api_key AND
                 event_account.fraud IS NULL AND
-                event_account.score <= :low_score'
+                event_account.added_to_review IS NOT NULL'
         );
 
         return [$query, $queryParams];
-    }
-
-    protected function getQueryParams(): array {
-        $model = new \Models\ApiKeys();
-        $model->getKeyById($this->apiKey);
-        $reviewQueueThreshold = $model->review_queue_threshold;
-
-        return [
-            ':api_key'      => $this->apiKey,
-            ':low_score'    => $reviewQueueThreshold,
-        ];
     }
 
     private function applySearch(string &$query, array &$queryParams): void {

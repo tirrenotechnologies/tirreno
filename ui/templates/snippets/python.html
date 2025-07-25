@@ -67,5 +67,5 @@ data = {
     'userCreated': ''
 }
 
-data = {k: v for k, v in data if v is not None}
+data = {k: v for k, v in data.items() if v is not None}
 response = requests.post(url, data=data, headers=headers)

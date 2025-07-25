@@ -1,4 +1,7 @@
-import {renderUserActionButtons} from './DataRenderers.js?v=2';
+import {
+    renderUserActionButtons,
+    renderUserReviewedStatus,
+} from './DataRenderers.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {replaceAll} from './utils/String.js?v=2';
 
@@ -18,10 +21,7 @@ export class SingleReviewButton {
 
             const record = {reviewed: true, accountid: me.userId, fraud: fraud};
 
-            let html = renderUserActionButtons(record);
-            html = replaceAll(html, 'is-small', '');
-
-            me.legitFraudButtonsBlock.innerHTML = html;
+            me.legitFraudButtonsBlock.replaceChildren(renderUserActionButtons(record, false));
         }
 
         if (me.reviewedButton) {
@@ -74,11 +74,8 @@ export class SingleReviewButton {
             //Get HTML w/ new fraud&legit buttons
             const record = {reviewed: true, accountid: me.userId};
 
-            let html = renderUserActionButtons(record);
-            html = replaceAll(html, 'is-small', '');
-
             const div = target.closest('div.head-button');
-            div.innerHTML = html;
+            div.replaceChildren(renderUserActionButtons(record, false));
 
             const onButtonClick = me.onButtonClick.bind(me);
 
@@ -112,7 +109,12 @@ export class SingleReviewButton {
             const tile = document.querySelector('#user-id-tile');
             const title = tile.querySelector('#review-status span').title;
 
-            tile.querySelector('#review-status').innerHTML = `<span class="tooltip reviewstatus ${reviewStatus}" title="${title}">${reviewStatus}</span>`;
+            const record = {
+                fraud:              (reviewStatus === 'Blacklisted'),
+                latest_decision:    title,
+            };
+
+            tile.querySelector('#review-status').replaceChildren(renderUserReviewedStatus(record));
 
             const userTitleSpan = document.querySelector('h1 span');
 

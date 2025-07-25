@@ -27,6 +27,7 @@ class Navigation extends \Controllers\Base {
         $this->response->data = $pageController->getPageParams();
     }
 
+    // TODO: daterange ~= event_logbook.started?
     public function getList(): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
 

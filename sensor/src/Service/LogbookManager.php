@@ -36,14 +36,12 @@ class LogbookManager {
 
     public function logRequest(
         \DateTime $startedTime,
-        ?string $eventTime,
         RegularResponse|ErrorResponse $response,
     ): void {
         if ($this->apiKeyDto?->id !== null) {
             $logbook = $this->logbookFactory->create(
                 $this->apiKeyDto->id,
                 $startedTime,
-                $eventTime,
                 $response,
             );
             $this->logbookRepository->insert($logbook);
@@ -52,14 +50,12 @@ class LogbookManager {
 
     public function logException(
         \DateTime $startedTime,
-        ?string $eventTime,
         string $exception,
     ): void {
         if ($this->apiKeyDto?->id !== null) {
             $logbook = $this->logbookFactory->createFromException(
                 $this->apiKeyDto->id,
                 $startedTime,
-                $eventTime,
                 $exception,
             );
             $this->logbookRepository->insert($logbook);

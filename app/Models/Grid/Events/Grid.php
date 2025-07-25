@@ -79,7 +79,7 @@ class Grid extends \Models\Grid\Base\Grid {
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
-        $fields = ['time', 'lastseen', 'session_max_t', 'session_min_t'];
+        $fields = ['time', 'lastseen', 'session_max_t', 'session_min_t', 'score_updated_at'];
 
         $this->translateTimeZones($result, $fields);
     }

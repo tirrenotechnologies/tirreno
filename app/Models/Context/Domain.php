@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Domain extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getDomainDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         foreach ($recordsByAccount as $key => $value) {
@@ -35,7 +35,7 @@ class Domain extends Base {
         return $recordsByAccount;
     }
 
-    private function getDomainDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $query = (

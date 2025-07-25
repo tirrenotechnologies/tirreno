@@ -6,18 +6,18 @@ import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 import {TotalTile} from '../TotalTile.js?v=2';
 import {renderTotalFrame} from '../DataRenderers.js?v=2';
 import {
-    HORIZONTAL_ELLIPSIS,
-    LOADER_PLACEHOLDER,
+    MIDLINE_HELLIP,
 } from '../utils/Constants.js?v=2';
 
 export class BaseGrid {
-
     constructor(gridParams) {
         this.config = gridParams;
 
         this.loader    = new Loader();
         this.tooltip   = new Tooltip();
         this.totalTile = new TotalTile();
+
+        this.firstload = true;
 
         this.renderTotalsLoader = this.renderTotalsLoader.bind(this);
 
@@ -28,6 +28,8 @@ export class BaseGrid {
             $.extend($.fn.dataTable.ext.classes, {
                 sStripeEven: '', sStripeOdd: ''
             });
+
+            $.fn.dataTable.ext.pager.numbers_length = 9;
 
             $.fn.dataTable.ext.errMode = function() {};
             $(`#${tableId}`).on('error.dt', me.onError);
@@ -43,6 +45,11 @@ export class BaseGrid {
 
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
+
+            const onDraw = me.onDraw.bind(me);
+            $(`#${tableId}`).on('draw.dt', onDraw);
+
+            document.getElementById(tableId).classList.add('hide-body');
         });
 
         if (this.config.dateRangeGrid) {
@@ -89,15 +96,25 @@ export class BaseGrid {
             pageLength: 25,
             autoWidth: false,
             lengthChange: false,
-            dom: 'lrtip',
             searching: true,
             ordering: isSortable,
             info: false,
+            pagingType: 'simple_numbers',
             language: {
                 paginate: {
                     previous: '&lt;',
                     next: '&gt;',
-                }
+                },
+            },
+
+            layout: {
+                topEnd: null,
+                bottomEnd: {
+                    paging: {
+                        boundaryNumbers: false,
+                        type: 'simple_numbers',
+                    },
+                },
             },
 
             createdRow: function(row, data, dataIndex) {
@@ -118,14 +135,18 @@ export class BaseGrid {
     }
 
     performAdditional(response, config) {
-        if (!config.calculateTotals) return;
+        if (!config.calculateTotals) {
+            fireEvent('dateFilterChangedCompleted');
+
+            return;
+        }
 
         const ids = response.data.map(item => item.id);
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const dateRange = response.dateRange;
 
         if (dateRange && ids.length) {
-            const data = {
+            const requestData = {
                 token: token,
                 ids: ids,
                 type: config.totals.type,
@@ -139,10 +160,15 @@ export class BaseGrid {
             $.ajax({
                 type: 'GET',
                 url: '/admin/timeFrameTotal',
-                data: data,
+                data: requestData,
                 success: (data) => this.onTotalsSuccess(data, config, preparedBase),
                 error: handleAjaxError,
+                complete: function() {
+                    fireEvent('dateFilterChangedCompleted');
+                },
             });
+        } else {
+            fireEvent('dateFilterChangedCompleted');
         }
 
         if (!dateRange && ids.length) {
@@ -229,22 +255,24 @@ export class BaseGrid {
         if (wrapper) {
             const span = wrapper.querySelector('header span');
 
-            span.innerHTML = `${value}`;
+            span.textContent = value;
         }
     }
 
     stopAnimation() {
         this.loader.stop();
+        const el = document.getElementById(`${this.config.tableId}_loader`);
+        if (el) el.remove();
     }
 
     updateTableFooter(dataTable) {
         const tableId = this.config.tableId;
-        const pagerId = `#${tableId}_paginate`;
+        const pagerSelector = `#${tableId}_wrapper .dt-paging`;
 
         if (dataTable.api().page.info().pages <= 1) {
-            $(pagerId).hide();
+            $(pagerSelector).hide();
         } else {
-            $(pagerId).show();
+            $(pagerSelector).show();
         }
     }
 
@@ -255,7 +283,9 @@ export class BaseGrid {
 
     onBeforeLoad(e, settings, data) {
         this.updateTimer();
-        this.updateTableTitle(HORIZONTAL_ELLIPSIS);
+        this.updateTableTitle(MIDLINE_HELLIP);
+
+        fireEvent('dateFilterChangedCaught');
 
         //TODO: move to events grid? Or not?
         const params = this.config.getParams();
@@ -267,6 +297,13 @@ export class BaseGrid {
 
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         data.token = token;
+    }
+
+    onDraw(e, settings) {
+        if (this.firstload) {
+            document.getElementById(this.config.tableId).classList.remove('hide-body');
+            this.firstload = false;
+        }
     }
 
     onBeforePageChange(e, settings) {
@@ -316,10 +353,11 @@ export class BaseGrid {
         const loaderPath = `${tableId}_processing`;
 
         const loaderWrapper = document.getElementById(loaderPath);
-        loaderWrapper.innerHTML = '<p class="text-loader"></p>';
+        const el = document.createElement('p');
+        el.className = 'text-loader';
+        loaderWrapper.replaceChildren(el);
 
-        const p = loaderWrapper.querySelector('p');
-        this.loader.start(p);
+        this.loader.start(el);
     }
 
     onRowClick(e) {
@@ -338,7 +376,7 @@ export class BaseGrid {
     }
 
     onError(e, settings, techNote, message) {
-        if (403 === settings.jqXHR.status) {
+        if (settings.jqXHR !== undefined && 403 === settings.jqXHR.status) {
             window.location.href = escape('/');
         }
 
@@ -382,7 +420,16 @@ export class BaseGrid {
     }
 
     renderTotalsLoader(data, type, record, meta) {
+        const span = document.createElement('span');
+
         const col_name = meta.settings.aoColumns[meta.col].name;
-        return this.config.calculateTotals && this.config.totals.columns.includes(col_name) ? LOADER_PLACEHOLDER : data;
+        if (this.config.calculateTotals && this.config.totals.columns.includes(col_name)) {
+            span.className = 'loading-table-total';
+            span.textContent = MIDLINE_HELLIP;
+        } else {
+            span.textContent = data;
+        }
+
+        return span;
     }
 }

@@ -47,18 +47,18 @@ class Data extends \Controllers\Base {
         $result = $this->getFullIpInfoById($ipId);
 
         return [
-            'abbr_country' => $result['abbr_country'],
-            'country' => $result['country'],
-            'serial' => $result['serial'],
-            'asn' => $result['asn'],
-            'blocklist' => $result['blocklist'],
-            'fraud_detected' => $result['fraud_detected'],
-            'data_center' => $result['data_center'],
-            'vpn' => $result['vpn'],
-            'tor' => $result['tor'],
-            'relay' => $result['relay'],
-            'starlink' => $result['starlink'],
-            'ispid' => $result['ispid'],
+            'full_country'      => $result['full_country'],
+            'country_id'        => $result['country_id'],
+            'country_iso'       => $result['country_iso'],
+            'asn'               => $result['asn'],
+            'blocklist'         => $result['blocklist'],
+            'fraud_detected'    => $result['fraud_detected'],
+            'data_center'       => $result['data_center'],
+            'vpn'               => $result['vpn'],
+            'tor'               => $result['tor'],
+            'relay'             => $result['relay'],
+            'starlink'          => $result['starlink'],
+            'ispid'             => $result['ispid'],
         ];
     }
 

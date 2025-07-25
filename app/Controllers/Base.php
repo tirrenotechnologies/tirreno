@@ -25,7 +25,9 @@ abstract class Base {
         $this->f3 = \Base::instance();
 
         $keepSessionInDb = $this->f3->get('KEEP_SESSION_IN_DB') ?? null;
-        $this->connectToDb($keepSessionInDb);
+        if (!$this->connectToDb($keepSessionInDb)) {
+            $this->f3->error(404);
+        }
 
         //Determine current user
         $currentOperator = $this->getLoggedInOperator();

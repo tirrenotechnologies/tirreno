@@ -24,58 +24,27 @@ class Query extends \Models\Grid\Base\Query {
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
-        $joinPart = '';
-        $selectPart = (
-            "event_country.total_visit,
-            event_country.total_account,
-            event_country.total_ip"
-        );
-
-        $params = $this->f3->get('GET');
-        if ($this->getDatesRange($params) !== null && !array_key_exists('draw', $params)) {
-            // count total_account for dateRange; params should be applied in applyDateRange()
-            $selectPart = (
-                "event_country.total_visit,
-                (SELECT COUNT(DISTINCT account)
-                FROM event LEFT JOIN event_ip ON event.ip = event_ip.id
-                WHERE
-                    event_ip.country = event_country.country AND
-                    event_ip.key = :api_key AND
-                    event.time >= :start_time AND
-                    event.time <= :end_time
-                ) AS total_account,
-                event_country.total_ip"
-            );
-        } elseif ($this->itemId !== null) {
-            $selectPart = (
-                "sub.total_visit,
-                sub.total_account,
-                sub.total_ip"
-            );
-            $joinPart = $this->totalQuery();
-        }
-
         $query = (
-            "SELECT
+            'SELECT
+                countries.iso       AS country_iso,
                 countries.id        AS country_id,
-                countries.id        AS country,
-                countries.serial    AS id,
                 countries.value     AS full_country,
-                countries.serial,
+                countries.id,
 
-                {$selectPart}
+                event_country.total_visit,
+                event_country.total_account,
+                event_country.total_ip
+
 
             FROM
                 event_country
 
-            INNER JOIN countries
-            ON event_country.country = countries.serial
-
-            {$joinPart}
+            LEFT JOIN countries
+            ON event_country.country = countries.id
 
             WHERE
                 event_country.key = :api_key
-                %s"
+                %s'
         );
 
         $this->applySearch($query, $queryParams);
@@ -95,7 +64,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_country
 
             INNER JOIN countries
-            ON event_country.country = countries.serial
+            ON event_country.country = countries.id
 
             WHERE
                 event_country.key = :api_key
@@ -112,14 +81,14 @@ class Query extends \Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $search = $this->f3->get('REQUEST.search');
-        $searchConditions = $this->injectIdQuery('countries.serial', $queryParams);
+        $searchConditions = '';
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (
                     LOWER(countries.value)              LIKE LOWER(:search_value)
-                    OR LOWER(countries.id)              LIKE LOWER(:search_value)
+                    OR LOWER(countries.iso)             LIKE LOWER(:search_value)
                 )'
             );
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
@@ -127,85 +96,5 @@ class Query extends \Models\Grid\Base\Query {
 
         //Add search and ids into request
         $query = sprintf($query, $searchConditions);
-    }
-
-
-    private function totalQuery(): string {
-        $field = $this->getItemField();
-        $join = $this->getJoinQueryPart();
-        return (
-            "LEFT JOIN (
-                SELECT
-                    event_ip.country,
-                    COUNT(event.id) AS total_visit,
-                    COUNT(DISTINCT event.account) AS total_account,
-                    COUNT(DISTINCT event.ip) AS total_ip
-                FROM
-                    event
-                INNER JOIN event_ip
-                ON event.ip = event_ip.id
-                {$join}
-                WHERE
-                    event.key       = :api_key AND
-                    {$field}        = :item_id
-                GROUP BY
-                    event_ip.country
-            ) sub ON countries.serial = sub.country"
-        );
-    }
-
-    private function getItemField(): string {
-        $field = '';
-        switch ($this->itemKey) {
-            case 'userId':
-                $field = 'event.account';
-                break;
-            case 'ispId':
-                $field = 'event_ip.isp';
-                break;
-            case 'domainId':
-                $field = 'event_email.domain';
-                break;
-            case 'deviceId':
-                $field = 'event_device.user_agent';
-                break;
-            case 'resourceId':
-                $field = 'event.url';
-                break;
-        }
-
-        return $field;
-    }
-
-    private function getJoinQueryPart(): string {
-        $query = '';
-        switch ($this->itemKey) {
-            case 'domainId':
-                $query = 'LEFT JOIN event_email ON event.email = event_email.id';
-                break;
-            case 'deviceId':
-                $query = 'LEFT JOIN event_device ON event.device = event_device.id';
-                break;
-        }
-
-        return $query;
-    }
-
-    protected function getQueryParams(): array {
-        $params = [':api_key' => $this->apiKey];
-        if ($this->itemId !== null) {
-            $params[':item_id'] = $this->itemId;
-        }
-
-        return $params;
-    }
-
-    public function injectIdQuery(string $field, &$params): string {
-        $idsQuery = $this->ids;
-        if ($idsQuery === null || $idsQuery === '') {
-            return '';
-        }
-
-        return " AND $field IN ($idsQuery)";
     }
 }

@@ -51,12 +51,12 @@ export class CountriesGrid extends BaseGrid {
                 data: 'full_country',
                 name: 'full_country',
                 render: (data, type, record) => {
-                    return renderClickableCountry(record);
+                    return renderClickableCountry(record, false);
                 }
             },
             {
-                data: 'country',
-                name: 'country'
+                data: 'country_iso',
+                name: 'country_iso'
             },
             {
                 data: 'total_account',
@@ -84,8 +84,8 @@ export class CountriesGrid extends BaseGrid {
 
     updateTableFooter(dataTable) {
         const tableId = this.config.tableId;
-        const pagerId = `#${tableId}_paginate`;
+        const pagerSelector = `#${tableId}_wrapper .dt-paging`;
 
-        $(pagerId).hide();
+        $(pagerSelector).hide();
     }
 }

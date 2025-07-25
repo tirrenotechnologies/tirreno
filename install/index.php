@@ -214,7 +214,7 @@ function execute(array $values) {
 }
 
 function configAlreadyExists(): bool {
-    return (getenv('SITE') && getenv('DATABASE_URL')) || file_exists('../config/config.local.ini');
+    return (getenv('SITE') && getenv('DATABASE_URL')) || file_exists('../config/local/config.local.ini');
 }
 
 function substituteFormWithEnv(): void {
@@ -258,9 +258,9 @@ function compatibilityCheck(int $step, array &$steps) {
 
     try {
         if (is_writable('../config')) {
-            $f = fopen('../config/config.local.ini', 'w');
+            $f = fopen('../config/local/config.local.ini', 'w');
             fclose($f);
-            unlink('../config/config.local.ini');
+            unlink('../config/local/config.local.ini');
             $steps[$step]['tasks'][2]['status'] = true;
         } else {
             $steps[$step]['tasks'][2]['status'] = false;

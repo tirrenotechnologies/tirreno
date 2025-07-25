@@ -15,8 +15,10 @@
 
 namespace Utils;
 
-class SuspiciousSqlWords {
-    private static array $words = [
+class SuspiciousWordsSql extends SuspiciousWords {
+    protected static string $extensionFile = 'sql.txt';
+
+    protected static array $words = [
         '--',
         '/*',
         '*/',
@@ -45,8 +47,4 @@ class SuspiciousSqlWords {
         '%28',      // (
         '%29',      // )
     ];
-
-    public static function getWords(): array {
-        return self::$words;
-    }
 }

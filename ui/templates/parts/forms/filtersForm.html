@@ -4,7 +4,7 @@
         $USE_RANGE    = false;
         $USE_INTERVAL = false;
 
-        if('/event' == $CURRENT_PATH) {
+        if('/event' == $CURRENT_PATH || '/logbook' == $CURRENT_PATH) {
             $USE_RANGE = true;
         } else {
             $USE_INTERVAL = true;
@@ -20,13 +20,13 @@
 
             <div class="control has-icons-left">
                 <span class="dateselector">
-                    <a href="javascript:void(0);" data-type="d" data-value="1">1H</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="24" class="active">1D</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="72">3D</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="168">1W</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="720">1M</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="2160">3M</a>
-                    <a href="javascript:void(0);" data-type="d" data-value="0">MAX</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="0"      class="blocked">MAX</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="2160"   class="blocked">3M</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="720"    class="blocked">1M</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="168"    class="blocked">1W</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="72"     class="blocked">3D</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="24"     class="active">1D</a>
+                    <a href="javascript:void(0);" data-type="d" data-value="1"      class="blocked">1H</a>
                 </span>
 
                 <span class="icon">

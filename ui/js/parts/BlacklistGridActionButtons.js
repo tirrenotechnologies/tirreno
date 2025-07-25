@@ -58,7 +58,7 @@ export class BlacklistGridActionButtons {
 
         target.classList.remove('is-loading');
         target.setAttribute('disabled', '');
-        target.innerHTML = 'Removed';
+        target.textContent = 'Removed';
 
         const card  = target.closest('.card');
         const span  = card.querySelector('.card-header-title span');
@@ -69,7 +69,7 @@ export class BlacklistGridActionButtons {
             total -= 1;
         }
 
-        span.innerHTML = total;
+        span.textContent = total;
 
         if (tableRow) {
             const dataTable = $(`#${me.tableId}`).DataTable();

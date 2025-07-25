@@ -18,11 +18,17 @@ namespace Models\Chart;
 class Domain extends BaseEventsCount {
     public function getCounts(int $apiKey): array {
         $query = (
-            'SELECT
+            "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(event.id) AS event_count
+                COUNT(CASE WHEN event_type.value IN ({$this->normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
+                COUNT(CASE WHEN event_type.value IN ({$this->editFlatIds})    THEN TRUE END) AS event_editing_type_count,
+                COUNT(CASE WHEN event_type.value IN ({$this->alertFlatIds})   THEN TRUE END) AS event_alert_type_count
+
             FROM
                 event
+
+            LEFT JOIN event_type
+            ON event.type = event_type.id
 
             INNER JOIN event_email
             ON (event.email = event_email.id)
@@ -34,7 +40,7 @@ class Domain extends BaseEventsCount {
                 event.time <= :end_time
 
             GROUP BY ts
-            ORDER BY ts'
+            ORDER BY ts"
         );
 
         return $this->executeOnRangeById($query, $apiKey);

@@ -36,7 +36,7 @@ class Dashboard extends \Models\BaseSql {
         return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    public function getTotalUsersForReview(int $lowScore, ?array $dateRange, int $apiKey): int {
+    public function getTotalUsersForReview(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT
                 COUNT(event_account.id)
@@ -47,16 +47,12 @@ class Dashboard extends \Models\BaseSql {
             WHERE
                 event_account.key = :api_key AND
                 event_account.fraud IS NULL AND
-                event_account.score <= :low_score'
+                event_account.added_to_review IS NOT NULL'
         );
 
-        $additionalParams = [
-            ':low_score'    => $lowScore,
-        ];
+        $field = 'event_account.added_to_review';
 
-        $field = 'event_account.lastseen';
-
-        return $this->getTotal($query, $field, $dateRange, $apiKey, $additionalParams);
+        return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
     public function getTotalEvents(?array $dateRange, int $apiKey): int {
@@ -144,8 +140,10 @@ class Dashboard extends \Models\BaseSql {
         return $this->getTotal($query, $field, $dateRange, $apiKey);
     }
 
-    private function getTotal(string $query, string $dateField, ?array $dateRange, int $apiKey, array $params = []): int {
-        $params[':api_key'] = $apiKey;
+    private function getTotal(string $query, string $dateField, ?array $dateRange, int $apiKey): int {
+        $params = [
+            ':api_key' => $apiKey,
+        ];
 
         if ($dateRange) {
             $params[':end_time'] = $dateRange['endDate'];

@@ -45,7 +45,7 @@ export class UserGridActionButtons {
 
     onSuccessCount(data) {
         const span = document.querySelector('span.reviewedUsersTile');
-        span.innerHTML = `${data.total}`;
+        span.textContent = data.total;
     }
 
     setMenuCount() {
@@ -105,7 +105,7 @@ export class UserGridActionButtons {
                     total -= 1;
                 }
 
-                span.innerHTML = total;
+                span.textContent = total;
 
                 twoButtonsContainer.setAttribute('counterUpdated', 1);
             }
@@ -123,7 +123,7 @@ export class UserGridActionButtons {
             const html   = renderUserActionButtons(record);
 
             const td = target.closest('td');
-            td.innerHTML = html;
+            td.replaceChildren(html);
 
             //Add event listener to newly created buttons
             const buttons = td.querySelectorAll('button');

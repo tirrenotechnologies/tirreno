@@ -87,6 +87,7 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                 event_account.fraud,
                 event_account.reviewed,
                 event_account.latest_decision,
+                event_account.added_to_review,
 
                 event_email.email
 
@@ -255,16 +256,21 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
         return $results;
     }
 
-    public function updateScoreDetails(array $data): void {
+    public function updateUserStatus(int $accountId, array $data, int $apiKey): void {
         $this->load(
-            ['id=? AND key=?', $data['accountId'], $data['apiKey']],
+            ['id=? AND key=?', $accountId, $apiKey],
         );
 
         if ($this->loaded()) {
+            $timestamp = (new \DateTime('now', new \DateTimeZone('UTC')))->format(\Utils\TimeZones::FORMAT);
             $this->score = $data['score'];
             $this->score_details = $data['details'];
-            $this->score_updated_at = date('Y-m-d H:i:s');
+            $this->score_updated_at = $timestamp;
             $this->score_recalculate = false;
+
+            if ($data['addToReview']) {
+                $this->added_to_review = $timestamp;
+            }
 
             $this->save();
         }

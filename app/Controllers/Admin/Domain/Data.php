@@ -48,7 +48,9 @@ class Data extends \Controllers\Base {
 
         $model = new \Models\Domain();
         $result = $model->getFullDomainInfoById($domainId, $apiKey);
-        $result['lastseen'] = \Utils\ElapsedDate::short($result['lastseen']);
+
+        $tsColumns = ['lastseen'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $result);
 
         return $result;
     }

@@ -19,6 +19,7 @@ class Updates {
     private const UPDATES_LIST = [
         \Updates\Update001::class,
         \Updates\Update002::class,
+        \Updates\Update003::class,
     ];
 
     public static function syncUpdates() {

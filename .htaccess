@@ -1,14 +1,201 @@
+# Do not show directory indexes
 Options -Indexes
-RewriteEngine On
 
-RewriteRule ^(\..+|Dockerfile|.+\.sh|.+\.yml|.+\.conf|.+\.ini|.+\.log|.+\.sql|.+\.json|.+\.md|.+\.diz|composer\.lock|phpcs\.xml)$ - [R=404,L]
-RewriteRule ^(app|config|logs|db|tmp|vendor|libs|assets|sensor/src|ui/templates).*$ - [R=404,L]
+# Do not use multiviews
+Options -MultiViews
 
-# Exclude /sensor path from general rules
-RewriteRule ^sensor(?:\/.*)?$ /sensor/ [L,QSA]
+# Do follow symbolic links
+Options +FollowSymLinks
+# Options +SymLinksifOwnerMatch
 
-RewriteCond %{REQUEST_FILENAME} !-l
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* index.php [L,QSA]
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+# Character encoding: serve text/html or text/plain as UTF-8
+AddDefaultCharset UTF-8
+
+# -----------------------------------------------------------------------------------------------
+# Protect from XSS with Apache headers
+# -----------------------------------------------------------------------------------------------
+
+<IfModule mod_headers.c>
+  # prevent site from being loaded in an iframe on another site
+  Header always append X-Frame-Options SAMEORIGIN 
+
+  # To prevent cross site scripting (IE8+ proprietary)
+  Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+
+# -----------------------------------------------------------------------------------------------
+# Prevent access to various types of files
+#
+# Note that some of these rules are duplicated by RewriteRules or other .htaccess files.
+# -----------------------------------------------------------------------------------------------
+
+# Block access to inc, info, info.json/php, module/php, sh, sql and composer files
+# -----------------------------------------------------------------------------------------------
+
+<FilesMatch "\.(inc|info|info\.(json|php)|module|module\.php|sh|sql)$|^\..*$|composer\.(json|lock)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+  </IfModule>
+</FilesMatch>
+
+
+# Block bak, conf, dist, ini, log, orig, sh, sql, swo, swp, ~, ...
+# -----------------------------------------------------------------------------------------------
+
+<FilesMatch "(^#.*#|\.(bak|conf|dist|in[ci]|log|orig|sh|sql|sw[op])|~)$">
+  <IfModule mod_authz_core.c>
+     Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_php5.c>
+  php_flag magic_quotes_gpc		off
+  php_flag magic_quotes_sybase	off
+  php_flag register_globals		off
+</IfModule>
+
+DirectoryIndex index.php index.html index.htm
+
+
+# -----------------------------------------------------------------------------------------------
+# Enable Apache mod_rewrite
+# -----------------------------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+
+  RewriteEngine On
+ 
+  # Optionally set a rewrite base if rewrites are not working properly on your server.
+  # -----------------------------------------------------------------------------------------------
+  # In addition, if your site directory starts with a "~" you will most likely have to use this.
+  # https://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
+ 
+  # For ex.: 
+  # RewriteBase /
+  # RewriteBase /p/
+  # RewriteBase /~user/
+
+  # To redirect HTTP requests to HTTPS, uncomment these lines:
+  # -----------------------------------------------------------------------------------------------
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # If using load balancer/AWS or behind proxy, use lines below rather lines before:
+  # -----------------------------------------------------------------------------------------------
+  # RewriteCond %{HTTP:X-Forwarded-Proto} =https 
+  # RewriteRule ^ - [env=proto:https]
+  # RewriteCond %{HTTP:X-Forwarded-Proto} =http 
+  # RewriteRule ^ - [env=proto:http]
+ 
+  <IfModule mod_headers.c>
+    # Uncomment one of lines below and adjust to enable Strict-Transport-Security (HSTS):
+    # Header always set Strict-Transport-Security "max-age=31536000;"
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubdomains"
+    # Header always set Strict-Transport-Security "max-age=31536000; preload"
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  </IfModule>
+
+  # -----------------------------------------------------------------------------------------------
+  # Access Restrictions
+  # -----------------------------------------------------------------------------------------------
+  
+  # Keep http requests out of specific files and directories
+  # -----------------------------------------------------------------------------------------------
+
+  # Prevent all the following rules from blocking images in ui directories 
+  RewriteRule (^|/)ui/images/.+\.(jpg|jpeg|png|gif|webp|svg)$ - [L]
+
+  # Prevent all the following rules from blocking css directory
+  RewriteRule (^|/)ui/css/[^/]+\.css$ - [L]
+
+  # Prevent all the following rules from blocking js files
+  RewriteRule (^|/)ui/js/.+\.(map|css|js)$ - [L,QSA]
+
+  # Prevent all the following rules from blocking sensor
+  RewriteRule (^|/)sensor/(|index.php)$ - [L,QSA]
+
+  # Prevent all the following rules from blocking installer
+  RewriteRule (^|/)install/(|index\.php)$ - [L,QSA]
+
+  RewriteRule (^|/)(|index.php)$ index.php [L,QSA]
+
+
+  # Block access to any htaccess files
+  RewriteCond %{REQUEST_URI} (^|/)(\.htaccess|htaccess\..*)$ [NC,OR]
+  
+  # Block access to assets directory
+  RewriteCond %{REQUEST_URI} (^|/)assets($|/.*$) [NC,OR]
+  
+  # Block access to the /app directories
+  RewriteCond %{REQUEST_URI} (^|/)app($|/.*$) [NC,OR]
+
+  # Block access to the /sensor directories
+  RewriteCond %{REQUEST_URI} (^|/)sensor($|/.*$) [NC,OR]
+
+  # Block access to the /config directories
+  RewriteCond %{REQUEST_URI} (^|/)config($|/.*$) [NC,OR]
+
+  # Block access to the /tmp directories
+  RewriteCond %{REQUEST_URI} (^|/)tmp($|/.*$) [NC,OR]
+
+  # Block access to the /libs directories
+  RewriteCond %{REQUEST_URI} (^|/)libs($|/.*$) [NC,OR]
+
+  # Block access to the /install directories
+  RewriteCond %{REQUEST_URI} (^|/)install($|/.*$) [NC,OR]
+
+  # Block access to the /vendor directories
+  RewriteCond %{REQUEST_URI} (^|/)vendor($|/.*$) [NC,OR]
+ 
+  # Block access to the /db directories
+  RewriteCond %{REQUEST_URI} (^|/)db($|/.*$) [NC]
+
+  RewriteRule ^.*$ - [F,L]
+
+
+  # Block access throughout to temporary files ending with tilde created by certain editors
+  RewriteCond %{REQUEST_URI} \.(html?|inc|json|lock|module|php|py|rb|sh|sql|tpl|tmpl|twig)~$ [NC,OR]
+
+  # Block access to markdown and other software documents
+  RewriteCond %{REQUEST_URI} (^|/)(COPYRIGHT|INSTALL|README|CHANGELOG|LICENSE|AUTHORS|CODE_OF_CONDUCT|LEGALNOTICE|RELEASE_NOTES|SECURITY|FILE_ID|htaccess)(|\.txt|\.md|\.textile|\.diz|\.DIZ)$ [NC,OR]
+
+  # Block access to source code files
+  RewriteCond %{REQUEST_URI} (^|/).+\.(sh|php|yml|conf|ini|log|sql|json|js|md|sh|xml|lock)$ [NC,OR]
+
+  # Block access to hidden files
+  RewriteCond %{REQUEST_URI} (^|/)\..+$ [NC,OR]
+
+  # Block access to names of potential backup file extensions within wire or site directories
+  RewriteCond %{REQUEST_URI} (^|/).+\.(bak|old|sql|sw[op]|(bak|php|sql)[./]+.*)[\d.]*$ [NC,OR]
+
+  # Block access to docker files if any left
+  RewriteCond %{REQUEST_URI} (^|/)(docker|Docker).*[\d.]*$ [NC,OR]
+
+  # Block archive file types commonly used for backups
+  # -----------------------------------------------------------------------------------------------
+  # This blocks requests for zip, rar, tar, gz, and tgz files that are sometimes left on servers
+
+  RewriteCond %{REQUEST_URI} \.(zip|rar|tar|gz|tgz)$ [NC]
+
+  RewriteRule ^.*$ - [F,L]
+
+  #RewriteCond %{REQUEST_FILENAME} !-f
+  #RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !(favicon\.ico|robots\.txt)
+
+  # ----------------------------------------------------------------------------------------------- 
+  # Pass control to tirreno if all the above directives allow us to this point.
+  # For regular VirtualHosts (most installs)
+  # ----------------------------------------------------------------------------------------------- 
+
+  RewriteRule .* index.php [L,QSA]
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+  
+</IfModule>

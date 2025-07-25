@@ -93,6 +93,7 @@ return [
     'AdminApi_invitation_email_body' => '%s has invited you to collaborate. You can accept this invitation by setting the password for your account or decline the invitation by ignoring this email. %s This invitation will expire in 24 hours.',
 
     'AdminApi_remove_co_owner_success_message' => 'Co-owner has been removed successfully.',
+    'AdminApi_remove_co_owner_error_message' => 'An error occured while removing co-owner.',
 
     'AdminApi_manual_enrichment_form_title' => 'Manual data enrichment',
     'AdminApi_manual_enrichment_form_confirmationMessage' => 'Identifies and sends data that was previously unenriched for re-enrichment in the background, ensuring all records are complete and accurate.',

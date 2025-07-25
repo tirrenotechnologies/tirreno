@@ -44,6 +44,9 @@ class Data extends \Controllers\Base {
         $details = $model->getPhoneDetails($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
+        $tsColumns = ['created', 'lastseen'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $details);
+
         return $details;
     }
 

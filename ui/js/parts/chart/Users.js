@@ -6,7 +6,7 @@ export class UsersChart extends BaseLineChart {
             this.getDaySeries(),
             this.getSingleSeries('High trust', 'green'),
             this.getSingleSeries('Average trust', 'yellow'),
-            this.getSingleSeries('On review', 'red'),
+            this.getSingleSeries('In review', 'red'),
         ];
     }
 }

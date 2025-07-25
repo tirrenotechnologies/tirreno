@@ -88,20 +88,8 @@ class Data extends \Controllers\Base {
         return ['data' => $resultKeys];
     }
 
-    public function getOperatorApiKeys(int $operatorId): array {
-        $model = new \Models\ApiKeys();
-        $apiKeys = $model->getKeys($operatorId);
-
-        $isOwner = true;
-        if (!$apiKeys) {
-            $coOwnerModel = new \Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
-
-            if ($coOwnerModel->loaded()) {
-                $isOwner = false;
-                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
-            }
-        }
+    public function getOperatorApiKeysDetails(int $operatorId): array {
+        [$isOwner, $apiKeys] = $this->getOperatorApiKeys($operatorId);
 
         $resultKeys = [];
 

@@ -32,4 +32,10 @@ class Navigation extends \Controllers\Base {
 
         return $apiKey ? (new Data())->getList($apiKey) : [];
     }
+
+    public function getMap(): array {
+        $apiKey = $this->getCurrentOperatorApiKeyId();
+
+        return $apiKey ? (new Data())->getMap($apiKey) : [];
+    }
 }

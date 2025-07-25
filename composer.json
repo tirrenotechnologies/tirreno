@@ -53,9 +53,11 @@
     "scripts": {
         "compile": [
             "chmod 755 tmp",
-            "chmod 755 logs",
+            "chmod 740 config",
             "chmod 755 assets",
             "chmod 755 assets/rules",
+            "chmod 755 assets/logs",
+            "chmod 755 assets/suspiciousWords",
             "chmod 640 composer.json",
             "chmod 640 composer.lock",
             "chmod -R 750 config"

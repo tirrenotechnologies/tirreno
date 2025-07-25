@@ -2,7 +2,7 @@
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="cmd" value="inviteCoOwner">
     <td>
-        <input class="input" name="email" type="text" placeholder="{{ @AdminApi_add_co_owner_form_email }}" />
+        <input class="input" name="email" type="text" placeholder="{{ @AdminApi_add_co_owner_form_email }}" autocomplete="off"/>
     </td>
     <td>
         <button class="button is-primary" type="submit">{{@AdminApi_add_co_owner_form_invite_button}}</button>

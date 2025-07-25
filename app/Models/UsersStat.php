@@ -36,19 +36,19 @@ class UsersStat extends \Models\BaseSql {
                 event
 
             LEFT JOIN event_account
-                ON event.account = event_account.id
+            ON event.account = event_account.id
 
             LEFT JOIN event_url
-                ON event.url = event_url.id
+            ON event.url = event_url.id
 
             LEFT JOIN event_ip
-                ON event.ip = event_ip.id
+            ON event.ip = event_ip.id
 
             LEFT JOIN event_device
-                ON event.device = event_device.id
+            ON event.device = event_device.id
 
             LEFT JOIN countries
-                ON event_ip.country = countries.serial
+            ON event_ip.country = countries.id
 
             WHERE
                 event.key = :api_key

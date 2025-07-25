@@ -1,53 +1,6 @@
-import {MAX_TOOLTIP_LENGTH} from './Constants.js?v=2';
-
-const truncateWithHellip = (value, n) => {
-    let tooltip = value;
-
-    if (value) {
-        if (value.length > (n + 2)) {
-            value = `${escapeForHTMLAttribute(value.slice(0, n))}&hellip;`;
-        } else {
-            value = escapeForHTMLAttribute(value);
-        }
-    }
-
-    if (tooltip.length > MAX_TOOLTIP_LENGTH) {
-        tooltip = `${escapeForHTMLAttribute(tooltip.slice(0, MAX_TOOLTIP_LENGTH))}&hellip;`;
-    } else {
-        tooltip = escapeForHTMLAttribute(tooltip);
-    }
-
-    value = `<span class="tooltip" title="${tooltip}">${value}</span>`;
-
-    return value;
-};
 
 const replaceAll = (str, search, replacement) => {
     return str.split(search).join(replacement);
-};
-
-const escapeForHTMLAttribute = (str) => {
-    if (str === '&#65293;') {
-        return str;
-    }
-
-    return (str === null || str === undefined) ? '' :
-        str.replace(/["'&<>]/g, function(match) {
-            switch (match) {
-                case '"':
-                    return '&quot;';
-                case '\'':
-                    return '&apos;';
-                case '&':
-                    return '&amp;';
-                case '<':
-                    return '&lt;';
-                case '>':
-                    return '&gt;';
-                default:
-                    return match;
-            }
-        });
 };
 
 const getRuleClass = (value) => {
@@ -111,9 +64,7 @@ const openJson = (str) => {
 };
 
 export {
-    truncateWithHellip,
     replaceAll,
-    escapeForHTMLAttribute,
     getRuleClass,
     formatTime,
     openJson,

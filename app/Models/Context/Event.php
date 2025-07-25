@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Event extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getEventDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         foreach ($recordsByAccount as $key => $value) {
@@ -37,7 +37,7 @@ class Event extends Base {
         return $recordsByAccount;
     }
 
-    private function getEventDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
         $contextLimit = \Utils\Constants::get('RULE_EVENT_CONTEXT_LIMIT');
 

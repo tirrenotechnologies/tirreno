@@ -1,9 +1,13 @@
 import {BasePage} from './Base.js';
 import {Tooltip} from '../parts/Tooltip.js?v=2';
-import {renderClickableUser, renderProportion} from '../parts/DataRenderers.js?v=2';
 import {handleAjaxError} from '../parts/utils/ErrorHandler.js?v=2';
 import {getRuleClass} from '../parts/utils/String.js?v=2';
 import {ThresholdsForm} from '../parts/ThresholdsForm.js?v=2';
+import {
+    renderClickableUser,
+    renderProportion,
+    renderRulePlayResult,
+} from '../parts/DataRenderers.js?v=2';
 
 export class RulesPage extends BasePage {
 
@@ -32,6 +36,8 @@ export class RulesPage extends BasePage {
     onPlayButtonClick(e) {
         e.preventDefault();
 
+        this.updateDisabled(true);
+
         const currentPlayButton = e.target.closest('button');
         currentPlayButton.classList.add('is-loading');
 
@@ -46,9 +52,8 @@ export class RulesPage extends BasePage {
             data: params,
             success: this.onCheckRuleLoad,          // without binding to keep simultaneous calls scopes separate
             error: handleAjaxError,
+            complete: this.updateDisabled.bind(this, false)
         });
-
-        this.initTooltips();
 
         return false;
     }
@@ -60,40 +65,28 @@ export class RulesPage extends BasePage {
 
         this.currentPlayButton.classList.remove('is-loading');
 
-        const users = data.users;
-        const count = data.count;
-
-        let html = [];
-        users.forEach((record) => {
-            html.push(renderClickableUser(record));
-        });
-
-
-        if (!count) {
-            html = `There are no users that match ${this.ruleUid} rule.`;
-        }
-
-        if (1 === count) {
-            html = `One user matching ${this.ruleUid} rule: ${html.join(', ')}`;
-        }
-
-        if (count > 1) {
-            html = `${count} users matching ${this.ruleUid} rule: ${html.join(', ')}`;
-        }
-
         let row     = document.querySelector(`tr[data-rule-uid="${this.ruleUid}"]`);
         let nextRow = row.nextElementSibling;
         if (!nextRow || nextRow.dataset.ruleUid) {
-            let ex = document.createElement('tr');
-            ex.innerHTML = '<td colspan="6"></td>';
+            const ex = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 6;
+
+            ex.replaceChildren(td);
 
             nextRow = row.parentNode.insertBefore(ex, row.nextSibling);
         }
 
-        nextRow.querySelector('td').innerHTML = html;
+        nextRow.querySelector('td').replaceChildren(renderRulePlayResult(data.users, data.count, this.ruleUid));
 
         // 3 is index of proportion column
-        row.children[3].innerHTML = renderProportion(data.proportion, data.proportion_updated_at);
+        row.children[3].replaceChildren(renderProportion(data.proportion, data.proportion_updated_at));
+
+        Tooltip.addTooltipsToRulesProportion();
+    }
+
+    updateDisabled(disabled) {
+        this.playButtons.forEach(button => button.disabled = disabled);
     }
 
     onSelectChange(e) {
@@ -184,10 +177,6 @@ export class RulesPage extends BasePage {
             }
             tr[i].style.display = found ? '' : 'none';
         }
-    }
-
-    initTooltips() {
-        Tooltip.addTooltipsToRulesProportion();
     }
 
     get selects() {

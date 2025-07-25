@@ -11,7 +11,7 @@ import {
     renderEmail,
     renderReputation,
     renderBoolean,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderClickableDomain,
     renderPhone,
     renderFullCountry,
@@ -101,7 +101,7 @@ export class EventPanel extends BasePanel {
         //data.email_profiles       = renderBoolean(data.email_profiles);
         data.free_provider        = renderBoolean(data.free_email_provider);
         data.data_breach          = renderBoolean(data.data_breach);
-        data.data_breaches        = renderDefaultIfEmpty(data.data_breaches);
+        data.data_breaches        = renderDefaultIfEmptyElement(data.data_breaches);
         data.blockemails          = renderBoolean(data.blockemails);
         data.email_fraud_detected = renderBoolean(data.email_fraud_detected);
         //  TODO: return alert_list back in next release
@@ -114,7 +114,7 @@ export class EventPanel extends BasePanel {
             http_code:  data.domain_return_code,
         };
         data.domain                 = renderClickableDomain(domain_record, 'long');
-        data.tranco_rank            = renderDefaultIfEmpty(data.tranco_rank);
+        data.tranco_rank            = renderDefaultIfEmptyElement(data.tranco_rank);
         data.blockdomains           = renderBoolean(data.blockdomains);
         data.disposable_domains     = renderBoolean(data.disposable_domains);
         data.domain_disabled        = renderBoolean(data.domain_disabled);
@@ -124,7 +124,8 @@ export class EventPanel extends BasePanel {
 
         const phone_record = {
             phonenumber:    data.phonenumber,
-            country:        data.phone_country,
+            country_id:     data.phone_country_id,
+            country_iso:    data.phone_country_iso,
             full_country:   data.phone_full_country,
             carrier_name:   data.carrier_name,
             type:           data.phone_type
@@ -149,6 +150,7 @@ export class EventPanel extends BasePanel {
             id:             data.deviceid,
             ua:             data.ua,
             os_name:        data.os_name,
+            os_version:     data.os_version,
             device_name:    data.device_name,
             browser:        `${browser_name} ${browser_version}`,
             lang:           data.lang
@@ -164,9 +166,9 @@ export class EventPanel extends BasePanel {
             isp_name:       data.netname,
             ipid:           data.ipid,
             ip:             data.ip,
-            country:        data.ip_country,
+            country_id:     data.ip_country_id,
+            country_iso:    data.ip_country_iso,
             full_country:   data.ip_full_country,
-            serial:         data.serial             // should be named serial for app/Traits/Enrichment/Ips.php calculations
         };
 
         data.cidr                 = renderCidr(data);

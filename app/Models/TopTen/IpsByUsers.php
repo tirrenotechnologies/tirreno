@@ -30,7 +30,7 @@ class IpsByUsers extends Base {
                 MAX(event_ip.ip) as ip,
                 MAX(event_ip.id) as ipid,
                 MAX(event_ip.shared) as value,
-                MAX(countries.id) as country,
+                MAX(countries.id) as country_id,
                 MAX(event_isp.name) as isp_name
 
             FROM
@@ -40,7 +40,7 @@ class IpsByUsers extends Base {
             ON (event.ip = event_ip.id)
 
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             INNER JOIN event_isp
             ON (event_ip.isp = event_isp.id)

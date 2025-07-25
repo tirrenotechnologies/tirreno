@@ -26,14 +26,14 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
 
         $query = (
             'SELECT
-                countries.id,
+                countries.iso,
                 countries.value
 
             FROM
                 event_country
 
             INNER JOIN countries
-            ON (event_country.country = countries.serial)
+            ON (event_country.country = countries.id)
 
             WHERE
                 event_country.key = :api_key
@@ -52,18 +52,18 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
 
         $query = (
             'SELECT
-                countries.serial
+                countries.id
 
             FROM
                 countries
 
             WHERE
-               countries.id = :country_iso'
+               countries.iso = :country_iso'
         );
 
         $results = $this->execQuery($query, $params);
 
-        return $results[0]['serial'] ?? 0;
+        return $results[0]['id'] ?? 0;
     }
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
@@ -217,9 +217,9 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
                     event.key = :key
                 GROUP BY event_ip.country
             ) AS sub
-            RIGHT JOIN countries sub_country ON sub.country = sub_country.serial
+            RIGHT JOIN countries sub_country ON sub.country = sub_country.id
             WHERE
-                event_country.country = sub_country.serial AND
+                event_country.country = sub_country.id AND
                 event_country.country IN ($flatIds) AND
                 event_country.key = :key
                 $extraClause"
@@ -250,10 +250,10 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
                 WHERE event.key = :key
                 GROUP BY event_ip.country
             ) AS sub
-            RIGHT JOIN countries sub_country ON sub.country = sub_country.serial
+            RIGHT JOIN countries sub_country ON sub.country = sub_country.id
             WHERE
                 event_country.key = :key AND
-                event_country.country = sub_country.serial AND
+                event_country.country = sub_country.id AND
                 event_country.lastseen >= event_country.updated'
         );
 

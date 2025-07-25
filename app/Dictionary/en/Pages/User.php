@@ -25,6 +25,8 @@ return [
     'AdminUser_widgets_email_tooltip' => 'A list of warning signals based on email addresses linked to the user.',
     'AdminUser_widgets_domain' => 'Domain',
     'AdminUser_widgets_domain_tooltip' => 'A list of warning signals based on email domains linked to the user.',
+    'AdminUser_widgets_phone' => 'Phone',
+    'AdminUser_widgets_phone_tooltip' => 'Phone.',
 
     'AdminUser_counters_total_countries' => 'Country count',
     'AdminUser_counters_total_countries_tooltip' => 'The number of countries geolocated by the user’s IP addresses.',

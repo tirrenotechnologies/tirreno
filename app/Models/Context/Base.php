@@ -18,6 +18,10 @@ namespace Models\Context;
 abstract class Base extends \Models\BaseSql {
     protected $DB_TABLE_NAME = 'event';
 
+    abstract public function getContext(array $accountIds, int $apiKey): array;
+
+    abstract protected function getDetails(array $accountIds, int $apiKey): array;
+
     protected function getRequestParams(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getArrayPlaceholders($accountIds);
         $params[':api_key'] = $apiKey;

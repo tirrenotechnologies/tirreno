@@ -30,7 +30,6 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'             => 'admin/blacklist.html',
             'JS'                    => 'admin_blacklist.js',
             'ENTITY_TYPES'          => \Utils\Constants::get('ENTITY_TYPES'),
-            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

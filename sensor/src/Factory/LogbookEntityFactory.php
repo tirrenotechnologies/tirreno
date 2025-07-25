@@ -26,7 +26,6 @@ class LogbookEntityFactory {
     public function create(
         int $apiKeyId,
         \DateTime $startedTime,
-        ?string $eventTime,
         RegularResponse|ErrorResponse $response,
     ): LogbookEntity {
         $eventId = null;
@@ -55,7 +54,6 @@ class LogbookEntityFactory {
             $errorType,
             $errorText,
             $this->getRawRequest(),
-            $eventTime,
             $this->formatStarted($startedTime),
         );
     }
@@ -63,7 +61,6 @@ class LogbookEntityFactory {
     public function createFromException(
         int $apiKeyId,
         \DateTime $startedTime,
-        ?string $eventTime,
         string $errorText,
     ): LogbookEntity {
         return new LogbookEntity(
@@ -73,7 +70,6 @@ class LogbookEntityFactory {
             3,
             $errorText,
             $this->getRawRequest(),
-            $eventTime,
             $this->formatStarted($startedTime),
         );
     }

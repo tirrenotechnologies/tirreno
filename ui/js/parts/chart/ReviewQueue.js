@@ -5,7 +5,7 @@ export class ReviewQueueChart extends BaseLineChart {
         return [
             this.getDaySeries(),
             this.getSingleSeries('Whitelisted', 'green'),
-            this.getSingleSeries('On review', 'yellow'),
+            this.getSingleSeries('In review', 'yellow'),
             this.getSingleSeries('Blacklisted', 'red'),
         ];
     }

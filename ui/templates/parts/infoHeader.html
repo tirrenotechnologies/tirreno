@@ -11,14 +11,14 @@
             <check if="isset(@country) && !empty(@country)">
                 <true>
                     {~
-                        $ICON_PATH = in_array($country['id'], [null, 'N/A', 'AN', 'CS', 'YU']) ? 'icons/null.svg' : 'flags/'.strtolower($country['id']).'.svg';
+                        $ICON_PATH = in_array($country['iso'], [null, 'N/A', 'AN', 'CS', 'YU']) ? 'icons/null.svg' : 'flags/'.strtolower($country['iso']).'.svg';
                     ~}
                     <check if="{{ isset(@type) && isset(@id) && isset(@dataIncomplete) && @dataIncomplete }}">
                         <true>
-                            <h1 class="title grey-title"><img src="/ui/images/{{ @ICON_PATH }}" class="country-flag" alt="{{@country.id}}">{{ @title }}<include href="templates/parts/forms/enrichmentButtonForm.html" with="type={{@type}}, entityId={{@id}}"/></h1>
+                            <h1 class="title grey-title"><img src="/ui/images/{{ @ICON_PATH }}" class="country-flag" alt="{{@country.iso}}">{{ @title }}<include href="templates/parts/forms/enrichmentButtonForm.html" with="type={{@type}}, entityId={{@id}}"/></h1>
                         </true>
                         <false>
-                            <h1 class="title grey-title"><img src="/ui/images/{{ @ICON_PATH }}" class="country-flag" alt="{{@country.id}}">{{ @title }}</h1>
+                            <h1 class="title grey-title"><img src="/ui/images/{{ @ICON_PATH }}" class="country-flag" alt="{{@country.iso}}">{{ @title }}</h1>
                         </false>
                     </check>
                 </true>

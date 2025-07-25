@@ -34,6 +34,24 @@ trait ApiKeys {
         return $key ? $key->token : null;
     }
 
+    public function getOperatorApiKeys(int $operatorId): array {
+        $model = new \Models\ApiKeys();
+        $apiKeys = $model->getKeys($operatorId);
+
+        $isOwner = true;
+        if (!$apiKeys) {
+            $coOwnerModel = new \Models\ApiKeyCoOwner();
+            $coOwnerModel->getCoOwnership($operatorId);
+
+            if ($coOwnerModel->loaded()) {
+                $isOwner = false;
+                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
+            }
+        }
+
+        return [$isOwner, $apiKeys];
+    }
+
     // returns \Models\ApiKeys; in test mode returns object
     protected function getCurrentOperatorApiKeyObject(): object|null {
         $currentOperator = $this->f3->get('CURRENT_USER');

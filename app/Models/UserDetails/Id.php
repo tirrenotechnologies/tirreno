@@ -60,6 +60,7 @@ class Id extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 event_account.fraud,
                 event_account.reviewed,
                 event_account.latest_decision,
+                event_account.added_to_review,
 
                 event_email.email
 
@@ -74,8 +75,14 @@ class Id extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 AND event_account.key = :api_key'
         );
 
+
         $results = $this->execQuery($query, $params);
 
-        return $results[0] ?? [];
+        $result = $results[0] ?? [];
+
+        $tsColumns = ['created', 'lastseen', 'score_updated_at', 'latest_decision', 'updated', 'added_to_review'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $result);
+
+        return $result;
     }
 }

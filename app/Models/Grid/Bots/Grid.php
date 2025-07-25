@@ -33,4 +33,10 @@ class Grid extends \Models\Grid\Base\Grid {
     protected function calculateCustomParams(array &$result): void {
         $this->applyDeviceParams($result);
     }
+
+    protected function convertTimeToUserTimezone(array &$result): void {
+        $fields = ['lastseen'];
+
+        $this->translateTimeZones($result, $fields);
+    }
 }

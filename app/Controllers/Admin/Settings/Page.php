@@ -26,19 +26,19 @@ class Page extends \Controllers\Pages\Base {
         $currentOperator = $this->f3->get('CURRENT_USER');
         $operatorId = $currentOperator->id;
 
-        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = $this->getOperatorApiKeys($operatorId);
 
         $pageParams = [
             'LOAD_DATATABLE'    => true,
             'LOAD_AUTOCOMPLETE' => true,
             'HTML_FILE'         => 'admin/settings.html',
             'JS'                => 'admin_settings.js',
+            'TIMEZONES'         => \Utils\TimeZones::timeZonesList(),
             'CURRENT_VERSION'   => \Utils\VersionControl::fullVersionString(),
         ];
 
         if ($this->isPostRequest()) {
             $params = $this->f3->get('POST');
-            $params['id'] = $operatorId;
             $operationResponse = $dataController->proceedPostRequest($params);
 
             $pageParams = array_merge($pageParams, $operationResponse);

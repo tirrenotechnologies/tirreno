@@ -1,7 +1,7 @@
 import {BasePanel} from './BasePanel.js?v=2';
 import {
     renderPhone,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderFullCountry,
     renderPhoneCarrierName,
     renderPhoneType,
@@ -28,14 +28,15 @@ export class PhonePanel extends BasePanel {
     proceedData(data) {
         const phone_record = {
             phonenumber:    data.phone_number,
-            country:        data.phone_country,
-            full_country:   data.phone_full_country,
+            country_id:     data.country_id,
+            country_iso:    data.country_iso,
+            full_country:   data.full_country,
             carrier_name:   data.carrier_name,
             type:           data.type
         };
         data.phone_number           = renderPhone(phone_record);
-        data.phone_national         = renderDefaultIfEmpty(data.national_format);
-        data.country                = renderFullCountry(data.phone_full_country);
+        data.phone_national         = renderDefaultIfEmptyElement(data.national_format);
+        data.country                = renderFullCountry(data.full_country);
         data.carrier_name           = renderPhoneCarrierName(phone_record);
         data.type                   = renderPhoneType(phone_record);
         data.shared                 = renderUserCounter(data.shared, 2);

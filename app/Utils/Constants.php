@@ -17,19 +17,17 @@ namespace Utils;
 
 class Constants {
     public static function get(string $key): array|string {
-        $reflection = new \ReflectionClass(__CLASS__);
-        $constants = $reflection->getConstants();
-
-        if (!array_key_exists($key, $constants)) {
-            trigger_error("Undefined constant: " . $key, E_USER_ERROR);
+        $const = __CLASS__ . '::' . $key;
+        if (!defined($const)) {
+            trigger_error('Undefined constant: ' . $key, E_USER_ERROR);
         }
 
-        $value = $constants[$key];
+        $value = constant($const);
 
         $f3 = \Base::instance();
-        $f3Key = 'EXTRA_' . $key;
-        if ($f3->exists($f3Key)) {
-            $value = is_array($value) ? array_merge($value, $f3->get($f3Key)) : $f3->get($f3Key);
+        $f3key = 'EXTRA_' . $key;
+        if ($f3->exists($f3key)) {
+            $value = is_array($value) ? array_merge($value, $f3->get($f3key)) : $f3->get($f3key);
         }
 
         return $value;
@@ -204,6 +202,7 @@ class Constants {
         'review-queue'  => \Models\Chart\ReviewQueue::class,
         'country'       => \Models\Chart\Country::class,
         'blacklist'     => \Models\Chart\Blacklist::class,
+        'logbook'       => \Models\Chart\Logbook::class,
     ];
 
     public const LINE_CHARTS = [
@@ -218,6 +217,7 @@ class Constants {
         'isps',
         'domains',
         'blacklist',
+        'logbook'
     ];
 
     public const CHART_RESOLUTION = [
@@ -300,6 +300,7 @@ class Constants {
 
     public const ALERT_EVENT_TYPES = [
         'page_delete',
+        'page_error',
         'account_login_fail',
         'account_email_change',
         'account_password_change',
@@ -309,6 +310,26 @@ class Constants {
         'page_edit',
         'account_registration',
         'account_edit',
+    ];
+
+    public const NORMAL_EVENT_TYPES = [
+        'page_view',
+        'page_search',
+        'account_login',
+        'account_logout',
+    ];
+
+    public const FAILED_LOGBOOK_EVENT_TYPES = [
+        'critical_validation_error',
+        'critical_error',
+    ];
+
+    public const ISSUED_LOGBOOK_EVENT_TYPES = [
+        'validation_error',
+    ];
+
+    public const NORMAL_LOGBOOK_EVENT_TYPES = [
+        'success',
     ];
 
     public const ENTITY_TYPES = [

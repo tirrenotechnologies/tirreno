@@ -59,7 +59,7 @@ docker pull tirreno/tirreno:latest
 
 ## Using Heroku (optional)
 
-Click [here](https://www.heroku.com/deploy?template=https://github.com/tirrenotechnologies/tirreno) to launch heroku deployment.
+Click [here](https://heroku.com/deploy?template=https://github.com/tirrenotechnologies/tirreno) to launch heroku deployment.
 
 ## Documentation
 

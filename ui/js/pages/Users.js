@@ -38,11 +38,6 @@ export class UsersPage extends BasePage {
             tableId:        'users-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
-            totals: {
-                type: 'user',
-                columns: ['total_visit'],
-            },
 
             choicesFilterEvents: [rulesFilter.getEventType(), scoresRangeFilter.getEventType()],
 

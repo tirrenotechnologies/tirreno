@@ -3,7 +3,7 @@ import {
     renderClickableDomain,
     renderBoolean,
     renderDate,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderUserCounter,
 } from '../DataRenderers.js?v=2';
 
@@ -74,7 +74,7 @@ export class DomainsGrid extends BaseGrid {
                 data: 'tranco_rank',
                 name: 'tranco_rank',
                 render: (data, type, record) => {
-                    let rank = renderDefaultIfEmpty(data);
+                    let rank = renderDefaultIfEmptyElement(data);
                     if (data) {
                         rank = data;
                     }
@@ -104,7 +104,7 @@ export class DomainsGrid extends BaseGrid {
                     if (creation_date) {
                         return renderDate(creation_date);
                     } else {
-                        return renderDefaultIfEmpty(creation_date);
+                        return renderDefaultIfEmptyElement(creation_date);
                     }
                 }
             },

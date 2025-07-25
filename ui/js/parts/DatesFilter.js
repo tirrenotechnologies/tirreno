@@ -11,7 +11,7 @@ export class DatesFilter {
     constructor() {
         this.setupXhrPool();
         this.offset = (this.offsetField) ? parseInt(this.offsetField.value, 10) : 0;
-
+        this.ajaxCount = 0;
         if (this.isDateFilterUnavailable) {
             return true;
         }
@@ -37,6 +37,12 @@ export class DatesFilter {
 
         const onIntervalLinkClick = this.onIntervalLinkClick.bind(this);
         this.intervalLinks.forEach(item => item.addEventListener('click', onIntervalLinkClick, false));
+
+        const onDateFilterChangedCaught = this.onDateFilterChangedCaught.bind(this);
+        window.addEventListener('dateFilterChangedCaught', onDateFilterChangedCaught, false);
+
+        const onDateFilterChangedCompleted = this.onDateFilterChangedCompleted.bind(this);
+        window.addEventListener('dateFilterChangedCompleted', onDateFilterChangedCompleted, false);
     }
 
     setupXhrPool() {
@@ -55,7 +61,7 @@ export class DatesFilter {
                 $.xhrPool.push(jqXHR);
             },
             complete: function(jqXHR) { // when some of the requests completed it will splice from the array
-                var index = $.xhrPool.indexOf(jqXHR);
+                const index = $.xhrPool.indexOf(jqXHR);
                 if (index > -1) {
                     $.xhrPool.splice(index, 1);
                 }
@@ -72,7 +78,7 @@ export class DatesFilter {
         dateTo = new Date(dateTo.getTime() + (dateTo.getTimezoneOffset() * 60 + this.offset) * 1000); // now time in op tz
 
         const dateFrom = addDays(dateTo, -DAYS_IN_RANGE); // dateFrom in op tz
-        dateFrom.setHours(0, 0, 0, 0);
+        dateFrom.setHours(24, 0, 0, 0);
 
         this.dateToLocalField.value   = formatStringTime(dateTo);
         this.dateFromLocalField.value = formatStringTime(dateFrom);
@@ -125,10 +131,10 @@ export class DatesFilter {
         data['dateTo']   = this.dateToField.value;
         data['dateFrom'] = this.dateFromField.value;
 
-        const rangeWasChanged = (1 == this.dateFromField.dataset.changed) || (1 == this.dateToField.dataset.changed);
+        /*const rangeWasChanged = (1 == this.dateFromField.dataset.changed) || (1 == this.dateToField.dataset.changed);
         if (rangeWasChanged) {
             data['keepDates'] = 1;
-        }
+        }*/
 
         return data;
     }
@@ -137,15 +143,17 @@ export class DatesFilter {
         e.preventDefault();
 
         const link = e.target;
-        if (link.classList.contains('active')) {
+        if (link.classList.contains('active') || link.classList.contains('blocked')) {
             return false;
         }
 
+        this.updateDisabled(true);
+
         $.xhrPool.abortAll();
 
-        const value = link.dataset.value;
+        const value = parseInt(link.dataset.value, 10) || 0;
 
-        if (value == 0) {
+        if (value === 0) {
             this.clearDateRange();
         } else {
             this.setDateRangeFromNow(value);
@@ -159,6 +167,22 @@ export class DatesFilter {
         return false;
     }
 
+    updateDisabled(disabled) {
+        this.intervalLinks.forEach(item => {
+            if (disabled) {
+                if (!item.classList.contains('active')) {
+                    item.setAttribute('tabindex', '-1');
+                    item.classList.add('blocked');
+                    item.removeAttribute('href');
+                }
+            } else {
+                item.setAttribute('tabindex', '0');
+                item.classList.remove('blocked');
+                item.setAttribute('href', 'javascript:void(0);');
+            }
+        });
+    }
+
     // with op tz and utc shift for calculation request
     setDateRangeFromNow(hoursDiff) {
         let dateTo = new Date();
@@ -168,7 +192,7 @@ export class DatesFilter {
         if (hoursDiff < 24 && hoursDiff > -24) {
             dateFrom.setMinutes(0, 0, 0);
         } else {
-            dateFrom.setHours(0, 0, 0, 0);
+            dateFrom.setHours(24, 0, 0, 0);
         }
 
         dateTo = new Date(dateTo.getTime() - (this.offset * 1000)); // dateTo at utc
@@ -181,6 +205,17 @@ export class DatesFilter {
     clearDateRange() {
         this.dateToField.value   = null;
         this.dateFromField.value = null;
+    }
+
+    onDateFilterChangedCaught() {
+        this.ajaxCount++;
+    }
+
+    onDateFilterChangedCompleted() {
+        this.ajaxCount--;
+        if (this.ajaxCount <= 0) {
+            this.updateDisabled(false);
+        }
     }
 
     get isDateFilterUnavailable() {

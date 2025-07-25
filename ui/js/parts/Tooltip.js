@@ -68,7 +68,7 @@ export class Tooltip {
     }
 
     static addTooltipsToRulesProportion() {
-        const path   = 'td.tooltip';
+        const path   = 'td .tooltip';
         const items  = document.querySelectorAll(path);
         const config = this.getConfig(true);
 

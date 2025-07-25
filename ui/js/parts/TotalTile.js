@@ -33,7 +33,7 @@ export class TotalTile {
             //Add new color class
             el.classList.add(tileCls);
 
-            el.innerHTML = value;
+            el.textContent = value;
         }
     }
 

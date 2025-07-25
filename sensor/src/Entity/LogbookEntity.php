@@ -30,7 +30,6 @@ class LogbookEntity {
         public int $errorType,
         public ?string $errorText,
         public string $raw,
-        public ?string $rawTime,
         public ?string $started,
     ) {
     }

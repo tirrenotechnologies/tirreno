@@ -21,38 +21,22 @@ class ReviewQueue extends Base {
     protected $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
-        $data0 = [];
-        $data1 = $this->getFirstLine($apiKey);
-        $iters = count($data1);
+        $field1 = 'ts_new_users_whitelisted';
+        $data1  = $this->getFirstLine($apiKey);
 
-        for ($i = 0; $i < $iters; ++$i) {
-            $item = $data1[$i];
-            $ts = $item['ts'];
-            $fraud = $item['fraud'];
+        $field2 = 'ts_new_added_to_review';
+        $data2  = $this->getSecondLine($apiKey);
 
-            if (!isset($data0[$ts])) {
-                $data0[$ts] = [
-                    'ts' => $ts,
-                    'ts_new_users_whitelisted' => 0,
-                    'ts_new_users_on_review' => 0,
-                    'ts_new_users_blacklisted' => 0,
-                ];
-            }
+        $field3 = 'ts_new_users_blacklisted';
+        $data3  = $this->getThirdLine($apiKey);
 
-            if ($fraud === false) {
-                ++$data0[$ts]['ts_new_users_whitelisted'];
-            } elseif ($fraud === true) {
-                ++$data0[$ts]['ts_new_users_blacklisted'];
-            } else {
-                ++$data0[$ts]['ts_new_users_on_review'];
-            }
-        }
+        $data0 = $this->concatDataLines($data1, $field1, $data2, $field2, $data3, $field3);
 
         $indexedData    = array_values($data0);
         $timestamps     = array_column($indexedData, 'ts');
-        $line1          = array_column($indexedData, 'ts_new_users_whitelisted');
-        $line2          = array_column($indexedData, 'ts_new_users_on_review');
-        $line3          = array_column($indexedData, 'ts_new_users_blacklisted');
+        $line1          = array_column($indexedData, $field1);
+        $line2          = array_column($indexedData, $field2);
+        $line3          = array_column($indexedData, $field3);
 
         return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
@@ -60,19 +44,60 @@ class ReviewQueue extends Base {
     private function getFirstLine(int $apiKey): array {
         $query = (
             'SELECT
-                EXTRACT(EPOCH FROM date_trunc(:resolution, COALESCE(event_account.latest_decision, event_account.lastseen) + :offset))::bigint AS ts,
-                event_account.id,
-                event_account.reviewed,
-                event_account.fraud
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_account.latest_decision + :offset))::bigint AS ts,
+                COUNT(event_account.id) as ts_new_users_whitelisted
             FROM
                 event_account
 
             WHERE
                 event_account.key = :api_key AND
-                event_account.lastseen >= :start_time AND
-                event_account.lastseen <= :end_time
+                event_account.fraud IS FALSE AND
+                event_account.latest_decision >= :start_time AND
+                event_account.latest_decision <= :end_time
 
-            GROUP BY ts, event_account.id
+            GROUP BY ts
+            ORDER BY ts'
+        );
+
+        return $this->execute($query, $apiKey, false);
+    }
+
+    private function getSecondLine(int $apiKey): array {
+        $query = (
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_account.added_to_review + :offset))::bigint AS ts,
+                COUNT(event_account.id) AS ts_new_added_to_review
+            FROM
+                event_account
+
+            WHERE
+                event_account.key = :api_key AND
+                event_account.added_to_review IS NOT NULL AND
+                event_account.added_to_review >= :start_time AND
+                event_account.added_to_review <= :end_time
+
+            GROUP BY ts
+            ORDER BY ts'
+        );
+
+        return $this->execute($query, $apiKey, false);
+    }
+
+    private function getThirdLine(int $apiKey): array {
+        $query = (
+            'SELECT
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_account.latest_decision + :offset))::bigint AS ts,
+                COUNT(event_account.id) as ts_new_users_blacklisted
+            FROM
+                event_account
+
+            WHERE
+                event_account.key = :api_key AND
+                event_account.fraud IS TRUE AND
+                event_account.latest_decision >= :start_time AND
+                event_account.latest_decision <= :end_time
+
+            GROUP BY ts
             ORDER BY ts'
         );
 

@@ -32,7 +32,6 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'             => 'admin/reviewQueue.html',
             'JS'                    => 'admin_review_queue.js',
             'RULES'                 => $rulesController->getAllRulesByApiKey($apiKey),
-            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

@@ -157,7 +157,11 @@ export class BasePanel {
         for (const key in data) {
             span = this.card.querySelector(`#details_${key}`);
             if (span) {
-                span.innerHTML = data[key];
+                if (data[key] instanceof Node) {
+                    span.replaceChildren(data[key]);
+                } else {
+                    span.innerHTML = data[key];
+                }
             }
         }
 

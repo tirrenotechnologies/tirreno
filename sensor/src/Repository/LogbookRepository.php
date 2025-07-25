@@ -27,9 +27,9 @@ class LogbookRepository {
 
     public function insert(LogbookEntity $request): void {
         $sql = 'INSERT INTO event_logbook
-                (key, ip, event, error_type, error_text, raw, raw_time, started)
+                (key, ip, event, error_type, error_text, raw, started)
             VALUES
-                (:key, :ip, :event, :error_type, :error_text, :raw, :raw_time, :started)';
+                (:key, :ip, :event, :error_type, :error_text, :raw, :started)';
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':key', $request->apiKeyId);
         $stmt->bindValue(':ip', $request->ip);
@@ -37,7 +37,6 @@ class LogbookRepository {
         $stmt->bindValue(':error_type', $request->errorType);
         $stmt->bindValue(':error_text', $request->errorText);
         $stmt->bindValue(':raw', $request->raw);
-        $stmt->bindValue(':raw_time', $request->rawTime);
         $stmt->bindValue(':started', $request->started);
         $stmt->execute();
     }

@@ -16,15 +16,15 @@
 namespace Models\Context;
 
 class Session extends Base {
-    public function getContext(int $timezoneOffset, array $accountIds, int $apiKey): array {
-        $records = $this->getSessionDetails($timezoneOffset, $apiKey, $accountIds);
+    public function getContext(array $accountIds, int $apiKey, int $timezoneOffset = 0): array {
+        $records = $this->getDetails($accountIds, $apiKey, $timezoneOffset);
         // one record per account
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         return $recordsByAccount;
     }
 
-    private function getSessionDetails(int $timezoneOffset, int $apiKey, array $accountIds): array {
+    protected function getDetails(array $accountIds, int $apiKey, int $timezoneOffset = 0): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $params[':night_start'] = gmdate('H:i:s', \Utils\Constants::get('NIGHT_RANGE_SECONDS_START') - $timezoneOffset);

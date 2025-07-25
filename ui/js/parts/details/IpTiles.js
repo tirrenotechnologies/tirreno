@@ -12,21 +12,21 @@ const ELEMS = ['country', 'asn', 'blocklist', 'blacklist', 'dc', 'vpn', 'tor', '
 export class IpTiles extends BaseTiles {
     updateTiles(data) {
         const record = {
-            country: data.abbr_country,
-            full_country: data.country,
-            serial: data.serial,
-            asn: data.asn,
-            ispid: data.ispid,
+            full_country:   data.full_country,
+            country_id:     data.country_id,
+            country_iso:    data.country_iso,
+            asn:            data.asn,
+            ispid:          data.ispid,
         };
 
-        document.getElementById('country').innerHTML    = renderClickableCountryTruncated(record);
-        document.getElementById('asn').innerHTML        = renderClickableAsn(record);
-        document.getElementById('blocklist').innerHTML  = renderBoolean(data.blocklist);
-        document.getElementById('blacklist').innerHTML  = renderBoolean(data.fraud_detected);
-        document.getElementById('dc').innerHTML         = renderBoolean(data.data_center);
-        document.getElementById('vpn').innerHTML        = renderBoolean(data.vpn);
-        document.getElementById('tor').innerHTML        = renderBoolean(data.tor);
-        document.getElementById('ar').innerHTML         = renderBoolean(data.relay);
+        document.getElementById('country').replaceChildren(renderClickableCountryTruncated(record));
+        document.getElementById('asn').replaceChildren(renderClickableAsn(record));
+        document.getElementById('blocklist').replaceChildren(renderBoolean(data.blocklist));
+        document.getElementById('blacklist').replaceChildren(renderBoolean(data.fraud_detected));
+        document.getElementById('dc').replaceChildren(renderBoolean(data.data_center));
+        document.getElementById('vpn').replaceChildren(renderBoolean(data.vpn));
+        document.getElementById('tor').replaceChildren(renderBoolean(data.tor));
+        document.getElementById('ar').replaceChildren(renderBoolean(data.relay));
     }
 
     initTooltips() {

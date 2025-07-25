@@ -30,6 +30,7 @@ export class DevicePanel extends BasePanel {
         const device_record   = {
             ua:             data.ua,
             os_name:        data.os_name,
+            os_version:     data.os_version,
             device_name:    data.device,
             browser:        `${browser_name} ${browser_version}`,
             lang:           data.lang

@@ -2,14 +2,14 @@ export class Loader {
 
     constructor() {
         this.symbols = [
-            '<p class=\'level-center\'>⣾</p>',
-            '<p class=\'level-center\'>⣷</p>',
-            '<p class=\'level-center\'>⣯</p>',
-            '<p class=\'level-center\'>⣟</p>',
-            '<p class=\'level-center\'>⡿</p>',
-            '<p class=\'level-center\'>⢿</p>',
-            '<p class=\'level-center\'>⣻</p>',
-            '<p class=\'level-center\'>⣽</p>'
+            this.el('⣾'),
+            this.el('⣷'),
+            this.el('⣯'),
+            this.el('⣟'),
+            this.el('⡿'),
+            this.el('⢿'),
+            this.el('⣻'),
+            this.el('⣽'),
         ];
     }
 
@@ -30,7 +30,7 @@ export class Loader {
 
             let symbol = me.symbols[counter % me.symbols.length];
 
-            me.loaderEl.innerHTML = symbol;
+            me.loaderEl.replaceChildren(symbol);
 
             counter++;
         }, 85);
@@ -39,5 +39,13 @@ export class Loader {
     stop() {
         this.loaderEl.classList.add('loaded');
         this.loaderEl.classList.remove('loading');
+    }
+
+    el(c) {
+        const node = document.createElement('p');
+        node.className = 'level-center';
+        node.textContent = c;
+
+        return node;
     }
 }

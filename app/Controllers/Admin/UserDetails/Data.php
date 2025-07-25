@@ -17,22 +17,46 @@ namespace Controllers\Admin\UserDetails;
 
 class Data extends \Controllers\Base {
     public function getUserDetails(int $userId, int $apiKey): array {
-        $model = new \Models\UserDetails\Id();
-        $userDetails = $model->getDetails($userId, $apiKey);
+        $model          = new \Models\UserDetails\Id();
+        $userDetails    = $model->getDetails($userId, $apiKey);
 
-        $model = new \Models\UserDetails\Email();
-        $emailDetails = $model->getDetails($userId, $apiKey);
+        $model          = new \Models\UserDetails\Behaviour();
+        $offset         = \Utils\TimeZones::getCurrentOperatorOffset();
 
-        $model = new \Models\UserDetails\Domain();
-        $domainDetails = $model->getDetails($userId, $apiKey);
+        $dateRange      = \Utils\TimeZones::getCurDayRange($offset);
+        $dayDetails     = $model->getDetails($userId, $dateRange, $apiKey);
 
-        $model = new \Models\UserDetails\Ip();
-        $ipDetails = $model->getDetails($userId, $apiKey);
+        $dateRange      = \Utils\TimeZones::getCurWeekRange($offset);
+        $weekDetails    = $model->getDetails($userId, $dateRange, $apiKey);
+
+        $dateRange      = \Utils\TimeZones::getCurMonthRange($offset);
+        $monthDetails   = $model->getDetails($userId, $dateRange, $apiKey);
 
         return [
-            'ipDetails' => $ipDetails,
-            'userDetails' => $userDetails,
-            'emailDetails' => $emailDetails,
+            'userDetails'   => $userDetails,
+            'dayDetails'    => $dayDetails,
+            'weekDetails'   => $weekDetails,
+            'monthDetails'  => $monthDetails,
+        ];
+    }
+
+    public function getUserEnrichmentDetails(int $userId, int $apiKey): array {
+        $model          = new \Models\UserDetails\Phone();
+        $phoneDetails   = $model->getDetails($userId, $apiKey);
+
+        $model          = new \Models\UserDetails\Email();
+        $emailDetails   = $model->getDetails($userId, $apiKey);
+
+        $model          = new \Models\UserDetails\Domain();
+        $domainDetails  = $model->getDetails($userId, $apiKey);
+
+        $model          = new \Models\UserDetails\Ip();
+        $ipDetails      = $model->getDetails($userId, $apiKey);
+
+        return [
+            'ipDetails'     => $ipDetails,
+            'phoneDetails'  => $phoneDetails,
+            'emailDetails'  => $emailDetails,
             'domainDetails' => $domainDetails,
         ];
     }

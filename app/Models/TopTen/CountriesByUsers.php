@@ -26,8 +26,8 @@ class CountriesByUsers extends Base {
 
         $query = (
             "SELECT
-                countries.serial,
-                countries.id                  AS country,
+                countries.id                  AS country_id,
+                countries.iso                 AS country_iso,
                 countries.value               AS full_country,
                 COUNT(DISTINCT event.account) AS value
 
@@ -38,7 +38,7 @@ class CountriesByUsers extends Base {
             ON (event.ip = event_ip.id)
 
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             WHERE
                 {$queryConditions}

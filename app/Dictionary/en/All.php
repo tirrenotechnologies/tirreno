@@ -22,6 +22,7 @@ return array_merge(
     include 'Parts/LeftMenu.php',
     include 'Parts/TopTen.php',
     include 'Parts/DetailsPanel.php',
+    include 'Parts/UserDetails.php',
     include 'Parts/TimeZones.php',
     include 'Pages/Logout.php',
     include 'Pages/Login.php',

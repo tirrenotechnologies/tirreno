@@ -29,7 +29,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_AUTOCOMPLETE'             => true,
             'HTML_FILE'                     => 'admin/bots.html',
             'JS'                            => 'admin_bots.js',
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

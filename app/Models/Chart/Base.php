@@ -49,6 +49,10 @@ abstract class Base extends \Models\BaseSql {
                     $field1 => 0,
                     $field2 => 0,
                 ];
+
+                if ($field3) {
+                    $data0[$ts][$field3] = 0;
+                }
             }
 
             $data0[$ts][$field2] = $item[$field2];
@@ -65,7 +69,7 @@ abstract class Base extends \Models\BaseSql {
                     'ts'    => $ts,
                     $field1 => 0,
                     $field2 => 0,
-                    $field2 => 3,
+                    $field3 => 0,
                 ];
             }
 

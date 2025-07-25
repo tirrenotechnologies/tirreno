@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Ip extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getIpDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);
         $recordsByAccount = $this->groupRecordsByAccount($records);
 
         foreach ($recordsByAccount as $key => $value) {
@@ -25,7 +25,6 @@ class Ip extends Base {
                 'eip_ip_id'             => array_column($value, 'eip_ip_id'),
                 'eip_ip'                => array_column($value, 'eip_ip'),
                 'eip_cidr'              => array_column($value, 'eip_cidr'),
-                'eip_country_serial'    => array_column($value, 'eip_country_serial'),
                 'eip_data_center'       => array_column($value, 'eip_data_center'),
                 'eip_tor'               => array_column($value, 'eip_tor'),
                 'eip_vpn'               => array_column($value, 'eip_vpn'),
@@ -45,7 +44,7 @@ class Ip extends Base {
         return $recordsByAccount;
     }
 
-    private function getIpDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $query = (
@@ -55,7 +54,7 @@ class Ip extends Base {
                 event_ip.id                                     AS eip_ip_id,
                 event_ip.ip                                     AS eip_ip,
                 event_ip.cidr::text                             AS eip_cidr,
-                event_ip.country                                AS eip_country_serial,
+                event_ip.country                                AS eip_country_id,
                 event_ip.data_center                            AS eip_data_center,
                 event_ip.tor                                    AS eip_tor,
                 event_ip.vpn                                    AS eip_vpn,
@@ -67,9 +66,7 @@ class Ip extends Base {
                 -- event_ip.domains_count                          AS eip_domains,
                 json_array_length(event_ip.domains_count::json) AS eip_domains_count_len,
                 event_ip.fraud_detected                         AS eip_fraud_detected,
-                event_ip.alert_list                             AS eip_alert_list,
-
-                event_ip.country                                AS eip_country_id
+                event_ip.alert_list                             AS eip_alert_list
 
             FROM
                 event_ip

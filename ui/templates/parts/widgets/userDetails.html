@@ -40,125 +40,119 @@
 
         </td>
 
-        <td class="table-card" id="ip-card">
+        <td class="table-card" id="day-behaviour-card">
             <header class="card-header">
                 <div class="card-header-title">
-                    {{ @AdminUser_widgets_ips_warning }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_ips_warning_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @UserDetails_day_card_title }}<p class="tooltip-info tooltip" title="{{ @UserDetails_day_card_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
             </header>
 
-            <div class="content" id="user-ip-tile">
+            <div class="content" id="day-behaviour-tile">
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_datacenter_tooltip }}">{{ @Base_table_column_ip_datacenter }}</span>
-                    <span class="detailsTileValue" id="datacenter"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_failed_login_count_tooltip }}">{{ @UserDetails_failed_login_count }}</span>
+                    <span class="detailsTileValue" id="failed-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_vpn_tooltip }}">{{ @Base_table_column_ip_vpn }}</span>
-                    <span class="detailsTileValue" id="vpn"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_password_reset_count_tooltip }}">{{ @UserDetails_password_reset_count }}</span>
+                    <span class="detailsTileValue" id="password-reset-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_tor_tooltip }}">{{ @Base_table_column_ip_tor }}</span>
-                    <span class="detailsTileValue" id="tor"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_auth_error_count_tooltip }}">{{ @UserDetails_auth_error_count }}</span>
+                    <span class="detailsTileValue" id="auth-error-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_apple_relay_tooltip }}">{{ @Base_table_column_ip_apple_relay }}</span>
-                    <span class="detailsTileValue" id="apple-relay"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_off_hours_login_count_tooltip }}">{{ @UserDetails_off_hours_login_count }}</span>
+                    <span class="detailsTileValue" id="off-hours-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_shared_tooltip }}">{{ @Base_table_column_ip_shared }}</span>
-                    <span class="detailsTileValue" id="ip-shared"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_device_count_tooltip }}">{{ @UserDetails_device_count }}</span>
+                    <span class="detailsTileValue" id="median-event-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_spamlist_tooltip }}">{{ @Base_table_column_ip_spamlist }}</span>
-                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_ip_count_tooltip }}">{{ @UserDetails_ip_count }}</span>
+                    <span class="detailsTileValue" id="login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_blacklist_tooltip }}">{{ @Base_table_column_ip_blacklist }}</span>
-                    <span class="detailsTileValue" id="blacklisted"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_session_count_tooltip }}">{{ @UserDetails_session_count }}</span>
+                    <span class="detailsTileValue" id="session-count"><span class="loading-background">&#8943;</span></span>
                 </div>
             </div>
         </td>
 
-        <td class="table-card" id="email-card">
+        <td class="table-card" id="week-behaviour-card">
             <header class="card-header">
                 <div class="card-header-title">
-                    {{ @AdminUser_widgets_email }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_email_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @UserDetails_week_card_title }}<p class="tooltip-info tooltip" title="{{ @UserDetails_week_card_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
             </header>
 
-            <div class="content" id="user-email-tile">
+            <div class="content" id="week-behaviour-tile">
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_reputation_tooltip }}">{{ @Base_table_column_email_reputation }}</span>
-                    <span class="detailsTileValue" id="reputation"><span class="loading-background">&#8943;</span></span>
-                </div>
-{***
-                <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_noprofiles_tooltip }}">{{ @Base_table_column_email_noprofiles }}</span>
-                    <span class="detailsTileValue" id="no-profiles"><span class="loading-background">&#8943;</span></span>
-                </div>
-***}
-                <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_nodatabreach_tooltip }}">{{ @Base_table_column_email_nodatabreach }}</span>
-                    <span class="detailsTileValue" id="no-breach"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_failed_login_count_tooltip }}">{{ @UserDetails_failed_login_count }}</span>
+                    <span class="detailsTileValue" id="failed-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_total_breaches_tooltip }}">{{ @Base_table_column_email_total_breaches }}</span>
-                    <span class="detailsTileValue" id="total-breaches"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_password_reset_count_tooltip }}">{{ @UserDetails_password_reset_count }}</span>
+                    <span class="detailsTileValue" id="password-reset-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_earliest_breach_tooltip }}">{{ @Base_table_column_email_earliest_breach }}</span>
-                    <span class="detailsTileValue" id="earliest-breach"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_auth_error_count_tooltip }}">{{ @UserDetails_auth_error_count }}</span>
+                    <span class="detailsTileValue" id="auth-error-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_free_provider_tooltip }}">{{ @Base_table_column_email_free_provider }}</span>
-                    <span class="detailsTileValue" id="free-provider"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_off_hours_login_count_tooltip }}">{{ @UserDetails_off_hours_login_count }}</span>
+                    <span class="detailsTileValue" id="off-hours-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_spamlist_tooltip }}">{{ @Base_table_column_email_spamlist }}</span>
-                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_device_count_tooltip }}">{{ @UserDetails_device_count }}</span>
+                    <span class="detailsTileValue" id="median-event-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_blacklist_tooltip }}">{{ @Base_table_column_email_blacklist }}</span>
-                    <span class="detailsTileValue" id="blacklisted"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_ip_count_tooltip }}">{{ @UserDetails_ip_count }}</span>
+                    <span class="detailsTileValue" id="login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_session_count_tooltip }}">{{ @UserDetails_session_count }}</span>
+                    <span class="detailsTileValue" id="session-count"><span class="loading-background">&#8943;</span></span>
+                </div
             </div>
         </td>
 
-        <td class="table-card" id="domain-card">
+        <td class="table-card" id="month-behaviour-card">
             <header class="card-header">
                 <div class="card-header-title">
-                    {{ @AdminUser_widgets_domain }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_domain_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @UserDetails_month_card_title }}<p class="tooltip-info tooltip" title="{{ @UserDetails_month_card_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
             </header>
 
-            <div class="content" id="user-domain-tile">
+            <div class="content" id="month-behaviour-tile">
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_total_accounts_tooltip }}">{{ @Base_table_column_domain_total_accounts }}</span>
-                    <span class="detailsTileValue" id="total-accounts"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_failed_login_count_tooltip }}">{{ @UserDetails_failed_login_count }}</span>
+                    <span class="detailsTileValue" id="failed-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_registered_tooltip }}">{{ @Base_table_column_domain_registered }}</span>
-                    <span class="detailsTileValue" id="registered-on"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_password_reset_count_tooltip }}">{{ @UserDetails_password_reset_count }}</span>
+                    <span class="detailsTileValue" id="password-reset-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_expires_tooltip }}">{{ @Base_table_column_domain_expires }}</span>
-                    <span class="detailsTileValue" id="expires-on"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_auth_error_count_tooltip }}">{{ @UserDetails_auth_error_count }}</span>
+                    <span class="detailsTileValue" id="auth-error-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_disposable_tooltip }}">{{ @Base_table_column_disposable }}</span>
-                    <span class="detailsTileValue" id="disposable"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_off_hours_login_count_tooltip }}">{{ @UserDetails_off_hours_login_count }}</span>
+                    <span class="detailsTileValue" id="off-hours-login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_tranco_rank_tooltip }}">{{ @Base_table_column_tranco_rank }}</span>
-                    <span class="detailsTileValue" id="global-rank"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_device_count_tooltip }}">{{ @UserDetails_device_count }}</span>
+                    <span class="detailsTileValue" id="median-event-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_spamlist_tooltip }}">{{ @Base_table_column_domain_spamlist }}</span>
-                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_ip_count_tooltip }}">{{ @UserDetails_ip_count }}</span>
+                    <span class="detailsTileValue" id="login-count"><span class="loading-background">&#8943;</span></span>
                 </div>
                 <div class="itemDetails">
-                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_unavailable_tooltip }}">{{ @Base_table_column_unavailable }}</span>
-                    <span class="detailsTileValue" id="unavailable"><span class="loading-background">&#8943;</span></span>
+                    <span class="tooltip detailsTileTitle" title="{{ @UserDetails_session_count_tooltip }}">{{ @UserDetails_session_count }}</span>
+                    <span class="detailsTileValue" id="session-count"><span class="loading-background">&#8943;</span></span>
                 </div>
             </div>
         </td>

@@ -60,6 +60,13 @@ class UsersByIps extends Base {
             LIMIT 10 OFFSET 0"
         );
 
-        return $this->execQuery($query, $params);
+        $results = $this->execQuery($query, $params);
+
+        foreach ($results as $i => $val) {
+            $tsColumns = ['score_updated_at'];
+            \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $results[$i]);
+        }
+
+        return $results;
     }
 }

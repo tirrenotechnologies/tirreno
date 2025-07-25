@@ -28,7 +28,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/isps.html',
             'JS'                    => 'admin_isps.js',
-            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

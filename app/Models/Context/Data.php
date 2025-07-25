@@ -16,38 +16,50 @@
 namespace Models\Context;
 
 class Data {
+    private \Models\Context\User $userModel;
+    private \Models\Context\Ip $ipModel;
+    private \Models\Context\Device $deviceModel;
+    private \Models\Context\Email $emailModel;
+    private \Models\Context\Phone $phoneModel;
+    private \Models\Context\Event $eventModel;
+    private \Models\Context\Session $sessionModel;
+    private \Models\ApiKeys $keyModel;
+
+    private array $suspiciousWordsUrl;
+    private array $suspiciousWordsSql;
+    private array $suspiciousWordsEmail;
+
+    public function __construct() {
+        $this->userModel    = new User();
+        $this->ipModel      = new Ip();
+        $this->deviceModel  = new Device();
+        $this->emailModel   = new Email();
+        $this->phoneModel   = new Phone();
+        $this->eventModel   = new Event();
+        $this->sessionModel = new Session();
+        $this->keyModel     = new \Models\ApiKeys();
+
+        $this->suspiciousWordsUrl   = \Utils\SuspiciousWordsUrl::getWords();
+        $this->suspiciousWordsSql   = \Utils\SuspiciousWordsSql::getWords();
+        $this->suspiciousWordsEmail = \Utils\SuspiciousWordsEmail::getWords();
+    }
+
     public function getContext(array $accountIds, int $apiKey): array {
-        $model = new User();
-        $userDetails = $model->getContext($accountIds, $apiKey);
+        $userDetails        = $this->userModel->getContext($accountIds, $apiKey);
+        $ipDetails          = $this->ipModel->getContext($accountIds, $apiKey);
+        $deviceDetails      = $this->deviceModel->getContext($accountIds, $apiKey);
+        $emailDetails       = $this->emailModel->getContext($accountIds, $apiKey);
+        $phoneDetails       = $this->phoneModel->getContext($accountIds, $apiKey);
+        $eventDetails       = $this->eventModel->getContext($accountIds, $apiKey);
+        //$domainDetails    = $this->domainModel->getContext($accountIds, $apiKey);
 
-        $model = new Ip();
-        $ipDetails = $model->getContext($accountIds, $apiKey);
-
-        $model = new Device();
-        $deviceDetails = $model->getContext($accountIds, $apiKey);
-
-        $model = new Email();
-        $emailDetails = $model->getContext($accountIds, $apiKey);
-
-        $model = new Phone();
-        $phoneDetails = $model->getContext($accountIds, $apiKey);
-
-        $model = new Event();
-        $eventDetails = $model->getContext($accountIds, $apiKey);
-
-        //$model = new Domain();
-        //$domainDetails = $model->getContext($accountIds, $apiKey);
-
-        $model = new \Models\ApiKeys();
-        $timezoneName = $model->getTimezoneByKeyId($apiKey);
-
-        $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
-        $timezone = new \DateTimeZone($timezoneName);
-        $offsetInSeconds = $timezone->getOffset($utcTime);
+        $timezoneName       = $this->keyModel->getTimezoneByKeyId($apiKey);
+        $utcTime            = new \DateTime('now', new \DateTimeZone('UTC'));
+        $timezone           = new \DateTimeZone($timezoneName);
+        $offsetInSeconds    = $timezone->getOffset($utcTime);
 
         // get only suspicious sessions
-        $model = new Session();
-        $sessionDetails = $model->getContext($offsetInSeconds, $accountIds, $apiKey);
+        $sessionDetails     = $this->sessionModel->getContext($accountIds, $apiKey, $offsetInSeconds);
 
         //Extend user details context
         foreach ($userDetails as $userId => $user) {
@@ -67,7 +79,7 @@ class Data {
             $user['eip_ip_id']              = $ip['eip_ip_id'] ?? [];
             $user['eip_ip']                 = $ip['eip_ip'] ?? [];
             $user['eip_cidr']               = $ip['eip_cidr'] ?? [];
-            $user['eip_country_serial']     = $ip['eip_country_serial'] ?? [];
+            $user['eip_country_id']         = $ip['eip_country_id'] ?? [];
             $user['eip_data_center']        = $ip['eip_data_center'] ?? [];
             $user['eip_tor']                = $ip['eip_tor'] ?? [];
             $user['eip_vpn']                = $ip['eip_vpn'] ?? [];
@@ -183,7 +195,7 @@ class Data {
         ), static function ($value): bool {
             return $value === true;
         }));
-        $record['eip_only_residential'] = $onlyNonResidentialParams && !in_array(0, $record['eip_country_serial']);
+        $record['eip_only_residential'] = $onlyNonResidentialParams && !in_array(0, $record['eip_country_id']);
         $record['eip_has_fraud']        = in_array(true, $record['eip_fraud_detected']);
         $record['eip_unique_cidrs']     = count(array_unique($record['eip_cidr']));
         $record['lp_fraud_detected']    = $record['lp_fraud_detected'] ?? false;
@@ -195,10 +207,9 @@ class Data {
 
         $record['eup_vulnerable_ua']    = false;
 
-        $suspiciousSqlWords = \Utils\SuspiciousSqlWords::getWords();
-        if (count($suspiciousSqlWords)) {
+        if (count($this->suspiciousWordsSql)) {
             foreach ($record['eup_ua'] as $url) {
-                foreach ($suspiciousSqlWords as $sub) {
+                foreach ($this->suspiciousWordsSql as $sub) {
                     if (stripos($url, $sub) !== false) {
                         $record['eup_vulnerable_ua'] = true;
                         break 2;
@@ -244,10 +255,9 @@ class Data {
 
         $record['event_vulnerable_url']     = false;
 
-        $suspiciousUrlWords = \Utils\SuspiciousUrlWords::getWords();
-        if (count($suspiciousUrlWords)) {
+        if (count($this->suspiciousWordsUrl)) {
             foreach ($record['event_url_string'] as $url) {
-                foreach ($suspiciousUrlWords as $sub) {
+                foreach ($this->suspiciousWordsUrl as $sub) {
                     if (stripos($url, $sub) !== false) {
                         $record['event_vulnerable_url'] = true;
                         break 2;
@@ -321,7 +331,7 @@ class Data {
     }
 
     private function checkEmailForSuspiciousString(array $record): bool {
-        foreach (\Utils\SuspiciousEmailWords::getWords() as $sub) {
+        foreach ($this->suspiciousWordsEmail as $sub) {
             if (stripos($record['le_email'], $sub) !== false) {
                 return true;
             }

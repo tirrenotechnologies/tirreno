@@ -40,7 +40,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_UPLOT'                    => true,
             'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
             'JS'                            => 'admin_isp.js',
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

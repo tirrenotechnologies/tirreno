@@ -1,4 +1,4 @@
-import {AutocompleteBlock} from '../parts/AutocompleteBlock.js';
+import {SearchLine} from '../parts/SearchLine.js';
 import {Tooltip} from '../parts/Tooltip.js?v=2';
 
 export class BasePage {
@@ -7,7 +7,7 @@ export class BasePage {
     }
 
     initCommonUi() {
-        new AutocompleteBlock();
+        new SearchLine();
 
         document.addEventListener('keyup', e => {
             if (e.key !== '/' || e.ctrlKey || e.metaKey) return;

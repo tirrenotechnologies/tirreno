@@ -46,15 +46,15 @@ class Query extends \Models\Grid\Base\Query {
                 event_isp.description,
                 event_isp.asn,
 
-                countries.serial,
-                countries.id    AS country,
+                countries.id    AS country_id,
+                countries.iso   AS country_iso,
                 countries.value AS full_country
 
             FROM
                 event_ip
 
             LEFT JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             LEFT JOIN event_isp
             ON (event_ip.isp = event_isp.id)
@@ -83,7 +83,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_ip
 
             LEFT JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             LEFT JOIN event_isp
             ON (event_ip.isp = event_isp.id)
@@ -113,7 +113,7 @@ class Query extends \Models\Grid\Base\Query {
                     OR LOWER(event_isp.asn::text)       LIKE LOWER(:search_value)
                     OR LOWER(event_isp.name)            LIKE LOWER(:search_value)
                     OR LOWER(countries.value)           LIKE LOWER(:search_value)
-                    OR LOWER(countries.id)              LIKE LOWER(:search_value)
+                    OR LOWER(countries.iso)             LIKE LOWER(:search_value)
                 )'
             );
 
@@ -139,7 +139,7 @@ class Query extends \Models\Grid\Base\Query {
                     $query .= ' AND blocklist IS TRUE ';
                     break;
                 case 2:
-                    $query .= ' AND serial = 0 AND event_ip.checked IS TRUE ';
+                    $query .= ' AND country_id = 0 AND event_ip.checked IS TRUE ';
                     break;
                 case 3:
                     $query .= ' AND tor IS TRUE ';

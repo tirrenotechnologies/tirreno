@@ -71,7 +71,7 @@ export class IpsGrid extends BaseGrid {
                     const rec = {
                         ip: record.ip,
                         ipid: record.id,
-                        country: record.country,
+                        country_iso: record.country_iso,
                         full_country: record.full_country,
                         isp_name: record.netname,
                     };

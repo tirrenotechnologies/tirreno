@@ -10,7 +10,7 @@
         <include href="templates/parts/notification.html" />
 
         {~
-            $country = ['id' => $IP['abbr_country']];
+            $country = ['iso' => $IP['country_iso']];
 
             $subtitle = array();
             if(isset($IP['name']) && !empty($IP['name'])) {

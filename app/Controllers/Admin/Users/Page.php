@@ -38,7 +38,6 @@ class Page extends \Controllers\Pages\Base {
             'JS'                    => 'admin_users.js',
             'RULES'                 => $rulesController->getAllRulesByApiKey($apiKey),
             'DEFAULT_RULE'          => $ruleUid,
-            'OFFSET'                => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

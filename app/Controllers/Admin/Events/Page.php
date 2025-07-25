@@ -35,7 +35,6 @@ class Page extends \Controllers\Pages\Base {
             'JS'                            => 'admin_events.js',
             'EVENT_TYPES'                   => $controller->getAllEventTypes(),
             'RULES'                         => $rulesController->getAllRulesByApiKey($apiKey),
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

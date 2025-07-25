@@ -42,7 +42,6 @@ class Page extends \Controllers\Pages\Base {
             'COUNTRY'                       => $country,
             'PAGE_TITLE'                    => $pageTitle,
             'JS'                            => 'admin_country.js',
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         return parent::applyPageParams($pageParams);

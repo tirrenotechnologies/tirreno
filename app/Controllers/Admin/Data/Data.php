@@ -66,6 +66,12 @@ class Data extends \Controllers\Base {
         return $controller->getList();
     }
 
+    public function getMap(): array {
+        $controller = new \Controllers\Admin\Countries\Navigation();
+
+        return $controller->getMap();
+    }
+
     public function getIps(): array {
         $controller = new \Controllers\Admin\IPs\Navigation();
 
@@ -154,6 +160,12 @@ class Data extends \Controllers\Base {
         $controller = new \Controllers\Admin\UserDetails\Navigation();
 
         return $controller->getUserDetails();
+    }
+
+    public function getUserEnrichmentDetails(): array {
+        $controller = new \Controllers\Admin\UserDetails\Navigation();
+
+        return $controller->getUserEnrichmentDetails();
     }
 
     public function getNotCheckedEntitiesCount(): array {

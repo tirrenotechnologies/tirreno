@@ -31,7 +31,7 @@ class Logbook extends \Models\BaseSql {
                 event_logbook.id,
                 event_logbook.ip,
                 event_logbook.raw,
-                event_logbook.raw_time,
+                event_logbook.started,
                 event_logbook.error_text,
                 event_logbook.error_type,
                 event_error_type.name           AS error_name,
@@ -50,17 +50,6 @@ class Logbook extends \Models\BaseSql {
         );
 
         $results = $this->execQuery($query, $params);
-
-        $fields = ['raw_time'];
-
-        $results = array_map(function ($row) use ($fields) {
-            try {
-                $this->translateTimeZone($row, $fields, true);
-            } catch (\Throwable $e) {
-            }
-
-            return $row;
-        }, $results);
 
         return $results[0] ?? [];
     }

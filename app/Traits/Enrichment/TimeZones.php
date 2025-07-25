@@ -18,7 +18,7 @@ namespace Traits\Enrichment;
 trait TimeZones {
     protected function translateTimeZone(array &$row, array $attributes = ['time', 'lastseen'], bool $useMilliseconds = false): void {
         foreach ($attributes as $attribute) {
-            if (isset($row[$attribute])) {
+            if (isset($row[$attribute]) && $row[$attribute] !== null) {
                 \Utils\TimeZones::localizeForActiveOperator($row[$attribute], $useMilliseconds);
             }
         }

@@ -6,6 +6,7 @@ import {
     renderUserId,
     renderUserLastname,
     renderUserReviewedStatus,
+    renderTime,
 } from '../DataRenderers.js?v=2';
 
 
@@ -38,7 +39,7 @@ export class UsersGrid extends BaseGrid {
                 targets: 4
             },
             {
-                className: 'user-total-counters-col',
+                className: 'timespamp-col',
                 targets: 5
             },
             {
@@ -80,14 +81,11 @@ export class UsersGrid extends BaseGrid {
             },
             {
                 data: 'created',
-                render: (data, type, record) => {
-                    return renderDate(data);
-                },
+                render: renderDate,
             },
             {
-                data: 'total_visit',
-                name: 'total_visit',
-                render: this.renderTotalsLoader,
+                data: 'lastseen',
+                render: renderTime,
             },
             {
                 data: 'fraud',

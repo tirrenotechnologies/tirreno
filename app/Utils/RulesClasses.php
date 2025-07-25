@@ -89,9 +89,27 @@ class RulesClasses {
         return $total;
     }
 
-    public static function loadAllRules(): void {
-        self::getRulesClasses(false);
-        self::getRulesClasses(true);
+    public static function getSingleRuleObject(string $uid, ?\Ruler\RuleBuilder $rb): ?\Controllers\Admin\Rules\Set\BaseRule {
+        $obj = null;
+        $cores = [false, true];
+
+        foreach ($cores as $core) {
+            $dir        = $core ? self::getCoreRulesDir() : self::getAssetsRulesDir();
+            $namespace  = $core ? self::$coreRulesNamespace : self::$assetsRulesNamespace;
+
+            $filename   = $dir . '/' . $uid . '.php';
+            $cls        = $namespace . '\\' . $uid;
+
+            try {
+                self::validateRuleClass($uid, $filename, $cls, $core);
+                $obj = new $cls($rb, []);
+                break;
+            } catch (\Throwable $e) {
+                error_log('Rule validation failed at file ' . $filename);
+            }
+        }
+
+        return $obj;
     }
 
     public static function getRulesClasses(bool $core): array {
@@ -115,27 +133,9 @@ class RulesClasses {
 
                     $filePath = $file->getRealPath();
 
-                    require_once $filePath;
-
                     $cls = $namespace . '\\' . $name;
 
-                    if (!class_exists($cls, false)) {
-                        throw new \LogicException("Class {$cls} not found after including {$filePath}");
-                    }
-
-                    $reflection = new \ReflectionClass($cls);
-                    $reflectionFileName = $reflection->getFileName();
-
-                    if (realpath($reflectionFileName) !== realpath($filePath)) {
-                        throw new \LogicException("Class {$cls} is defined in {$reflectionFileName}, not in {$filePath}");
-                    }
-
-                    if (!$core && !str_starts_with($name, 'X')) {
-                        $parentClassName = $reflection->getParentClass()?->getName();
-                        if ('\\' . $parentClassName !== self::$coreRulesNamespace . '\\' . $name) {
-                            throw new \LogicException("Class {$cls} in assets has invalid parent class {$parentClassName}");
-                        }
-                    }
+                    self::validateRuleClass($name, $filePath, $cls, $core);
 
                     $out[$name] = $cls;
                 } catch (\Throwable $e) {
@@ -146,5 +146,39 @@ class RulesClasses {
         }
 
         return ['imported' => $out, 'failed' => $failed];
+    }
+
+    private static function validateRuleClass(string $uid, string $filename, string $classname, bool $core): string {
+        $reflection = self::validateObject($filename, $classname);
+
+        if (!$core && !str_starts_with($uid, 'X')) {
+            $parentClassName = $reflection->getParentClass()?->getName();
+            if ('\\' . $parentClassName !== self::$coreRulesNamespace . '\\' . $uid) {
+                throw new \LogicException("Class {$classname} in assets has invalid parent class {$parentClassName}");
+            }
+        }
+
+        return $classname;
+    }
+
+    private static function validateObject(string $filename, string $classname): \ReflectionClass {
+        if (!file_exists($filename)) {
+            throw new \LogicException("File {$filename} doesn't exist.");
+        }
+
+        require_once $filename;
+
+        if (!class_exists($classname, false)) {
+            throw new \LogicException("Class {$classname} not found after including {$filename}");
+        }
+
+        $reflection = new \ReflectionClass($classname);
+        $reflectionFileName = $reflection->getFileName();
+
+        if (realpath($reflectionFileName) !== realpath($filename)) {
+            throw new \LogicException("Class {$classname} is defined in {$reflectionFileName}, not in {$filename}");
+        }
+
+        return $reflection;
     }
 }

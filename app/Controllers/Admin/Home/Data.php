@@ -63,12 +63,8 @@ class Data extends \Controllers\Base {
                 $result['allTimeTotal'] = $model->getTotalResources(null, $apiKey);
                 break;
             case 'totalUsersForReview':
-                $keyModel = new \Models\ApiKeys();
-                $keyModel->getKeyById($apiKey);
-                $reviewQueueThreshold = $keyModel->review_queue_threshold;
-
-                $result['total']        = $model->getTotalUsersForReview($reviewQueueThreshold, $dateRange, $apiKey);
-                $result['allTimeTotal'] = $model->getTotalUsersForReview($reviewQueueThreshold, null, $apiKey);
+                $result['total']        = $model->getTotalUsersForReview($dateRange, $apiKey);
+                $result['allTimeTotal'] = $model->getTotalUsersForReview(null, $apiKey);
                 break;
             case 'totalBlockedUsers':
                 $result['total']        = $model->getTotalBlockedUsers($dateRange, $apiKey);

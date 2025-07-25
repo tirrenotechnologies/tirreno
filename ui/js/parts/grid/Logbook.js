@@ -1,7 +1,7 @@
 import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
 import {
     renderIp,
-    renderRawTime,
+    renderTimeMs,
     renderErrorType,
     renderSensorErrorColumn,
 } from '../DataRenderers.js?v=2';
@@ -44,10 +44,8 @@ export class LogbookGrid extends BaseGridWithPanel {
                 }
             },
             {
-                data: 'raw_time',
-                render: (data, type, record) => {
-                    return renderRawTime(record);
-                }
+                data: 'started',
+                render: renderTimeMs,
             },
             {
                 data: 'error_type',

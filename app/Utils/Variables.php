@@ -20,7 +20,7 @@ class Variables {
         return \Base::instance();
     }
 
-    public static function getDB(): string {
+    public static function getDB(): ?string {
         return getenv('DATABASE_URL') ?: self::getF3()->get('DATABASE_URL');
     }
 

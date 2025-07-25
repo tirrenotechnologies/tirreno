@@ -69,6 +69,7 @@ class RequestFactory {
                 /** @var array<mixed, mixed> $payload */
                 $payload = json_decode($data['payload'], true, 512, \JSON_THROW_ON_ERROR);
             } catch (\JsonException) {
+                $payload = null;
             }
         }
 

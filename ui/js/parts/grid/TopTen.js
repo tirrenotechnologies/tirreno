@@ -1,5 +1,7 @@
 import {BaseGrid} from './Base.js?v=2';
-import {renderDefaultIfEmpty}  from '../DataRenderers.js?v=2';
+import {fireEvent} from '../utils/Event.js?v=2';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
+import {renderDefaultIfEmptyElement}  from '../DataRenderers.js?v=2';
 
 export class TopTenGrid extends BaseGrid {
     get columnDefs() {
@@ -27,7 +29,7 @@ export class TopTenGrid extends BaseGrid {
             },
             {
                 data: 'value',
-                render: renderDefaultIfEmpty,
+                render: renderDefaultIfEmptyElement,
             }
         ];
 
@@ -43,13 +45,28 @@ export class TopTenGrid extends BaseGrid {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         const config = {
-            ajax: `/admin/loadTopTen?mode=${mode}&token=${token}`,
+            ajax: function(data, callback, settings) {
+                $.ajax({
+                    url: `/admin/loadTopTen?mode=${mode}&token=${token}`,
+                    method: 'GET',
+                    data: data,
+                    dataType: 'json',
+                    success: function(response, textStatus, jqXHR) {
+                        callback(response);
+                    },
+                    error: handleAjaxError,
+                    complete: function() {
+                        fireEvent('dateFilterChangedCompleted');
+                    },
+                });
+            },
+
             processing: true,
             serverSide: true,
             searching: false,
             pageLength: 10,
-            bPaginate: false,
-            bInfo: false,
+            paging: false,
+            info: false,
             lengthChange: false,
             ordering: false,
             autoWidth: false,

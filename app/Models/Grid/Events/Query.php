@@ -56,9 +56,9 @@ class Query extends \Models\Grid\Base\Query {
 
                 event_isp.name AS isp_name,
 
-                countries.serial,
-                countries.id AS country,
-                countries.value AS full_country,
+                countries.iso       AS country_iso,
+                countries.id        AS country_id,
+                countries.value     AS full_country,
 
                 event_ua_parsed.ua,
                 event_ua_parsed.device,
@@ -100,7 +100,7 @@ class Query extends \Models\Grid\Base\Query {
             ON (event_ip.isp = event_isp.id)
 
             INNER JOIN countries
-            ON (event_ip.country = countries.serial)
+            ON (event_ip.country = countries.id)
 
             LEFT JOIN event_email
             ON (event.email = event_email.id)
@@ -179,7 +179,7 @@ class Query extends \Models\Grid\Base\Query {
                 ON (event.ip = event_ip.id)
 
                 INNER JOIN countries
-                ON (event_ip.country = countries.serial)
+                ON (event_ip.country = countries.id)
 
                 INNER JOIN event_type
                 ON (event.type = event_type.id)
@@ -274,7 +274,7 @@ class Query extends \Models\Grid\Base\Query {
                     $searchConditions = ' AND event.url = :item_id %s';
                     break;
                 case 'countryId':
-                    $searchConditions = ' AND countries.serial = :item_id %s';
+                    $searchConditions = ' AND countries.id = :item_id %s';
                     break;
                 case 'ipId':
                     $searchConditions = ' AND event_ip.id = :item_id %s';

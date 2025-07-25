@@ -4,9 +4,9 @@ export class EventsChart extends BaseLineChart {
     getSeries() {
         return [
             this.getDaySeries(),
-            this.getSingleSeries('Total regular events', 'green'),
-            this.getSingleSeries('Total warning events', 'yellow'),
-            this.getSingleSeries('Total alert events', 'red'),
+            this.getSingleSeries('Regular events', 'green'),
+            this.getSingleSeries('Warning events', 'yellow'),
+            this.getSingleSeries('Alert events', 'red'),
         ];
     }
 }

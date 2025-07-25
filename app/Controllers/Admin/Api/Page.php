@@ -49,7 +49,7 @@ class Page extends \Controllers\Pages\Base {
         }
 
         // set these params after proccessing POST request
-        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeysDetails($operatorId);
         $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;
 

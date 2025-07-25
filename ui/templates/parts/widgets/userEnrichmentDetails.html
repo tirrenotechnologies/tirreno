@@ -1,0 +1,205 @@
+<table class="table-tile content">
+    <tr>
+        <td class="table-card" id="user-card">
+            <header class="card-header">
+                <div class="card-header-title">
+                    {{ @AdminUser_widgets_id }}<p class="tooltip-info  tooltip" title="{{ @AdminUser_widgets_id_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                </div>
+            </header>
+
+            <div class="content" id="user-id-tile">
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_user_registered_tooltip }}">{{ @Base_table_column_user_registered }}</span>
+                    <span class="detailsTileValue" id="signup-date"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_lastseen_tooltip }}">{{ @Base_table_column_lastseen }}</span>
+                    <span class="detailsTileValue" id="lastseen"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_latest_decision_tooltip }}">{{ @Base_table_column_latest_decision }}</span>
+                    <span class="detailsTileValue" id="latest-decision"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_reviewed_status_tooltip }}">{{ @Base_table_column_reviewed_status }}</span>
+                    <span class="detailsTileValue" id="review-status"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_user_firstname_tooltip }}">{{ @Base_table_column_user_firstname }}</span>
+                    <span class="detailsTileValue" id="firstname"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_user_lastname_tooltip }}">{{ @Base_table_column_user_lastname }}</span>
+                    <span class="detailsTileValue" id="lastname"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_userid_tooltip }}">{{ @Base_table_column_userid }}</span>
+                    <span class="detailsTileValue" id="userid"><span class="loading-background">&#8943;</span></span>
+                </div>
+            </div>
+        </td>
+
+        <td class="table-card" id="ip-card">
+            <header class="card-header">
+                <div class="card-header-title">
+                    {{ @AdminUser_widgets_ips_warning }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_ips_warning_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                </div>
+            </header>
+
+            <div class="content" id="user-ip-tile">
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_datacenter_tooltip }}">{{ @Base_table_column_ip_datacenter }}</span>
+                    <span class="detailsTileValue" id="datacenter"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_vpn_tooltip }}">{{ @Base_table_column_ip_vpn }}</span>
+                    <span class="detailsTileValue" id="vpn"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_tor_tooltip }}">{{ @Base_table_column_ip_tor }}</span>
+                    <span class="detailsTileValue" id="tor"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_apple_relay_tooltip }}">{{ @Base_table_column_ip_apple_relay }}</span>
+                    <span class="detailsTileValue" id="apple-relay"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_shared_tooltip }}">{{ @Base_table_column_ip_shared }}</span>
+                    <span class="detailsTileValue" id="ip-shared"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_spamlist_tooltip }}">{{ @Base_table_column_ip_spamlist }}</span>
+                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_ip_blacklist_tooltip }}">{{ @Base_table_column_ip_blacklist }}</span>
+                    <span class="detailsTileValue" id="blacklisted"><span class="loading-background">&#8943;</span></span>
+                </div>
+            </div>
+        </td>
+
+        <td class="table-card" id="email-card">
+            <header class="card-header">
+                <div class="card-header-title">
+                    {{ @AdminUser_widgets_email }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_email_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                </div>
+            </header>
+
+            <div class="content" id="user-email-tile">
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_reputation_tooltip }}">{{ @Base_table_column_email_reputation }}</span>
+                    <span class="detailsTileValue" id="reputation"><span class="loading-background">&#8943;</span></span>
+                </div>
+{***
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_noprofiles_tooltip }}">{{ @Base_table_column_email_noprofiles }}</span>
+                    <span class="detailsTileValue" id="no-profiles"><span class="loading-background">&#8943;</span></span>
+                </div>
+***}
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_nodatabreach_tooltip }}">{{ @Base_table_column_email_nodatabreach }}</span>
+                    <span class="detailsTileValue" id="no-breach"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_total_breaches_tooltip }}">{{ @Base_table_column_email_total_breaches }}</span>
+                    <span class="detailsTileValue" id="total-breaches"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_earliest_breach_tooltip }}">{{ @Base_table_column_email_earliest_breach }}</span>
+                    <span class="detailsTileValue" id="earliest-breach"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_free_provider_tooltip }}">{{ @Base_table_column_email_free_provider }}</span>
+                    <span class="detailsTileValue" id="free-provider"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_spamlist_tooltip }}">{{ @Base_table_column_email_spamlist }}</span>
+                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_email_blacklist_tooltip }}">{{ @Base_table_column_email_blacklist }}</span>
+                    <span class="detailsTileValue" id="blacklisted"><span class="loading-background">&#8943;</span></span>
+                </div>
+            </div>
+        </td>
+
+        <td class="table-card" id="domain-card">
+            <header class="card-header">
+                <div class="card-header-title">
+                    {{ @AdminUser_widgets_domain }}<p class="tooltip-info tooltip" title="{{ @AdminUser_widgets_domain_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                </div>
+            </header>
+
+            <div class="content" id="user-domain-tile">
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_total_accounts_tooltip }}">{{ @Base_table_column_domain_total_accounts }}</span>
+                    <span class="detailsTileValue" id="total-accounts"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_registered_tooltip }}">{{ @Base_table_column_domain_registered }}</span>
+                    <span class="detailsTileValue" id="registered-on"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_expires_tooltip }}">{{ @Base_table_column_domain_expires }}</span>
+                    <span class="detailsTileValue" id="expires-on"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_disposable_tooltip }}">{{ @Base_table_column_disposable }}</span>
+                    <span class="detailsTileValue" id="disposable"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_tranco_rank_tooltip }}">{{ @Base_table_column_tranco_rank }}</span>
+                    <span class="detailsTileValue" id="global-rank"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_domain_spamlist_tooltip }}">{{ @Base_table_column_domain_spamlist }}</span>
+                    <span class="detailsTileValue" id="spam-list"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_unavailable_tooltip }}">{{ @Base_table_column_unavailable }}</span>
+                    <span class="detailsTileValue" id="unavailable"><span class="loading-background">&#8943;</span></span>
+                </div>
+            </div>
+        </td>
+{***
+        <td class="table-card" id="phone-card">
+            <header class="card-header">
+                <div class="card-header-title">
+                    {{ @AdminUser_widgets_phone }}<p class="tooltip-info  tooltip" title="{{ @AdminUser_widgets_phone_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                </div>
+            </header>
+
+            <div class="content" id="user-phone-tile">
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_user_phone_tooltip }}">{{ @Base_table_column_user_phone }}</span>
+                    <span class="detailsTileValue" id="phonenumber"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_phone_invalid_tooltip }}">{{ @Base_table_column_phone_invalid }}</span>
+                    <span class="detailsTileValue" id="invalid"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_country_tooltip }}">{{ @Base_table_column_country }}</span>
+                    <span class="detailsTileValue" id="country"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_phone_carrier_name_tooltip }}">{{ @Base_table_column_phone_carrier_name }}</span>
+                    <span class="detailsTileValue" id="carrier"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_phone_type_tooltip }}">{{ @Base_table_column_phone_type }}</span>
+                    <span class="detailsTileValue" id="type"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_total_users_tooltip_phones }}">{{ @Base_table_column_total_users }}</span>
+                    <span class="detailsTileValue" id="shared"><span class="loading-background">&#8943;</span></span>
+                </div>
+                <div class="itemDetails">
+                    <span class="tooltip detailsTileTitle" title="{{ @Base_table_column_phone_blacklist_tooltip }}">{{ @Base_table_column_phone_blacklist }}</span>
+                    <span class="detailsTileValue" id="blacklist"><span class="loading-background">&#8943;</span></span>
+                </div>
+            </div>
+        </td>
+***}
+    </tr>
+</table>

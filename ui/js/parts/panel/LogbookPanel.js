@@ -1,7 +1,7 @@
 import {BasePanel} from './BasePanel.js?v=2';
 import {
     renderIp,
-    renderRawTime,
+    renderTimeMs,
     renderErrorType,
     renderSensorError,
     renderRawRequest,
@@ -25,7 +25,7 @@ export class LogbookPanel extends BasePanel {
 
     proceedData(data) {
         data.ip         = renderIp(data);
-        data.raw_time   = renderRawTime(data);
+        data.started    = renderTimeMs(data.started);
         data.error_type = renderErrorType(data);
         data.error_text = renderSensorError(data);
         data.request    = renderRawRequest(data);

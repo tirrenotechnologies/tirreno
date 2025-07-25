@@ -14,13 +14,16 @@
         <include href="templates/parts/infoHeader.html" with="title={{isset(@USER.email) ? @USER.email : @USER.userid}}, lastseen={{@USER.lastseen}}, isUserPage=true"/>
 
         <include href="templates/parts/scoreDetails.html" />
-        <include href="templates/parts/widgets/userDetails.html" />
+        {***<include href="templates/parts/widgets/userDetails.html" />***}
+        <include href="templates/parts/widgets/userEnrichmentDetails.html" />
         <include href="templates/parts/widgets/user.html" />
         <include href="templates/parts/mapWithIps.html" />
         <include href="templates/parts/tables/isps.html" />
         <include href="templates/parts/tables/devices.html" />
+
         <include href="templates/parts/tables/emails.html" />
         <include href="templates/parts/tables/phones.html" />
+
         <include href="templates/parts/tables/events.html" with="showChart=1" />
 
         <div>

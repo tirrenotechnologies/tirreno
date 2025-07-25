@@ -1,8 +1,7 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
-    renderBoolean,
     renderDate,
-    renderDefaultIfEmpty,
+    renderUserCounter,
     renderReputation,
     renderUserId,
     renderUserFirstname,
@@ -15,66 +14,90 @@ const URL   = '/admin/loadUserDetails';
 export class UserTiles extends BaseTiles {
     updateTiles(data) {
         this.updateIdDetails(data);
-        this.updateIpDetails(data);
-        this.updateEmailDetails(data);
-        this.updateDomainDetails(data);
+        this.updateDayDetails(data);
+        this.updateWeekDetails(data);
+        this.updateMonthDetails(data);
     }
 
     updateIdDetails(data) {
         const tile = document.querySelector('#user-id-tile');
+
+        if (!tile) {
+            return;
+        }
+
         const record = data.userDetails;
         this.removeLoaderBackground(tile);
 
-        tile.querySelector('#signup-date').innerHTML        = renderDate(record.created);
-        tile.querySelector('#lastseen').innerHTML           = renderDate(record.lastseen);
-        tile.querySelector('#latest-decision').innerHTML    = renderDate(record.latest_decision);
-        tile.querySelector('#review-status').innerHTML      = renderUserReviewedStatus(record);
-        tile.querySelector('#firstname').innerHTML          = renderUserFirstname(record);
-        tile.querySelector('#lastname').innerHTML           = renderUserLastname(record);
-        tile.querySelector('#userid').innerHTML             = renderUserId(record.userid);
+        tile.querySelector('#signup-date').replaceChildren(renderDate(record.created));
+        tile.querySelector('#lastseen').replaceChildren(renderDate(record.lastseen));
+        tile.querySelector('#latest-decision').replaceChildren(renderDate(record.latest_decision));
+        tile.querySelector('#review-status').replaceChildren(renderUserReviewedStatus(record));
+        tile.querySelector('#firstname').replaceChildren(renderUserFirstname(record));
+        tile.querySelector('#lastname').replaceChildren(renderUserLastname(record));
+        tile.querySelector('#userid').replaceChildren(renderUserId(record.userid));
     }
 
-    updateIpDetails(data) {
-        const tile = document.querySelector('#user-ip-tile');
-        const record = data.ipDetails;
-        this.removeLoaderBackground(tile);
+    updateDayDetails(data) {
+        const limits = {
+            median_event_cnt:   20,
+            login_cnt:          3,
+            session_cnt:        5,
+        };
 
-        tile.querySelector('#datacenter').innerHTML     = renderBoolean(record.withdc);
-        tile.querySelector('#vpn').innerHTML            = renderBoolean(record.withvpn);
-        tile.querySelector('#tor').innerHTML            = renderBoolean(record.withtor);
-        tile.querySelector('#apple-relay').innerHTML    = renderBoolean(record.withar);
-        tile.querySelector('#ip-shared').innerHTML      = renderBoolean(record.sharedips);
-        tile.querySelector('#spam-list').innerHTML      = renderBoolean(record.spamlist);
-        tile.querySelector('#blacklisted').innerHTML    = renderBoolean(record.fraud_detected);
+        this.updateDateRangeDetails(data.dayDetails, '#day-behaviour-tile', limits);
     }
 
-    updateEmailDetails(data) {
-        const tile = document.querySelector('#user-email-tile');
-        const record = data.emailDetails;
-        this.removeLoaderBackground(tile);
+    updateWeekDetails(data) {
+        const limits = {
+            median_event_cnt:   20,
+            login_cnt:          10,
+            session_cnt:        25,
+        };
 
-        tile.querySelector('#reputation').innerHTML         = renderReputation(record);
-        //tile.querySelector('#no-profiles').innerHTML        = renderBoolean(record.profiles === null ? null : !record.profiles);
-        tile.querySelector('#no-breach').innerHTML          = renderBoolean(record.data_breach === null ? null : !record.data_breach);
-        tile.querySelector('#total-breaches').innerHTML     = renderDefaultIfEmpty(record.data_breaches);
-        tile.querySelector('#earliest-breach').innerHTML    = renderDate(record.earliest_breach);
-        tile.querySelector('#free-provider').innerHTML      = renderBoolean(record.free_email_provider);
-        tile.querySelector('#spam-list').innerHTML          = renderBoolean(record.blockemails);
-        tile.querySelector('#blacklisted').innerHTML        = renderBoolean(record.fraud_detected);
+        this.updateDateRangeDetails(data.weekDetails, '#week-behaviour-tile', limits);
     }
 
-    updateDomainDetails(data) {
-        const tile = document.querySelector('#user-domain-tile');
-        const record = data.domainDetails;
+    updateMonthDetails(data) {
+        const limits = {
+            median_event_cnt:   20,
+            login_cnt:          40,
+            session_cnt:        100,
+        };
+
+        this.updateDateRangeDetails(data.monthDetails, '#month-behaviour-tile', limits);
+    }
+
+    updateDateRangeDetails(record, tileId, limits) {
+        const tile = document.querySelector(tileId);
+
+        if (!tile) {
+            return;
+        }
+
+        const span = document.createElement('span');
+        span.className = 'nolight';
+        span.textContent = 'N/A';
+
         this.removeLoaderBackground(tile);
 
-        tile.querySelector('#total-accounts').innerHTML = renderDefaultIfEmpty(record.total_account);
-        tile.querySelector('#registered-on').innerHTML  = renderDate(record.creation_date);
-        tile.querySelector('#expires-on').innerHTML     = renderDate(record.expiration_date);
-        tile.querySelector('#disposable').innerHTML     = renderBoolean(record.disposable_domains);
-        tile.querySelector('#global-rank').innerHTML    = renderDefaultIfEmpty(record.tranco_rank);
-        tile.querySelector('#spam-list').innerHTML      = renderBoolean(record.blockdomains);
-        tile.querySelector('#unavailable').innerHTML    = renderBoolean(record.disabled);
+        if (record.session_cnt === 0) {
+            tile.querySelector('#failed-login-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#password-reset-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#auth-error-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#off-hours-login-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#median-event-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#login-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#session-count').replaceChildren(span.cloneNode(true));
+        } else {
+            tile.querySelector('#failed-login-count').replaceChildren(renderUserCounter(record.failed_login_cnt, limits.failed_login_cnt || 1));
+            tile.querySelector('#password-reset-count').replaceChildren(renderUserCounter(record.password_reset_cnt, limits.password_reset_cnt || 1));
+            tile.querySelector('#auth-error-count').replaceChildren(renderUserCounter(record.auth_error_cnt, limits.auth_error_cnt || 1));
+            tile.querySelector('#off-hours-login-count').replaceChildren(renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1));
+            tile.querySelector('#median-event-count').replaceChildren(renderUserCounter(record.median_event_cnt, limits.median_event_cnt || 1));
+            tile.querySelector('#login-count').replaceChildren(renderUserCounter(record.login_cnt, limits.login_cnt || 1));
+            tile.querySelector('#session-count').replaceChildren(renderUserCounter(record.session_cnt, limits.session_cnt || 1));
+        }
     }
 
     removeLoaderBackground(tile) {

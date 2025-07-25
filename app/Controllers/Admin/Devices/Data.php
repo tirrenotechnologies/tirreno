@@ -51,6 +51,9 @@ class Data extends \Controllers\Base {
         $details = $model->getFullDeviceInfoById($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
+        $tsColumns = ['created'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $details);
+
         return $details;
     }
 

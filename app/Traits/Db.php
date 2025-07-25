@@ -16,12 +16,16 @@
 namespace Traits;
 
 trait Db {
-    public function connectToDb(bool $keepSessionInDb = true): void {
+    public function connectToDb(bool $keepSessionInDb = true): bool {
         try {
             $db = $this->f3->get('API_DATABASE');
 
             if (!$db) {
                 $url = \Utils\Variables::getDB();
+
+                if ($url === null) {
+                    return false;
+                }
                 $db = $this->getDbConnection($url);
 
                 if ($keepSessionInDb) {
@@ -30,9 +34,13 @@ trait Db {
 
                 $this->f3->set('API_DATABASE', $db);
             }
+
+            return true;
         } catch (\Exception $e) {
             error_log('Failed to establish database connection: ' . $e->getMessage());
         }
+
+        return false;
     }
 
     private function getDbConnection(string $url): ?\DB\SQL {

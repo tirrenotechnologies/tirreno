@@ -37,6 +37,9 @@ class Data extends \Controllers\Base {
         $details = $model->getEmailDetails($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
+        $tsColumns = ['email_created', 'email_lastseen', 'domain_lastseen', 'domain_created'];
+        \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $details);
+
         return $details;
     }
 

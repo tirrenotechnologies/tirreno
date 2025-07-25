@@ -1,6 +1,5 @@
 # Add value after '=' for each key
-curl -X POST                \
-
+params=(
     ########### Required fields ###########
 
     # Unique value that allows identification of a user. Ex: alice54 (string)
@@ -55,7 +54,9 @@ curl -X POST                \
 
     # User created UTC timestamp ('Y-m-d H:i:s' string)
     -d 'userCreated='       \
+)
 
-    {{ @apiUrl }} \    # sensor URL
+curl -X POST "${params[@]}" \
     -H 'Api-Key: {{ @apiKey }}' \
     -H 'Content-Type: application/x-www-form-urlencoded'
+    {{ @apiUrl }} \    # sensor URL

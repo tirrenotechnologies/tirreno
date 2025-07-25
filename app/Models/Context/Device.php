@@ -17,7 +17,7 @@ namespace Models\Context;
 
 class Device extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $record = $this->getDeviceDetails($accountIds, $apiKey);
+        $record = $this->getDetails($accountIds, $apiKey);
         $recordByAccount = $this->groupRecordsByAccount($record);
 
         foreach ($recordByAccount as $key => $value) {
@@ -37,7 +37,7 @@ class Device extends Base {
         return $recordByAccount;
     }
 
-    private function getDeviceDetails(array $accountIds, int $apiKey): array {
+    protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
         $query = (

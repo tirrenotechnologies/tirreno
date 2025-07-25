@@ -3,7 +3,7 @@ import {
     renderEmail,
     renderReputation,
     renderBoolean,
-    renderDefaultIfEmpty,
+    renderDefaultIfEmptyElement,
     renderDate,
     renderClickableDomain,
     renderHttpCode,
@@ -32,7 +32,7 @@ export class EmailPanel extends BasePanel {
         data.data_breach            = renderBoolean(data.data_breach === null ? null : !data.data_breach);
         // to 'No Profiles'
         // data.profiles               = renderBoolean(data.profiles === null ? null : data.profiles === 0);
-        data.data_breaches          = renderDefaultIfEmpty(data.data_breaches);
+        data.data_breaches          = renderDefaultIfEmptyElement(data.data_breaches);
 
         data.earliest_breach        = renderDate(data.earliest_breach);
         data.fraud_detected         = renderBoolean(data.fraud_detected);
@@ -53,7 +53,7 @@ export class EmailPanel extends BasePanel {
         data.mx_record              = renderBoolean(data.mx_record === null ? null : !data.mx_record);
         data.disposable_domains     = renderBoolean(data.disposable_domains);
         data.disabled               = renderBoolean(data.disabled);
-        data.tranco_rank            = renderDefaultIfEmpty(data.tranco_rank);
+        data.tranco_rank            = renderDefaultIfEmptyElement(data.tranco_rank);
         data.creation_date          = renderDate(data.creation_date);
         data.expiration_date        = renderDate(data.expiration_date);
         data.closest_snapshot       = renderDate(data.closest_snapshot);

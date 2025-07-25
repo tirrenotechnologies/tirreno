@@ -15,8 +15,10 @@
 
 namespace Utils;
 
-class SuspiciousEmailWords {
-    private static array $words = [
+class SuspiciousWordsEmail extends SuspiciousWords {
+    protected static string $extensionFile = 'email.txt';
+
+    protected static array $words = [
         'spam',
         'test',
         'gummie',
@@ -34,8 +36,4 @@ class SuspiciousEmailWords {
         '888',
         '999',
     ];
-
-    public static function getWords(): array {
-        return self::$words;
-    }
 }

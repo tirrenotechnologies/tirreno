@@ -17,9 +17,9 @@ namespace Models\Grid\Logbook;
 
 class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_logbook.error_type DESC, event_logbook.id DESC';
-    protected $dateRangeField = 'event_logbook.raw_time';
+    protected $dateRangeField = 'event_logbook.started';
 
-    protected $allowedColumns = ['ip', 'raw_time', 'error_type', 'error_text'];
+    protected $allowedColumns = ['ip', 'started', 'error_type', 'error_text'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -31,7 +31,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_logbook.error_type,
                 event_logbook.error_text,
                 event_logbook.raw,
-                event_logbook.raw_time,
+                event_logbook.started,
                 event_error_type.name           AS error_name,
                 event_error_type.value          AS error_value
 
@@ -77,8 +77,11 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        $searchConditions = '';
+        //Add dates into request
+        $this->applyDateRange($query, $queryParams);
+
         $search = $this->f3->get('REQUEST.search');
+        $searchConditions = '';
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             //TODO: user isIp function here

@@ -41,7 +41,6 @@ class Page extends \Controllers\Pages\Base {
             'LOAD_ACCEPT_LANGUAGE_PARSER'   => true,
             'JS'                            => 'admin_ip.js',
             'IS_ENRICHABLE'                 => $isEnrichable,
-            'OFFSET'                        => \Utils\TimeZones::getCurrentOperatorOffset(),
         ];
 
         if ($this->isPostRequest()) {

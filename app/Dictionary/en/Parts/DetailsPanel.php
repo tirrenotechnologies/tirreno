@@ -96,7 +96,7 @@ return [
     'Details_device_created' => 'First seen',
 
     //Logbook
-    'Details_event_timestamp' => 'Event timestamp',
+    'Details_local_timestamp' => 'Local timestamp',
     'Details_error_type' => 'Status',
     'Details_error_text' => 'Warning message',
     'Details_request' => 'Raw POST data',

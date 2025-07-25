@@ -56,7 +56,7 @@ class LocalhostIp extends \Models\Enrichment\Base {
 
         $previousIpData = $ipModel->getFullIpInfoById($entityId);
         $previousIspId = count($previousIpData) ? $previousIpData['ispid'] : null;
-        $previousCountryId = count($previousIpData) ? $previousIpData['serial'] : 0;
+        $previousCountryId = count($previousIpData) ? $previousIpData['country_id'] : 0;
         // get current isp id
         $ispModel = new \Models\Isp();
         $newIspId = $ispModel->getIdByAsn($this->asn, $apiKey);

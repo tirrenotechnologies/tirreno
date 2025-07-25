@@ -38,4 +38,10 @@ class Grid extends \Models\Grid\Base\Grid {
 
         return $results[0]['count'];
     }
+
+    protected function convertTimeToUserTimezone(array &$result): void {
+        $fields = ['lastseen', 'created', 'score_updated_at', 'added_to_review'];
+
+        $this->translateTimeZones($result, $fields);
+    }
 }
