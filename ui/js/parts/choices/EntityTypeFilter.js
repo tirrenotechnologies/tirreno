@@ -6,6 +6,11 @@ import {
 
 export class EntityTypeFilter extends BaseFilter {
     constructor() {
-        super('#entity-type-selectors', renderEntityTypeSelectorItem, renderEntityTypeSelectorChoice, 'entityTypeFilterChanged');
+        super(
+            '#entity-type-selectors',
+            renderEntityTypeSelectorItem,
+            renderEntityTypeSelectorChoice,
+            'entityTypeFilterChanged',
+        );
     }
 }

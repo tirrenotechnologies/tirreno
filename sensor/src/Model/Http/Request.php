@@ -36,6 +36,7 @@ class Request {
         'eventType',
         'httpMethod',
         'userCreated',
+        'payload',
     ];
 
     /**
@@ -55,7 +56,10 @@ class Request {
                 if (is_bool($value)) {
                     $this->body[$key] = ($value) ? 'true' : 'false';
                 } elseif (is_array($value)) {
-                    $this->body[$key] = json_encode($this->cleanArrayEncoding($value));
+                    $this->body[$key] = $this->cleanArrayEncoding($value);
+                    if ($key !== 'payload') {
+                        $this->body[$key] = json_encode($this->body[$key]);
+                    }
                 } elseif ($value !== null) {
                     $this->body[$key] = $this->cleanArrayEncoding(strval($value));
                 }

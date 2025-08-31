@@ -13,24 +13,34 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Models\Grid\Payloads;
+namespace Models\Grid\Payloads\FieldAuditTrail;
 
 class Query extends \Models\Grid\Base\Query {
-    protected $defaultOrder = 'id DESC';
-    protected $dateRangeField = 'event.time';
+    protected $defaultOrder = 'event_field_audit_trail.id DESC';
+    protected $dateRangeField = 'event_field_audit_trail.created';
+
+    protected $allowedColumns = ['id', 'created'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
 
         $query = (
             'SELECT
-                id, payload, time
+                event_field_audit_trail.id,
+                event_field_audit_trail.created,
+                event_field_audit_trail.event_id,
+                event_field_audit_trail.field_id,
+                event_field_audit_trail.field_name,
+                event_field_audit_trail.old_value,
+                event_field_audit_trail.new_value,
+                event_field_audit_trail.parent_id,
+                event_field_audit_trail.parent_name
 
             FROM
-                event
+                event_field_audit_trail
 
             WHERE
-                event.key = :api_key
+                event_field_audit_trail.key = :api_key
                 %s'
         );
 
@@ -46,13 +56,13 @@ class Query extends \Models\Grid\Base\Query {
 
         $query = (
             'SELECT
-                COUNT (DISTINCT event.id)
+                COUNT(*)
 
             FROM
-                event
+                event_field_audit_trail
 
             WHERE
-                event.key = :api_key
+                event_field_audit_trail.key = :api_key
                 %s'
         );
 
@@ -62,17 +72,9 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        $userId = $this->f3->get('REQUEST.userId') ?? null;
+        $searchConditions = $this->injectIdQuery('event_field_audit_trail.id', $queryParams);
 
-        $searchConditions = '';
-        if ($userId) {
-            $searchConditions = (
-                'AND payload IS NOT NULL
-                AND event.account = :user_id'
-            );
-            $queryParams[':user_id'] = $userId;
-        }
-
+        //Add ids into request
         $query = sprintf($query, $searchConditions);
     }
 }

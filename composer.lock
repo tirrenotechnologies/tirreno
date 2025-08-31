@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c751e88bae6fdfbcb7aa805d9c5f625",
+    "content-hash": "f7d566341a12b85af399060b56600688",
     "packages": [
         {
             "name": "bcosca/fatfree-core",
-            "version": "3.9.0",
+            "version": "3.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/f3-factory/fatfree-core.git",
-                "reference": "227b3b03315ab86b1601d9e9fd8e07efbedf6ab9"
+                "reference": "15167bf8377c262a5354e2c419c383aaa4d41280"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/f3-factory/fatfree-core/zipball/227b3b03315ab86b1601d9e9fd8e07efbedf6ab9",
-                "reference": "227b3b03315ab86b1601d9e9fd8e07efbedf6ab9",
+                "url": "https://api.github.com/repos/f3-factory/fatfree-core/zipball/15167bf8377c262a5354e2c419c383aaa4d41280",
+                "reference": "15167bf8377c262a5354e2c419c383aaa4d41280",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             "homepage": "http://fatfreeframework.com/",
             "support": {
                 "issues": "https://github.com/f3-factory/fatfree-core/issues",
-                "source": "https://github.com/f3-factory/fatfree-core/tree/3.9.0"
+                "source": "https://github.com/f3-factory/fatfree-core/tree/3.9.1"
             },
             "funding": [
                 {
@@ -49,20 +49,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-12-31T17:11:04+00:00"
+            "time": "2025-08-09T10:27:39+00:00"
         },
         {
             "name": "matomo/device-detector",
-            "version": "6.4.6",
+            "version": "6.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "6f07f615199851548db47a900815d2ea2cdcde08"
+                "reference": "e53eed31bb1530851feebe52bd64c3451da19e77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/6f07f615199851548db47a900815d2ea2cdcde08",
-                "reference": "6f07f615199851548db47a900815d2ea2cdcde08",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/e53eed31bb1530851feebe52bd64c3451da19e77",
+                "reference": "e53eed31bb1530851feebe52bd64c3451da19e77",
                 "shasum": ""
             },
             "require": {
@@ -119,7 +119,7 @@
                 "source": "https://github.com/matomo-org/matomo",
                 "wiki": "https://dev.matomo.org/"
             },
-            "time": "2025-06-10T10:00:59+00:00"
+            "time": "2025-08-20T17:20:16+00:00"
         },
         {
             "name": "mustangostang/spyc",
@@ -309,16 +309,16 @@
     "packages-dev": [
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.19",
+            "version": "2.1.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "473a8c30e450d87099f76313edcbb90852f9afdf"
+                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/473a8c30e450d87099f76313edcbb90852f9afdf",
-                "reference": "473a8c30e450d87099f76313edcbb90852f9afdf",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/41600c8379eb5aee63e9413fe9e97273e25d57e4",
+                "reference": "41600c8379eb5aee63e9413fe9e97273e25d57e4",
                 "shasum": ""
             },
             "require": {
@@ -363,7 +363,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-07-21T19:58:24+00:00"
+            "time": "2025-08-04T19:17:37+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

@@ -16,9 +16,9 @@
 namespace Utils;
 
 class Rules {
-    public static function checkPhoneCountryMatchIp(array $params): bool {
+    public static function checkPhoneCountryMatchIp(array $params): ?bool {
         if (is_null($params['lp_country_code']) || $params['lp_country_code'] === 0) {
-            return true;
+            return null;
         }
 
         return in_array($params['lp_country_code'], $params['eip_country_id']);

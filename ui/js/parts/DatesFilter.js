@@ -8,10 +8,11 @@ import {debounce} from './utils/Functions.js?v=2';
 import {DAYS_IN_RANGE} from './utils/Constants.js?v=2';
 
 export class DatesFilter {
-    constructor() {
+    constructor(sequential=false) {
         this.setupXhrPool();
-        this.offset = (this.offsetField) ? parseInt(this.offsetField.value, 10) : 0;
-        this.ajaxCount = 0;
+        this.offset     = (this.offsetField) ? parseInt(this.offsetField.value, 10) : 0;
+        this.ajaxCount  = 0;
+        this.sequential = sequential;
         if (this.isDateFilterUnavailable) {
             return true;
         }
@@ -43,6 +44,9 @@ export class DatesFilter {
 
         const onDateFilterChangedCompleted = this.onDateFilterChangedCompleted.bind(this);
         window.addEventListener('dateFilterChangedCompleted', onDateFilterChangedCompleted, false);
+
+        const onSequentialLoadCompleted = this.onSequentialLoadCompleted.bind(this);
+        window.addEventListener('sequentialLoadCompleted', onSequentialLoadCompleted, false);
     }
 
     setupXhrPool() {
@@ -50,7 +54,7 @@ export class DatesFilter {
         // Stop all ajax request by http://tjrus.com/blog/stop-all-active-ajax-requests
         $.xhrPool = []; // array of uncompleted requests
         $.xhrPool.abortAll = function() { // our abort function
-            $(this).each(function(idx, jqXHR) {
+            $(this).each((idx, jqXHR) => {
                 jqXHR.abort();
             });
             $.xhrPool.length = 0;
@@ -168,6 +172,7 @@ export class DatesFilter {
     }
 
     updateDisabled(disabled) {
+        let m = disabled ? 'true' : 'false';
         this.intervalLinks.forEach(item => {
             if (disabled) {
                 if (!item.classList.contains('active')) {
@@ -213,9 +218,13 @@ export class DatesFilter {
 
     onDateFilterChangedCompleted() {
         this.ajaxCount--;
-        if (this.ajaxCount <= 0) {
+        if (this.ajaxCount <= 0 && !this.sequential) {
             this.updateDisabled(false);
         }
+    }
+
+    onSequentialLoadCompleted() {
+        this.updateDisabled(false);
     }
 
     get isDateFilterUnavailable() {

@@ -62,9 +62,9 @@ class UsersByIps extends Base {
 
         $results = $this->execQuery($query, $params);
 
-        foreach ($results as $i => $val) {
+        foreach ($results as $row) {
             $tsColumns = ['score_updated_at'];
-            \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $results[$i]);
+            \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $row);
         }
 
         return $results;

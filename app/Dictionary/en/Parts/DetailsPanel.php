@@ -21,6 +21,7 @@ return [
     'Details_event_http_code' => 'HTTP code',
     'Details_user_count' => 'User count',
     'Details_event_count' => 'Event count',
+    'Details_payload' => 'Payload',
 
     //User
     'Details_user_id' => 'Trust score & email',

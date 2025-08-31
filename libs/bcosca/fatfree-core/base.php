@@ -119,7 +119,7 @@ final class Base extends Prefab implements ArrayAccess {
 	//@{ Framework details
 	const
 		PACKAGE='Fat-Free Framework',
-		VERSION='3.9.0-Release';
+		VERSION='3.9.1-Release';
 	//@}
 
 	//@{ HTTP status codes (RFC 2616)
@@ -246,7 +246,7 @@ final class Base extends Prefab implements ArrayAccess {
 	function build($url, $args=[], $addParams=TRUE) {
 		if ($addParams)
 			$args+=$this->recursive($this->hive['PARAMS'], function($val) {
-				return implode('/', array_map('urlencode', explode('/', $val)));
+				return implode('/', array_map('urlencode', explode('/', $val ?? '')));
 			});
 		if (is_array($url))
 			foreach ($url as &$var) {
@@ -386,8 +386,7 @@ final class Base extends Prefab implements ArrayAccess {
 			$this->sync('SESSION');
 		}
 		elseif (!preg_match('/^\w+$/',$parts[0]))
-			user_error(sprintf(self::E_Hive,$this->stringify($key)),
-				E_USER_ERROR);
+            throw new \Exception(\sprintf(self::E_Hive,$this->stringify($key)));
 		if (is_null($var)) {
 			if ($add)
 				$var=&$this->hive;
@@ -774,6 +773,18 @@ final class Base extends Prefab implements ArrayAccess {
 		return $out;
 	}
 
+    /**
+     * fetch a hive key result, then clear the key
+     * @param string $key
+     * @return mixed
+     */
+    function pull($key): mixed
+    {
+        $value = $this->get($key);
+        $this->clear($key);
+        return $value;
+    }
+
 	/**
 	*	Convert backslashes to slashes
 	*	@return string
@@ -979,10 +990,10 @@ final class Base extends Prefab implements ArrayAccess {
 	}
 
 	/**
-	*	Remove HTML tags (except those enumerated) and non-printable
-	*	characters to mitigate XSS/code injection attacks
-	*	@return mixed
-	*	@param $arg mixed
+	*	Remove HTML tags (except those enumerated) and non-printable characters
+    *   NB: This method doesn't mitigate XSS/code injection attacks.
+    *   @return mixed
+    *	@param $arg mixed
 	*	@param $tags string
 	**/
 	function clean($arg,$tags=NULL) {
@@ -1294,7 +1305,7 @@ final class Base extends Prefab implements ArrayAccess {
 
 	/**
 	*	Return PHP value derived from string
-	*	@return string
+	*	@return mixed
 	*	@param $arg mixed
 	**/
 	function unserialize($arg) {
@@ -1526,13 +1537,13 @@ final class Base extends Prefab implements ArrayAccess {
 		$verb=strtoupper($parts[1]);
 		if ($parts[2]) {
 			if (empty($this->hive['ALIASES'][$parts[2]]))
-				user_error(sprintf(self::E_Named,$parts[2]),E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Named,$parts[2]));
 			$parts[4]=$this->hive['ALIASES'][$parts[2]];
 			$parts[4]=$this->build($parts[4],
 				isset($parts[3])?$this->parse($parts[3]):[]);
 		}
 		if (empty($parts[4]))
-			user_error(sprintf(self::E_Pattern,$pattern),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_Pattern,$pattern));
 		$url=parse_url($parts[4]);
 		parse_str(isset($url['query'])?$url['query']:'',$GLOBALS['_GET']);
 		if (preg_match('/GET|HEAD/',$verb))
@@ -1568,7 +1579,7 @@ final class Base extends Prefab implements ArrayAccess {
 		if (!is_array($params))
 			$params=$this->parse($params);
 		if (empty($this->hive['ALIASES'][$name]))
-			user_error(sprintf(self::E_Named,$name),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_Named,$name));
 		$url=$this->build($this->hive['ALIASES'][$name],$params);
 		if (is_array($query))
 			$query=http_build_query($query);
@@ -1595,16 +1606,16 @@ final class Base extends Prefab implements ArrayAccess {
 			'(?:\h+\[('.implode('|',$types).')\])?/u',$pattern,$parts);
 		if (isset($parts[2]) && $parts[2]) {
 			if (!preg_match('/^\w+$/',$parts[2]))
-				user_error(sprintf(self::E_Alias,$parts[2]),E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Alias,$parts[2]));
 			$this->hive['ALIASES'][$alias=$parts[2]]=$parts[3];
 		}
 		elseif (!empty($parts[4])) {
 			if (empty($this->hive['ALIASES'][$parts[4]]))
-				user_error(sprintf(self::E_Named,$parts[4]),E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Named,$parts[4]));
 			$parts[3]=$this->hive['ALIASES'][$alias=$parts[4]];
 		}
 		if (empty($parts[3]))
-			user_error(sprintf(self::E_Pattern,$pattern),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_Pattern,$pattern));
 		$type=empty($parts[5])?0:constant('self::REQ_'.strtoupper($parts[5]));
 		foreach ($this->split($parts[1]) as $verb) {
 			if (!preg_match('/'.self::VERBS.'/',$verb))
@@ -1764,7 +1775,7 @@ final class Base extends Prefab implements ArrayAccess {
 			$this->error(403);
 		if (!$this->hive['ROUTES'])
 			// No routes defined
-			user_error(self::E_Routes,E_USER_ERROR);
+            throw new \Exception(self::E_Routes);
 		// Match specific routes first
 		$paths=[];
 		foreach ($keys=array_keys($this->hive['ROUTES']) as $key) {
@@ -1996,7 +2007,7 @@ final class Base extends Prefab implements ArrayAccess {
 		if (preg_match('/(.+)\h*(->|::)\h*(.+)/s',$func,$parts)) {
 			// Convert string to executable PHP callback
 			if (!class_exists($parts[1]))
-				user_error(sprintf(self::E_Class,$parts[1]),E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Class,$parts[1]));
 			if ($parts[2]=='->') {
 				if (is_subclass_of($parts[1],'Prefab'))
 					$parts[1]=call_user_func($parts[1].'::instance');
@@ -2012,9 +2023,8 @@ final class Base extends Prefab implements ArrayAccess {
 						$parts[1]=call_user_func($container.'::instance')->
 							get($parts[1]);
 					else
-						user_error(sprintf(self::E_Class,
-							$this->stringify($parts[1])),
-							E_USER_ERROR);
+                        throw new \Exception(sprintf(self::E_Class,
+							$this->stringify($parts[1])));
 				}
 				else {
 					$ref=new ReflectionClass($parts[1]);
@@ -2055,9 +2065,8 @@ final class Base extends Prefab implements ArrayAccess {
 				$this->error(405);
 			}
 			else
-				user_error(sprintf(self::E_Method,
-					is_string($func)?$func:$this->stringify($func)),
-					E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Method,
+					is_string($func)?$func:$this->stringify($func)));
 		$obj=FALSE;
 		if (is_array($func)) {
 			$hooks=$this->split($hooks);
@@ -2240,9 +2249,15 @@ final class Base extends Prefab implements ArrayAccess {
 	*	@param $file string
 	*	@param $lf bool
 	**/
-	function read($file,$lf=FALSE) {
-		$out=@file_get_contents($file);
-		return $lf?preg_replace('/\r\n|\r/',"\n",$out):$out;
+	function read($file, $lf = FALSE)
+	{
+		if (!file_exists($file)) {
+			return false;
+		}
+		
+		$out = file_get_contents($file);
+
+		return $lf ? preg_replace('/\r\n|\r/', "\n", $out) : $out;
 	}
 
 	/**
@@ -2428,7 +2443,7 @@ final class Base extends Prefab implements ArrayAccess {
 	function __call($key,array $args) {
 		if ($this->exists($key,$val))
 			return call_user_func_array($val,$args);
-		user_error(sprintf(self::E_Method,$key),E_USER_ERROR);
+        throw new \Exception(sprintf(self::E_Method,$key));
 	}
 
 	//! Prohibit cloning
@@ -3066,7 +3081,7 @@ class View extends Prefab {
 				return $data;
 			}
 		}
-		user_error(sprintf(Base::E_Open,$file),E_USER_ERROR);
+        throw new \Exception(sprintf(Base::E_Open,$file));
 	}
 
 	/**
@@ -3287,7 +3302,7 @@ class Preview extends View {
 				return $data;
 			}
 		}
-		user_error(sprintf(Base::E_Open,$file),E_USER_ERROR);
+        throw new \Exception(sprintf(Base::E_Open,$file));
 	}
 
 	/**

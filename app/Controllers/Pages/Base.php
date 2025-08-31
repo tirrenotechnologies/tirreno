@@ -110,7 +110,7 @@ abstract class Base {
 
             $params['OFFSET']   = $offset;
             $params['DAY']      = ($day < 10 ? '00' : ($day < 100 ? '0' : '')) . strval($day);
-            $params['TIME']     = date('H:i:s', $now);
+            $params['TIME_HIS'] = date('H:i:s', $now);
             $params['TIMEZONE'] = 'UTC' . (($offset < 0) ? '-' . date('H:i', -$offset) : '+' . date('H:i', $offset));
         }
 

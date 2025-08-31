@@ -36,6 +36,11 @@ use Sensor\Model\Validated\UserAgent;
 use Sensor\Model\Validated\BrowserLanguage;
 use Sensor\Model\Validated\EventType;
 use Sensor\Model\Validated\HttpMethod;
+use Sensor\Model\Validated\Payloads\FieldEditPayload;
+use Sensor\Model\Validated\Payloads\PageSearchPayload;
+use Sensor\Model\Validated\Payloads\EmailChangePayload;
+use Sensor\Repository\EventRepository;
+use Sensor\Service\Constants;
 
 class RequestFactory {
     private const REQUIRED_FIELDS = ['ipAddress', 'url', 'eventTime'];
@@ -43,15 +48,13 @@ class RequestFactory {
     /**
      * @param array<string, string> $data
      */
-    public static function createFromArray(array $data, ?string $traceId): CreateEventDto {
-        // Check required fields
+    public static function createFromArray(array $data, ?string $traceId, EventRepository $eventRepository): CreateEventDto {
         foreach (self::REQUIRED_FIELDS as $key) {
             if (!isset($data[$key])) {
                 throw new ValidationException('Required field is missing or empty', $key);
             }
         }
 
-        // Check datetime
         $eventTime = new Timestamp($data['eventTime']);
 
         $userCreated = isset($data['userCreated']) ? (new Timestamp($data['userCreated'])) : null;
@@ -63,32 +66,42 @@ class RequestFactory {
 
         $phone = isset($data['phoneNumber']) ? (new Phone($data['phoneNumber'])) : null;
 
+        $email =        isset($data['emailAddress']) ? (new Email($data['emailAddress'])) : null;
+        $firstname =    isset($data['firstName']) ? (new Firstname($data['firstName'])) : null;
+        $lastname =     isset($data['lastName']) ? (new Lastname($data['lastName'])) : null;
+        $fullname =     isset($data['fullName']) ? (new Fullname($data['fullName'])) : null;
+        $username =     isset($data['userName']) ? (new Userid($data['userName'])) : null;
+        $pageTitle =    isset($data['pageTitle']) ? (new PageTitle($data['pageTitle'])) : null;
+        $url =          isset($data['url']) ? (new Url($data['url'])) : null;
+        $userAgent =    isset($data['userAgent']) ? (new UserAgent($data['userAgent'])) : null;
+        $browserLang =  isset($data['browserLanguage']) ? (new BrowserLanguage($data['browserLanguage'])) : null;
+        $eventType =    isset($data['eventType']) ? (new EventType($data['eventType'])) : null;
+        $httpMethod =   isset($data['httpMethod']) ? (new HttpMethod($data['httpMethod'])) : null;
+
         $payload = null;
-        if (isset($data['payload'])) {
-            try {
-                /** @var array<mixed, mixed> $payload */
-                $payload = json_decode($data['payload'], true, 512, \JSON_THROW_ON_ERROR);
-            } catch (\JsonException) {
-                $payload = null;
+        $payloadRaw = $data['payload'] ?? null;
+
+        if ($eventType?->value) {
+            $eventTypeId = $eventRepository->getEventType($eventType->value);
+
+            if ($eventTypeId === Constants::FIELD_EDIT_EVENT_TYPE_ID) {
+                $payload = new FieldEditPayload($payloadRaw);
+            } elseif ($payloadRaw) {
+                switch ($eventTypeId) {
+                    case Constants::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID:
+                        $payload = new EmailChangePayload($payloadRaw);
+                        break;
+                    case Constants::PAGE_SEARCH_EVENT_TYPE_ID:
+                        $payload = new PageSearchPayload($payloadRaw);
+                        break;
+                }
             }
         }
-
-        $email =       isset($data['emailAddress']) ? (new Email($data['emailAddress'])) : null;
-        $firstname =   isset($data['firstName']) ? (new Firstname($data['firstName'])) : null;
-        $lastname =    isset($data['lastName']) ? (new Lastname($data['lastName'])) : null;
-        $fullname =    isset($data['fullName']) ? (new Fullname($data['fullName'])) : null;
-        $username =    isset($data['userName']) ? (new Userid($data['userName'])) : null;
-        $pageTitle =   isset($data['pageTitle']) ? (new PageTitle($data['pageTitle'])) : null;
-        $url =         isset($data['url']) ? (new Url($data['url'])) : null;
-        $userAgent =   isset($data['userAgent']) ? (new UserAgent($data['userAgent'])) : null;
-        $browserLang = isset($data['browserLanguage']) ? (new BrowserLanguage($data['browserLanguage'])) : null;
-        $eventType =   isset($data['eventType']) ? (new EventType($data['eventType'])) : null;
-        $httpMethod =  isset($data['httpMethod']) ? (new HttpMethod($data['httpMethod'])) : null;
 
         $validatedParams = [
             $email, $eventTime, $userCreated, $referer, $httpCode, $ipAddress,
             $phone, $firstname, $lastname, $fullname, $username, $pageTitle,
-            $url, $userAgent, $browserLang, $eventType, $httpMethod,
+            $url, $userAgent, $browserLang, $eventType, $httpMethod, $payload,
         ];
 
         $changedParams = self::changedParams($validatedParams);
@@ -116,7 +129,7 @@ class RequestFactory {
             $httpMethod?->value,
             $userCreated?->value,
             $traceId,
-            $payload,
+            $payload?->value,
             $changedParams,
         );
     }

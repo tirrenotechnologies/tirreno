@@ -22,8 +22,10 @@ class UsersByLoginFail extends Base {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
         $queryConditions = $this->getQueryConditions($dateRange);
-        $queryConditions[] = 'event.type = 7';
+        $queryConditions[] = 'event.type = :event_type';
         $queryConditions = join(' AND ', $queryConditions);
+
+        $params[':event_type'] = \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
 
         $query = (
             "SELECT
@@ -60,9 +62,9 @@ class UsersByLoginFail extends Base {
 
         $results = $this->execQuery($query, $params);
 
-        foreach ($results as $i => $val) {
+        foreach ($results as $row) {
             $tsColumns = ['score_updated_at'];
-            \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $results[$i]);
+            \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $row);
         }
 
         return $results;

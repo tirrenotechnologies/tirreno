@@ -131,7 +131,7 @@ class Query extends \Models\Grid\Base\Query {
         }
 
         $uids = [];
-        foreach ($ruleUids as $key => $ruleUid) {
+        foreach ($ruleUids as $ruleUid) {
             $uids[] = ['uid' => $ruleUid];
         }
 

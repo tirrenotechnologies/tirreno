@@ -21,10 +21,31 @@ export class BaseGrid {
 
         this.renderTotalsLoader = this.renderTotalsLoader.bind(this);
 
-        const me      = this;
-        const tableId = gridParams.tableId;
+        this.initLoad();
 
-        $(document).ready(function() {
+        if (this.config.dateRangeGrid && !this.config.sequential) {
+            const onDateFilterChanged = this.onDateFilterChanged.bind(this);
+            window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
+        }
+
+        if (gridParams.choicesFilterEvents) {
+            const onChoicesFilterChanged = this.onChoicesFilterChanged.bind(this);
+            for (let i = 0; i < gridParams.choicesFilterEvents.length; i++) {
+                window.addEventListener(gridParams.choicesFilterEvents[i], onChoicesFilterChanged, false);
+            }
+        }
+
+        if (!this.config.sequential) {
+            const onSearchFilterChanged = this.onSearchFilterChanged.bind(this);
+            window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
+        }
+    }
+
+    initLoad() {
+        const me      = this;
+        const tableId = this.config.tableId;
+
+        $(document).ready(() => {
             $.extend($.fn.dataTable.ext.classes, {
                 sStripeEven: '', sStripeOdd: ''
             });
@@ -49,23 +70,14 @@ export class BaseGrid {
             const onDraw = me.onDraw.bind(me);
             $(`#${tableId}`).on('draw.dt', onDraw);
 
+            $(`#${tableId}`).closest('.dt-container').find('nav').empty();
+
             document.getElementById(tableId).classList.add('hide-body');
-        });
 
-        if (this.config.dateRangeGrid) {
-            const onDateFilterChanged = this.onDateFilterChanged.bind(this);
-            window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
-        }
-
-        if (gridParams.choicesFilterEvents) {
-            const onChoicesFilterChanged = this.onChoicesFilterChanged.bind(this);
-            for (let i = 0; i < gridParams.choicesFilterEvents.length; i++) {
-                window.addEventListener(gridParams.choicesFilterEvents[i], onChoicesFilterChanged, false);
+            if (!me.config.sequential) {
+                me.loadData();
             }
-        }
-
-        const onSearchFilterChanged = this.onSearchFilterChanged.bind(this);
-        window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
+        });
     }
 
     getDataTableConfig() {
@@ -86,6 +98,7 @@ export class BaseGrid {
                     success: function(response, textStatus, jqXHR) {
                         callback(response);
                         me.performAdditional(response, me.config);
+                        me.stopAnimation();
                     },
                     error: handleAjaxError,
                 });
@@ -93,6 +106,7 @@ export class BaseGrid {
             processing: true,
             serverSide: true,
             deferRender: true,
+            deferLoading: 0,
             pageLength: 25,
             autoWidth: false,
             lengthChange: false,
@@ -226,26 +240,25 @@ export class BaseGrid {
 
     drawCallback(settings) {
         const me    = this;
-        const json  = settings.json;
-        const total = json.recordsTotal;
-
-        //Update total tile
-        const tileId  = this.config.tileId;
-        const tableId = this.config.tableId;
-
-        this.totalTile.update(tableId, tileId, total);
-
-        //Update table title
-        this.updateTableTitle(total);
 
         this.initTooltips();
-        this.stopAnimation();
+
+        //this.stopAnimation();
 
         const params = {
             tableId: me.config.tableId
         };
 
-        fireEvent('tableLoaded', params);
+        if (settings && settings.iDraw > 1) {
+            const total = settings.json.recordsTotal;
+            const tileId  = this.config.tileId;
+            const tableId = this.config.tableId;
+
+            this.totalTile.update(tableId, tileId, total);
+            this.updateTableTitle(total);
+
+            fireEvent('tableLoaded', params);
+        }
     }
 
     updateTableTitle(value) {
@@ -269,7 +282,13 @@ export class BaseGrid {
         const tableId = this.config.tableId;
         const pagerSelector = `#${tableId}_wrapper .dt-paging`;
 
-        if (dataTable.api().page.info().pages <= 1) {
+        const api = dataTable.api();
+        if (api.ajax && typeof api.ajax.json === 'function' && api.ajax.json() === undefined) {
+            return;
+        }
+
+        $(`#${tableId}`).closest('.dt-container').find('nav').show();
+        if (api.page.info().pages <= 1) {
             $(pagerSelector).hide();
         } else {
             $(pagerSelector).show();
@@ -282,7 +301,9 @@ export class BaseGrid {
     }
 
     onBeforeLoad(e, settings, data) {
-        this.updateTimer();
+        if (!this.config.sequential) {
+            this.startLoader();
+        }
         this.updateTableTitle(MIDLINE_HELLIP);
 
         fireEvent('dateFilterChangedCaught');
@@ -348,7 +369,7 @@ export class BaseGrid {
         }
     }
 
-    updateTimer() {
+    startLoader() {
         const tableId    = this.config.tableId;
         const loaderPath = `${tableId}_processing`;
 
@@ -358,6 +379,8 @@ export class BaseGrid {
         loaderWrapper.replaceChildren(el);
 
         this.loader.start(el);
+
+        loaderWrapper.style.display = null;
     }
 
     onRowClick(e) {
@@ -383,22 +406,22 @@ export class BaseGrid {
         //console.warn('An error has been reported by DataTables: ', message);
     }
 
-    reloadData() {
+    loadData() {
         //TODO: create getter for table el: $(me.table).DataTable().ajax.reload()
         const me = this;
         $(me.table).DataTable().ajax.reload();
     }
 
     onDateFilterChanged() {
-        this.reloadData();
+        this.loadData();
     }
 
     onSearchFilterChanged() {
-        this.reloadData();
+        this.loadData();
     }
 
     onChoicesFilterChanged() {
-        this.reloadData();
+        this.loadData();
     }
 
     getConfigParam(key) {

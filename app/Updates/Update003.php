@@ -18,9 +18,9 @@ namespace Updates;
 class Update003 extends Base {
     public static $version = 'v0.9.7';
 
-    private const ERROR_EVENT_TYPE = 12;
-
     public static function up($db) {
+        $data = [':type' => \Utils\Constants::get('PAGE_ERROR_EVENT_TYPE_ID')];
+
         $queries = [
             'ALTER TABLE event_logbook DROP COLUMN raw_time',
             'ALTER TABLE event_account ADD COLUMN added_to_review TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL',
@@ -34,7 +34,16 @@ class Update003 extends Base {
                     event_account.fraud IS NULL AND
                     event_account.score <= dshb_api.review_queue_threshold'
             ),
-            'INSERT INTO event_type (id, value, name) VALUES (12, \'page_error\', \'Page Error\')',
+        ];
+
+        foreach ($queries as $sql) {
+            $db->exec($sql);
+        }
+
+        $sql = 'INSERT INTO event_type (id, value, name) VALUES (:type, \'page_error\', \'Page Error\')';
+        $db->exec($sql, $data);
+
+        $queries = [
             'ALTER TABLE countries RENAME COLUMN id TO iso',
             'ALTER TABLE countries RENAME COLUMN serial TO id',
             'ALTER TABLE countries DROP CONSTRAINT countries_id_pkey',
@@ -53,6 +62,6 @@ class Update003 extends Base {
             WHERE http_code >= 400'
         );
 
-        $db->exec($sql, [':type' => self::ERROR_EVENT_TYPE]);
+        $db->exec($sql, $data);
     }
 }

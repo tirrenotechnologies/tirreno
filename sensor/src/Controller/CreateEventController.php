@@ -21,7 +21,6 @@ use Sensor\Dto\GetApiKeyDto;
 use Sensor\Dto\InsertAccountDto;
 use Sensor\Dto\InsertEventDto;
 use Sensor\Entity\AccountEntity;
-use Sensor\Entity\EventEntity;
 use Sensor\Exception\ValidationException;
 use Sensor\Factory\EventFactory;
 use Sensor\Factory\RequestFactory;
@@ -65,7 +64,7 @@ class CreateEventController {
         $this->profiler->start('user');
 
         try {
-            $dto = $this->requestFactory->createFromArray($request->body, $request->traceId);
+            $dto = $this->requestFactory->createFromArray($request->body, $request->traceId, $this->eventRepository);
         } catch (ValidationException $e) {
             return new ValidationFailedResponse($e);
         }

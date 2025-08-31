@@ -33,7 +33,7 @@ const handleAjaxError = (xhr, status, error) => {
     notificationEl.replaceChildren(frag);
 
     const deleteButton = notificationEl.querySelector('.delete');
-    deleteButton.addEventListener('click', function() {
+    deleteButton.addEventListener('click', () => {
         notificationEl.classList.add('is-hidden');
     });
 

@@ -186,6 +186,12 @@ class Data extends \Controllers\Base {
         return $controller->getList();
     }
 
+    public function getFieldAuditTrail(): array {
+        $controller = new \Controllers\Admin\Payloads\FieldAuditTrail\Navigation();
+
+        return $controller->getList();
+    }
+
     public function getUserScoreDetails(): array {
         $controller = new \Controllers\Admin\User\Navigation();
 

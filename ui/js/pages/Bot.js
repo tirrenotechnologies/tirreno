@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {Map} from '../parts/Map.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
@@ -64,9 +64,8 @@ export class BotPage extends BasePage {
             getParams: function() {
                 const id        = BOT_ID;
                 const mode      = 'bot';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
@@ -77,12 +76,17 @@ export class BotPage extends BasePage {
         };
 
         new EventPanel();
-        new BotTiles(botDetailsTiles);
-        new Map(mapParams);
-        new IpsGrid(ipsGridParams);
-        new BaseBarChart(chartParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
         new ReenrichmentButton();
+
+        const elements = [
+            [BotTiles,              botDetailsTiles],
+            [Map,                   mapParams],
+            [IpsGrid,               ipsGridParams],
+            [UsersGrid,             usersGridParams],
+            [BaseBarChart,          chartParams],
+            [EventsGrid,            eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

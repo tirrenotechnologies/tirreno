@@ -56,7 +56,7 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
             if (count($items)) {
                 $summary[$type] = count($items);
             }
-            foreach ($items as $idx => $item) {
+            foreach ($items as $item) {
                 $result = $this->controller->enrichEntity($type, null, $item, $apiKey, $subscriptionKey);
                 if (isset($result['ERROR_CODE'])) {
                     $failed += 1;

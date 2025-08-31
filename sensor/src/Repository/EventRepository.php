@@ -20,11 +20,9 @@ namespace Sensor\Repository;
 use Sensor\Dto\InsertEventDto;
 use Sensor\Entity\EventEntity;
 use Sensor\Model\Validated\Timestamp;
+use Sensor\Service\Constants;
 
 class EventRepository {
-    private const DEFAULT_EVENT_TYPE = 1;
-    private const ERROR_EVENT_TYPE = 12;
-
     public function __construct(
         private AccountRepository $accountRepository,
         private SessionRepository $sessionRepository,
@@ -37,6 +35,8 @@ class EventRepository {
         private DomainRepository $domainRepository,
         private PhoneRepository $phoneRepository,
         private EventCountryRepository $eventCountryRepository,
+        private FieldAuditTrailRepository $fieldAuditTrailRepository,
+        private PayloadRepository $payloadRepository,
         private \PDO $pdo,
     ) {
     }
@@ -60,14 +60,21 @@ class EventRepository {
         $refererId = $event->referer !== null ? $this->refererRepository->insert($event->referer) : null;
 
         if ($event->httpCode >= 400) {
-            $eventTypeId = self::ERROR_EVENT_TYPE;
+            $eventTypeId = Constants::PAGE_ERROR_EVENT_TYPE_ID;
         } elseif ($event->eventType === null) {
-            $eventTypeId = self::DEFAULT_EVENT_TYPE;
+            $eventTypeId = Constants::PAGE_VIEW_EVENT_TYPE_ID;
         } else {
-            $eventTypeId = $this->getEventType($event->eventType) ?? self::DEFAULT_EVENT_TYPE;
+            $eventTypeId = $this->getEventType($event->eventType) ?? Constants::PAGE_VIEW_EVENT_TYPE_ID;
         }
 
         $sessionId = $this->sessionRepository->insert($event->session);
+
+        $payloadId = null;
+        if ($event->payload) {
+            if ($eventTypeId === Constants::PAGE_SEARCH_EVENT_TYPE_ID || $eventTypeId === Constants::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID) {
+                $payloadId = $this->payloadRepository->insert($event->payload);
+            }
+        }
 
         $eventId = $this->insertEvent(
             $event,
@@ -81,7 +88,12 @@ class EventRepository {
             $emailDto?->emailId,
             $phoneId,
             $sessionId,
+            $payloadId,
         );
+
+        if ($eventTypeId === Constants::FIELD_EDIT_EVENT_TYPE_ID) {
+            $this->fieldAuditTrailRepository->insert($event->payload, $eventId);
+        }
 
         // Update last email/phone, if changed or was empty
         if ($lastEmailId !== $emailDto?->emailId || $lastPhoneId !== $phoneId) {
@@ -100,6 +112,7 @@ class EventRepository {
             $ipDto->countryId,
             $emailDto?->domainId,
             $ipDto->ispId,
+            $payloadId,
         );
     }
 
@@ -115,9 +128,8 @@ class EventRepository {
         ?int $emailId,
         ?int $phoneId,
         int $sessionId,
+        ?int $payloadId,
     ): int {
-        $payload = $event->payload !== null ? json_encode($event->payload) : null;
-
         $sql = 'INSERT INTO event
                 (key, account, ip, url, device, referer, time, query, type, http_method, email, phone, http_code, traceid, payload, session_id)
             VALUES
@@ -138,7 +150,7 @@ class EventRepository {
         $stmt->bindValue(':phone', $phoneId);
         $stmt->bindValue(':http_code', $event->httpCode);
         $stmt->bindValue(':traceid', $event->traceId);
-        $stmt->bindValue(':payload', $payload);
+        $stmt->bindValue(':payload', $payloadId);
         $stmt->bindValue(':session_id', $sessionId);
         $stmt->execute();
 
@@ -148,7 +160,7 @@ class EventRepository {
         return $result['id'];
     }
 
-    private function getEventType(string $eventType): ?int {
+    public function getEventType(string $eventType): ?int {
         $sql = 'SELECT id FROM event_type WHERE "value" ilike :event_type LIMIT 1';
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':event_type', $eventType);

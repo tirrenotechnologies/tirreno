@@ -6,6 +6,11 @@ import {
 
 export class EventTypeFilter extends BaseFilter {
     constructor() {
-        super('#event-type-selectors', renderEventTypeSelectorItem, renderEventTypeSelectorChoice, 'eventTypeFilterChanged');
+        super(
+            '#event-type-selectors',
+            renderEventTypeSelectorItem,
+            renderEventTypeSelectorChoice,
+            'eventTypeFilterChanged',
+        );
     }
 }

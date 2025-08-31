@@ -1,4 +1,5 @@
 config/config.local.ini
+config/local/config.local.ini
 ui/node_modules
 node_modules/*
 public/*
@@ -8,5 +9,7 @@ composer.phar
 /.php-cs-fixer.cache
 logs/*
 !/logs/index.php
+assets/logs/*
+!/assets/logs/index.php
 tmp/*
 !/tmp/index.php

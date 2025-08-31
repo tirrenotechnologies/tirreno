@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 import {IspsGrid} from '../parts/grid/Isps.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
@@ -68,9 +68,8 @@ export class CountryPage extends BasePage {
             getParams: function() {
                 const id        = COUNTRY_ID;
                 const mode      = 'country';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
@@ -80,10 +79,16 @@ export class CountryPage extends BasePage {
 
         new StaticTiles(tilesParams);
         new EventPanel();
-        new BaseBarChart(chartParams);
-        new IpsGrid(ipsGridParams);
-        new IspsGrid(ispsGridParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
+
+        const elements = [
+            [UsersGrid,     usersGridParams],
+            [IpsGrid,       ipsGridParams],
+            [IspsGrid,      ispsGridParams],
+            [BaseBarChart,  chartParams],
+            [EventsGrid,    eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
+
     }
 }

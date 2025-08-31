@@ -9,15 +9,17 @@
     </a>
 </p>
 
-tirreno is an open-source security platform.
+The open-source security analytics.
 
-It monitors, analyzes and protects your web app from cyberfraud, account threats, fake accounts, and abuse. Unlike classic SIEMs that focus on infrastructure, tirreno monitors your users to detect threats where they actually happen — inside your app.
+tirreno helps you to understand, monitor, and protect your platforms from cyber fraud, account threats, and abuse. Proactively defend against internal and external threats, ensure sovereignty through on-premises deployment, and secure your digital platforms:
 
-* **For mission-critical applications**: Secure your user environments from account takeovers, brute-force attacks, insider threats, and vulnerabilities driven by user behavior.
-* **For web applications**: Protect your user areas from account takeovers, brute-force attacks, fake accounts, malicious bots, and common web vulnerabilities caused by user behavior.
-* **For online platforms**: Conduct thorough merchant risk assessments to identify and mitigate potential threats from high-risk merchants, ensuring the integrity of your platform.
-* **For SaaS, client portals and e-commerce**: Get a ready-made boilerplate for account security, including monitoring customer activity for suspicious behavior and preventing fraud using advanced email, IP address, and phone reputation checks.
-* **For online communities**: Combat spam, prevent fake registrations and account sharing.
+* **Proactive monitoring and granular visibility**: Understand your application with detailed event tracking and smart monitoring. Capture all events: logins/logouts, data modification, page visits, API calls, along with user context and application errors to get complete operational awareness.
+* **Continuous monitoring**: Monitor user behaviour in near real time by choosing from a list of relevant event types. Proactively find cyberfraud, account threats, and abuse in your digital platform, and respond to threats quickly based on in-app intelligence.
+* **Single user view**: Get comprehensive visibility into individual user activity. Analyze behavior patterns, risk scores, connected identities, and activity timelines for specific users. Investigate suspicious activity and review detailed session data to make informed security decisions.
+* **User risk assessment**: Set up security rules to automatically identify malicious activity, and assess risk tailored to your specific requirements.
+* **Case management and auto-decision**: Accounts with risky events are sent to manual review or automatic suspension. Security team can investigate flagged cases and make informed decisions based on comprehensive security analytics.
+* **Field audit trail**: Automatically track modifications to important fields, including what changed and when. Centralized field audit trail lets you easily review data changes, streamlining audit and compliance.
+* **Enhanced threat intelligence**: tirreno can be enhanced with first-party threat intelligence via API enrichment. Eliminate blind spots and get the threat intelligence you need to build a multi-layered defense against fraud. (Optional)
 
 tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time threat analytics.
 
@@ -33,9 +35,9 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 * **HTTP web server**: `Apache` with `mod_rewrite` and `mod_headers` enabled
 * **Operating system**: A Unix-like system is recommended
 * **Minimum hardware requirements**:
-    * **PostgreSQL**: 512 MB RAM (4 GB recommended)
-    * **Application**: 128 MB RAM (1 GB recommended)
-    * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
+  * **PostgreSQL**: 512 MB RAM (4 GB recommended)
+  * **Application**: 128 MB RAM (1 GB recommended)
+  * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
 
 ## Quickstart install
 
@@ -45,8 +47,9 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 4. After the successful installation, delete the `install/` directory and its contents.
 5. Navigate to `http://your-domain.example/signup/` in a browser to create administrator account.
 6. For cron jobs setup insert the following schedule (every 10 minutes) expression with `crontab -e` command or by editing `/var/spool/cron/your-web-server` file:
+
 ```
-*/10 * * * * cd /path/to/tirreno && /usr/bin/php /path/to/tirreno/index.php /cron >> /path/to/tirreno/logs/error.log 2>&1
+*/10 * * * * cd /path/to/tirreno && /usr/bin/php /path/to/tirreno/index.php /cron >> /path/to/tirreno/assets/logs/error.log 2>&1
 ```
 
 ## Using a docker-based installation (optional)
@@ -91,10 +94,10 @@ The tirreno wordmark, positioned beyond a horizon line, as a metaphor for the co
 
 ## Links
 
-- [Website](https://www.tirreno.com)
-- [Live demo](https://play.tirreno.com)
-- [Documentation](https://docs.tirreno.com)
-- [Mattermost community](https://chat.tirreno.com)
+* [Website](https://www.tirreno.com)
+* [Live demo](https://play.tirreno.com)
+* [Documentation](https://docs.tirreno.com)
+* [Mattermost community](https://chat.tirreno.com)
 
 ## Reporting a security issue
 
@@ -102,11 +105,11 @@ If you've found a security-related issue with tirreno, please email security@tir
 
 After receiving a report, tirreno will take the following steps:
 
-- Confirm that the report has been received and is being addressed.
-- Attempt to reproduce the problem and confirm the vulnerability.
-- Release new versions of all the affected packages.
-- Announce the problem prominently in the release notes.
-- If requested, give credit to the reporter.
+* Confirm that the report has been received and is being addressed.
+* Attempt to reproduce the problem and confirm the vulnerability.
+* Release new versions of all the affected packages.
+* Announce the problem prominently in the release notes.
+* If requested, give credit to the reporter.
 
 ## License
 

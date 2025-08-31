@@ -6,6 +6,13 @@
 ###############
 
 ##########
+# KolibriOS (https://www.kolibrios.org/en/)
+##########
+- regex: 'KolibriOS'
+  name: 'KolibriOS'
+  version: ''
+
+##########
 # Coolita OS (http://www.coolitaos.com/)
 ##########
 - regex: 'Coolita OS QJY/.+LiteOS(\d+[.\d]+)'
@@ -655,6 +662,8 @@
 - regex: '(?:Android (\d([\d.])*);? )?lineage_\w+'
   name: 'Lineage OS'
   versions:
+    - regex: 'Android 16'
+      version: '23'
     - regex: 'Android 15'
       version: '22'
     - regex: 'Android 14'
@@ -743,7 +752,7 @@
   version: '$1'
 
 # https://chromiumdash.appspot.com/serving-builds?deviceCategory=ChromeOS
-- regex: '(?:Android (?:9|1[0-6])[.\d]*|Linux x86_64); (?:asurada|atlas|brask|brya|cherry|coral|corsola|dedede|drallion|elm|eve|fizz|geralt|grunt|guybrush|hana|hatch|jacuzzi|kalista|kukui|nami|nautilus|nissa|nocturne|octopus|puff|pyro|rammus|reef|rex|sand|sarien|skyrim|snappy|soraka|staryu|strongbad|trogdor|volteer|zork)\)'
+- regex: '(?:Android (?:9|1[0-6])[.\d]*|Linux x86_64); (?:asurada|atlas|brask|brox|brya|cherry|coral|corsola|dedede|drallion|elm|eve|fizz|geralt|grunt|guybrush|hana|hatch|jacuzzi|kalista|kukui|nami|nautilus|nissa|nocturne|octopus|puff|pyro|rammus|reef|rex|sand|sarien|skyrim|snappy|soraka|staryu|strongbad|trogdor|volteer|zork)\)'
   name: 'Chrome OS'
   version: ''
 

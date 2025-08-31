@@ -9,10 +9,10 @@ class A05 extends BaseRule {
 
     protected function prepareParams(array $params): array {
         $passwordChangeOnNewDevice = false;
-        $passwordChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
+        $passwordChange = \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
 
         if ($params['eup_device_count'] > 1) {
-            foreach ($params['event_device'] as $idx => $device) {
+            foreach (array_keys($params['event_device']) as $idx) {
                 if ($params['event_type'][$idx] === $passwordChange && \Utils\Rules::eventDeviceIsNew($params, $idx)) {
                     $passwordChangeOnNewDevice = true;
                     break;

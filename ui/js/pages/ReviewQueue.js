@@ -23,11 +23,10 @@ export class ReviewQueuePage extends BasePage {
         const chartParams = {
             getParams: function() {
                 const mode        = 'review-queue';
-                const chartType   = 'line';
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
-                return {mode, chartType, dateRange, searchValue};
+                return {mode, dateRange, searchValue};
             }
         };
 

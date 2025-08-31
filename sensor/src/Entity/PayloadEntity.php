@@ -13,19 +13,16 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Controllers\Admin\Payloads;
+declare(strict_types=1);
 
-class Data extends \Controllers\Base {
-    public function getList(int $apiKey): array {
-        $result = [];
-        $model = new \Models\Grid\Payloads\Grid($apiKey);
+namespace Sensor\Entity;
 
-        $userId = $this->f3->get('REQUEST.userId');
-
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getPayloadsByUserId($userId);
-        }
-
-        return $result;
+class PayloadEntity {
+    public function __construct(
+        public int $accountId,
+        public int $apiKeyId,
+        public array|string $payload,
+        public \DateTimeImmutable $lastSeen,
+    ) {
     }
 }

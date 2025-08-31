@@ -26,6 +26,7 @@ class InsertEventDto {
         public int $countryId,
         public ?int $domainId,
         public ?int $ispId,
+        public ?int $payloadId,
     ) {
     }
 }

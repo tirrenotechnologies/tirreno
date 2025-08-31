@@ -15,8 +15,8 @@
 
 namespace Utils;
 
-class SuspiciousWordsSql extends SuspiciousWords {
-    protected static string $extensionFile = 'sql.txt';
+class SuspiciousWordsUserAgent extends SuspiciousWords {
+    protected static string $extensionFile = 'user-agent.txt';
 
     protected static array $words = [
         '--',
@@ -46,5 +46,10 @@ class SuspiciousWordsSql extends SuspiciousWords {
         '%3D',      // =
         '%28',      // (
         '%29',      // )
+        '/bin',
+        '%2Fbin',
+        '.sh',
+        '|sh',
+        '.exe',
     ];
 }

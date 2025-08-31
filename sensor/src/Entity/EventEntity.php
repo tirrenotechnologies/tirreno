@@ -36,7 +36,7 @@ class EventEntity {
         public ?int $httpCode,
         public \DateTimeImmutable $eventTime,
         public ?string $traceId,
-        public ?array $payload,
+        public ?PayloadEntity $payload,
         public CountryEntity $country,
     ) {
     }

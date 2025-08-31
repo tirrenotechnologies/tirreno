@@ -23,7 +23,7 @@ class Data extends \Controllers\Base {
     public function __construct() {
         parent::__construct();
 
-        $this->ENRICHED_ATTRIBUTES = array_keys(\Utils\Constants::ENRICHING_ATTRIBUTES);
+        $this->ENRICHED_ATTRIBUTES = array_keys(\Utils\Constants::get('ENRICHING_ATTRIBUTES'));
     }
 
     public function proceedPostRequest(array $params): array {
@@ -162,7 +162,6 @@ class Data extends \Controllers\Base {
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $operatorId = $data['id'];
             $apiKey = $this->getCurrentOperatorApiKeyId();
 
             $model = new \Models\Users();

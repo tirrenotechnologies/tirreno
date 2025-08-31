@@ -13,6 +13,7 @@ class E02 extends BaseRule {
             $this->rb['ld_days_since_domain_creation']->lessThan(30),
             //$this->rb['le_has_no_profiles']->equalTo(true),
             $this->rb['le_has_no_data_breaches']->equalTo(true),
+            $this->rb['le_local_part_len']->greaterThan(0),
         );
     }
 }

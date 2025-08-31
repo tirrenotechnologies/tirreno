@@ -146,6 +146,10 @@ class Navigation extends \Controllers\Base {
         $this->response->data = $this->dataController->getPhones();
     }
 
+    public function getFieldAuditTrail(): void {
+        $this->response->data = $this->dataController->getFieldAuditTrail();
+    }
+
     public function getUserScoreDetails(): void {
         $this->response->data = $this->dataController->getUserScoreDetails();
     }

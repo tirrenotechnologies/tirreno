@@ -67,15 +67,15 @@ class OAuth2 extends \Magic {
 			);
 		$response=$web->request($uri,$options);
 		if ($response['error'])
-			user_error($response['error'],E_USER_ERROR);
+            throw new \Exception($response['error']);
 		if (isset($response['body'])) {
 			if (preg_grep('/^Content-Type:.*application\/json/i',
 				$response['headers'])) {
 				$token=json_decode($response['body'],TRUE);
 				if (isset($token['error_description']))
-					user_error($token['error_description'],E_USER_ERROR);
+                    throw new \Exception($token['error_description']);
 				if (isset($token['error']))
-					user_error($token['error'],E_USER_ERROR);
+                    throw new \Exception($token['error']);
 				return $token;
 			}
 			else

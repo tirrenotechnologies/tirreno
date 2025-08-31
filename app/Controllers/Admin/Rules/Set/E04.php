@@ -10,6 +10,7 @@ class E04 extends BaseRule {
     protected function defineCondition() {
         return $this->rb->logicalAnd(
             $this->rb['le_has_numeric_only_local_part']->equalTo(true),
+            $this->rb['le_local_part_len']->greaterThan(0),
         );
     }
 }

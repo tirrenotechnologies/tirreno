@@ -9,7 +9,7 @@ class A01 extends BaseRule {
 
     protected function prepareParams(array $params): array {
         $maximumAttempts = \Utils\Constants::get('RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS');
-        $loginFail = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
+        $loginFail = \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
         $windowSize = \Utils\Constants::get('RULE_LOGIN_ATTEMPTS_WINDOW');
         $tooManyLoginAttempts = false;
         $cnt = 0;

@@ -25,9 +25,9 @@ class Behaviour extends \Models\BaseSql {
             ':start_ts'         => $dateRange['startDate'],
             ':end_ts'           => $dateRange['endDate'],
             ':offset'           => $dateRange['offset'],
-            ':failed_login'     => 7,
-            ':success_login'    => 5,
-            ':password_reset'   => 10,
+            ':failed_login'     => \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID'),
+            ':success_login'    => \Utils\Constants::get('ACCOUNT_LOGIN_EVENT_TYPE_ID'),
+            ':password_reset'   => \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID'),
             ':seconds_day'      => 60 * 60 * 24,
             ':night_time_end'   => 60 * 60 * 5,
         ];

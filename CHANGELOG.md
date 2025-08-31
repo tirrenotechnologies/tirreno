@@ -1,5 +1,16 @@
 # tirreno changelog
 
+## tirreno v0.9.8
+
+* field audit trail via new event type `field_edit`
+* optional payload for event types `page_search` and `account_email_change`
+* sequential load of inner pages elements
+* inactive rules visualisation
+* extended list for user-agent vulnerability check
+* several rules tuning
+* Fat-Free Framework update
+* minor bug fixes
+
 ## tirreno v0.9.7
 
 * DataTables 2.3.2

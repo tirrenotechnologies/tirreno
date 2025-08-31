@@ -26,7 +26,7 @@ class LogbookRotation extends AbstractCron {
 
         $model = new \Models\Logbook();
         $cnt = 0;
-        foreach ($keys as $idx => $key) {
+        foreach ($keys as $key) {
             $cnt += $model->rotateRequests($key['id']);
         }
 

@@ -61,7 +61,7 @@ $f3->config('config/apiEndpoints.ini');
 //Use custom onError function
 $f3->set('ONERROR', \Utils\ErrorHandler::getOnErrorHandler());
 
-//Load dictionary files
+//Load dictionary file
 $f3->set('LOCALES', 'app/Dictionary/');
 $f3->set('LANGUAGE', 'en');
 

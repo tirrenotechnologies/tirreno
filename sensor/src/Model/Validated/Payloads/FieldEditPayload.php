@@ -13,15 +13,27 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Controllers\Admin\Payloads;
+declare(strict_types=1);
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+namespace Sensor\Model\Validated\Payloads;
 
-    public function getList(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+class FieldEditPayload extends Base {
+    public function __construct(mixed $value) {
+        $this->requiredFields = [
+            'new_value',
+        ];
 
-        return $apiKey ? (new Data())->getList($apiKey) : [];
+        $this->optionalFields = [
+            'field_id',
+            'field_name',
+            'old_value',
+            'parent_id',
+            'parent_name',
+        ];
+
+        $this->set = true;
+        $this->dump = false;
+
+        parent::__construct($value);
     }
 }

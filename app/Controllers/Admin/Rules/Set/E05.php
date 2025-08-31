@@ -10,6 +10,7 @@ class E05 extends BaseRule {
     protected function defineCondition() {
         return $this->rb->logicalAnd(
             $this->rb['le_email_has_consec_s_chars']->equalTo(true),
+            $this->rb['le_local_part_len']->greaterThan(0),
         );
     }
 }

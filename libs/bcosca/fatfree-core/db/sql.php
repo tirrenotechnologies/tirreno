@@ -236,7 +236,7 @@ class SQL {
 					// Statement-level error occurred
 					if ($this->trans)
 						$this->rollback();
-					user_error('PDOStatement: '.$error[2],E_USER_ERROR);
+                    throw new \Exception('PDOStatement: '.$error[2]);
 				}
 				if (preg_match('/(?:^[\s\(]*'.
 					'(?:WITH|EXPLAIN|SELECT|PRAGMA|SHOW)|RETURNING)\b/is',$cmd) ||
@@ -265,7 +265,7 @@ class SQL {
 				// PDO-level error occurred
 				if ($this->trans)
 					$this->rollback();
-				user_error('PDO: '.$error[2],E_USER_ERROR);
+                throw new \Exception('PDO: '.$error[2]);
 			}
 
 		}
@@ -435,8 +435,7 @@ class SQL {
 					$cache->set($hash,$rows,$ttl);
 				return $rows;
 			}
-		user_error(sprintf(self::E_PKey,$table),E_USER_ERROR);
-		return FALSE;
+        throw new \Exception(sprintf(self::E_PKey,$table));
 	}
 
 	/**

@@ -48,11 +48,10 @@ export class IpsPage extends BasePage {
         const chartParams = {
             getParams: function() {
                 const mode        = 'ips';
-                const chartType   = 'line';
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
-                return {mode, chartType, dateRange, searchValue};
+                return {mode, dateRange, searchValue};
             }
         };
 

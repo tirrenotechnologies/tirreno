@@ -124,7 +124,7 @@ class Users extends \Models\BaseSql {
         $result = array_unique($result);
 
         $res = [];
-        foreach ($result as $idx => $id) {
+        foreach ($result as $id) {
             $res[] = ['accountId' => $id, 'key' => $apiKey];
         }
 

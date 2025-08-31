@@ -565,7 +565,7 @@ class Web extends Prefab {
 		foreach ($flags as $key=>$val)
 			if ($val)
 				return $this->wrapper=$key;
-		user_error(self::E_Request,E_USER_ERROR);
+        throw new \Exception(self::E_Request);
 	}
 
 	/**
@@ -946,13 +946,18 @@ class Web extends Prefab {
 	}
 
 	/**
-	*	Return a URL/filesystem-friendly version of string
-	*	@return string
-	*	@param $text string
-	**/
-	function slug($text) {
-		return trim(strtolower(preg_replace('/([^\pL\pN])+/u','-',
-			trim(strtr($text,Base::instance()->DIACRITICS+$this->diacritics())))),'-');
+	 *	Return a URL/filesystem-friendly version of string
+	 *	@return string
+	 *	@param $text string
+	 *	@param $separator string
+	 **/
+	function slug($text, $separator = '-')
+	{
+		return trim(strtolower(preg_replace(
+			'/([^\pL\pN])+/u',
+			$separator,
+			trim(strtr($text, Base::instance()->DIACRITICS + $this->diacritics()))
+		)), $separator);
 	}
 
 	/**

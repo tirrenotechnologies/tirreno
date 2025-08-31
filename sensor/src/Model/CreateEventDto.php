@@ -41,7 +41,7 @@ class CreateEventDto {
         public ?string $httpMethod,
         public ?\DateTimeImmutable $userCreated,
         public ?string $traceId,
-        public ?array $payload,
+        public array|string|null $payload,
         public array $changedParams,
     ) {
     }

@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {Map} from '../parts/Map.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js';
 import {IspsGrid} from '../parts/grid/Isps.js?v=2';
@@ -89,9 +89,8 @@ export class ResourcePage extends BasePage {
             getParams: function() {
                 const id        = RESOURCE_ID;
                 const mode      = 'resource';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
@@ -102,12 +101,18 @@ export class ResourcePage extends BasePage {
         new StaticTiles(tilesParams);
         new EventPanel();
         new DevicePanel();
-        new Map(mapParams);
-        new BaseBarChart(chartParams);
-        new IpsGrid(ipsGridParams);
-        new IspsGrid(ispsGridParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
-        new DevicesGrid(devicesGridParams);
+
+        const elements = [
+            [UsersGrid,             usersGridParams],
+            [Map,                   mapParams],
+            [IpsGrid,               ipsGridParams],
+            [IspsGrid,              ispsGridParams],
+            [DevicesGrid,           devicesGridParams],
+            [BaseBarChart,          chartParams],
+            [EventsGrid,            eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
+
     }
 }

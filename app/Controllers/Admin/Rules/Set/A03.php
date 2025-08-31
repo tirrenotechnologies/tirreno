@@ -10,7 +10,7 @@ class A03 extends BaseRule {
     protected function prepareParams(array $params): array {
         $eventNewDeviceNewCountry = false;
         if ($params['eup_device_count'] > 1 && count(array_unique($params['eip_country_id'])) > 1) {
-            foreach ($params['event_device'] as $idx => $device) {
+            foreach (array_keys($params['event_device']) as $idx) {
                 if (\Utils\Rules::eventDeviceIsNew($params, $idx) && \Utils\Rules::countryIsNewByIpId($params, $params['event_ip'][$idx])) {
                     $eventNewDeviceNewCountry = true;
                     break;

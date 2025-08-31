@@ -260,7 +260,7 @@ class Template extends Preview {
 			return call_user_func_array($this->custom[$func],$args);
 		if (method_exists($this,$func))
 			return call_user_func_array([$this,$func],$args);
-		user_error(sprintf(self::E_Method,$func),E_USER_ERROR);
+        throw new \Exception(sprintf(self::E_Method,$func));
 	}
 
 	/**

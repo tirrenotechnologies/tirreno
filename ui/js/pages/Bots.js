@@ -32,11 +32,10 @@ export class BotsPage extends BasePage {
         const chartParams = {
             getParams: function() {
                 const mode        = 'bots';
-                const chartType   = 'line';
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
-                return {mode, chartType, dateRange, searchValue};
+                return {mode, dateRange, searchValue};
             },
         };
 

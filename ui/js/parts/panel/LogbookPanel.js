@@ -4,7 +4,7 @@ import {
     renderTimeMs,
     renderErrorType,
     renderSensorError,
-    renderRawRequest,
+    renderJsonTextarea,
     renderMailto,
 } from '../DataRenderers.js?v=2';
 
@@ -28,7 +28,7 @@ export class LogbookPanel extends BasePanel {
         data.started    = renderTimeMs(data.started);
         data.error_type = renderErrorType(data);
         data.error_text = renderSensorError(data);
-        data.request    = renderRawRequest(data);
+        data.request    = renderJsonTextarea(data.raw);
 
         data.mailto     = renderMailto(data);
 

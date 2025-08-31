@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
 import {EventsGrid} from '../parts/grid/Events.js?v=2';
 import {DevicesGrid} from '../parts/grid/Devices.js?v=2';
@@ -64,19 +64,23 @@ export class IpPage extends BasePage {
             getParams: function() {
                 const id        = IP_ID;
                 const mode      = 'ip';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
         new EventPanel();
         new DevicePanel();
-        new IpTiles(ipDetailsTiles);
-        new BaseBarChart(chartParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
-        new DevicesGrid(devicesGridParams);
         new ReenrichmentButton();
+
+        const elements = [
+            [IpTiles,       ipDetailsTiles],
+            [UsersGrid,     usersGridParams],
+            [DevicesGrid,   devicesGridParams],
+            [BaseBarChart,  chartParams],
+            [EventsGrid,    eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

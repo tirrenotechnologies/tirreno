@@ -53,6 +53,7 @@ return array_merge(
     include 'Pages/ManualCheck.php',
     include 'Pages/Phone.php',
     include 'Pages/Phones.php',
+    include 'Pages/FieldAuditTrail.php',
     include 'Pages/Profile.php',
     include 'Pages/Logbook.php',
     include 'Pages/Resource.php',

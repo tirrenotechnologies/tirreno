@@ -10,11 +10,36 @@ export class BaseGridWithPanel extends BaseGrid {
         this.markerClass = 'marker';
 
         this.allPanels = {
-            'event':    {id: 'event-card',  closedEvent: 'eventPanelClosed',    close: 'closeEventPanel',   rowClicked: 'eventTableRowClicked'},
-            'logbook':  {id: 'logbook-card',closedEvent: 'logbookPanelClosed',  close: 'closeLogbookPanel', rowClicked: 'logbookTableRowClicked'},
-            'email':    {id: 'email-card',  closedEvent: 'emailPanelClosed',    close: 'closeEmailPanel',   rowClicked: 'emailTableRowClicked'},
-            'device':   {id: 'device-card', closedEvent: 'devicePanelClosed',   close: 'closeDevicePanel',  rowClicked: 'deviceTableRowClicked'},
-            'phone':    {id: 'phone-card',  closedEvent: 'phonePanelClosed',    close: 'closePhonePanel',   rowClicked: 'phoneTableRowClicked'},
+            'event': {
+                id:             'event-card',
+                closedEvent:    'eventPanelClosed',
+                close:          'closeEventPanel',
+                rowClicked:     'eventTableRowClicked',
+            },
+            'logbook': {
+                id:             'logbook-card',
+                closedEvent:    'logbookPanelClosed',
+                close:          'closeLogbookPanel',
+                rowClicked:     'logbookTableRowClicked',
+            },
+            'email': {
+                id:             'email-card',
+                closedEvent:    'emailPanelClosed',
+                close:          'closeEmailPanel',
+                rowClicked:     'emailTableRowClicked',
+            },
+            'device': {
+                id:             'device-card',
+                closedEvent:    'devicePanelClosed',
+                close:          'closeDevicePanel',
+                rowClicked:     'deviceTableRowClicked',
+            },
+            'phone': {
+                id:             'phone-card',
+                closedEvent:    'phonePanelClosed',
+                close:          'closePhonePanel',
+                rowClicked:     'phoneTableRowClicked',
+            },
         };
 
         this.panelType = gridParams.panelType;

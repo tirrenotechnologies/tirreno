@@ -25,8 +25,11 @@ export class DevicePanel extends BasePanel {
     }
 
     proceedData(data) {
-        const browser_name    = (data.browser_name !== null && data.browser_name !== undefined) ? data.browser_name : '';
-        const browser_version = (data.browser_version !== null && data.browser_version !== undefined) ? data.browser_version : '';
+        let browser_name    = data.browser_name;
+        let browser_version = data.browser_version;
+        browser_name        = (browser_name !== null && browser_name !== undefined) ? browser_name : '';
+        browser_version     = (browser_version !== null && browser_version !== undefined) ? browser_version : '';
+
         const device_record   = {
             ua:             data.ua,
             os_name:        data.os_name,

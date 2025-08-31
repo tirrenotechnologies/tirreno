@@ -73,6 +73,12 @@ class Data extends \Controllers\Base {
         $tsColumns = ['device_created', 'latest_decision', 'added_to_review', 'score_updated_at', 'event_time'];
         \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $result);
 
+        if (isset($result['event_type_id']) && $result['event_type_id'] === \Utils\Constants::get('FIELD_EDIT_EVENT_TYPE_ID')) {
+            $model = new \Models\FieldAuditTrail();
+
+            $result['event_payload'] = json_encode($model->getByEventId($id, $apiKey));
+        }
+
         return $result;
     }
 

@@ -20,7 +20,6 @@ class Data extends \Controllers\Base {
 
     public function getChart(int $apiKey): array {
         $request = $this->f3->get('REQUEST');
-        $type = $request['type'];
         $mode = $request['mode'];
         $modelMap = \Utils\Constants::get('CHART_MODEL_MAP');
 

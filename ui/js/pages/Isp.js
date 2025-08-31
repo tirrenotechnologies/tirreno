@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {Map} from '../parts/Map.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
@@ -69,18 +69,22 @@ export class IspPage extends BasePage {
             getParams: function() {
                 const id        = ISP_ID;
                 const mode      = 'isp';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
-        new Map(mapParams);
         new EventPanel();
-        new IspTiles(ispDetailsTiles);
-        new BaseBarChart(chartParams);
-        new IpsGrid(ipsGridParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
+
+        const elements = [
+            [IspTiles,      ispDetailsTiles],
+            [UsersGrid,     usersGridParams],
+            [Map,           mapParams],
+            [IpsGrid,       ipsGridParams],
+            [BaseBarChart,  chartParams],
+            [EventsGrid,    eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

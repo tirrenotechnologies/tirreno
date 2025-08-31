@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {Map} from '../parts/Map.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 import {UsersGrid} from '../parts/grid/Users.js?v=2';
@@ -92,21 +92,25 @@ export class DomainPage extends BasePage {
             getParams: function() {
                 const id        = DOMAIN_ID;
                 const mode      = 'domain';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
-        new Map(mapParams);
         new EventPanel();
-        new DomainTiles(domainDetailsTiles);
-        new BaseBarChart(chartParams);
-        new IpsGrid(ipsGridParams);
-        new IspsGrid(ispsGridParams);
-        new UsersGrid(usersGridParams);
-        new EventsGrid(eventsGridParams);
-        new DomainsGrid(domainsGridParams);
         new ReenrichmentButton();
+
+        const elements = [
+            [DomainTiles,           domainDetailsTiles],
+            [UsersGrid,             usersGridParams],
+            [DomainsGrid,           domainsGridParams],
+            [Map,                   mapParams],
+            [IpsGrid,               ipsGridParams],
+            [IspsGrid,              ispsGridParams],
+            [BaseBarChart,          chartParams],
+            [EventsGrid,            eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

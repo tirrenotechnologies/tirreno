@@ -21,6 +21,7 @@ import {
     MAX_STRING_LENGTH_FOR_TILE,
     MAX_STRING_USERID_LENGTH_IN_TABLE,
     MAX_STRING_USER_NAME_IN_TABLE,
+    MAX_STRING_DEVICE_OS_LENGTH,
     MAX_TOOLTIP_URL_LENGTH,
     MAX_TOOLTIP_LENGTH,
 
@@ -33,6 +34,7 @@ import {
     ASN_OVERRIDE,
     COUNTRIES_EXCEPTIONS,
     NORMAL_DEVICES,
+    PHONE_LANDLINE,
     NO_RULES_MSG,
     UNDEFINED_RULES_MSG,
     MIDLINE_HELLIP,
@@ -49,7 +51,7 @@ const getNumberOfSymbols = (length = 'default') => {
             return MAX_STRING_USER_LONG_LENGTH_IN_TABLE;
         } else if (length === 'short') {
             return MAX_STRING_USER_SHORT_LENGTH_IN_TABLE;
-        } else if (length == 'medium') {
+        } else if (length === 'medium') {
             return MAX_STRING_USER_MEDIUM_LENGTH_IN_TABLE;
         } else if (length === 'tile') {
             return MAX_STRING_USER_LONG_LENGTH_IN_TILE;
@@ -736,18 +738,16 @@ const renderTimestampForEvent = (record, sessionGroup, singleUser) => {
     return renderTime(record.time); // events on other pages and on /event page in a middle of the session
 };
 
+const capitalizeValue = value => {
+    return value.charAt(0).toUpperCase() + value.substr(1).toLowerCase();
+};
+
 const renderUserFirstname = record => {
     let span = null;
     let name = record.firstname;
 
     if (name) {
-        name = name.replace(
-            /\b\w+/g,
-            function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            }
-        );
-
+        name = name.replace(/\b\w+/g, capitalizeValue);
         span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
     }
 
@@ -759,13 +759,7 @@ const renderUserLastname = record => {
     let name = record.lastname;
 
     if (name) {
-        name = name.replace(
-            /\b\w+/g,
-            function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            }
-        );
-
+        name = name.replace(/\b\w+/g, capitalizeValue);
         span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
     }
 
@@ -883,6 +877,8 @@ const renderScoreDetails = record => {
     }
 
     const frag = document.createDocumentFragment();
+    const extra = document.createDocumentFragment();
+    const result = document.createDocumentFragment();
     const details = record.score_details;
 
     if (Array.isArray(details)) {
@@ -890,6 +886,7 @@ const renderScoreDetails = record => {
         let descr = '';
         let name = '';
         //let part = '';
+
         for (let i = 0; i < details.length; i++) {
             uid = (details[i].uid !== null && details[i].uid !== undefined) ? details[i].uid : '';
             descr = (details[i].descr !== null && details[i].descr !== undefined) ? details[i].descr : '';
@@ -911,19 +908,66 @@ const renderScoreDetails = record => {
             part.appendChild(el);
             part.appendChild(t);
 
-            frag.appendChild(wrapWithRuleLink(part, uid));
+            if (details[i].score !== 0) {
+                frag.appendChild(wrapWithRuleLink(part, uid));
+            } else {
+                extra.appendChild(wrapWithRuleLink(part, uid));
+            }
         }
     }
 
-    if (!frag.childNodes.length) {
-        const span = document.createElement('span');
-        span.className = 'no-rules-tile';
-        span.textContent = NO_RULES_MSG.value;
+    let firstArray = null;
+    let secondArray = null;
 
-        return tooltipWrap(NO_RULES_MSG.tooltip, span, false);
+    if (frag.childNodes.length) {
+        const div = document.createElement('div');
+        div.appendChild(frag);
+        firstArray = div;
     }
 
-    return frag;
+    if (extra.childNodes.length) {
+        const div = document.createElement('div');
+        div.id = 'score-details-weightless';
+        div.appendChild(extra);
+        secondArray = div;
+    }
+
+    if (firstArray !== null) {
+        result.append(firstArray);
+
+        if (secondArray !== null) {
+            const button = document.createElement('button');
+            button.className = 'button-score-details';
+            button.textContent = 'Show all';
+            button.onclick = (e) => {
+                const el = document.getElementById('score-details-weightless');
+                if (el) {
+                    const isHidden = el.classList.toggle('is-hidden');
+                    button.textContent = isHidden ? 'Show all' : 'Show less';
+                }
+            };
+
+            const tooltip = 'Show all rules that were triggered but are inactive according to your rule settings';
+            const wrappedButton = tooltipWrap(tooltip, button, true);
+
+            secondArray.classList.add('is-hidden');
+
+            result.append(wrappedButton);
+            result.append(secondArray);
+        }
+    } else {
+        if (secondArray !== null) {
+            result.append(secondArray);
+        } else {
+            const span = document.createElement('span');
+            span.className = 'no-rules-tile';
+            span.textContent = NO_RULES_MSG.value;
+
+            result.appendChild(tooltipWrap(NO_RULES_MSG.tooltip, span, false));
+        }
+    }
+
+    return result;
 };
 
 //Email
@@ -1036,7 +1080,7 @@ const renderPhoneType = record => {
 
     if (type) {
         let src = 'smartphone.svg';
-        if (['landline', 'FIXED_LINE', 'FIXED_LINE_OR_MOBILE', 'TOLL_FREE', 'SHARED_COST'].includes(type)) src = 'landline.svg';
+        if (PHONE_LANDLINE.includes(type)) src = 'landline.svg';
         if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
 
         const tooltip = type.toLowerCase().replace(/_/g, ' ');
@@ -1056,7 +1100,7 @@ const renderUsersList = (data) => {
 
     const frag = document.createDocumentFragment();
 
-    if (Array.isArray(data)) {;
+    if (Array.isArray(data)) {
         let user = null;
         for (let i = 0; i < data.length; i++) {
             user = renderClickableImportantUserWithScore(
@@ -1221,7 +1265,8 @@ const renderIpType = record => {
     };
 
     const ipType  = record.ip_type.toLowerCase().replace(' ', '_');
-    const tooltip = (tooltipMap[ipType] !== null && tooltipMap[ipType] !== undefined) ? tooltipMap[ipType] : record.ip_type;
+    let tooltip = tooltipMap[ipType];
+    tooltip = (tooltip !== null && tooltip !== undefined) ? tooltip : record.ip_type;
 
     const span = document.createElement('span');
     span.className = `iptype ${ipType}`;
@@ -1238,16 +1283,11 @@ const renderNetName = (record, length = 'default') => {
     if (name) {
         const regex = /-|_/ig;
         name = name.replace(regex, ' ');
-
-        name = name.replace(
-            /\b\w+/g,
-            function(txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            }
-        );
+        name = name.replace(/\b\w+/g, capitalizeValue);
 
         //TODO: move to constants
-        span = truncateWithHellip(name, length == 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE);
+        const len = length === 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE; 
+        span = truncateWithHellip(name, len);
     }
 
     return renderDefaultIfEmptySpan(span);
@@ -1335,6 +1375,49 @@ const renderClickableCountryTruncated = record => {
     return wrapWithCountryLink(span, record);
 };
 
+//Audit Trail
+const renderAuditValue = (data, type, record, meta) => {
+    if (data) {
+        data = truncateWithHellip(data, getNumberOfSymbols());
+    }
+
+    return renderDefaultIfEmptySpan(data);
+};
+
+const renderAuditParent = record => {
+    const n = getNumberOfSymbols();
+
+    let tooltip = record.parent_id;
+    let value = record.parent_name;
+
+    if (value && value.length > (n + 2)) {
+        value = value.slice(0, n) + HELLIP;
+    }
+
+    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
+        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    }
+
+    return tooltipWrap(renderDefaultIfEmpty(tooltip), renderDefaultIfEmpty(value), true);
+};
+
+const renderAuditField = record => {
+    const n = getNumberOfSymbols();
+
+    let tooltip = record.field_id;
+    let value = record.field_name;
+
+    if (value && value.length > (n + 2)) {
+        value = value.slice(0, n) + HELLIP;
+    }
+
+    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
+        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    }
+
+    return tooltipWrap(renderDefaultIfEmpty(tooltip), renderDefaultIfEmpty(value), true);
+};
+
 //Device
 const renderClickableBotId = record => {
     const device = document.createTextNode(record.id);
@@ -1372,6 +1455,10 @@ const renderDeviceWithOs = record => {
 
     let os = record.os_name ? record.os_name : 'N/A';
     os += record.os_version ? ' ' + record.os_version : '';
+
+    if (os && os.length > MAX_STRING_DEVICE_OS_LENGTH) {
+        os = os.slice(0, MAX_STRING_DEVICE_OS_LENGTH) + HELLIP;
+    }
 
     const frag = document.createDocumentFragment();
 
@@ -1436,23 +1523,6 @@ const renderClickableOs = record => {
     return el;
 };
 
-const renderDomain = (record, length = 'short') => {
-    let domain = record.domain;
-
-    if (domain) {
-        domain = truncateWithHellip(domain, getNumberOfSymbols(length));
-    }
-
-    return renderDefaultIfEmptySpan(domain);
-};
-
-const renderClickableDomain = (record, length = 'short') => {
-    let span = renderDomain(record, length);
-    const el = (record.id !== null && record.id !== undefined) ? wrapWithDomainLink(span, record) : span;
-
-    return el;
-};
-
 const renderBrowser = record => {
     let browser = record.browser;
 
@@ -1470,36 +1540,43 @@ const renderBrowser = record => {
     return renderDefaultIfEmptySpan(browser);
 };
 
-const renderQuery = record => {
+const renderDomain = (record, length = 'short') => {
+    let domain = record.domain;
+
+    if (domain) {
+        domain = truncateWithHellip(domain, getNumberOfSymbols(length));
+    }
+
+    return renderDefaultIfEmptySpan(domain);
+};
+
+const renderClickableDomain = (record, length = 'short') => {
+    let span = renderDomain(record, length);
+    const el = (record.id !== null && record.id !== undefined) ? wrapWithDomainLink(span, record) : span;
+
+    return el;
+};
+
+const renderTextarea = (value, h=4, w=37) => {
     const textarea = document.createElement('textarea');
-    textarea.readonly = true;
-    textarea.rows = 4;
-    textarea.cols = 37;
-    textarea.textContent = record.query;
+    textarea.readOnly = true;
+    textarea.rows = h;
+    textarea.cols = w;
+    textarea.textContent = renderDefaultIfEmpty(value);
 
     return textarea;
+};
 
+const renderQuery = record => {
+    return renderTextarea(record.query);
 };
 
 const renderReferer = record => {
-    const textarea = document.createElement('textarea');
-    textarea.readonly = true;
-    textarea.rows = 4;
-    textarea.cols = 37;
-    textarea.textContent = record.referer;
-
-    return textarea;
-
+    return renderTextarea(record.referer);
 };
 
 const renderUserAgent = record => {
-    const textarea = document.createElement('textarea');
-    textarea.readonly = true;
-    textarea.rows = 5;
-    textarea.cols = 37;
-    textarea.textContent = record.ua;
-
-    return textarea;
+    return renderTextarea(record.ua, 5);
 };
 
 const renderDefaultIfEmptyElement = (value) => {
@@ -1557,12 +1634,7 @@ const renderBlacklistType = record => {
         if (type.toUpperCase() === 'IP') {
             type = 'IP';
         } else {
-            type = type.replace(
-                /\b\w+/g,
-                function(txt) {
-                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                }
-            );
+            type = type.replace(/\b\w+/g, capitalizeValue);
         }
 
         span.textContent = type;
@@ -1582,26 +1654,17 @@ const renderSensorError = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join(';\n') : null;
 
-    const textarea = document.createElement('textarea');
-    textarea.readonly = true;
-    textarea.rows = 4;
-    textarea.cols = 37;
-    textarea.textContent = renderDefaultIfEmpty(s);
-
-    return textarea;
+    return renderTextarea(s);
 };
 
-const renderRawRequest = record => {
-    const obj = openJson(record.raw);
+const renderJsonTextarea = value => {
+    const obj = openJson(value);
     const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
 
-    const textarea = document.createElement('textarea');
-    textarea.readonly = true;
-    textarea.rows = 24;
-    textarea.cols = 37;
-    textarea.textContent = renderDefaultIfEmpty(s);
+    const rows = s ? s.split(/\r\n|\r|\n/).length : 0;
+    const h = rows > 24 ? 24 : (rows < 4 ? 4 : rows);;
 
-    return textarea;
+    return renderTextarea(s, h);
 };
 
 const renderErrorType = record => {
@@ -1714,13 +1777,7 @@ const renderEnrichmentCalculation = data => {
     result.push('Total: ' + String(sum));
     const text = result.join('\n');
 
-    const textarea = document.createElement('textarea');
-    textarea.readOnly = true;
-    textarea.rows = 6;
-    textarea.cols = 37;
-    textarea.value = text;
-
-    return textarea;
+    return renderTextarea(text, 6);
 };
 
 const renderRulePlayResult = (users, count, uid) => {
@@ -1838,6 +1895,11 @@ export {
     renderNetName,
     renderCidr,
 
+    //Audit Trail
+    renderAuditField,
+    renderAuditValue,
+    renderAuditParent,
+
     //Device
     renderDevice,
     renderDeviceWithOs,
@@ -1869,7 +1931,7 @@ export {
     //Logbook
     renderSensorErrorColumn,
     renderSensorError,
-    renderRawRequest,
+    renderJsonTextarea,
     renderErrorType,
     renderMailto,
 

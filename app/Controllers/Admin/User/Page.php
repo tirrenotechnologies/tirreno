@@ -33,7 +33,6 @@ class Page extends \Controllers\Pages\Base {
         $user = $dataController->getUserById($userId);
 
         $pageTitle      = $this->getInternalPageTitleWithPostfix($user['page_title']);
-        $payload        = $dataController->getPayloadColumns($userId);
         $enrichmentOn   = $dataController->checkEnrichmentAvailability();
 
         $pageParams = [
@@ -46,7 +45,6 @@ class Page extends \Controllers\Pages\Base {
             'USER'                          => $user,
             'SCHEDULED_FOR_DELETION'        => $scheduledForDeletion,
             'PAGE_TITLE'                    => $pageTitle,
-            'PAYLOAD'                       => $payload,
             'ENRICHMENT'                    => $enrichmentOn,
             'JS'                            => 'admin_user.js',
             'ERROR_CODE'                    => $errorCode,

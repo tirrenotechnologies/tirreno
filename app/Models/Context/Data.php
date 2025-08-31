@@ -26,7 +26,7 @@ class Data {
     private \Models\ApiKeys $keyModel;
 
     private array $suspiciousWordsUrl;
-    private array $suspiciousWordsSql;
+    private array $suspiciousWordsUserAgent;
     private array $suspiciousWordsEmail;
 
     public function __construct() {
@@ -39,9 +39,9 @@ class Data {
         $this->sessionModel = new Session();
         $this->keyModel     = new \Models\ApiKeys();
 
-        $this->suspiciousWordsUrl   = \Utils\SuspiciousWordsUrl::getWords();
-        $this->suspiciousWordsSql   = \Utils\SuspiciousWordsSql::getWords();
-        $this->suspiciousWordsEmail = \Utils\SuspiciousWordsEmail::getWords();
+        $this->suspiciousWordsUrl       = \Utils\SuspiciousWordsUrl::getWords();
+        $this->suspiciousWordsUserAgent = \Utils\SuspiciousWordsUserAgent::getWords();
+        $this->suspiciousWordsEmail     = \Utils\SuspiciousWordsEmail::getWords();
     }
 
     public function getContext(array $accountIds, int $apiKey): array {
@@ -207,9 +207,9 @@ class Data {
 
         $record['eup_vulnerable_ua']    = false;
 
-        if (count($this->suspiciousWordsSql)) {
+        if (count($this->suspiciousWordsUserAgent)) {
             foreach ($record['eup_ua'] as $url) {
-                foreach ($this->suspiciousWordsSql as $sub) {
+                foreach ($this->suspiciousWordsUserAgent as $sub) {
                     if (stripos($url, $sub) !== false) {
                         $record['eup_vulnerable_ua'] = true;
                         break 2;
@@ -228,9 +228,9 @@ class Data {
 
         $eventTypeCount                     = array_count_values($eventTypeFiltered);
 
-        //$accountLoginFailId = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
-        $accountEmailChangeId               = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_EMAIL_CHANGE');
-        $accountPwdChangeId                 = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
+        //$accountLoginFailId = \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
+        $accountEmailChangeId               = \Utils\Constants::get('ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID');
+        $accountPwdChangeId                 = \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
 
         //$record['event_failed_login_attempts'] = $eventTypeCount[$accountLoginFailId] ?? 0;
         $record['event_email_changed']      = array_key_exists($accountEmailChangeId, $eventTypeCount);
@@ -242,7 +242,7 @@ class Data {
 
         $clientErrors = 0;
         $serverErrors = 0;
-        foreach ($eventHttpCodeFiltered as $idx => $code) {
+        foreach ($eventHttpCodeFiltered as $code) {
             if (is_int($code) && $code >= 400 && $code < 500) {
                 ++$clientErrors;
             } elseif (is_int($code) && $code >= 500 && $code < 600) {

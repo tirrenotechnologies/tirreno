@@ -74,7 +74,7 @@ class Mapper extends \DB\Cursor {
 	function &get($key) {
 		if ($this->exists($key))
 			return $this->document[$key];
-		user_error(sprintf(self::E_Field,$key),E_USER_ERROR);
+        throw new \Exception(sprintf(self::E_Field,$key));
 	}
 
 	/**

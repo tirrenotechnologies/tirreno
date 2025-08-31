@@ -11,7 +11,6 @@ export class TopTenGrid extends BaseGrid {
                 targets: 0
             },
             {
-                className: 'level-center',
                 targets: 1
             },
         ];
@@ -53,6 +52,7 @@ export class TopTenGrid extends BaseGrid {
                     dataType: 'json',
                     success: function(response, textStatus, jqXHR) {
                         callback(response);
+                        me.stopAnimation();
                     },
                     error: handleAjaxError,
                     complete: function() {
@@ -64,6 +64,7 @@ export class TopTenGrid extends BaseGrid {
             processing: true,
             serverSide: true,
             searching: false,
+            deferLoading: 0,
             pageLength: 10,
             paging: false,
             info: false,

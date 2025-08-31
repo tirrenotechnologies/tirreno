@@ -54,9 +54,11 @@ export class UserEnrichmentTiles extends BaseTiles {
         const record = data.emailDetails;
         this.removeLoaderBackground(tile);
 
+        const breach = record.data_breach === null ? null : !record.data_breach;
+
         tile.querySelector('#reputation').replaceChildren(renderReputation(record));
         //tile.querySelector('#no-profiles').replaceChildren(renderBoolean(record.profiles === null ? null : !record.profiles);
-        tile.querySelector('#no-breach').replaceChildren(renderBoolean(record.data_breach === null ? null : !record.data_breach));
+        tile.querySelector('#no-breach').replaceChildren(renderBoolean(breach));
         tile.querySelector('#total-breaches').replaceChildren(renderDefaultIfEmptyElement(record.data_breaches));
         tile.querySelector('#earliest-breach').replaceChildren(renderDate(record.earliest_breach));
         tile.querySelector('#free-provider').replaceChildren(renderBoolean(record.free_email_provider));

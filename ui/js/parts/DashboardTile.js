@@ -10,10 +10,18 @@ export class DashboardTile {
 
         this.loader = new Loader();
 
-        const onDateFilterChanged = this.onDateFilterChanged.bind(this);
-        window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
+        if (!this.config.sequential) {
+            const onDateFilterChanged = this.onDateFilterChanged.bind(this);
+            window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
 
-        this.loadData();
+            this.initLoad();
+
+        }
+    }
+
+    startLoader() {
+        const el = document.querySelector(`.${this.config.mode} .title`);
+        this.loader.start(el);
     }
 
     loadData() {
@@ -23,8 +31,9 @@ export class DashboardTile {
         let params   = this.config.getParams().dateRange;
         params.mode  = this.config.mode;
 
-        const el = document.querySelector(`.${this.config.mode} .title`);
-        this.loader.start(el);
+        if (!this.config.sequential) {
+            this.startLoader();
+        }
 
         fireEvent('dateFilterChangedCaught');
 

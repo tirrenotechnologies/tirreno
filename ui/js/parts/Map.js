@@ -57,7 +57,12 @@ export class Map {
         const onDateFilterChanged = this.onDateFilterChanged.bind(this);
         window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
 
-        this.loadData();
+        if (!this.config.sequential) {
+            this.loadData();
+        }
+    }
+
+    startLoader() {
     }
 
     onRegionTipShow(tipEl, value) {

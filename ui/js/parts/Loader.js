@@ -43,7 +43,6 @@ export class Loader {
 
     el(c) {
         const node = document.createElement('p');
-        node.className = 'level-center';
         node.textContent = c;
 
         return node;

@@ -39,14 +39,16 @@ export class BaseChart {
         this.chartBlock.appendChild(loaderDiv);
 
         this.chart = null;
-        this.reloadData();
+        if (!this.config.sequential) {
+            this.loadData();
+        }
 
         const onDateFilterChanged = this.onDateFilterChanged.bind(this);
         window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
     }
 
     onDateFilterChanged() {
-        this.reloadData();
+        this.loadData();
     }
 
     stopAnimation() {
@@ -54,7 +56,7 @@ export class BaseChart {
         this.loader.stop();
     }
 
-    updateTimer() {
+    startLoader() {
         const el = document.createElement('p');
         el.className = 'text-loader';
 
@@ -66,15 +68,16 @@ export class BaseChart {
         this.loader.start(p);
     }
 
-    reloadData() {
-        this.updateTimer();
+    loadData() {
+        if (!this.config.sequential) {
+            this.startLoader();
+        }
 
         const token  = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const params = this.config.getParams();
         const data   = getQueryParams(params);
 
         data['mode']        = params.mode;
-        data['type']        = params.chartType;
         data['token']       = token;
         data['resolution']  = 'day';
         if (data['dateFrom']) {
@@ -211,8 +214,8 @@ export class BaseChart {
         if (resolution === 'hour') {
             xAxis.scale = 'HOUR';
             xAxis.values = [
-                // tick incr default                year         month         day         hour     min        sec     mode
-                [3600,      '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,      null,   1]
+                // tick incr default                year         month         day         hour     min     sec     mode
+                [3600,      '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,   null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeHours   = (scaleMax - scaleMin) / 3600;
@@ -224,8 +227,8 @@ export class BaseChart {
         } else if (resolution === 'minute') {
             xAxis.scale = 'MINUTE';
             xAxis.values = [
-                // tick incr default              year           month         day         hour     min        sec     mode
-                [60,        '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,      null,   1]
+                // tick incr default              year           month         day         hour     min     sec     mode
+                [60,        '{HH}:{mm}', '\n{DD}/{MM}/{YYYY}',   null,    '\n{DD}/{MM}',   null,    null,   null,   1]
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeMinutes   = (scaleMax - scaleMin) / 60;

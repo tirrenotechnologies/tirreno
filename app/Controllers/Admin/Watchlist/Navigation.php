@@ -28,7 +28,6 @@ class Navigation extends \Controllers\Base {
     }
 
     public function removeUserFromList(): array {
-        $params = $this->f3->get('POST');
         $dataController = new Data();
 
         $apiKey = $this->getCurrentOperatorApiKeyId();

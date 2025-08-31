@@ -234,7 +234,7 @@ export class ManualCheckItems {
         let value;
 
         value = this.getItem(itemId);
-        value = {country: value, full_country: value};
+        value = {country_iso: value, full_country: value};
         value = renderCountryIso(value);
         this.setItem(itemId, value);
     }

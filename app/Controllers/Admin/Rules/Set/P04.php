@@ -10,6 +10,7 @@ class P04 extends BaseRule {
     protected function defineCondition() {
         return $this->rb->logicalAnd(
             $this->rb['lp_invalid_phone']->equalTo(false),
+            $this->rb['ep_phone_number']->notEqualTo([]),
         );
     }
 }

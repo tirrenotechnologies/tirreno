@@ -10,6 +10,7 @@ class E15 extends BaseRule {
     protected function defineCondition() {
         return $this->rb->logicalAnd(
             $this->rb['le_has_no_data_breaches']->equalTo(true),
+            $this->rb['le_local_part_len']->greaterThan(0),
         );
     }
 }

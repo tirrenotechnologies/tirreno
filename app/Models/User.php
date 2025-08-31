@@ -216,7 +216,7 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
         return $this->load($filters);
     }
 
-    public function getApplicableRulesByAccountId(int $id, int $apiKey): array {
+    public function getApplicableRulesByAccountId(int $id, int $apiKey, bool $all = false): array {
         $params = [
             ':account_id' => $id,
             ':api_key' => $apiKey,
@@ -243,9 +243,12 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
             WHERE
                 event_account.id = :account_id AND
                 event_account.key = :api_key AND
-                (score_element ->> 'score')::int != 0 AND
                 uid IS NOT NULL"
         );
+
+        if (!$all) {
+            $query .= ' AND (score_element ->> \'score\')::int != 0';
+        }
 
         $results = $this->execQuery($query, $params);
 

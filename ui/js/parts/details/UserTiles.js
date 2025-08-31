@@ -81,6 +81,8 @@ export class UserTiles extends BaseTiles {
 
         this.removeLoaderBackground(tile);
 
+        let el = null;
+
         if (record.session_cnt === 0) {
             tile.querySelector('#failed-login-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#password-reset-count').replaceChildren(span.cloneNode(true));
@@ -90,13 +92,20 @@ export class UserTiles extends BaseTiles {
             tile.querySelector('#login-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#session-count').replaceChildren(span.cloneNode(true));
         } else {
-            tile.querySelector('#failed-login-count').replaceChildren(renderUserCounter(record.failed_login_cnt, limits.failed_login_cnt || 1));
-            tile.querySelector('#password-reset-count').replaceChildren(renderUserCounter(record.password_reset_cnt, limits.password_reset_cnt || 1));
-            tile.querySelector('#auth-error-count').replaceChildren(renderUserCounter(record.auth_error_cnt, limits.auth_error_cnt || 1));
-            tile.querySelector('#off-hours-login-count').replaceChildren(renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1));
-            tile.querySelector('#median-event-count').replaceChildren(renderUserCounter(record.median_event_cnt, limits.median_event_cnt || 1));
-            tile.querySelector('#login-count').replaceChildren(renderUserCounter(record.login_cnt, limits.login_cnt || 1));
-            tile.querySelector('#session-count').replaceChildren(renderUserCounter(record.session_cnt, limits.session_cnt || 1));
+            el = renderUserCounter(record.failed_login_cnt, limits.failed_login_cnt || 1);
+            tile.querySelector('#failed-login-count').replaceChildren(el);
+            el = renderUserCounter(record.password_reset_cnt, limits.password_reset_cnt || 1);
+            tile.querySelector('#password-reset-count').replaceChildren(el);
+            el = renderUserCounter(record.auth_error_cnt, limits.auth_error_cnt || 1);
+            tile.querySelector('#auth-error-count').replaceChildren(el);
+            el = renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1);
+            tile.querySelector('#off-hours-login-count').replaceChildren(el);
+            el = renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1);
+            tile.querySelector('#median-event-count').replaceChildren(el);
+            el = renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1);
+            tile.querySelector('#login-count').replaceChildren(el);
+            el = renderUserCounter(record.off_hours_login_cnt, limits.off_hours_login_cnt || 1);
+            tile.querySelector('#session-count').replaceChildren(el);
         }
     }
 

@@ -139,7 +139,7 @@ class Query extends \Models\Grid\Base\Query {
                     $query .= ' AND blocklist IS TRUE ';
                     break;
                 case 2:
-                    $query .= ' AND country_id = 0 AND event_ip.checked IS TRUE ';
+                    $query .= ' AND countries.id = 0 AND event_ip.checked IS TRUE ';
                     break;
                 case 3:
                     $query .= ' AND tor IS TRUE ';

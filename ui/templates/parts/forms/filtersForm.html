@@ -41,6 +41,10 @@
     </check>
 
     <check if="{{ @USE_RANGE }}">
+        <input type="hidden" name="date_from" />
+        <input type="hidden" name="date_to" />
+        <input type="hidden" name="offset" value="{{ @OFFSET ?? 0 }}"/>
+
         <div class="field">
             <p class="control has-icons-left">
                 <input type="datetime-local" class="input" name="date_from_local" step="1">
@@ -58,9 +62,5 @@
                 </span>
             </p>
         </div>
-
-        <input type="hidden" name="date_from" />
-        <input type="hidden" name="date_to" />
-        <input type="hidden" name="offset" value="{{ @OFFSET ?? 0 }}"/>
     </check>
 </nav>

@@ -40,11 +40,10 @@ export class IspsPage extends BasePage {
         const chartParams = {
             getParams: function() {
                 const mode        = 'isps';
-                const chartType   = 'line';
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
-                return {mode, chartType, dateRange, searchValue};
+                return {mode, dateRange, searchValue};
             }
         };
 

@@ -10,7 +10,7 @@ class A04 extends BaseRule {
     protected function prepareParams(array $params): array {
         $eventNewDeviceNewCidr = false;
         if ($params['eup_device_count'] > 1 && $params['eip_unique_cidrs'] > 1) {
-            foreach ($params['event_device'] as $idx => $device) {
+            foreach (array_keys($params['event_device']) as $idx) {
                 if (\Utils\Rules::eventDeviceIsNew($params, $idx) && \Utils\Rules::cidrIsNewByIpId($params, $params['event_ip'][$idx])) {
                     $eventNewDeviceNewCidr = true;
                     break;

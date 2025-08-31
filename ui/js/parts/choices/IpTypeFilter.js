@@ -6,6 +6,11 @@ import {
 
 export class IpTypeFilter extends BaseFilter {
     constructor() {
-        super('#ip-type-selectors', renderIpTypeSelectorItem, renderIpTypeSelectorChoice, 'ipTypeFilterChanged');
+        super(
+            '#ip-type-selectors',
+            renderIpTypeSelectorItem,
+            renderIpTypeSelectorChoice,
+            'ipTypeFilterChanged',
+        );
     }
 }

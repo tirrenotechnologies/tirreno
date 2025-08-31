@@ -243,7 +243,7 @@ class WS {
 				$func($this);
 		});
 		if ($errstr)
-			user_error($errstr,E_USER_ERROR);
+            throw new \Exception($errstr);
 		if (isset($this->events['start']) &&
 			is_callable($func=$this->events['start']))
 			$func($this);

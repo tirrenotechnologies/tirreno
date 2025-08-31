@@ -52,8 +52,9 @@ class Event extends \Models\BaseSql {
         $query = (
             'SELECT
                 event.id,
-                event.time AS event_time,
+                event.time      AS event_time,
                 event.http_code AS event_http_code,
+                event.type      AS event_type_id,
 
                 event_ip.ip,
                 event_ip.cidr,
@@ -145,10 +146,12 @@ class Event extends \Models\BaseSql {
                 event_ua_parsed.device AS device_name,
                 event_ua_parsed.modified AS ua_modified,
 
-                event_type.name  AS event_type_name,
-                event_type.value AS event_type,
+                event_type.name         AS event_type_name,
+                event_type.value        AS event_type,
 
-                event_http_method.name AS event_http_method_name
+                event_payload.payload   AS event_payload,
+
+                event_http_method.name  AS event_http_method_name
 
             FROM
                 event
@@ -201,6 +204,9 @@ class Event extends \Models\BaseSql {
             LEFT JOIN event_http_method
             ON (event.http_method = event_http_method.id)
 
+            LEFT JOIN event_payload
+            ON (event.payload = event_payload.id)
+
             WHERE
                 event.key = :api_key
                 AND event.id = :id
@@ -220,7 +226,7 @@ class Event extends \Models\BaseSql {
             $results['spamlist'] = $spamlist;
 
             $model = new \Models\User();
-            $results['score_details'] = $model->getApplicableRulesByAccountId($results['accountid'], $apiKey);
+            $results['score_details'] = $model->getApplicableRulesByAccountId($results['accountid'], $apiKey, true);
             $results['score_calculated'] = $results['score'] !== null;
         }
 

@@ -40,6 +40,7 @@ use Sensor\Entity\UrlEntity;
 use Sensor\Entity\UrlQueryEntity;
 use Sensor\Entity\UserAgentEnrichedEntity;
 use Sensor\Entity\UserAgentEntity;
+use Sensor\Entity\PayloadEntity;
 use Sensor\Model\Blacklist\FraudDetected;
 use Sensor\Model\CreateEventDto;
 use Sensor\Model\DeviceDetected;
@@ -368,6 +369,8 @@ class EventFactory {
 
         $device = new DeviceEntity($accountId, $apiKeyId, $userAgent, $dto->browserLanguage, $lastSeen);
 
+        $payload = ($dto->payload) ? (new PayloadEntity($accountId, $apiKeyId, $dto->payload, $lastSeen)) : null;
+
         return new EventEntity(
             $accountId,
             $session,
@@ -383,7 +386,7 @@ class EventFactory {
             $dto->httpCode,
             $dto->eventTime,
             $dto->traceId,
-            $dto->payload,
+            $payload,
             $country,
         );
     }

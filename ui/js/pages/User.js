@@ -1,5 +1,5 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {Map} from '../parts/Map.js?v=2';
 import {EmailsGrid} from '../parts/grid/Emails.js?v=2';
 import {IpsGrid} from '../parts/grid/Ips.js?v=2';
@@ -13,6 +13,7 @@ import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 import {SingleReviewButton} from '../parts/SingleReviewButton.js?v=2';
 import {ScoreDetails} from '../parts/ScoreDetails.js?v=2';
 import {PhonesGrid} from '../parts/grid/Phones.js?v=2';
+import {FieldAuditTrailGrid} from '../parts/grid/payloads/FieldAuditTrail.js?v=2';
 import {IspsGrid} from '../parts/grid/Isps.js?v=2';
 
 import {EmailPanel} from '../parts/panel/EmailPanel.js?v=2';
@@ -90,6 +91,15 @@ export class UserPage extends BasePage {
             getParams:  getParams,
         };
 
+        const fieldAuditTrailGridParams = {
+            url:        '/admin/loadFieldAuditTrail',
+            tableId:    'field-audit-trail-table',
+
+            isSortable: false,
+
+            getParams:  getParams,
+        };
+
         const ispsGridParams = {
             url:        '/admin/loadIsps',
             tableId:    'isps-table',
@@ -117,9 +127,8 @@ export class UserPage extends BasePage {
             getParams: function() {
                 const id        = ACCOUNT_ID;
                 const mode      = 'user';
-                const chartType = 'bar';
 
-                return {mode, chartType, id};
+                return {mode, id};
             }
         };
 
@@ -127,26 +136,30 @@ export class UserPage extends BasePage {
             elems: ['totalCountries', 'totalIps', 'totalDevices', 'totalEvents']
         };
 
-        new StaticTiles(tilesParams);
-        new UserTiles(userDetailsTiles);
-        new UserEnrichmentTiles(userDetailsTiles);
-        new EmailsGrid(emailsGridParams);
-        new PhonesGrid(phonesGridParams);
-        new SingleReviewButton(ACCOUNT_ID);
         new ScoreDetails(userScoreDetails);
+        new StaticTiles(tilesParams);
 
+        new SingleReviewButton(ACCOUNT_ID);
         new EventPanel();
-
         new EmailPanel();
         new PhonePanel();
         new DevicePanel();
         new ReenrichmentButton();
-        new Map(mapParams);
-        new BaseBarChart(chartParams);
 
-        new IpsGrid(ipsGridParams);
-        new IspsGrid(ispsGridParams);
-        new EventsGrid(eventsGridParams);
-        new DevicesGrid(devicesGridParams);
+        const elements = [
+            [UserTiles,             userDetailsTiles],
+            [UserEnrichmentTiles,   userDetailsTiles],
+            [Map,                   mapParams],
+            [IpsGrid,               ipsGridParams],
+            [IspsGrid,              ispsGridParams],
+            [DevicesGrid,           devicesGridParams],
+            [EmailsGrid,            emailsGridParams],
+            [PhonesGrid,            phonesGridParams],
+            [FieldAuditTrailGrid,   fieldAuditTrailGridParams],
+            [BaseBarChart,          chartParams],
+            [EventsGrid,            eventsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

@@ -39,9 +39,9 @@ class Events extends Base {
             ];
         }
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
-        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::NORMAL_EVENT_TYPES, 'normal');
+        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::get('ALERT_EVENT_TYPES'), 'alert');
+        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::get('EDITING_EVENT_TYPES'), 'edit');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('NORMAL_EVENT_TYPES'), 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
@@ -56,15 +56,12 @@ class Events extends Base {
         $query = (
             "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(CASE WHEN event_type.value IN ({$normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
-                COUNT(CASE WHEN event_type.value IN ({$editFlatIds})    THEN TRUE END) AS event_editing_type_count,
-                COUNT(CASE WHEN event_type.value IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count
+                COUNT(CASE WHEN event.type IN ({$normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
+                COUNT(CASE WHEN event.type IN ({$editFlatIds})    THEN TRUE END) AS event_editing_type_count,
+                COUNT(CASE WHEN event.type IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event
-
-            LEFT JOIN event_type
-            ON event.type = event_type.id
 
             WHERE
                 event.key = :api_key AND

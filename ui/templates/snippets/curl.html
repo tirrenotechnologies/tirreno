@@ -1,62 +1,21 @@
-# Add value after '=' for each key
-params=(
-    ########### Required fields ###########
-
-    # Unique value that allows identification of a user. Ex: alice54 (string)
-    -d 'userName='          \
-
-    # User email (string)
-    -d 'emailAddress='      \
-
-    # User IP address (string)
-    -d 'ipAddress='         \
-
-    # URL path of visited page (string)
-    -d 'url='               \
-
-    # User-agent of user request (string)
-    -d 'userAgent='         \
-
-    # Event UTC timestamp ('Y-m-d H:i:s.v' string)
-    -d 'eventTime='         \
-
-    ########### Optional fields ###########
-
-    # User first name (string)
-    -d 'firstName='         \
-
-    # User last name (string)
-    -d 'lastName='          \
-
-    # User full name (string)
-    -d 'fullName='          \
-
-    # Title of visited page (string)
-    -d 'pageTitle='         \
-
-    # User phone number (string)
-    -d 'phoneNumber='       \
-
-    # Referer of visited page (string)
-    -d 'httpReferer='       \
-
-    # Status code for page visit (string)
-    -d 'httpCode='          \
-
-    # User browser language (string)
-    -d 'browserLanguage='   \
-
-    # Type of user action from event types list (string)
-    -d 'eventType='         \
-
-    # Type of HTTP request from list (string)
-    -d 'httpMethod='        \
-
-    # User created UTC timestamp ('Y-m-d H:i:s' string)
-    -d 'userCreated='       \
-)
-
-curl -X POST "${params[@]}" \
+curl -X POST \
+    -d 'userName=' \
+    -d 'emailAddress=' \
+    -d 'ipAddress=' \
+    -d 'url=' \
+    -d 'userAgent=' \
+    -d 'eventTime=' \
+    -d 'firstName=' \
+    -d 'lastName=' \
+    -d 'fullName=' \
+    -d 'pageTitle=' \
+    -d 'phoneNumber=' \
+    -d 'httpReferer=' \
+    -d 'httpCode=' \
+    -d 'browserLanguage=' \
+    -d 'eventType=' \
+    -d 'httpMethod=' \
+    -d 'userCreated=' \
     -H 'Api-Key: {{ @apiKey }}' \
-    -H 'Content-Type: application/x-www-form-urlencoded'
-    {{ @apiUrl }} \    # sensor URL
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    {{ @apiUrl }}

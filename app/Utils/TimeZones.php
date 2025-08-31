@@ -60,8 +60,8 @@ class TimeZones {
         $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $offsetInSeconds = $operatorTimeZone->getOffset($utcTime);
 
-        foreach ($ts as $i => $t) {
-            $ts[$i] += $offsetInSeconds;
+        foreach (array_keys($ts) as $idx) {
+            $ts[$idx] += $offsetInSeconds;
         }
     }
 
@@ -137,8 +137,6 @@ class TimeZones {
     public static function timeZonesList(): array {
         $timezones = (\Base::instance())->get('timezones');
         $utcTime = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        $st = microtime(true);
 
         foreach ($timezones as $key => $value) {
             $offset = (new \DateTimeZone($key))->getOffset($utcTime);

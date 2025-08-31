@@ -9,7 +9,7 @@ class A06 extends BaseRule {
 
     protected function prepareParams(array $params): array {
         $pwdChangeInNewCountry = false;
-        $pwdChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
+        $pwdChange = \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
 
         if (count(array_unique($params['eip_country_id'])) > 1) {
             foreach ($params['event_type'] as $idx => $event) {

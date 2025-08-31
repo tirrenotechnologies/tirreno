@@ -25,7 +25,7 @@ class RetentionPolicyViolations extends AbstractCron {
         $retentionKeys = $retentionPoliciesModel->getRetentionKeys();
         $cnt = 0;
 
-        foreach ($retentionKeys as $idx => $key) {
+        foreach ($retentionKeys as $key) {
             // insuring clause
             if ($key['retention_policy'] > 0) {
                 $cnt += $eventsModel->retentionDeletion($key['retention_policy'], $key['id']);

@@ -34,6 +34,7 @@ import {
     renderUserFirstname,
     renderUserLastname,
     renderIpType,
+    renderJsonTextarea,
 } from '../DataRenderers.js?v=2';
 
 export class EventPanel extends BasePanel {
@@ -143,8 +144,10 @@ export class EventPanel extends BasePanel {
 
         data.url                  = renderClickableResourceWithoutQuery(data);
 
-        const browser_name      = (data.browser_name !== null && data.browser_name !== undefined) ? data.browser_name : '';
-        const browser_version   = (data.browser_version !== null && data.browser_version !== undefined) ? data.browser_version : '';
+        let browser_name    = data.browser_name;
+        let browser_version = data.browser_version;
+        browser_name        = (browser_name !== null && browser_name !== undefined) ? browser_name : '';
+        browser_version     = (browser_version !== null && browser_version !== undefined) ? browser_version : '';
 
         const device_record = {
             id:             data.deviceid,
@@ -199,6 +202,9 @@ export class EventPanel extends BasePanel {
         data.relay                = renderBoolean(data.relay);
         data.data_center          = renderBoolean(data.data_center);
         ***/
+
+        data.payload              = renderJsonTextarea(data.event_payload);
+
         return data;
     }
 }

@@ -27,11 +27,14 @@ class IpsByUsers extends Base {
 
         $query = (
             "SELECT
-                MAX(event_ip.ip) as ip,
-                MAX(event_ip.id) as ipid,
-                MAX(event_ip.shared) as value,
-                MAX(countries.id) as country_id,
-                MAX(event_isp.name) as isp_name
+                MAX(event_ip.ip)        AS ip,
+                MAX(event_ip.id)        AS ipid,
+                MAX(event_ip.shared)    AS value,
+                MAX(event_isp.name)     AS isp_name,
+
+                MAX(countries.value)    AS full_country,
+                MAX(countries.id)       AS country_id,
+                MAX(countries.iso)      AS country_iso
 
             FROM
                 event

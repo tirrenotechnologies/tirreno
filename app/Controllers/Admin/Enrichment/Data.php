@@ -229,7 +229,7 @@ class Data extends \Controllers\Base {
         $model = new \Models\ApiKeys();
         $models = $model->enrichableAttributes($apiKey);
 
-        foreach ($models as $type => $model) {
+        foreach ($models as $model) {
             if ((new $model())->notCheckedExists($apiKey)) {
                 return true;
             }

@@ -12,6 +12,7 @@ const MAX_STRING_LENGTH_FOR_EMAIL = 14;
 const MAX_STRING_LENGTH_FOR_PHONE = 17;
 const MAX_STRING_LENGTH_FULL_COUNTRY = 23;
 const MAX_STRING_LENGTH_FOR_TILE = 15;
+const MAX_STRING_DEVICE_OS_LENGTH = 10;
 const MAX_TOOLTIP_URL_LENGTH = 50;
 const MAX_TOOLTIP_LENGTH = 121;
 
@@ -49,6 +50,14 @@ const ASN_OVERRIDE = {
 const COUNTRIES_EXCEPTIONS = [null, undefined, 'N/A', 'AN', 'CS', 'YU'];
 
 const NORMAL_DEVICES = ['smartphone', 'desktop', 'bot', 'tablet'];
+
+const PHONE_LANDLINE = [
+    'landline',
+    'FIXED_LINE',
+    'FIXED_LINE_OR_MOBILE',
+    'TOLL_FREE',
+    'SHARED_COST',
+];
 
 const NO_RULES_MSG = {
     value:      'No rule',
@@ -98,6 +107,7 @@ export {
     MAX_STRING_LENGTH_FOR_PHONE,
     MAX_STRING_LENGTH_FULL_COUNTRY,
     MAX_STRING_LENGTH_FOR_TILE,
+    MAX_STRING_DEVICE_OS_LENGTH,
     MAX_TOOLTIP_URL_LENGTH,
     MAX_TOOLTIP_LENGTH,
 
@@ -131,6 +141,7 @@ export {
 
     COUNTRIES_EXCEPTIONS,
     NORMAL_DEVICES,
+    PHONE_LANDLINE,
     NO_RULES_MSG,
     UNDEFINED_RULES_MSG,
 

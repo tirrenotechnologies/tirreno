@@ -10,8 +10,10 @@ export class CountriesGrid extends BaseGrid {
     drawCallback(settings) {
         super.drawCallback(settings);
 
-        const data = settings.json.data;
-        fireEvent('countriesGridLoaded', {data: data});
+        if (settings && settings.iDraw > 1) {
+            const data = settings.json.data;
+            fireEvent('countriesGridLoaded', {data: data});
+        }
     }
 
     get columnDefs() {
@@ -85,6 +87,13 @@ export class CountriesGrid extends BaseGrid {
     updateTableFooter(dataTable) {
         const tableId = this.config.tableId;
         const pagerSelector = `#${tableId}_wrapper .dt-paging`;
+
+        const api = dataTable.api();
+        if (api.ajax && typeof api.ajax.json === 'function' && api.ajax.json() === undefined) {
+            $(`${pagerSelector} nav`).empty();
+
+            return;
+        }
 
         $(pagerSelector).hide();
     }

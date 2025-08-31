@@ -376,7 +376,6 @@ function printTasks(array $tasks) {
 
     $out = '';
     $side = intdiv(64 - strlen($tasks['description']), 2);
-    $extra = (64 - strlen($tasks['description'])) % 2;
     $header = str_repeat('=', $side) . ' ' . $tasks['description'] . ' ' . str_repeat('=', $side);
     $out .= "\n\n" . $header;
     foreach ($tasks['tasks'] as $task) {

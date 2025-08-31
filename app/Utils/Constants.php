@@ -16,7 +16,7 @@
 namespace Utils;
 
 class Constants {
-    public static function get(string $key): array|string {
+    public static function get(string $key): array|string|int {
         $const = __CLASS__ . '::' . $key;
         if (!defined($const)) {
             trigger_error('Undefined constant: ' . $key, E_USER_ERROR);
@@ -85,10 +85,6 @@ class Constants {
     public const COUNTRY_CODES_NORTH_AMERICA    = [238, 40];
     public const COUNTRY_CODES_EUROPE           = [77, 2, 15, 22, 35, 57, 60, 61, 62, 71, 78, 85, 88, 102, 108, 111, 122, 128, 129, 136, 155, 177, 178, 182, 195, 196, 203, 215];
 
-    public const EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL       = 7;
-    public const EVENT_TYPE_ID_ACCOUNT_EMAIL_CHANGE     = 9;
-    public const EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE  = 10;
-
     public const EVENT_REQUEST_TYPE_HEAD    = 3;
 
     public const ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS = 7;
@@ -111,6 +107,20 @@ class Constants {
     public const MAIL_SEND_BIN  = '/usr/sbin/sendmail';
 
     public const PAGE_TITLE_POSTFIX = '| tirreno';
+
+    public const PAGE_VIEW_EVENT_TYPE_ID = 1;
+    public const PAGE_EDIT_EVENT_TYPE_ID = 2;
+    public const PAGE_DELETE_EVENT_TYPE_ID = 3;
+    public const PAGE_SEARCH_EVENT_TYPE_ID = 4;
+    public const ACCOUNT_LOGIN_EVENT_TYPE_ID = 5;
+    public const ACCOUNT_LOGOUT_EVENT_TYPE_ID = 6;
+    public const ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID = 7;
+    public const ACCOUNT_REGISTRATION_EVENT_TYPE_ID = 8;
+    public const ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID = 9;
+    public const ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID = 10;
+    public const ACCOUNT_EDIT_EVENT_TYPE_ID = 11;
+    public const PAGE_ERROR_EVENT_TYPE_ID = 12;
+    public const FIELD_EDIT_EVENT_TYPE_ID = 13;
 
     public const DEFAULT_RULES = [
         // Positive
@@ -299,24 +309,25 @@ class Constants {
     ];
 
     public const ALERT_EVENT_TYPES = [
-        'page_delete',
-        'page_error',
-        'account_login_fail',
-        'account_email_change',
-        'account_password_change',
+        self::PAGE_DELETE_EVENT_TYPE_ID,
+        self::PAGE_ERROR_EVENT_TYPE_ID,
+        self::ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID,
+        self::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID,
+        self::ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID,
     ];
 
     public const EDITING_EVENT_TYPES = [
-        'page_edit',
-        'account_registration',
-        'account_edit',
+        self::PAGE_EDIT_EVENT_TYPE_ID,
+        self::ACCOUNT_REGISTRATION_EVENT_TYPE_ID,
+        self::ACCOUNT_EDIT_EVENT_TYPE_ID,
+        self::FIELD_EDIT_EVENT_TYPE_ID,
     ];
 
     public const NORMAL_EVENT_TYPES = [
-        'page_view',
-        'page_search',
-        'account_login',
-        'account_logout',
+        self::PAGE_VIEW_EVENT_TYPE_ID,
+        self::PAGE_SEARCH_EVENT_TYPE_ID,
+        self::ACCOUNT_LOGIN_EVENT_TYPE_ID,
+        self::ACCOUNT_LOGOUT_EVENT_TYPE_ID,
     ];
 
     public const FAILED_LOGBOOK_EVENT_TYPES = [

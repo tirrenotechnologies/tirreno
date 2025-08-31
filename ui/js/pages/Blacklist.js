@@ -41,11 +41,10 @@ export class BlacklistPage extends BasePage {
         const chartParams = {
             getParams: function() {
                 const mode        = 'blacklist';
-                const chartType   = 'line';
                 const dateRange   = datesFilter.getValue();
                 const searchValue = searchFilter.getValue();
 
-                return {mode, chartType, dateRange, searchValue};
+                return {mode, dateRange, searchValue};
             }
         };
 

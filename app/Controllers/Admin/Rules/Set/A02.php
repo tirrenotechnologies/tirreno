@@ -9,7 +9,7 @@ class A02 extends BaseRule {
 
     protected function prepareParams(array $params): array {
         $suspiciousLoginFailed = false;
-        $loginFail = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_LOGIN_FAIL');
+        $loginFail = \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
 
         foreach ($params['event_type'] as $idx => $event) {
             if ($event === $loginFail && \Utils\Rules::eventDeviceIsNew($params, $idx)) {

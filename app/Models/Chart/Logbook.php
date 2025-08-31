@@ -42,9 +42,9 @@ class Logbook extends Base {
         //$dateRange['endDate']   = \Utils\TimeZones::localizeForActiveOperator($dateRange['endDate']);
         //$dateRange['startDate'] = \Utils\TimeZones::localizeForActiveOperator($dateRange['startDate']);
 
-        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::FAILED_LOGBOOK_EVENT_TYPES, 'failed');
-        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::ISSUED_LOGBOOK_EVENT_TYPES, 'issued');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::NORMAL_LOGBOOK_EVENT_TYPES, 'normal');
+        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('FAILED_LOGBOOK_EVENT_TYPES'), 'failed');
+        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('ISSUED_LOGBOOK_EVENT_TYPES'), 'issued');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('NORMAL_LOGBOOK_EVENT_TYPES'), 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],

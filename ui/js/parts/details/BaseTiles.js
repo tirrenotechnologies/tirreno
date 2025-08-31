@@ -1,6 +1,7 @@
 import {Loader} from '../Loader.js?v=2';
 import {Tooltip} from '../Tooltip.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
+import {fireEvent} from '../utils/Event.js?v=2';
 
 export class BaseTiles {
 
@@ -13,7 +14,9 @@ export class BaseTiles {
             me.loaders[elem] = new Loader();
         });
 
-        this.loadData();
+        if (!this.config.sequential) {
+            this.loadData();
+        }
     }
 
     loadData() {
@@ -22,7 +25,11 @@ export class BaseTiles {
         const params = this.config.getParams();
         const token  = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
-        this.startLoaders();
+        if (!this.config.sequential) {
+            this.startLoaders();
+        }
+
+        fireEvent('dateFilterChangedCaught');
 
         $.ajax({
             url: `${url}?token=${token}`,
@@ -50,10 +57,15 @@ export class BaseTiles {
         }
     }
 
+    startLoader() {
+        this.startLoaders();
+    }
+
     onLoad(data, status) {
         if ('success' == status) {
             this.stopLoaders();
             this.updateTiles(data);
+            fireEvent('dateFilterChangedCompleted');
         }
     }
 

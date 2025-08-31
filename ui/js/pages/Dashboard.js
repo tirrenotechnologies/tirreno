@@ -1,9 +1,8 @@
 import {BasePage} from './Base.js';
-
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {DashboardTile} from '../parts/DashboardTile.js?v=2';
 import {TopTenGrid} from '../parts/grid/TopTen.js?v=2';
-
 import {
     renderClickableImportantUserWithScoreTile,
     renderClickableCountry,
@@ -20,7 +19,7 @@ export class DashboardPage extends BasePage {
     }
 
     initUi() {
-        const datesFilter = new DatesFilter();
+        const datesFilter = new DatesFilter(true);
 
         const getParams = () => {
             const dateRange = datesFilter.getValue();
@@ -75,18 +74,22 @@ export class DashboardPage extends BasePage {
             renderItemColumn:   renderClickableImportantUserWithScoreTile,
         };
 
-        //new DashboardTile({getParams: getParams, mode: 'totalEvents'});
-        new DashboardTile({getParams: getParams, mode: 'totalUsers'});
-        new DashboardTile({getParams: getParams, mode: 'totalIps'});
-        new DashboardTile({getParams: getParams, mode: 'totalCountries'});
-        new DashboardTile({getParams: getParams, mode: 'totalUrls'});
-        new DashboardTile({getParams: getParams, mode: 'totalUsersForReview'});
-        new DashboardTile({getParams: getParams, mode: 'totalBlockedUsers'});
-        new TopTenGrid(topTenUsersGridParams);
-        new TopTenGrid(topTenCountriesGridParams);
-        new TopTenGrid(topTenResourcesGridParams);
-        new TopTenGrid(topTenUsersWithMostIpsGridParams);
-        new TopTenGrid(topTenUsersWithMostLoginFailGridParams);
-        new TopTenGrid(topTenIpsWithMostUsersGridParams);
+        const elements = [
+            //[DashboardTile,   {getParams: getParams, mode: 'totalEvents'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalUsers'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalIps'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalCountries'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalUrls'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalUsersForReview'}],
+            [DashboardTile,     {getParams: getParams, mode: 'totalBlockedUsers'}],
+            [TopTenGrid,        topTenUsersGridParams],
+            [TopTenGrid,        topTenCountriesGridParams],
+            [TopTenGrid,        topTenResourcesGridParams],
+            [TopTenGrid,        topTenIpsWithMostUsersGridParams],
+            [TopTenGrid,        topTenUsersWithMostLoginFailGridParams],
+            [TopTenGrid,        topTenUsersWithMostIpsGridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

@@ -62,7 +62,7 @@ class Image {
 			$color=hexdec($color);
 		$hex=str_pad($hex=dechex($color),$color<4096?3:6,'0',STR_PAD_LEFT);
 		if (($len=strlen($hex))>6)
-			user_error(sprintf(self::E_Color,'0x'.$hex),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_Color,'0x'.$hex));
 		$color=str_split($hex,$len/3);
 		foreach ($color as &$hue) {
 			$hue=hexdec(str_repeat($hue,6/$len));
@@ -405,12 +405,10 @@ class Image {
 	function captcha($font,$size=24,$len=5,
 		$key=NULL,$path='',$fg=0xFFFFFF,$bg=0x000000) {
 		if ((!$ssl=extension_loaded('openssl')) && ($len<4 || $len>13)) {
-			user_error(sprintf(self::E_Length,$len),E_USER_ERROR);
-			return FALSE;
+            throw new \Exception(sprintf(self::E_Length,$len));
 		}
 		if (!function_exists('imagettftext')) {
-			user_error(self::E_TTF,E_USER_ERROR);
-			return FALSE;
+            throw new \Exception(self::E_TTF);
 		}
 		$fw=Base::instance();
 		foreach ($fw->split($path?:$fw->UI.';./') as $dir)
@@ -455,8 +453,7 @@ class Image {
 					$fw->$key=$seed;
 				return $this->save();
 			}
-		user_error(self::E_Font,E_USER_ERROR);
-		return FALSE;
+        throw new \Exception(self::E_Font);
 	}
 
 	/**
@@ -597,7 +594,7 @@ class Image {
 			foreach ($fw->split($path,FALSE) as $dir)
 				if (is_file($dir.$file))
 					return $this->load($fw->read($dir.$file));
-			user_error(self::E_File,E_USER_ERROR);
+            throw new \Exception(self::E_File);
 		}
 	}
 

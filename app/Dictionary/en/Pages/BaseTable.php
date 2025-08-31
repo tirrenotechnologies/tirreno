@@ -196,4 +196,15 @@ return [
     'Base_table_column_error_text_tooltip' => 'An error message returned by an unsuccessful request processing.',
     'Base_table_column_local_timestamp' => 'Local timestamp',
     'Base_table_column_local_timestamp_tooltip' => 'Server time when API request was received.',
+
+    'Base_table_column_audit_trail_created' => 'Date',
+    'Base_table_column_audit_trail_created_tooltip' => 'The date the field was changed.',
+    'Base_table_column_audit_trail_field' => 'Field',
+    'Base_table_column_audit_trail_field_tooltip' => 'The name of the field that has been changed.',
+    'Base_table_column_audit_trail_old_value' => 'Old value',
+    'Base_table_column_audit_trail_old_value_tooltip' => 'Previous value of the field.',
+    'Base_table_column_audit_trail_new_value' => 'New value',
+    'Base_table_column_audit_trail_new_value_tooltip' => 'Updated value of the field.',
+    'Base_table_column_audit_trail_parent' => 'Parent ID',
+    'Base_table_column_audit_trail_parent_tooltip' => 'ID of the parent record related to the field change.',
 ];

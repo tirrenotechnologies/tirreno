@@ -11,7 +11,9 @@ import {
 export class EventsGrid extends BaseGridWithPanel {
     // 7, 8 - invisible time and id columns to prevent sorting buttons appearence
     get orderConfig() {
-        return this.config.sessionGroup && !this.config.singleUser ? [[6, 'desc'], [7, 'desc'], [8, 'desc']] : [[7, 'desc'], [8, 'desc']];
+        return this.config.sessionGroup && !this.config.singleUser
+            ? [[6, 'desc'], [7, 'desc'], [8, 'desc']]
+            : [[7, 'desc'], [8, 'desc']];
     }
 
     get columnDefs() {
@@ -58,8 +60,12 @@ export class EventsGrid extends BaseGridWithPanel {
     }
 
     get columns() {
-        const userIdRender = (record) => renderUserForEvent(record, 'medium', this.config.sessionGroup, this.config.singleUser);
-        const timestampRender = (record) => renderTimestampForEvent(record, this.config.sessionGroup, this.config.singleUser);
+        const userIdRender = (record) => {
+            return renderUserForEvent(record, 'medium', this.config.sessionGroup, this.config.singleUser);
+        };
+        const timestampRender = (record) => {
+            return renderTimestampForEvent(record, this.config.sessionGroup, this.config.singleUser);
+        };
 
         const columns = [
             {

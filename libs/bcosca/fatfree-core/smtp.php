@@ -159,7 +159,7 @@ class SMTP extends Magic {
 			$this->log.=str_replace("\r",'',$reply);
 		}
 		if (preg_match('/^(4|5)\d{2}\s.*$/', $reply))
-			user_error(sprintf(self::E_DIALOG,$reply),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_DIALOG,$reply));
 		return $reply;
 	}
 
@@ -172,7 +172,7 @@ class SMTP extends Magic {
 	**/
 	function attach($file,$alias=NULL,$cid=NULL) {
 		if (!is_file($file))
-			user_error(sprintf(self::E_Attach,$file),E_USER_ERROR);
+            throw new \Exception(sprintf(self::E_Attach,$file));
 		if ($alias)
 			$file=[$alias,$file];
 		$this->attachments[]=['filename'=>$file,'cid'=>$cid];
@@ -190,7 +190,7 @@ class SMTP extends Magic {
 			return FALSE;
 		// Message should not be blank
 		if (!$message)
-			user_error(self::E_Blank,E_USER_ERROR);
+            throw new \Exception(self::E_Blank);
 		$fw=Base::instance();
 		// Retrieve headers
 		$headers=$this->headers;
@@ -250,7 +250,7 @@ class SMTP extends Magic {
 		$reqd=['From','To','Subject'];
 		foreach ($reqd as $id)
 			if (empty($headers[$id]))
-				user_error(sprintf(self::E_Header,$id),E_USER_ERROR);
+                throw new \Exception(sprintf(self::E_Header,$id));
 		$eol="\r\n";
 		// Stringify headers
 		foreach ($headers as $key=>&$val) {

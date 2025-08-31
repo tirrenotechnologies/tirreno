@@ -85,7 +85,7 @@ class Data extends \Controllers\Base {
         $user = $model->getUser($userId, $apiKey);
 
         return [
-            'score_details'     => $model->getApplicableRulesByAccountId($userId, $apiKey),
+            'score_details'     => $model->getApplicableRulesByAccountId($userId, $apiKey, true),
             'score_calculated'  => $user !== [] ? $user['score'] !== null : false,
         ];
     }
@@ -252,13 +252,6 @@ class Data extends \Controllers\Base {
         return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::Failed) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
     }
 
-    public function getPayloadColumns($userId) {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Grid\Payloads\Grid($apiKey);
-
-        return $model->getPayloadConfiguration($userId);
-    }
-
     public function setFraudFlag(int $accountId, bool $fraud, int $apiKey): array {
         $blacklistItemsModel = new \Models\BlacklistItems();
 
@@ -304,7 +297,7 @@ class Data extends \Controllers\Base {
 
         if ($scoreData['score'] <= $keyModel->blacklist_threshold) {
             $this->addToBlacklistQueue($accountId, true, $apiKey);
-        } elseif ($scoreData['score'] < $keyModel->review_queue_threshold) {
+        } elseif ($scoreData['score'] <= $keyModel->review_queue_threshold) {
             $data = $userModel->getUser($accountId, $apiKey);
             $scoreData['addToReview'] = $data['added_to_review'] === null && $data['fraud'] === null;
         }

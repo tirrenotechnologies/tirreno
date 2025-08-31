@@ -6,6 +6,11 @@ import {
 
 export class ScoresRangeFilter extends BaseFilter {
     constructor() {
-        super('#scores-range-selectors', renderScoresRangeSelectorItem, renderScoresRangeSelectorChoice, 'scoresRangeFilterChanged');
+        super(
+            '#scores-range-selectors',
+            renderScoresRangeSelectorItem,
+            renderScoresRangeSelectorChoice,
+            'scoresRangeFilterChanged',
+        );
     }
 }

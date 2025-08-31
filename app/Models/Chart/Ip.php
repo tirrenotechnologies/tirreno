@@ -20,15 +20,12 @@ class Ip extends BaseEventsCount {
         $query = (
             "SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(CASE WHEN event_type.value IN ({$this->normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
-                COUNT(CASE WHEN event_type.value IN ({$this->editFlatIds})    THEN TRUE END) AS event_editing_type_count,
-                COUNT(CASE WHEN event_type.value IN ({$this->alertFlatIds})   THEN TRUE END) AS event_alert_type_count
+                COUNT(CASE WHEN event.type IN ({$this->normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
+                COUNT(CASE WHEN event.type IN ({$this->editFlatIds})    THEN TRUE END) AS event_editing_type_count,
+                COUNT(CASE WHEN event.type IN ({$this->alertFlatIds})   THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event
-
-            LEFT JOIN event_type
-            ON event.type = event_type.id
 
             WHERE
                 event.ip = :id AND

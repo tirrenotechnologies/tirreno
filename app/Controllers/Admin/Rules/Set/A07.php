@@ -9,7 +9,7 @@ class A07 extends BaseRule {
 
     protected function prepareParams(array $params): array {
         $passwordChangeInNewCidr = false;
-        $passwordChange = \Utils\Constants::get('EVENT_TYPE_ID_ACCOUNT_PASSWORD_CHANGE');
+        $passwordChange = \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
 
         if ($params['eip_unique_cidrs'] > 1) {
             foreach ($params['event_type'] as $idx => $event) {

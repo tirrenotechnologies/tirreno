@@ -6,6 +6,11 @@ import {
 
 export class RulesFilter extends BaseFilter {
     constructor() {
-        super('#rule-selectors', renderRuleSelectorItem, renderRuleSelectorChoice, 'rulesFilterChanged');
+        super(
+            '#rule-selectors',
+            renderRuleSelectorItem,
+            renderRuleSelectorChoice,
+            'rulesFilterChanged',
+        );
     }
 }

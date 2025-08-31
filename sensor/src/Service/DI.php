@@ -34,6 +34,8 @@ use Sensor\Repository\EmailRepository;
 use Sensor\Repository\EventCountryRepository;
 use Sensor\Repository\EventIncorrectRepository;
 use Sensor\Repository\EventRepository;
+use Sensor\Repository\FieldAuditTrailRepository;
+use Sensor\Repository\PayloadRepository;
 use Sensor\Repository\IpAddressRepository;
 use Sensor\Repository\IspRepository;
 use Sensor\Repository\PhoneRepository;
@@ -116,6 +118,8 @@ class DI {
                 $domainRepository,
                 $phoneRepository,
                 new EventCountryRepository($pdo),
+                new FieldAuditTrailRepository($pdo),
+                new PayloadRepository($pdo),
                 $pdo,
             ),
             $accountRepository,

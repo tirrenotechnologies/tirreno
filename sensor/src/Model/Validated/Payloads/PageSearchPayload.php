@@ -13,7 +13,24 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Models\Grid\Payloads;
+declare(strict_types=1);
 
-class Ids extends \Models\Grid\Base\Ids {
+namespace Sensor\Model\Validated\Payloads;
+
+class PageSearchPayload extends Base {
+    public function __construct(mixed $value) {
+        $this->requiredFields = [
+            'field_id',
+            'value',
+        ];
+
+        $this->optionalFields = [
+            'field_name',
+        ];
+
+        $this->set = false;
+        $this->dump = true;
+
+        parent::__construct($value);
+    }
 }
