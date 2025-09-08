@@ -11,15 +11,15 @@
 
 The open-source security analytics.
 
-tirreno helps you to understand, monitor, and protect your platforms from cyber fraud, account threats, and abuse. Proactively defend against internal and external threats, ensure sovereignty through on-premises deployment, and secure your digital platforms:
+tirreno helps organizations to understand, monitor, and protect their digital platforms from cyber threats, account threats, and abuse. Proactively defend against internal and external threats, ensure sovereignty through on-premises deployment, and secure your digital platforms.
 
-* **Proactive monitoring and granular visibility**: Understand your application with detailed event tracking and smart monitoring. Capture all events: logins/logouts, data modification, page visits, API calls, along with user context and application errors to get complete operational awareness.
-* **Continuous monitoring**: Monitor user behaviour in near real time by choosing from a list of relevant event types. Proactively find cyberfraud, account threats, and abuse in your digital platform, and respond to threats quickly based on in-app intelligence.
-* **Single user view**: Get comprehensive visibility into individual user activity. Analyze behavior patterns, risk scores, connected identities, and activity timelines for specific users. Investigate suspicious activity and review detailed session data to make informed security decisions.
+* **Granular visibility**: Understand your application with detailed event tracking and smart monitoring. Capture all events: logins/logouts, data modification, page visits, API calls, along with user context and application errors to get complete operational awareness.
+* **Continuous monitoring**: Monitor user behaviour in near real time by choosing from a list of relevant event types. Proactively find cyber threats, account threats, and abuse in your digital platform, and respond to threats quickly based on in-app intelligence.
+* **Single user view**: Get comprehensive visibility into individual user activity. Analyze behaviour patterns, risk scores, connected identities, and activity timelines for specific users. Investigate suspicious activity and review detailed session data to make informed security decisions.
 * **User risk assessment**: Set up security rules to automatically identify malicious activity, and assess risk tailored to your specific requirements.
 * **Case management and auto-decision**: Accounts with risky events are sent to manual review or automatic suspension. Security team can investigate flagged cases and make informed decisions based on comprehensive security analytics.
 * **Field audit trail**: Automatically track modifications to important fields, including what changed and when. Centralized field audit trail lets you easily review data changes, streamlining audit and compliance.
-* **Enhanced threat intelligence**: tirreno can be enhanced with first-party threat intelligence via API enrichment. Eliminate blind spots and get the threat intelligence you need to build a multi-layered defense against fraud. (Optional)
+* **Enhanced threat intelligence**: tirreno can be enhanced with first-party threat intelligence via API enrichment. Eliminate blind spots and get the threat intelligence you need to build a multi-layered defense for your application. (Optional)
 
 tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time threat analytics.
 
@@ -72,7 +72,7 @@ See the [User Guide](https://docs.tirreno.com/) for details on how to use tirren
 
 The open-sourced tirreno code is intended to be used for free as a standalone application. It provides general statistics, rule engine and risk-based alerting to a monitored system. As is, this tooling may be sufficient for bringing insights about user activity and behavioral patterns in a wide range of use cases, especially as a solution for small and medium-sized organizations.
 
-However, if you are looking to cover more advanced usage scenarios, such as cyber fraud prevention, the additional tirreno API enrichment capabilities can be enabled via [monthly-paid subscription](https://www.tirreno.com/pricing/). It supplies extended information on any of the following: IP address, email address, domain, and phone number. Enabling all the data enrichment types augments tirreno into a fully-fledged enterprise solution for an online fraud prevention system.
+However, if you are looking to cover more advanced usage scenarios, the additional tirreno API enrichment capabilities can be enabled via [monthly-paid subscription](https://www.tirreno.com/pricing/). 
 
 ## About
 
