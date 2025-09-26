@@ -21,9 +21,9 @@ class QueuesClearer extends AbstractCron {
         $clearBefore = new \DateTime(sprintf('%s days ago', $daysAgo));
 
         $actionTypes = [
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist),
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Delete),
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore),
+            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST),
+            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE),
+            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE),
         ];
 
         $clearedCount = 0;

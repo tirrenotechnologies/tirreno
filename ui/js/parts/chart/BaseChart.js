@@ -32,6 +32,8 @@ export class BaseChart {
             })
         };
 
+        this.timeLabelColor = '#d7e6e1';
+
         this.loader = new Loader();
 
         const loaderDiv = document.createElement('div');
@@ -260,90 +262,19 @@ export class BaseChart {
     }
 
     get chartBlock() {
-        return document.querySelector('.stat-chart');
+        return document.querySelector('.stat-chart:not(#session-stat)');
     }
 
     tooltipsPlugin(opts, resolution = 'day', defaultVal = '0') {
         let self = this;
         let seriestt;
 
-        function init(u, opts, data) {
-            let over = u.over;
-
-            let tt = document.createElement('div');
-            tt.className = 'tooltipline';
-            tt.textContent = '';
-            tt.style.pointerEvents = 'none';
-            tt.style.position = 'absolute';
-            tt.style.background = 'rgba(0,0,0,1)';
-            over.appendChild(tt);
-            seriestt = tt;
-
-            over.addEventListener('mouseleave', () => {
-                if (!u.cursor._lock) {
-                    tt.style.display = 'none';
-                }
-            });
-
-            over.addEventListener('mouseenter', () => {
-                tt.style.display = u.data.length > 1 ? null : 'none';
-            });
-
-            tt.style.display = (u.cursor.left < 0) ? 'none' : null;
+        function init(u, options, data) {
+            seriestt = self.tooltipInit(u, options, data);
         }
 
         function setCursor(u) {
-            const {left, idx} = u.cursor;
-
-            if (opts && opts.cursorMemo) {
-                opts.cursorMemo.set(left, top);
-            }
-
-            if (left >= 0) {
-                let xVal = u.data[0][idx];
-
-                const vtp = (resolution === 'day') ? 'DAY' : ((resolution === 'hour') ? 'HOUR' : 'MINUTE');
-                let ts = '';
-
-                if (Number.isInteger(xVal)) {
-                    const useTime = resolution === 'hour' || resolution === 'minute';
-                    ts = formatIntTimeUtc(xVal * 1000, useTime);
-                }
-
-                let frag = document.createDocumentFragment();
-                frag.appendChild(document.createTextNode(ts.replace(/\./g, '/')));
-
-                for (let i = 1; i <= 4; i++) {
-                    frag = self.extendTooltipFragment(i, idx, u.data, defaultVal, u, frag);
-                }
-
-                if (frag.children.length > 1) {
-                    seriestt.replaceChildren(frag);
-
-                    let val = null;
-                    let lvl = 1;
-
-                    const lim = Math.min(u.data.length - 1, 4);
-
-                    for (let i = 1; i <= lim; i++) {
-                        if (u.data[i][idx] > val) {
-                            val = u.data[i][idx];
-                            lvl = i;
-                        }
-                    }
-
-                    val = (val !== null && val != undefined) ? val : defaultVal;
-
-                    seriestt.style.top = Math.round(u.valToPos(val, u.series[lvl].scale)) + 'px';
-                    //seriestt.style.top = Math.round(self.getTop(idx, u.data, defaultVal, u)) + 'px';
-                    seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
-                    seriestt.style.display = null;
-                } else {
-                    seriestt.style.display = 'none';
-                }
-            } else {
-                seriestt.style.display = 'none';
-            }
+            [seriestt, opts] = self.tooltipCursor(u, seriestt, opts, resolution, defaultVal);
         }
 
         return {
@@ -352,6 +283,86 @@ export class BaseChart {
                 setCursor,
             },
         };
+    }
+
+    tooltipCursor(u, seriestt, opts, resolution, defaultVal) {
+        const left = u.cursor.left;
+        const idx  = u.cursor.idx;
+
+        if (opts && opts.cursorMemo) {
+            opts.cursorMemo.set(left, top);
+        }
+
+        seriestt.style.display = 'none';
+
+        if (left >= 0) {
+            let xVal = u.data[0][idx];
+
+            const vtp = (resolution === 'day') ? 'DAY' : ((resolution === 'hour') ? 'HOUR' : 'MINUTE');
+            let ts = '';
+
+            if (Number.isInteger(xVal)) {
+                const useTime = resolution === 'hour' || resolution === 'minute';
+                ts = formatIntTimeUtc(xVal * 1000, useTime);
+            }
+
+            let frag = document.createDocumentFragment();
+            frag.appendChild(renderChartTooltipPart(this.timeLabelColor, null, ts.replace(/\./g, '/')));
+
+            for (let i = 1; i <= 12; i++) {
+                frag = this.extendTooltipFragment(i, idx, u.data, defaultVal, u, frag);
+            }
+
+            if (frag.children.length > 1) {
+                seriestt.replaceChildren(frag);
+
+                let val = null;
+                let lvl = 1;
+
+                const lim = Math.min(u.data.length - 1, 12);
+
+                for (let i = 1; i <= lim; i++) {
+                    if (u.data[i][idx] > val) {
+                        val = u.data[i][idx];
+                        lvl = i;
+                    }
+                }
+
+                val = (val !== null && val != undefined) ? val : defaultVal;
+
+                seriestt.style.top = Math.round(u.valToPos(val, u.series[lvl].scale)) + 'px';
+                seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
+                seriestt.style.display = null;
+            }
+        }
+
+        return [seriestt, opts];
+    }
+
+    tooltipInit(u, options, data) {
+        let over = u.over;
+
+        let tt = document.createElement('div');
+        tt.className = 'tooltipline';
+        tt.textContent = '';
+        tt.style.pointerEvents = 'none';
+        tt.style.position = 'absolute';
+        tt.style.background = 'rgba(0,0,0,1)';
+        over.appendChild(tt);
+
+        over.addEventListener('mouseleave', () => {
+            if (!u.cursor._lock) {
+                tt.style.display = 'none';
+            }
+        });
+
+        over.addEventListener('mouseenter', () => {
+            tt.style.display = u.data.length > 1 ? null : 'none';
+        });
+
+        tt.style.display = (u.cursor.left < 0) ? 'none' : null;
+
+        return tt;
     }
 
     extendTooltipFragment(lvl, idx, data, defaultVal, u, frag) {

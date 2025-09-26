@@ -3,52 +3,11 @@
 
     <div class="container">
         <code><span style="background:#8080AA;color:#2B2A3D;">&nbsp;A secret place!&nbsp;</span><br>
-                    <check if="{{ isset(@ERROR_DATA) }}">
-                        <true>
-                            <p>* {{ @ERROR_DATA.message }}</p>
-                        </true>
-                    </check>
-
-                    <check if="{{ @DEBUG }}">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Key</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>IP</td>
-                                    <td>{{ @ERROR_DATA.ip }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Code</td>
-                                    <td>{{ @ERROR_DATA.code }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Date</td>
-                                    <td>{{ @ERROR_DATA.date }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Message</td>
-                                    <td>{{ @ERROR_DATA.message }}</td>
-                                </tr>
-                                <tr>
-                                    <td>POST</td>
-                                    <td><pre>{{ var_dump(@ERROR_DATA.post) }}</pre></td>
-                                </tr>
-                                <tr>
-                                    <td>GET</td>
-                                    <td><pre>{{ var_dump(@ERROR_DATA.get) }}</pre></td>
-                                </tr>
-                                <tr>
-                                    <td>Trace</td>
-                                    <td>{{ @ERROR_DATA.trace | raw }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </check>
+            <check if="{{ isset(@ERROR_DATA) }}">
+                <true>
+                    <p>* {{ @ERROR_DATA.message }}</p>
+                </true>
+            </check>
         </code>
         <br>
         <div class="game"><pre id=b></pre></div><script>

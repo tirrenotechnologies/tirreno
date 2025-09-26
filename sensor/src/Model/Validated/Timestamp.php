@@ -18,7 +18,6 @@ declare(strict_types=1);
 namespace Sensor\Model\Validated;
 
 class Timestamp extends Base {
-    private const INVALIDPLACEHOLDER = '1970-01-01 00:00:00.000';
     public const EVENTFORMAT = 'Y-m-d H:i:s.v';
     public const FORMAT = 'Y-m-d H:i:s';
     public const MICROSECONDS = 'Y-m-d H:i:s.u';
@@ -34,7 +33,7 @@ class Timestamp extends Base {
         } catch (\Throwable $e) {
             // \DateTimeImmutable::createFromFormat throws ValueError when the datetime contains NULL-bytes
             $invalid = true;
-            $val = new \DateTimeImmutable(self::INVALIDPLACEHOLDER);
+            $val = self::currentTime();
         }
 
         if ($val === false) {
@@ -47,10 +46,14 @@ class Timestamp extends Base {
 
         if ($val === false) {
             $invalid = true;
-            $val = new \DateTimeImmutable(self::INVALIDPLACEHOLDER);
+            $val = self::currentTime();
         }
 
         $this->value = $val;
         $this->invalid = $invalid;
+    }
+
+    private function currentTime(): \DateTimeImmutable {
+        return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 }

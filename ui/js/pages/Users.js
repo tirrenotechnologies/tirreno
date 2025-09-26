@@ -10,7 +10,7 @@ import {UsersChart} from '../parts/chart/Users.js?v=2';
 export class UsersPage extends BasePage {
 
     constructor() {
-        super();
+        super('users');
 
         this.initUi();
     }
@@ -21,15 +21,7 @@ export class UsersPage extends BasePage {
         const rulesFilter       = new RulesFilter();
         const scoresRangeFilter = new ScoresRangeFilter();
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'users';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         const gridParams = {
             url:            '/admin/loadUsers',

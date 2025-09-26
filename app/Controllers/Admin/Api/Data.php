@@ -167,10 +167,10 @@ class Data extends \Controllers\Base {
             $model = new \Models\Users();
             $accountsForEnrichment = $model->notCheckedUsers($apiKey);
 
-            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
+            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
             $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
-            $accountOpQueueModel->addBatch($accountsForEnrichment);
+            $accountOpQueueModel->addBatchIds($accountsForEnrichment, $apiKey);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_manual_enrichment_success_message');
         }
@@ -300,7 +300,7 @@ class Data extends \Controllers\Base {
 
     public function getScheduledForEnrichment(): bool {
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         // do not use isInQueue() to prevent true on failed state

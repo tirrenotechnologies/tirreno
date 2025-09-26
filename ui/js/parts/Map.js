@@ -162,10 +162,9 @@ export class Map {
         if ('success' == status) {
             const me = this.scope;
 
-            const tileId  = 'totalCountries';
             const tableId = 'countries-table';
 
-            me.totalTile.update(tableId, tileId, data.length);
+            me.totalTile.update(tableId, me.config.tileId, data.length);
 
             const regions = me.getCountriesRegionsFromResponse(data);
 

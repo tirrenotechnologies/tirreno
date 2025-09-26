@@ -15,23 +15,23 @@ export class BlacklistGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'email-risk-score-short-col',
+                className: 'blacklist-user-col',
                 targets: 0
             },
             {
-                className: 'timestamp-col',
+                className: 'blacklist-timestamp-col',
                 targets: 1
             },
             {
-                className: 'id-type-col',
+                className: 'blacklist-type-col',
                 targets: 2
             },
             {
-                className: 'id-value-col',
+                className: 'blacklist-value-col',
                 targets: 3
             },
             {
-                className: 'action-button-col',
+                className: 'blacklist-button-col',
                 targets: 4
             }
         ];

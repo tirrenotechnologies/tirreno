@@ -31,9 +31,9 @@ class BaseEventsCount extends \Models\BaseSql {
     public function __construct() {
         parent::__construct();
 
-        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::ALERT_EVENT_TYPES, 'alert');
-        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::EDITING_EVENT_TYPES, 'edit');
-        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::NORMAL_EVENT_TYPES, 'normal');
+        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Utils\Constants::get('ALERT_EVENT_TYPES'), 'alert');
+        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Utils\Constants::get('EDITING_EVENT_TYPES'), 'edit');
+        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('NORMAL_EVENT_TYPES'), 'normal');
     }
 
     public function getData(int $apiKey): array {
@@ -50,7 +50,7 @@ class BaseEventsCount extends \Models\BaseSql {
         $request = $this->f3->get('REQUEST');
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        $datesRange = $this->getLatest180DatesRange($offset);
+        $datesRange = $this->getLatestNDatesRange(180, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
         $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
@@ -86,7 +86,7 @@ class BaseEventsCount extends \Models\BaseSql {
     protected function executeOnRangeById(string $query, int $apiKey): array {
         $request = $this->f3->get('REQUEST');
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = $this->getLatest180DatesRange();
+        $dateRange = $this->getLatestNDatesRange(180);
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
 
         $params = [

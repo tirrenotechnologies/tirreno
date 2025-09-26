@@ -127,7 +127,7 @@ class Update002 extends Base {
         110 => 'B24',
     ];
 
-    public static function up($db) {
+    public static function apply($db) {
         $queries = [
             'INSERT INTO dshb_rules (id) VALUES (109), (110)',
             'CREATE INDEX event_account_lastseen_key_idx ON event_account USING btree (lastseen, key)',

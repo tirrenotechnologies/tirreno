@@ -55,7 +55,7 @@ class Updates extends \Models\BaseSql {
             $this->db->begin();
             foreach ($updatesList as $migration) {
                 if (!$migration::isApplied($this)) {
-                    $migration::up($this->db);
+                    $migration::apply($this->db);
                     $this->add($migration::$version, $service);
                 }
             }

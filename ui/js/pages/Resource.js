@@ -14,85 +14,19 @@ import {DevicePanel} from '../parts/panel/DevicePanel.js?v=2';
 export class ResourcePage extends BasePage {
 
     constructor() {
-        super();
+        super('resource', true);
 
         this.initUi();
     }
 
     initUi() {
-
-        const RESOURCE_ID = parseInt(window.location.pathname.replace('/resource/', ''), 10);
-
-        const getParams = () => {
-            return {resourceId: RESOURCE_ID};
-        };
-
-        const devicesGridParams = {
-            url:        '/admin/loadDevices',
-            tileId:     'totalDevices',
-            tableId:    'devices-table',
-            panelType:  'device',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const eventsGridParams = {
-            url:        '/admin/loadEvents',
-            tileId:     'totalEvents',
-            tableId:    'user-events-table',
-            panelType:  'event',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const ipsGridParams = {
-            url:                '/admin/loadIps',
-            tileId:             'totalIps',
-            tableId:            'ips-table',
-
-            isSortable:         false,
-            orderByLastseen:    true,
-
-            getParams:          getParams,
-        };
-
-        const usersGridParams = {
-            url:        '/admin/loadUsers',
-            tileId:     'totalUsers',
-            tableId:    'users-table',
-
-            isSortable: false,
-
-            getParams: getParams,
-        };
-
-        const ispsGridParams = {
-            url:        '/admin/loadIsps',
-            tableId:    'isps-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const mapParams = {
-            getParams:  getParams,
-            tooltipString: 'event',
-            tooltipField : 'total_visit',
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = RESOURCE_ID;
-                const mode      = 'resource';
-
-                return {mode, id};
-            }
-        };
+        const devicesGridParams = this.getDevicesGridParams();
+        const eventsGridParams  = this.getEventsGridParams();
+        const ipsGridParams     = this.getIpsGridParams();
+        const usersGridParams   = this.getUsersGridParams();
+        const ispsGridParams    = this.getIspsGridParams();
+        const mapParams         = this.getMapParams();
+        const chartParams       = this.getBarChartParams();
 
         const tilesParams = {
             elems: ['totalUsers', 'totalCountries', 'totalIps', 'totalEvents']
@@ -103,16 +37,15 @@ export class ResourcePage extends BasePage {
         new DevicePanel();
 
         const elements = [
-            [UsersGrid,             usersGridParams],
-            [Map,                   mapParams],
-            [IpsGrid,               ipsGridParams],
-            [IspsGrid,              ispsGridParams],
-            [DevicesGrid,           devicesGridParams],
-            [BaseBarChart,          chartParams],
-            [EventsGrid,            eventsGridParams],
+            [UsersGrid,     usersGridParams],
+            [Map,           mapParams],
+            [IpsGrid,       ipsGridParams],
+            [IspsGrid,      ispsGridParams],
+            [DevicesGrid,   devicesGridParams],
+            [BaseBarChart,  chartParams],
+            [EventsGrid,    eventsGridParams],
         ];
 
         new SequentialLoad(elements);
-
     }
 }

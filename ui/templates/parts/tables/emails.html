@@ -24,18 +24,18 @@
                 <include href="templates/parts/forms/searchForm.html" />
                 </true>
             </check>
-            <table class="table" id="emails-table">
+            <table class="table dim-table" id="emails-table">
                 <thead>
                     <tr>
-                        <th class="tooltip email-col" title="{{ @Base_table_column_user_email_tooltip }}">{{ @Base_table_column_user_email }}</th>
+                        <th class="tooltip email-email-col" title="{{ @Base_table_column_user_email_tooltip }}">{{ @Base_table_column_user_email }}</th>
                         <th class="tooltip email-reputation-col" title="{{ @Base_table_column_email_reputation_tooltip }}">{{ @Base_table_column_email_reputation }}</th>
-                        <th class="tooltip yes-no-col" title="{{ @Base_table_column_email_free_provider_tooltip }}">{{ @Base_table_column_email_free_provider }}</th>
+                        <th class="tooltip email-free-provider-col" title="{{ @Base_table_column_email_free_provider_tooltip }}">{{ @Base_table_column_email_free_provider }}</th>
                         {***<th class="tooltip medium-yes-no-col" title="{{ @Base_table_column_email_noprofiles_tooltip }}">{{ @Base_table_column_email_noprofiles }}</th>***}
-                        <th class="tooltip medium-yes-no-col" title="{{ @Base_table_column_email_nodatabreach_tooltip }}">{{ @Base_table_column_email_nodatabreach }}</th>
-                        <th class="tooltip medium-yes-no-col" title="{{ @Base_table_column_email_total_breaches_tooltip }}">{{ @Base_table_column_email_total_breaches }}</th>
-                        <th class="tooltip medium-yes-no-col" title="{{ @Base_table_column_email_disposable_tooltip }}">{{ @Base_table_column_email_disposable }}</th>
-                        <th class="tooltip short-yes-no-col" title="{{ @Base_table_column_email_spamlist_tooltip }}">{{ @Base_table_column_email_spamlist }}</th>
-                        <th class="tooltip short-yes-no-col" title="{{ @Base_table_column_email_blacklist_tooltip }}">{{ @Base_table_column_email_blacklist }}</th>
+                        <th class="tooltip email-no-breach-col" title="{{ @Base_table_column_email_nodatabreach_tooltip }}">{{ @Base_table_column_email_nodatabreach }}</th>
+                        <th class="tooltip email-total-breaches-col" title="{{ @Base_table_column_email_total_breaches_tooltip }}">{{ @Base_table_column_email_total_breaches }}</th>
+                        <th class="tooltip email-disposable-col" title="{{ @Base_table_column_email_disposable_tooltip }}">{{ @Base_table_column_email_disposable }}</th>
+                        <th class="tooltip email-spam-col" title="{{ @Base_table_column_email_spamlist_tooltip }}">{{ @Base_table_column_email_spamlist }}</th>
+                        <th class="tooltip email-blacklist-col" title="{{ @Base_table_column_email_blacklist_tooltip }}">{{ @Base_table_column_email_blacklist }}</th>
                         {***<!-- TODO: return alert_list back in next release -->
                         <!-- <th class="tooltip medium-yes-no-col" title="{{ @Base_table_column_global_alert_tooltip }}">{{ @Base_table_column_global_alert }}</th> -->***}
                     </tr>

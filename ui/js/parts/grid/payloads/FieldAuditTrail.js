@@ -14,23 +14,23 @@ export class FieldAuditTrailGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'date-col',
+                className: 'field-audit-trail-date-col',
                 targets: 0
             },
             {
-                className: 'audit-id-col',
+                className: 'field-audit-trail-field-col',
                 targets: 1
             },
             {
-                className: 'audit-value-col',
+                className: 'field-audit-trail-value-col',
                 targets: 2
             },
             {
-                className: 'audit-value-col',
+                className: 'field-audit-trail-value-col',
                 targets: 3
             },
             {
-                className: 'audit-id-col',
+                className: 'field-audit-trail-parent-col',
                 targets: 4
             },
         ];

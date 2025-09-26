@@ -10,7 +10,7 @@ import {BlacklistGrid} from '../parts/grid/Blacklist.js?v=2';
 export class BlacklistPage extends BasePage {
 
     constructor() {
-        super();
+        super('blacklist');
         this.tableId = 'blacklist-table';
         this.initUi();
     }
@@ -18,7 +18,6 @@ export class BlacklistPage extends BasePage {
     initUi() {
         const datesFilter       = new DatesFilter();
         const searchFilter      = new SearchFilter();
-        const entityTypeFilter  = new EntityTypeFilter();
 
         const gridParams = {
             url:            '/admin/loadBlacklist',
@@ -27,26 +26,28 @@ export class BlacklistPage extends BasePage {
 
             dateRangeGrid:  true,
 
-            choicesFilterEvents: [entityTypeFilter.getEventType()],
-
             getParams: function() {
+                const dateRange     = datesFilter.getValue();
+                const searchValue   = searchFilter.getValue();
+
+                return {dateRange, searchValue};
+            },
+        };
+
+        if (document.getElementById('entity-type-selectors')) {
+            const entityTypeFilter  = new EntityTypeFilter();
+
+            gridParams.choicesFilterEvents = [entityTypeFilter.getEventType()];
+            gridParams.getParams = function() {
                 const dateRange     = datesFilter.getValue();
                 const searchValue   = searchFilter.getValue();
                 const entityTypeIds = entityTypeFilter.getValues();
 
                 return {dateRange, searchValue, entityTypeIds};
-            },
-        };
+            };
+        }
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'blacklist';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         new BlacklistChart(chartParams);
         new BlacklistGrid(gridParams);

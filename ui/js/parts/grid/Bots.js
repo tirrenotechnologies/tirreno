@@ -10,19 +10,19 @@ export class BotsGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'device-id-col',
+                className: 'bot-id-col',
                 targets: 0
             },
             {
-                className: 'device-type-col',
+                className: 'bot-type-col',
                 targets: 1
             },
             {
-                className: 'ua-part-col',
+                className: 'bot-os-col',
                 targets: 2
             },
             {
-                className: 'yes-no-col',
+                className: 'bot-modified-col',
                 targets: 3
             },
         ];

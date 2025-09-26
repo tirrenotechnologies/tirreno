@@ -26,15 +26,15 @@
                     <include href="templates/parts/choices/rules.html" />
                 </true>
             </check>
-            <table class="table" id="review-queue-table">
+            <table class="table dim-table" id="review-queue-table">
                 <thead>
                     <tr>
-                        <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
-                        <th class="tooltip timestamp-col" title="{{ @Base_table_column_added_to_review_tooltip }}">{{ @Base_table_column_added_to_review }}</th>
-                        <th class="tooltip user-firstname-col" title="{{ @Base_table_column_user_firstname_tooltip }}">{{ @Base_table_column_user_firstname }}</th>
-                        <th class="tooltip user-lastname-col" title="{{ @Base_table_column_user_lastname_tooltip }}">{{ @Base_table_column_user_lastname }}</th>
-                        <th class="tooltip date-col" title="{{ @Base_table_column_user_registered_tooltip }}">{{ @Base_table_column_user_registered }}</th>
-                        <th class="tooltip double-action-button-col" title="{{ @Base_table_column_reviewed_status_tooltip }}">{{ @Base_table_column_action_buttons }}</th>
+                        <th class="tooltip review-queue-user-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
+                        <th class="tooltip review-queue-timestamp-col" title="{{ @Base_table_column_added_to_review_tooltip }}">{{ @Base_table_column_added_to_review }}</th>
+                        <th class="tooltip review-queue-name-col" title="{{ @Base_table_column_user_firstname_tooltip }}">{{ @Base_table_column_user_firstname }}</th>
+                        <th class="tooltip review-queue-name-col" title="{{ @Base_table_column_user_lastname_tooltip }}">{{ @Base_table_column_user_lastname }}</th>
+                        <th class="tooltip review-queue-date-col" title="{{ @Base_table_column_user_registered_tooltip }}">{{ @Base_table_column_user_registered }}</th>
+                        <th class="tooltip review-queue-button-col" title="{{ @Base_table_column_reviewed_status_tooltip }}">{{ @Base_table_column_action_buttons }}</th>
                     </tr>
                 </thead>
             </table>

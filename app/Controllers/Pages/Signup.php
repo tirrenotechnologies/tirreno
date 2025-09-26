@@ -69,6 +69,10 @@ class Signup extends Base {
         $model = new \Models\OperatorsRules();
         $defaultRules = \Utils\Constants::get('DEFAULT_RULES');
 
+        if (\Utils\Variables::getEmailPhoneAllowed()) {
+            $defaultRules = array_merge($defaultRules, \Utils\Constants::get('DEFAULT_RULES_EXTENSION'));
+        }
+
         foreach ($defaultRules as $key => $value) {
             $model->updateRule($key, $value, $apiKey);
         }

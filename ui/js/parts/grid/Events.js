@@ -19,27 +19,27 @@ export class EventsGrid extends BaseGridWithPanel {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'email-risk-score-short-col',
+                className: 'event-user-col',
                 targets: 0
             },
             {
-                className: 'timestamp-col',
+                className: 'event-timestamp-col',
                 targets: 1
             },
             {
-                className: 'event-type-col',
+                className: 'event-event-type-col',
                 targets: 2
             },
             {
-                className: 'ip-col',
+                className: 'event-ip-col',
                 targets: 3
             },
             {
-                className: 'ip-type-col',
+                className: 'event-ip-type-col',
                 targets: 4
             },
             {
-                className: 'device-type-col',
+                className: 'event-device-col',
                 targets: 5
             },
             {

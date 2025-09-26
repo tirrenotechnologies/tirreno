@@ -16,7 +16,7 @@
 namespace Utils;
 
 class RulesClasses {
-    private const rulesWeight = [
+    private const RULES_WEIGHT = [
         -20 =>  'positive',
         10 =>   'medium',
         20 =>   'high',
@@ -24,7 +24,7 @@ class RulesClasses {
         0 =>    'none',
     ];
 
-    private const rulesTypes = [
+    private const RULES_TYPES = [
         'A' => 'Account takeover',
         'B' => 'Behaviour',
         'C' => 'Country',
@@ -40,11 +40,11 @@ class RulesClasses {
     private static string $assetsRulesNamespace = '\\ExtendedRules';
 
     public static function getRuleClass(?int $value): string {
-        return self::rulesWeight[$value ?? 0] ?? 'none';
+        return self::RULES_WEIGHT[$value ?? 0] ?? 'none';
     }
 
     public static function getRuleTypeByUid(string $uid): string {
-        return self::rulesTypes[$uid[0]] ?? $uid[0];
+        return self::RULES_TYPES[$uid[0]] ?? $uid[0];
     }
 
     public static function getUserScoreClass(?int $score): array {

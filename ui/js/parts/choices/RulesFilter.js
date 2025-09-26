@@ -10,7 +10,7 @@ export class RulesFilter extends BaseFilter {
             '#rule-selectors',
             renderRuleSelectorItem,
             renderRuleSelectorChoice,
-            'rulesFilterChanged',
+            'rulesFilterChanged'
         );
     }
 }

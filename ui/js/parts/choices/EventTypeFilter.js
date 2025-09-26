@@ -10,7 +10,7 @@ export class EventTypeFilter extends BaseFilter {
             '#event-type-selectors',
             renderEventTypeSelectorItem,
             renderEventTypeSelectorChoice,
-            'eventTypeFilterChanged',
+            'eventTypeFilterChanged'
         );
     }
 }

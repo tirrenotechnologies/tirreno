@@ -18,7 +18,7 @@ namespace Updates;
 class Update004 extends Base {
     public static $version = 'v0.9.8';
 
-    public static function up($db) {
+    public static function apply($db) {
         $data = [':type' => \Utils\Constants::get('FIELD_EDIT_EVENT_TYPE_ID')];
 
         $queries = [

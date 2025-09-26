@@ -16,7 +16,7 @@
 return [
     'AdminUsers_page_title' => 'Users',
     'AdminUsers_breadcrumb_title' => 'Users',
-    'AdminUsers_search_placeholder' => 'User Email, Name, ID and Signup Date',
+    'AdminUsers_search_placeholder' => 'User Name, ID and Signup Date',
     'AdminUsers_rules_search_placeholder' => '+ Add another rule',
     'AdminUsers_scores_range_search_placeholder' => '+ Add another score',
 

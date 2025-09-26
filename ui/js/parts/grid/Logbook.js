@@ -15,19 +15,19 @@ export class LogbookGrid extends BaseGridWithPanel {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'ip-col',
+                className: 'logbook-ip-col',
                 targets: 0
             },
             {
-                className: 'timestamp-col',
+                className: 'logbook-timestamp-col',
                 targets: 1
             },
             {
-                className: 'error-type-col',
+                className: 'logbook-status-col',
                 targets: 2
             },
             {
-                className: 'error-text-col',
+                className: 'logbook-message-col',
                 targets: 3
             },
         ];

@@ -13,27 +13,27 @@ export class IspsGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'asn-col',
+                className: 'isp-asn-col',
                 targets: 0
             },
             {
-                className: 'isp-netname-col',
+                className: 'isp-network-col',
                 targets: 1
             },
             {
-                className: 'total-counters-col',
+                className: 'isp-cnt-col',
                 targets: 2
             },
             {
-                className: 'total-counters-col',
+                className: 'isp-cnt-col',
                 targets: 3
             },
             {
-                className: 'total-counters-col',
+                className: 'isp-cnt-col',
                 targets: 4
             },
             {
-                className: 'total-counters-col',
+                className: 'isp-cnt-col',
                 targets: 5
             },
             {

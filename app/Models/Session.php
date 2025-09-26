@@ -24,7 +24,7 @@ class Session extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
                 event_session.id
 
             FROM
-                event_ua_parsed
+                event_session
 
             WHERE
                 event_session.key    = :api_key

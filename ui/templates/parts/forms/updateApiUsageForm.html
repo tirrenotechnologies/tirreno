@@ -9,12 +9,14 @@
             <textarea class="textarea" name="apiToken" placeholder="{{ @AdminApi_form_field_token_placeholder }}" rows="2" cols="84" required>{{ @API_KEY.apiToken }}</textarea>
 
             <repeat group="{{ @API_KEY.enrichedAttributes }}" key="{{ @attribute }}" value="{{ @enabled }}">
-                <div class="field">
-                    <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
-                    <div class="control">
-                        <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
+                <check if="{{ @ALLOW_EMAIL_PHONE || @attribute === 'ip' }}">
+                    <div class="field">
+                        <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
+                        <div class="control">
+                            <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
+                        </div>
                     </div>
-                </div>
+                </check>
             </repeat>
 {***
             <div class="field">

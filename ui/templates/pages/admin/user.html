@@ -1,9 +1,13 @@
 <include href="templates/parts/headerAdmin.html" />
 <div id="wrap">
     <include href="templates/parts/panel/eventPanel.html" />
-    <include href="templates/parts/panel/emailPanel.html" />
-    <include href="templates/parts/panel/phonePanel.html" />
     <include href="templates/parts/panel/devicePanel.html" />
+
+    <check if="{{ @ALLOW_EMAIL_PHONE }}">
+        <include href="templates/parts/panel/emailPanel.html" />
+        <include href="templates/parts/panel/phonePanel.html" />
+    </check>
+
     <include href="templates/parts/leftMenu.html" />
     <div class="main">
         <include href="templates/parts/forms/globalSearchForm.html" />
@@ -14,16 +18,16 @@
         <include href="templates/parts/infoHeader.html" with="title={{isset(@USER.email) ? @USER.email : @USER.userid}}, lastseen={{@USER.lastseen}}, isUserPage=true"/>
 
         <include href="templates/parts/scoreDetails.html" />
-        {***<include href="templates/parts/widgets/userDetails.html" />***}
-        <include href="templates/parts/widgets/userEnrichmentDetails.html" />
+        <include href="templates/parts/widgets/userDetails.html" />
         <include href="templates/parts/widgets/user.html" />
         <include href="templates/parts/mapWithIps.html" />
         <include href="templates/parts/tables/isps.html" />
         <include href="templates/parts/tables/devices.html" />
 
-        <include href="templates/parts/tables/emails.html" />
-        <include href="templates/parts/tables/phones.html" />
-
+        <check if="{{ @ALLOW_EMAIL_PHONE }}">
+            <include href="templates/parts/tables/emails.html" />
+            <include href="templates/parts/tables/phones.html" />
+        </check>
         <include href="templates/parts/tables/payloads/fieldAuditTrail.html" />
 
         <include href="templates/parts/tables/events.html" with="showChart=1" />

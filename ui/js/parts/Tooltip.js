@@ -7,83 +7,59 @@ export class Tooltip {
     }
 
     static addTooltipsToEventDetailsPanel() {
-        const path   = '.details-card .tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('.details-card .tooltip', true);
     }
 
     static addTooltipsToScoreDetails() {
-        const path   = '.score-details-content .tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('.score-details-content .tooltip', true);
     }
 
     static addTooltipsToTiles() {
-        const path   = 'span.detailsTileValue .tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(false);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('span.detailsTileValue .tooltip', false);
     }
 
     static addTooltipsToGridRecords(tableId) {
-        const path1   = `#${tableId} td .tooltip:not(.iptype)`;
-        const items1  = document.querySelectorAll(path1);
-        const config1 = this.getConfig(true);
-
-        const path2   = `#${tableId} td .tooltip.iptype`;
-        const items2  = document.querySelectorAll(path2);
-        const config2 = this.getConfig(true);
-
-        $(items1).tooltipster(config1);
-        $(items2).tooltipster(config2);
+        this.baseTooltips(`#${tableId} td .tooltip.tooltipster-word-break`, true, true);
+        this.baseTooltips(`#${tableId} td .tooltip:not(.tooltipster-word-break)`, true);
     }
 
     static addTooltipToSpans() {
-        const path   = 'span.tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('span.tooltip', true);
     }
 
     static addTooltipToTableHeaders() {
-        const path   = 'th.tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('th.tooltip', true);
     }
 
     static addTooltipToParagraphs() {
-        const path   = 'p.tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('p.tooltip', true);
     }
 
     static addTooltipsToRulesProportion() {
-        const path   = 'td .tooltip';
-        const items  = document.querySelectorAll(path);
-        const config = this.getConfig(true);
-
-        $(items).tooltipster(config);
+        this.baseTooltips('td .tooltip', true);
     }
 
-    static getConfig(useMaxWidth) {
+    static addTooltipsToClock() {
+        this.baseTooltips('div .day-tile.tooltip, div .time-tile.tooltip', true);
+    }
+
+    static baseTooltips(path, useMaxWidth = true, wordBreak = false) {
+        $(document.querySelectorAll(path)).tooltipster(this.getConfig(useMaxWidth, wordBreak));
+    }
+
+    static getConfig(useMaxWidth, wordBreak) {
         const config = {
             delay: 0,
             delayTouch: 0,
             debug: false,
             side: 'bottom',
             animationDuration: 0,
-            theme: 'tooltipster-borderless'
+            theme: ['tooltipster-borderless'],
         };
+
+        if (wordBreak) {
+            config.theme.push('tooltipster-word-break');
+        }
 
         if (useMaxWidth) {
             config['maxWidth'] = 250;

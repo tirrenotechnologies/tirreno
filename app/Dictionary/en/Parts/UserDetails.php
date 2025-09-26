@@ -29,10 +29,8 @@ return [
     'UserDetails_session_count'                 => 'Sessions',
     'UserDetails_session_count_tooltip'         => 'Sessions',
 
-    'UserDetails_day_card_title'                => 'Today',
+    'UserDetails_day_card_title'                => 'Today\'s activity',
     'UserDetails_day_card_title_tooltip'        => 'Today since midnight.',
-    'UserDetails_week_card_title'               => 'This week',
-    'UserDetails_week_card_title_tooltip'       => 'This week since monday.',
-    'UserDetails_month_card_title'              => 'This month',
-    'UserDetails_month_card_title_tooltip'      => 'This month since first day.',
+    'UserDetails_week_card_title'               => 'Average daily activity',
+    'UserDetails_week_card_title_tooltip'       => 'Median number of user events per day (last 7 days).',
 ];

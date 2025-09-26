@@ -87,12 +87,18 @@ class DataEnrichmentService {
         ?HashedValue $phone,
         ?string $emailDomain,
     ): ?EnrichedData {
-        $query = array_filter([
-            'email' => $email?->toArray($hashExchange),
-            'ip' => $ipAddress?->toArray($hashExchange),
-            'phone' => $phone?->toArray($hashExchange),
-            'domain' => $emailDomain,
-        ], static function ($value): bool {
+        $query = [];
+
+        if ($this->config->allowEmailPhone) {
+            $query = [
+                'email'     => $email?->toArray($hashExchange),
+                'phone'     => $phone?->toArray($hashExchange),
+                'domain'    => $emailDomain,
+            ];
+        }
+
+        $query['ip'] = $ipAddress?->toArray($hashExchange);
+        $query = array_filter($query, static function ($value): bool {
             return $value !== null;
         });
 

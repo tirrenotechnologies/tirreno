@@ -24,8 +24,9 @@ class Login extends Base {
         }
 
         $pageParams = [
-            'HTML_FILE' => 'login.html',
-            'JS' => 'user_main.js',
+            'HTML_FILE'             => 'login.html',
+            'JS'                    => 'user_main.js',
+            'ALLOW_FORGOT_PASSWORD' => \Utils\Variables::getForgotPasswordAllowed(),
         ];
 
         if ($this->isPostRequest()) {

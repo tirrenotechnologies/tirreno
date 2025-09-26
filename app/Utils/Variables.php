@@ -52,6 +52,24 @@ class Variables {
         return getenv('PEPPER') ?: self::getF3()->get('PEPPER');
     }
 
+    public static function getLogbookLimit(): int {
+        $value = getenv('LOGBOOK_LIMIT') ?: self::getF3()->get('LOGBOOK_LIMIT') ?: \Utils\Constants::get('LOGBOOK_LIMIT');
+
+        return is_int($value) ? $value : (ctype_digit($value) ? intval($value) : \Utils\Constants::get('LOGBOOK_LIMIT'));
+    }
+
+    public static function getForgotPasswordAllowed(): bool {
+        $variable = getenv('ALLOW_FORGOT_PASSWORD') ?: self::getF3()->get('ALLOW_FORGOT_PASSWORD') ?? 'false';
+
+        return filter_var($variable, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+    }
+
+    public static function getEmailPhoneAllowed(): bool {
+        $variable = getenv('ALLOW_EMAIL_PHONE') ?: self::getF3()->get('ALLOW_EMAIL_PHONE') ?? 'false';
+
+        return filter_var($variable, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+    }
+
     public static function getForceHttps(): bool {
         // set 'false' string if FORCE_HTTPS wasn't set due to filter_var() issues
         $variable = getenv('FORCE_HTTPS') ?: self::getF3()->get('FORCE_HTTPS') ?? 'false';

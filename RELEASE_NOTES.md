@@ -1,7 +1,7 @@
-Release song: https://youtu.be/bwl6njgJ34Q
+Release song: https://youtu.be/nVfTGzlD4_Y
 
-tirreno is announcing version v0.9.8.
+tirreno is announcing version v0.9.9.
 
-This release introduces field audit trails with new event type `field_edit`,
-optional payload for `page_search` and `account_email_change`, UI enhancements
-and performance improvement through sequential requests.
+This release enhances user visiual analytics, improves user-agent treatment
+and introduces several manual app settings, including `.php` formatted lists
+of suspicious words.

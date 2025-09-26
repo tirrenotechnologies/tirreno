@@ -21,6 +21,7 @@ class Updates {
         \Updates\Update002::class,
         \Updates\Update003::class,
         \Updates\Update004::class,
+        \Updates\Update005::class,
     ];
 
     public static function syncUpdates() {

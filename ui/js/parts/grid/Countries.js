@@ -19,23 +19,23 @@ export class CountriesGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'country-full-name-flag-col',
+                className: 'country-country-col',
                 targets: 0
             },
             {
-                className: 'country-code-col',
+                className: 'country-iso-col',
                 targets: 1
             },
             {
-                className: 'country-total-counters-col',
+                className: 'country-cnt-col',
                 targets: 2
             },
             {
-                className: 'country-total-counters-col',
+                className: 'country-cnt-col',
                 targets: 3
             },
             {
-                className: 'country-total-counters-col',
+                className: 'country-cnt-col',
                 targets: 4
             },
             {

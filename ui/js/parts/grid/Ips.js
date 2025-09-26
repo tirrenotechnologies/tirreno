@@ -17,31 +17,31 @@ export class IpsGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'ip-col',
+                className: 'ip-ip-col',
                 targets: 0
             },
             {
-                className: 'country-full-name-col',
+                className: 'ip-country-col',
                 targets: 1
             },
             {
-                className: 'asn-col',
+                className: 'ip-asn-col',
                 targets: 2
             },
             {
-                className: 'ip-netname-col',
+                className: 'ip-newtwork-col',
                 targets: 3
             },
             {
-                className: 'ip-type-col',
+                className: 'ip-ip-type-col',
                 targets: 4
             },
             {
-                className: 'ip-total-counters-col',
+                className: 'ip-cnt-col',
                 targets: 5
             },
             {
-                className: 'ip-total-counters-col',
+                className: 'ip-cnt-col',
                 targets: 6
             },
             {

@@ -1,5 +1,19 @@
 # tirreno changelog
 
+## tirreno v0.9.9
+
+* user activity sparklines charts
+* sessions stat collection
+* settings for `LOGBOOK_LIMIT`
+* settings for `ALLOW_FORGOT_PASSWORD`
+* unique UA on language change
+* suspicious url substrings update
+* textarea url/query rendering fixes
+* default current time on invalid eventTime in sensor and 0 on invalid httpCode
+* default N/A on empty userName
+* jquery-autocomplete update
+* minor bug fixes
+
 ## tirreno v0.9.8
 
 * field audit trail via new event type `field_edit`

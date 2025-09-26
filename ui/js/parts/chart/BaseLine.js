@@ -14,15 +14,15 @@ export class BaseLineChart extends BaseChart {
 
     getSingleSeries(label, color) {
         return {
-            label: label,
-            scale: 'EVENTS',
-            value: (u, v) => Number(v.toFixed(0)).toLocaleString(),
+            label:  label,
+            scale:  'EVENTS',
+            value:  (u, v) => Number(v.toFixed(0)).toLocaleString(),
             points: {
                 space: 0,
                 fill: COLOR_MAP[color].main,
             },
             stroke: COLOR_MAP[color].main,
-            fill: COLOR_MAP[color].light,
+            fill:   COLOR_MAP[color].light,
         };
     }
 
@@ -37,9 +37,9 @@ export class BaseLineChart extends BaseChart {
             return pxPerDay;
         };
 
-        axes.y.scale =  'EVENTS';
-        axes.y.side =   3;
-        axes.y.split =  u => [
+        axes.y.scale    = 'EVENTS';
+        axes.y.side     = 3;
+        axes.y.split    = u => [
             u.series[1].min,
             u.series[1].max,
         ];

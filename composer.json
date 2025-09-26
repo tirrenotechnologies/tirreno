@@ -57,7 +57,7 @@
             "chmod 755 assets",
             "chmod 755 assets/rules",
             "chmod 755 assets/logs",
-            "chmod 755 assets/suspiciousWords",
+            "chmod 755 assets/lists",
             "chmod 640 composer.json",
             "chmod 640 composer.lock",
             "chmod -R 750 config"

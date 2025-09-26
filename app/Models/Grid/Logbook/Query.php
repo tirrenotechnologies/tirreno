@@ -84,28 +84,24 @@ class Query extends \Models\Grid\Base\Query {
         $searchConditions = '';
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
-            //TODO: user isIp function here
+            $extra = '';
+            //TODO: use isIp function here
             if (filter_var($search['value'], FILTER_VALIDATE_IP) !== false) {
-                $searchConditions .= (
-                    ' AND
-                    (
-                        event_logbook.ip = :search_value
-                    )'
-                );
-
-                $queryParams[':search_value'] = $search['value'];
-            } else {
-                $searchConditions .= (
-                    ' AND
-                    (
-                        LOWER(event_logbook.raw::text)      LIKE LOWER(:search_value) OR
-                        LOWER(event_logbook.error_text)     LIKE LOWER(:search_value) OR
-                        LOWER(event_error_type.name)        LIKE LOWER(:search_value)
-                    )'
-                );
-
-                $queryParams[':search_value'] = '%' . $search['value'] . '%';
+                $extra = ' event_logbook.ip = :search_ip_value OR ';
+                $queryParams[':search_ip_value'] = $search['value'];
             }
+
+            $searchConditions .= (
+                " AND
+                (
+                    $extra
+                    LOWER(event_logbook.raw::text)      LIKE LOWER(:search_value) OR
+                    LOWER(event_logbook.error_text)     LIKE LOWER(:search_value) OR
+                    LOWER(event_error_type.name)        LIKE LOWER(:search_value)
+                )"
+            );
+
+            $queryParams[':search_value'] = '%' . $search['value'] . '%';
         }
 
         //Add search and ids into request

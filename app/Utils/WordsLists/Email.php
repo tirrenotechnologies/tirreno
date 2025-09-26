@@ -13,10 +13,10 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Utils;
+namespace Utils\WordsLists;
 
-class SuspiciousWordsEmail extends SuspiciousWords {
-    protected static string $extensionFile = 'email.txt';
+class Email extends Base {
+    protected static string $extensionFile = 'email.php';
 
     protected static array $words = [
         'spam',

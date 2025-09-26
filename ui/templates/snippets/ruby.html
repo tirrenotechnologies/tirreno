@@ -63,7 +63,10 @@ data = {
     'httpMethod': '',
 
     # User created UTC timestamp ('Y-m-d H:i:s' string)
-    'userCreated': ''
+    'userCreated': '',
+
+    # Payload
+    'payload': [],
 }
 
 http = Net::HTTP.new(url.host, url.port)

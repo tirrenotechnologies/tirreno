@@ -1,11 +1,18 @@
+import {Loader} from './Loader.js?v=2';
+import {Tooltip} from './Tooltip.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {padZero} from './utils/Date.js?v=2';
 
 export class SearchLine {
     constructor() {
-        const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
+        this.loader = new Loader();
 
+        Tooltip.addTooltipsToClock();
+
+        const me = this;
+        const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const url = `/admin/search?token=${token}`;
+
         $('#auto-complete').autocomplete({
             serviceUrl: url,
             deferRequestBy: 300,
@@ -20,7 +27,15 @@ export class SearchLine {
 
             onSearchStart: function(params) {
                 params.query = params.query.trim();
+                me.loaderDiv.classList.remove('is-hidden');
+                me.loader.start(me.loaderDiv);
+
             },
+            onSearchComplete: function(query, suggestions) {
+                me.loader.stop();
+                me.loaderDiv.classList.add('is-hidden');
+            },
+
             onSearchError: handleAjaxError,
         });
 
@@ -81,6 +96,10 @@ export class SearchLine {
         const activeType = activeLink.dataset.value;
 
         return activeType;
+    }
+
+    get loaderDiv() {
+        return document.querySelector('.searchline').querySelector('div.text-loader');
     }
 
     get timeInput() {

@@ -62,7 +62,16 @@ class Constants {
         'Yandex Browser'    => 20,
     ];
 
-    public const LOGBOOK_LIMIT = 1000;
+    public const DEVICE_TYPES   = [
+        'bot',
+        'desktop',
+        'smartphone',
+        'tablet',
+        'other',
+        'unknown',
+    ];
+
+    public const LOGBOOK_LIMIT  = 1000;
 
     public const NIGHT_RANGE_SECONDS_START  = 0;        // midnight
     public const NIGHT_RANGE_SECONDS_END    = 18000;    // 5 AM
@@ -99,6 +108,8 @@ class Constants {
     public const USER_MEDIUM_SCORE_SUP  = 67;
     public const USER_HIGH_SCORE_INF    = 67;
 
+    public const UNAUTHORIZED_USERID    = 'N/A';
+
     public const ENRICHMENT_IP_IS_BOGON     = 'IP is bogon';
     public const ENRICHMENT_IP_IS_NOT_FOUND = 'Value is not found';
 
@@ -124,7 +135,6 @@ class Constants {
 
     public const DEFAULT_RULES = [
         // Positive
-        'E20'  => -20,
         'E23'  => -20,
         'E24'  => -20,
         'E25'  => -20,
@@ -152,17 +162,12 @@ class Constants {
         'E06'  => 10,
         'E07'  => 10,
         'E08'  => 10,
-        'E09'  => 10,
-        'E10'  => 10,
-        'E12'  => 10,
-        'E15'  => 10,
         //'E18'  => 10,
         'E21'  => 10,
         'E22'  => 10,
         'I05'  => 10,
         'I06'  => 10,
         'I09'  => 10,
-        'P01'  => 10,
         // High
         'D01'  => 20,
         'D02'  => 20,
@@ -173,7 +178,6 @@ class Constants {
         'E03'  => 20,
         'E04'  => 20,
         'E05'  => 20,
-        'E16'  => 20,
         'I02'  => 20,
         'I03'  => 20,
         'I04'  => 20,
@@ -181,16 +185,30 @@ class Constants {
         // Extreme
         'B06'  => 70,
         'E01'  => 70,
-        'E02'  => 70,
-        'E11'  => 70,
-        'E13'  => 70,
-        'E14'  => 70,
-        'E17'  => 70,
         'E19'  => 70,
         'I01'  => 70,
         'R01'  => 70,
         'R02'  => 70,
         'R03'  => 70,
+    ];
+
+    public const DEFAULT_RULES_EXTENSION = [
+        // Positive
+        'E20'  => -20,
+        // Medium
+        'E09'  => 10,
+        'E10'  => 10,
+        'E12'  => 10,
+        'E15'  => 10,
+        'P01'  => 10,
+        // High
+        'E16'  => 20,
+        // Extreme
+        'E02'  => 70,
+        'E11'  => 70,
+        'E13'  => 70,
+        'E14'  => 70,
+        'E17'  => 70,
     ];
 
     public const CHART_MODEL_MAP = [
@@ -213,6 +231,7 @@ class Constants {
         'country'       => \Models\Chart\Country::class,
         'blacklist'     => \Models\Chart\Blacklist::class,
         'logbook'       => \Models\Chart\Logbook::class,
+        'stats'         => \Models\Chart\SessionStat::class,
     ];
 
     public const LINE_CHARTS = [

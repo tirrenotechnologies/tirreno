@@ -34,6 +34,7 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'                     => 'admin/events.html',
             'JS'                            => 'admin_events.js',
             'EVENT_TYPES'                   => $controller->getAllEventTypes(),
+            'DEVICE_TYPES'                  => $controller->getAllDeviceTypes(),
             'RULES'                         => $rulesController->getAllRulesByApiKey($apiKey),
         ];
 

@@ -28,20 +28,22 @@ return [
     'AdminUser_widgets_phone' => 'Phone',
     'AdminUser_widgets_phone_tooltip' => 'Phone.',
 
-    'AdminUser_counters_total_countries' => 'Country count',
-    'AdminUser_counters_total_countries_tooltip' => 'The number of countries geolocated by the user’s IP addresses.',
-    'AdminUser_counters_total_ips' => 'IP count',
-    'AdminUser_counters_total_ips_tooltip' => 'The number of IP addresses associated with the user.',
-    'AdminUser_counters_total_devices' => 'Device count',
-    'AdminUser_counters_total_devices_tooltip' => 'The number of devices associated with the user.',
-    'AdminUser_counters_total_events' => 'Event count',
-    'AdminUser_counters_total_events_tooltip' => 'The number of events recorded for the user.',
+    'AdminUser_counters_total_new_devices' => 'New devices per day',
+    'AdminUser_counters_total_new_devices_tooltip' => 'Total new devices over user\'s sessions per day.',
+    'AdminUser_counters_total_new_ips' => 'New IPs per day',
+    'AdminUser_counters_total_new_ips_tooltip' => 'Total new IPs over user\'s sessions per day.',
+    'AdminUser_counters_total_events_max' => 'Events per session',
+    'AdminUser_counters_total_events_max_tooltip' => 'Average total events over user\'s sessions per day.',
+    'AdminUser_counters_total_sessions' => 'Sessions per day',
+    'AdminUser_counters_total_sessions_tooltip' => 'Total user\'s sessions per day.',
 
     'AdminUser_recalculate_risk_score_success_message' => 'User trust score was successfully recalculated.',
     'AdminUser_recalculate_risk_score_tooltip' => 'Recalculate trust score',
 
     'AdminUser_remove_user_button' => 'Delete user',
     'AdminUser_scheduled_for_removal' => 'All information related to this user is scheduled for removal.',
+
+    'AdminUser_review_comment_placeholder' => 'There is no review for this user.',
 
     'AdminPayload_table_title' => 'Payload',
     'AdminPayload_table_title_tooltip' => 'Payload',

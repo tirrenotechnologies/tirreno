@@ -18,7 +18,7 @@ namespace Updates;
 class Update001 extends Base {
     public static $version = 'v0.9.5';
 
-    public static function up($db) {
+    public static function apply($db) {
         $queries = [
             'ALTER TABLE dshb_api ADD COLUMN blacklist_threshold INTEGER DEFAULT -1',
             'ALTER TABLE dshb_api ADD COLUMN review_queue_threshold INTEGER DEFAULT 33',

@@ -12,7 +12,7 @@
             <li>
                 <set REVIEW_QUEUE_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/review-queue') ? 'is-active': 'is-normal'}}" />
                 <a class="{{ @REVIEW_QUEUE_ACTIVE_CLASS }}" href="/review-queue">
-                    <include href="images/icons/watchlist.svg" />{{ @LeftMenu_not_reviewed_users_link }}<span class="reviewedUsersTile">{{ @NUMBER_OF_NOT_REVIEWED_USERS }}</span>
+                    <include href="images/icons/watchlist.svg" />{{ @LeftMenu_not_reviewed_users_link }}<span class="reviewed-users-tile">{{ @NUMBER_OF_NOT_REVIEWED_USERS }}</span>
                 </a>
             </li>
 {***
@@ -65,12 +65,15 @@
                     <include href="images/icons/isp.svg" />{{ @LeftMenu_isps_link }}
                 </a>
             </li>
-            <li>
-                <set DOMAINS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/domain') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @DOMAINS_ACTIVE_CLASS }}" href="/domain">
-                    <include href="images/icons/domains.svg" />{{ @LeftMenu_domains_link }}
-                </a>
-            </li>
+
+            <check if="{{ @ALLOW_EMAIL_PHONE }}">
+                <li>
+                    <set DOMAINS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/domain') ? 'is-active': 'is-normal'}}" />
+                    <a class="{{ @DOMAINS_ACTIVE_CLASS }}" href="/domain">
+                        <include href="images/icons/domains.svg" />{{ @LeftMenu_domains_link }}
+                    </a>
+                </li>
+            </check>
 
             <li>
                 <set RESOURCES_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/resource') ? 'is-active': 'is-normal'}}" />

@@ -39,9 +39,9 @@ class Data {
         $this->sessionModel = new Session();
         $this->keyModel     = new \Models\ApiKeys();
 
-        $this->suspiciousWordsUrl       = \Utils\SuspiciousWordsUrl::getWords();
-        $this->suspiciousWordsUserAgent = \Utils\SuspiciousWordsUserAgent::getWords();
-        $this->suspiciousWordsEmail     = \Utils\SuspiciousWordsEmail::getWords();
+        $this->suspiciousWordsUrl       = \Utils\WordsLists\Url::getWords();
+        $this->suspiciousWordsUserAgent = \Utils\WordsLists\UserAgent::getWords();
+        $this->suspiciousWordsEmail     = \Utils\WordsLists\Email::getWords();
     }
 
     public function getContext(array $accountIds, int $apiKey): array {
@@ -240,18 +240,23 @@ class Data {
 
         $record['event_empty_referer']      = in_array(true, $record['event_empty_referer'], true);
 
-        $clientErrors = 0;
-        $serverErrors = 0;
+        $clientErrors   = 0;
+        $serverErrors   = 0;
+        $successEvents  = 0;
         foreach ($eventHttpCodeFiltered as $code) {
             if (is_int($code) && $code >= 400 && $code < 500) {
                 ++$clientErrors;
             } elseif (is_int($code) && $code >= 500 && $code < 600) {
                 ++$serverErrors;
+            } elseif (is_int($code) && $code >= 200 && $code < 300) {
+                ++$successEvents;
             }
         }
 
         $record['event_multiple_5xx_http']  = $serverErrors;
         $record['event_multiple_4xx_http']  = $clientErrors;
+
+        $record['event_2xx_http']           = (bool) $successEvents;
 
         $record['event_vulnerable_url']     = false;
 

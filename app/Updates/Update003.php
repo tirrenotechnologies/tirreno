@@ -18,7 +18,7 @@ namespace Updates;
 class Update003 extends Base {
     public static $version = 'v0.9.7';
 
-    public static function up($db) {
+    public static function apply($db) {
         $data = [':type' => \Utils\Constants::get('PAGE_ERROR_EVENT_TYPE_ID')];
 
         $queries = [

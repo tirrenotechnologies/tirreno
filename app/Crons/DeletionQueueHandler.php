@@ -19,7 +19,7 @@ class DeletionQueueHandler extends AbstractQueueCron {
     public function __construct() {
         parent::__construct();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Delete);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 

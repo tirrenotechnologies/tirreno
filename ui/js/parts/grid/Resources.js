@@ -13,31 +13,31 @@ export class ResourcesGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'url-col',
+                className: 'resource-url-col',
                 targets: 0
             },
             {
-                className: 'http-response-code-col',
+                className: 'resource-cnt-col',
                 targets: 1
             },
             {
-                className: 'resources-total-counters-col',
+                className: 'resource-cnt-col',
                 targets: 2
             },
             {
-                className: 'resources-total-counters-col',
+                className: 'resource-cnt-col',
                 targets: 3
             },
             {
-                className: 'resources-total-counters-col',
+                className: 'resource-cnt-col',
                 targets: 4
             },
             {
-                className: 'resources-total-counters-col',
+                className: 'resource-cnt-col',
                 targets: 5
             },
             {
-                className: 'yes-no-col',
+                className: 'resource-cnt-col',
                 targets: 6
             },
             {

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Sensor\Model\Validated;
 
 class HttpCode extends Base {
-    private const INVALIDPLACEHOLDER = '999';
+    private const INVALIDPLACEHOLDER = '0';
     public int $value;
 
     public function __construct(string $value) {

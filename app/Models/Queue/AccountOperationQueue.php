@@ -102,11 +102,36 @@ class AccountOperationQueue extends \Models\BaseSql {
         \Utils\Logger::log(null, $msg);
     }
 
+    public function addBatchIds(array $accountIds, int $key): void {
+        $batchSize = \Utils\Variables::getAccountOperationQueueBatchSize();
+
+        $batch = [];
+        $cnt = 0;
+
+        foreach ($accountIds as $id) {
+            $batch[] = [
+                'accountId' => $id,
+                'key' => $key,
+            ];
+            $cnt++;
+
+            if ($cnt >= $batchSize) {
+                $this->addBatch($batch);
+                $batch = [];
+                $cnt = 0;
+            }
+        }
+
+        if ($cnt) {
+            $this->addBatch($batch);
+        }
+    }
+
     public function isInQueueStatus(int $accountId, int $key): array {
         $this->reset();
         $this->load([
             'event_account = ? AND key = ? AND action = ? AND status != ?',
-            $accountId, $key, $this->actionType->value, \Type\QueueAccountOperationStatusType::Completed,
+            $accountId, $key, $this->actionType->value, \Type\QueueAccountOperationStatusType::COMPLETED,
         ]);
 
         return $this->dry() ? [false, null] : [true, $this->status];
@@ -116,7 +141,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         $this->reset();
         $this->load([
             'event_account = ? AND key = ? AND action = ? AND status != ?',
-            $accountId, $key, $this->actionType->value, \Type\QueueAccountOperationStatusType::Completed,
+            $accountId, $key, $this->actionType->value, \Type\QueueAccountOperationStatusType::COMPLETED,
         ]);
 
         return $this->dry() ? false : true;
@@ -125,7 +150,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     public function isExecuting(): bool {
         $this->load([
             'action = ? AND status = ?',
-            $this->actionType->value, \Type\QueueAccountOperationStatusType::Executing,
+            $this->actionType->value, \Type\QueueAccountOperationStatusType::EXECUTING,
         ]);
 
         return $this->dry() ? false : true;
@@ -137,8 +162,8 @@ class AccountOperationQueue extends \Models\BaseSql {
             'key = ? AND action = ? AND status != ? AND status != ?',
             $key,
             $this->actionType->value,
-            \Type\QueueAccountOperationStatusType::Completed,
-            \Type\QueueAccountOperationStatusType::Failed,
+            \Type\QueueAccountOperationStatusType::COMPLETED,
+            \Type\QueueAccountOperationStatusType::FAILED,
         ]);
 
         return $this->dry() ? false : true;
@@ -151,7 +176,7 @@ class AccountOperationQueue extends \Models\BaseSql {
             WHERE dshb_api.id = queue_account_operation.key';
         $this->load([
             'action = ? AND status = ?',
-            $this->actionType->value, \Type\QueueAccountOperationStatusType::Waiting,
+            $this->actionType->value, \Type\QueueAccountOperationStatusType::WAITING,
         ], ['order' => 'created ASC']);
 
         return $this->dry() ? null : $this->cast();
@@ -161,7 +186,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         $params = [
             ':batchSize' => $batchSize,
             ':action' => $this->actionType->value,
-            ':status' => \Type\QueueAccountOperationStatusType::Waiting,
+            ':status' => \Type\QueueAccountOperationStatusType::WAITING,
         ];
 
         $query = ('
@@ -185,7 +210,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         $params = [
             ':batchSize' => $batchSize,
             ':action' => $this->actionType->value,
-            ':status' => \Type\QueueAccountOperationStatusType::Waiting,
+            ':status' => \Type\QueueAccountOperationStatusType::WAITING,
         ];
 
         $query = ('
@@ -213,7 +238,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         if ($this->loaded()) {
             $now = new \DateTime();
             $this->updated = $now->format(self::DATETIME_FORMAT);
-            $this->status = \Type\QueueAccountOperationStatusType::Waiting;
+            $this->status = \Type\QueueAccountOperationStatusType::WAITING;
             $this->save();
         }
     }
@@ -224,7 +249,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     public function setWaitingForBatch(array $ids): void {
         $this->setStatusForBatch(
             $ids,
-            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::Waiting),
+            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::WAITING),
         );
     }
 
@@ -232,7 +257,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         if ($this->loaded()) {
             $now = new \DateTime();
             $this->updated = $now->format(self::DATETIME_FORMAT);
-            $this->status = \Type\QueueAccountOperationStatusType::Executing;
+            $this->status = \Type\QueueAccountOperationStatusType::EXECUTING;
             $this->save();
         }
     }
@@ -243,7 +268,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     public function setExecutingForBatch(array $ids): void {
         $this->setStatusForBatch(
             $ids,
-            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::Executing),
+            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::EXECUTING),
         );
     }
 
@@ -251,7 +276,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         if ($this->loaded()) {
             $now = new \DateTime();
             $this->updated = $now->format(self::DATETIME_FORMAT);
-            $this->status = \Type\QueueAccountOperationStatusType::Completed;
+            $this->status = \Type\QueueAccountOperationStatusType::COMPLETED;
             $this->save();
         }
     }
@@ -262,7 +287,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     public function setCompletedForBatch(array $ids): void {
         $this->setStatusForBatch(
             $ids,
-            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::Completed),
+            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::COMPLETED),
         );
     }
 
@@ -270,7 +295,7 @@ class AccountOperationQueue extends \Models\BaseSql {
         if ($this->loaded()) {
             $now = new \DateTime();
             $this->updated = $now->format(self::DATETIME_FORMAT);
-            $this->status = \Type\QueueAccountOperationStatusType::Failed;
+            $this->status = \Type\QueueAccountOperationStatusType::FAILED;
             $this->save();
         }
     }
@@ -281,7 +306,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     public function setFailedForBatch(array $ids): void {
         $this->setStatusForBatch(
             $ids,
-            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::Failed),
+            new \Type\QueueAccountOperationStatusType(\Type\QueueAccountOperationStatusType::FAILED),
         );
     }
 
@@ -317,7 +342,7 @@ class AccountOperationQueue extends \Models\BaseSql {
     }
 
     public function unclog(): bool {
-        if ($this->loaded() && $this->status === \Type\QueueAccountOperationStatusType::Executing) {
+        if ($this->loaded() && $this->status === \Type\QueueAccountOperationStatusType::EXECUTING) {
             $updatedDateTime = new \DateTime($this->updated);
             $currentDateTime = new \DateTime();
 
@@ -344,7 +369,7 @@ class AccountOperationQueue extends \Models\BaseSql {
 
         $params = [
             ':daysAgo' => $clearBefore->format(self::DATETIME_FORMAT),
-            ':status' => \Type\QueueAccountOperationStatusType::Completed,
+            ':status' => \Type\QueueAccountOperationStatusType::COMPLETED,
         ];
 
         $query = ('

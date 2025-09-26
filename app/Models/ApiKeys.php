@@ -128,7 +128,21 @@ class ApiKeys extends \Models\BaseSql {
             return [];
         }
 
-        return \json_decode($results[0]['skip_enriching_attributes']);
+        $results = json_decode($results[0]['skip_enriching_attributes']);
+
+        if (!\Utils\Variables::getEmailPhoneAllowed()) {
+            if (!in_array('email', $results, true)) {
+                $results[] = 'email';
+            }
+            if (!in_array('phone', $results, true)) {
+                $results[] = 'phone';
+            }
+            if (!in_array('domain', $results, true)) {
+                $results[] = 'domain';
+            }
+        }
+
+        return $results;
     }
 
     public function enrichableAttributes(int $keyId): array {

@@ -48,7 +48,7 @@ textarea {
     width: 100%;
     height: 70%;
     min-height: 350px;
-    background: url(/ui/images/logo.svg) no-repeat center calc(100% + 1px) / 157px auto, linear-gradient(#2b2a3d 96%, #36354f 100%, #2b2a3d 100%);
+    background: url(/ui/images/logo.svg) no-repeat center calc(100% + 1px) / 270px auto, linear-gradient(#2b2a3d 96%, #36354f 100%, #2b2a3d 100%);
 }
 
 .front-block {
@@ -305,6 +305,7 @@ table th {
 
 .button.is-small {
     font-size: 0.75rem;
+    height: 19px;
 }
 
 .content li+li {
@@ -1200,10 +1201,6 @@ table.dataTable>tbody>tr:hover {
     vertical-align: middle;
 }
 
-#review-queue-table td {
-    padding: 0.3em 0 0.3em 0.75em;
-}
-
 .content table thead th {
     text-align: left;
     font-weight: 400;
@@ -1409,16 +1406,16 @@ input[type="datetime-local"] {
     vertical-align: bottom;
 }
 
-#dasboard-form {
+#dashboard-form {
     float: right;
 }
 
-#dasboard-form .filtersForm {
+#dashboard-form .filtersForm {
     padding: 0;
     margin: 0;
 }
 
-#dasboard-form .dateselector {
+#dashboard-form .dateselector {
     background: #131220;
 }
 
@@ -1672,7 +1669,7 @@ input[type="datetime-local"]::placeholder {
 
 .iptype,
 .no-rules-tile {
-    font-size: 13px;
+    font-size: 12px;
     border: 1px solid #575678;
     padding: 0px 3px;
     border-radius: 2px;
@@ -1754,27 +1751,8 @@ article.tile .columns {
     position: relative;
 }
 
-.clearDates,
 .is-loading .ruleIcon svg {
     display: none !important;
-}
-
-.clearDates {
-    position: relative;
-    width: 16px;
-    margin-right: 0.57em;
-    vertical-align: middle;
-}
-
-.clearDates svg {
-    display: inherit;
-    position: absolute;
-    top: 0;
-    left: -10%;
-}
-
-.mismatched .clearDates {
-    display: inherit !important;
 }
 
 .important-user,
@@ -2071,34 +2049,30 @@ article.tile .columns {
     padding: 0.75rem;
 }
 
-.countryCodeDetails {
-    float: left;
-    padding-right: 5px;
-}
-
-.itemDetails {
-    padding: 0.57em 0.75em;
+.item-details {
+    padding: 0.56em 0.75em;
     display: table;
     width: 100%;
     border-spacing: 0;
+    height: 37px;
 }
 
-.itemDetails p {
+.item-details p {
     margin-left: 0 !important;
 }
 
-.itemDetails span {
+.item-details span {
     display: inline-block;
 }
 
-.itemDetails .detailsTileTitle {
+.item-details .detailsTileTitle {
     width: 88px;
     display: table-cell;
     color: #8180a0;
     white-space: nowrap;
 }
 
-.itemDetails .detailsTileValue {
+.item-details .detailsTileValue {
     width: 124px;
     text-align: right;
     display: table-cell;
@@ -2248,10 +2222,6 @@ article.tile .columns {
     line-height: 1.4;
 }
 
-.lang-col span {
-    width: 46px;
-}
-
 .loading-background {
     display: block;
     background: #575678;
@@ -2387,7 +2357,7 @@ input:is([type="button"], [type="submit"], [type="reset"]):disabled {
     display: inline-block;
 }
 
-.reviewedUsersTile {
+.reviewed-users-tile {
     padding: 2px 4px 2px 4px;
     white-space: nowrap;
     border-radius: 3px;
@@ -2517,186 +2487,17 @@ input:is([type="button"], [type="submit"], [type="reset"]):disabled {
     width: 72px;
 }
 
-.short-yes-no-col {
-    width: 57px;
-}
-
 .title .flag img {
     height: 19px;
     width: 24px;
-}
-
-.country-ico-flag-col {
-    width: 55px;
-}
-
-.country-code-col {
-    width: 133.5px;
-}
-
-.country-full-name-col {
-    width: 145px;
-}
-
-.country-full-name-flag-col {
-    width: 350px;
-}
-
-.country-total-counters-col {
-    width: 153px;
-}
-
-.phone-number-col {
-    width: 160px;
-}
-
-.phone-carrier-name-col {
-    width: 147px;
-}
-
-.phone-type-col {
-    width: 45px;
-}
-
-.ip-type-col {
-    width: 75px;
-}
-
-.ip-col {
-    width: 105px;
-}
-
-.asn-col {
-    width: 50px;
-}
-
-.isp-netname-col {
-    width: 290px;
-}
-
-.ip-netname-col {
-    width: 200px;
-}
-
-.user-total-counters-col,
-.ip-total-counters-col {
-    width: 55px;
-}
-
-.email-col {
-    width: 117px;
-}
-
-.email-reputation-col {
-    width: 70px;
-}
-
-.email-risk-score-short-col {
-    width: 180px;
-}
-
-.email-risk-score-med-col {
-    width: 216px;
-}
-
-.email-risk-score-long-col {
-    width: 270px;
 }
 
 .top-ten-aggregating-col {
     width: 220px;
 }
 
-.userid-col {
-    width: 108px;
-}
-
-.timestamp-col {
-    width: 140px;
-}
-
-.date-col {
-    width: 92px;
-}
-
-.id-type-col {
-    width: 103px;
-}
-
-.id-value-col {
-    width: 210px;
-}
-
-.double-action-button-col {
-    width: 130px;
-}
-
 .action-button-col {
     width: 104px;
-}
-
-.device-type-col {
-    width: 94px;
-}
-
-.event-type-col {
-    width: 125px;
-}
-
-.user-firstname-col {
-    width: 80px;
-}
-
-.user-lastname-col {
-    width: 96px;
-}
-
-.user-review-status-col {
-    width: 86px;
-}
-
-.resources-total-counters-col {
-    width: 110px;
-}
-
-.http-response-code-col {
-    width: 110px;
-}
-
-.url-col {
-    width: 229px;
-}
-
-.total-counters-col {
-    width: 85px;
-}
-
-.domains-total-counters-col {
-    width: 55px;
-}
-
-.phones-total-counters-col {
-    width: 55px;
-}
-
-.ua-part-col {
-    width: 145px;
-}
-
-.lang-col {
-    width: 100px;
-}
-
-.device-id-col {
-    width: 113px;
-}
-
-.domain-col {
-    width: 167px;
-}
-
-.domain-rating-col {
-    width: 92px;
 }
 
 .rules-code-col {
@@ -2723,14 +2524,6 @@ input:is([type="button"], [type="submit"], [type="reset"]):disabled {
     width: 120px;
 }
 
-.error-type-col {
-    width: 200px;
-}
-
-.error-text-col {
-    width: 380px;
-}
-
 .billing-date-col {
     width: 145px;
 }
@@ -2745,14 +2538,6 @@ input:is([type="button"], [type="submit"], [type="reset"]):disabled {
 
 .subscription-plan-col {
     width: 170px;
-}
-
-.audit-id-col {
-    width: 130px;
-}
-
-.audit-value-col {
-    width: 130px;
 }
 
 /* choices styles */
@@ -2907,10 +2692,12 @@ input::placeholder {
 }
 
 .choices__inner {
+    padding: 6px 9px;
+    font-size: 1rem;
+    height: 2.5em;
     display: inline-block;
     vertical-align: top;
     width: 100%;
-    padding: 6px 6px 0px 6px;
     overflow: hidden;
     border-style: solid;
     border-top: 1px solid #000;
@@ -3125,7 +2912,7 @@ input::placeholder {
     border-radius: 0;
     max-width: 100%;
     background: transparent;
-    padding: 2px 0 8px 3px;
+    padding: 2px 3px 8px 0px;
     color: #d7e6e1;
 }
 
@@ -3180,10 +2967,14 @@ input::placeholder {
     margin-right: 20px;
 }
 
-.searchline form {
-    display: inline-block;
-    vertical-align: top;
-    margin-right: 20px;
+.global-search {
+    position: relative;
+}
+
+.global-search .text-loader {
+    position: absolute;
+    right: 10px;
+    top: 10%;
 }
 
 .ignore-select {
@@ -3196,4 +2987,314 @@ input::placeholder {
 .inactive-rulename {
     text-decoration: line-through;
     color: #8180a0;
+}
+
+/* table columns */
+.ip-ip-col {
+    width: 165px;
+}
+
+.ip-country-col {
+    width: 220px;
+}
+
+.ip-asn-col {
+    width: 100px;
+}
+
+.ip-newtwork-col {
+    width: 250px;
+}
+
+.ip-ip-type-col {
+    width: 110px;
+}
+
+.ip-cnt-col {
+    width: 75px;
+}
+
+.country-country-col {
+    width: 375px;
+}
+
+.country-iso-col {
+    width: 155px;
+}
+
+.country-cnt-col {
+    width: 155px;
+}
+
+.isp-asn-col {
+    width: 100px;
+}
+
+.isp-network-col {
+    width: 375px;
+}
+
+.isp-cnt-col {
+    width: 130px;
+}
+
+.domain-domain-col {
+    width: 210px;
+}
+
+.domain-date-col {
+    width: 125px;
+}
+
+.domain-cnt-col {
+    width: 110px;
+}
+
+.resource-url-col {
+    width: 305px;
+}
+
+.resource-cnt-col {
+    width: 115px;
+}
+
+.blacklist-user-col {
+    width: 235px;
+}
+
+.blacklist-timestamp-col {
+    width: 190px;
+}
+
+.blacklist-type-col {
+    width: 140px;
+}
+
+.blacklist-value-col {
+    width: 290px;
+}
+
+.blacklist-button-col {
+    width: 140px;
+}
+
+.review-queue-user-col {
+    width: 255px;
+}
+
+.review-queue-timestamp-col {
+    width: 185px;
+}
+
+.review-queue-name-col {
+    width: 135px;
+}
+
+.review-queue-date-col {
+    width: 120px;
+}
+
+.review-queue-button-col {
+    width: 165px;
+}
+
+.event-user-col {
+    width: 255px;
+}
+
+.event-timestamp-col {
+    width: 200px;
+}
+
+.event-event-type-col {
+    width: 130px;
+}
+
+.event-ip-col {
+    width: 165px;
+}
+
+.event-ip-type-col {
+    width: 110px;
+}
+
+.event-device-col {
+    width: 135px;
+}
+
+.user-user-col {
+    width: 220px;
+}
+
+.user-userid-col {
+    width: 130px;
+}
+
+.user-name-col {
+    width: 135px;
+}
+
+.user-date-col {
+    width: 110px;
+}
+
+.user-timestamp-col {
+    width: 160px;
+}
+
+.user-status-col {
+    width: 115px;
+}
+
+.bot-id-col {
+    width: 185px;
+}
+
+.bot-type-col {
+    width: 250px;
+}
+
+.bot-os-col {
+    width: 370px;
+}
+
+.bot-modified-col {
+    width: 190px;
+}
+
+.logbook-ip-col {
+    width: 130px;
+}
+
+.logbook-timestamp-col {
+    width: 170px;
+}
+
+.logbook-status-col {
+    width: 240px;
+}
+
+.logbook-message-col {
+    width: 455px;
+}
+
+.device-date-col {
+    width: 130px;
+}
+
+.device-type-col {
+    width: 155px;
+}
+
+.device-os-col {
+    width: 210px;
+}
+
+.device-browser-col {
+    width: 230px;
+}
+
+.device-language-col {
+    width: 150px;
+}
+
+.device-modified-col {
+    width: 120px;
+}
+
+.device-language-col span {
+    width: 46px;
+}
+
+.email-email-col {
+    width: 190px;
+}
+
+.email-reputation-col {
+    width: 145px;
+}
+
+.email-free-provider-col {
+    width: 110px;
+}
+
+.email-no-breach-col {
+    width: 110px;
+}
+
+.email-total-breaches-col {
+    width: 110px;
+}
+
+.email-disposable-col {
+    width: 110px;
+}
+
+.email-spam-col {
+    width: 110px;
+}
+
+.email-blacklist-col {
+    width: 110px;
+}
+
+.phone-phonenumber-col {
+    width: 210px;
+}
+
+.phone-invalid-col {
+    width: 110px;
+}
+
+.phone-country-col {
+    width: 200px;
+}
+
+.phone-carrier-col {
+    width: 200px;
+}
+
+.phone-type-col {
+    width: 80px;
+}
+
+.phone-users-col {
+    width: 80px;
+}
+
+.phone-blacklist-col {
+    width: 115px;
+}
+
+.field-audit-trail-date-col {
+    width: 155px;
+}
+
+.field-audit-trail-field-col {
+    width: 210px;
+}
+
+.field-audit-trail-value-col {
+    width: 210px;
+}
+
+.field-audit-trail-parent-col {
+    width: 210px;
+}
+
+.dim-table {
+    opacity: 0.6;
+}
+
+img.device-choice {
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+.tooltipster-base.tooltipster-word-break .tooltipster-content {
+    word-break: break-all;
+}
+
+.word-break {
+    word-break: break-all;
 }

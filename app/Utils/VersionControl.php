@@ -16,15 +16,15 @@
 namespace Utils;
 
 class VersionControl {
-    public const versionMajor = 0;
-    public const versionMinor = 9;
-    public const versionRevision = 8;
+    public const VERSION_MAJOR = 0;
+    public const VERSION_MINOR = 9;
+    public const VERSION_REVISION = 9;
 
     public static function versionString(): string {
-        return sprintf('%d.%d.%d', self::versionMajor, self::versionMinor, self::versionRevision);
+        return sprintf('%d.%d.%d', self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_REVISION);
     }
 
     public static function fullVersionString(): string {
-        return sprintf('v%d.%d.%d', self::versionMajor, self::versionMinor, self::versionRevision);
+        return sprintf('v%d.%d.%d', self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_REVISION);
     }
 }

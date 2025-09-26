@@ -15,35 +15,35 @@ export class DomainsGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'domain-col',
+                className: 'domain-domain-col',
                 targets: 0
             },
             {
-                className: 'yes-no-col',
+                className: 'domain-cnt-col',
                 targets: 1
             },
             {
-                className: 'domain-rating-col',
+                className: 'domain-cnt-col',
                 targets: 2
             },
             {
-                className: 'yes-no-col',
+                className: 'domain-cnt-col',
                 targets: 3
             },
             {
-                className: 'yes-no-col',
+                className: 'domain-cnt-col',
                 targets: 4
             },
             {
-                className: 'date-col',
+                className: 'domain-date-col',
                 targets: 5
             },
             {
-                className: 'domains-total-counters-col',
+                className: 'domain-cnt-col',
                 targets: 6
             },
             {
-                className: 'domains-total-counters-col',
+                className: 'domain-cnt-col',
                 targets: 7
             },
             {

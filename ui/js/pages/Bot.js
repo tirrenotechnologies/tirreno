@@ -12,68 +12,20 @@ import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
 export class BotPage extends BasePage {
 
     constructor() {
-        super();
+        super('bot', true);
 
         this.initUi();
     }
 
     initUi() {
-        const BOT_ID = parseInt(window.location.pathname.replace('/bot/', ''), 10);
+        const usersGridParams   = this.getUsersGridParams();
+        const eventsGridParams  = this.getEventsGridParams();
+        const ipsGridParams     = this.getIpsGridParams();
+        const mapParams         = this.getMapParams();
 
-        const getParams = () => {
-            return {botId: BOT_ID};
-        };
+        const botDetailsTiles   = this.getSelfDetails();
 
-        const usersGridParams = {
-            url:        '/admin/loadUsers',
-            tileId:     'totalUsers',
-            tableId:    'users-table',
-
-            isSortable: false,
-
-            getParams: getParams
-        };
-
-        const eventsGridParams = {
-            url:        '/admin/loadEvents',
-            tileId:     'totalEvents',
-            tableId:    'user-events-table',
-            panelType:  'event',
-
-            isSortable: false,
-
-            getParams: getParams
-        };
-
-        const ipsGridParams = {
-            url:        '/admin/loadIps',
-            tileId:     'totalIps',
-            tableId:    'ips-table',
-
-            isSortable: false,
-            orderByLastseen: true,
-
-            getParams: getParams
-        };
-
-        const botDetailsTiles = {
-            getParams: getParams
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = BOT_ID;
-                const mode      = 'bot';
-
-                return {mode, id};
-            }
-        };
-
-        const mapParams = {
-            getParams:      getParams,
-            tooltipString:  'event',
-            tooltipField:   'total_visit'
-        };
+        const chartParams       = this.getBarChartParams();
 
         new EventPanel();
         new ReenrichmentButton();

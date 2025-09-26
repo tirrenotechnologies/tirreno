@@ -276,6 +276,9 @@ export class BaseGrid {
         this.loader.stop();
         const el = document.getElementById(`${this.config.tableId}_loader`);
         if (el) el.remove();
+
+        const table = document.getElementById(this.config.tableId);
+        table.classList.remove('dim-table');
     }
 
     updateTableFooter(dataTable) {
@@ -298,6 +301,8 @@ export class BaseGrid {
     initTooltips() {
         const tableId = this.config.tableId;
         Tooltip.addTooltipsToGridRecords(tableId);
+        Tooltip.addTooltipToSpans();
+        Tooltip.addTooltipToParagraphs();
     }
 
     onBeforeLoad(e, settings, data) {
@@ -381,6 +386,9 @@ export class BaseGrid {
         this.loader.start(el);
 
         loaderWrapper.style.display = null;
+
+        const table = document.getElementById(this.config.tableId);
+        table.classList.add('dim-table');
     }
 
     onRowClick(e) {

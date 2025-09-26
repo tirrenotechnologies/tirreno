@@ -53,4 +53,7 @@ return [
     'AdminHome_top10_users_with_most_login_fail_tooltip' => 'A list of users with the highest quantity of failed login attempts.',
     'AdminHome_top10_users_with_the_most_ips' => 'Multiple IP addresses',
     'AdminHome_top10_users_with_the_most_ips_tooltip' => 'A list of users with a high number of IP addresses.',
+
+    'AdminHome_clock_day_tooltip' => 'The day of year (DOY) is the sequential day number starting with day 1 on January 1st.',
+    'AdminHome_clock_time_tooltip' => 'Current time in your application based on timezone settings.',
 ];

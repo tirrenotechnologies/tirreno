@@ -26,16 +26,16 @@
                     <include href="templates/parts/choices/scoresRange.html" />
                 </true>
             </check>
-            <table class="table" id="users-table">
+            <table class="table dim-table" id="users-table">
                 <thead>
                     <tr>
-                        <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
-                        <th class="tooltip userid-col" title="{{ @Base_table_column_userid_tooltip }}">{{ @Base_table_column_userid }}</th>
-                        <th class="tooltip user-firstname-col" title="{{ @Base_table_column_user_firstname_tooltip }}">{{ @Base_table_column_user_firstname }}</th>
-                        <th class="tooltip user-lastname-col" title="{{ @Base_table_column_user_lastname_tooltip }}">{{ @Base_table_column_user_lastname }}</th>
-                        <th class="tooltip date-col" title="{{ @Base_table_column_user_registered_tooltip }}">{{ @Base_table_column_user_registered }}</th>
-                        <th class="tooltip timestamp-col" title="{{ @Base_table_column_lastseen_tooltip }}">{{ @Base_table_column_lastseen }}</th>
-                        <th class="tooltip user-review-status-col" title="{{ @Base_table_column_reviewed_status_tooltip }}">{{ @Base_table_column_reviewed_status_short }}</th>
+                        <th class="tooltip user-user-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
+                        <th class="tooltip user-userid-col" title="{{ @Base_table_column_userid_tooltip }}">{{ @Base_table_column_userid }}</th>
+                        <th class="tooltip user-name-col" title="{{ @Base_table_column_user_firstname_tooltip }}">{{ @Base_table_column_user_firstname }}</th>
+                        <th class="tooltip user-name-col" title="{{ @Base_table_column_user_lastname_tooltip }}">{{ @Base_table_column_user_lastname }}</th>
+                        <th class="tooltip user-date-col" title="{{ @Base_table_column_user_registered_tooltip }}">{{ @Base_table_column_user_registered }}</th>
+                        <th class="tooltip user-timestamp-col" title="{{ @Base_table_column_lastseen_tooltip }}">{{ @Base_table_column_lastseen }}</th>
+                        <th class="tooltip user-status-col" title="{{ @Base_table_column_reviewed_status_tooltip }}">{{ @Base_table_column_reviewed_status_short }}</th>
                     </tr>
                 </thead>
             </table>

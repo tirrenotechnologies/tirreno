@@ -12,7 +12,7 @@ export class DevicesGrid extends BaseGridWithPanel {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'date-col',
+                className: 'device-date-col',
                 targets: 0
             },
             {
@@ -20,19 +20,19 @@ export class DevicesGrid extends BaseGridWithPanel {
                 targets: 1
             },
             {
-                className: 'ua-part-col',
+                className: 'device-os-col',
                 targets: 2
             },
             {
-                className: 'ua-part-col',
+                className: 'device-browser-col',
                 targets: 3
             },
             {
-                className: 'lang-col',
+                className: 'device-language-col',
                 targets: 4
             },
             {
-                className: 'yes-no-col',
+                className: 'device-modified-col',
                 targets: 5
             },
             {

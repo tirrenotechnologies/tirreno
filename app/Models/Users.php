@@ -121,13 +121,6 @@ class Users extends \Models\BaseSql {
         );
         $result = array_merge($result, array_column($this->execQuery($query, $params), 'id'));
 
-        $result = array_unique($result);
-
-        $res = [];
-        foreach ($result as $id) {
-            $res[] = ['accountId' => $id, 'key' => $apiKey];
-        }
-
-        return $res;
+        return array_unique($result);
     }
 }

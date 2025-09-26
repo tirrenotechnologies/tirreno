@@ -16,8 +16,9 @@
 return [
     'AdminEvents_page_title' => 'Events',
     'AdminEvents_breadcrumb_title' => 'Events',
-    'AdminEvents_search_placeholder' => 'User Email, Timestamp, IP, HTTP Code',
+    'AdminEvents_search_placeholder' => 'User ID, Timestamp, IP, HTTP Code',
     'AdminEvents_event_type_search_placeholder' => '+ Add another event type',
+    'AdminEvents_device_type_search_placeholder' => '+ Add another device type',
 
     'AdminEvents_table_title' => 'Events',
     'AdminEvents_table_title_tooltip' => 'This page lists events recorded during a selected period of time. To see extended event details, click on a table row. The chart shows the number of events recorded each day.',

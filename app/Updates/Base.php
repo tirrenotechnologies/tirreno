@@ -18,7 +18,7 @@ namespace Updates;
 abstract class Base {
     public static $version = '';
 
-    abstract public static function up($db);
+    abstract public static function apply($db);
 
     public static function isApplied($updatesModel) {
         return $updatesModel->isApplied(static::$version, 'core');

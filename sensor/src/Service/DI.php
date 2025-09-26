@@ -145,6 +145,7 @@ class DI {
             new LogbookRepository($pdo),
             new ApiKeyRepository($pdo),
             new EventIncorrectRepository($pdo),
+            $this->config?->allowEmailPhone ?? false,
         );
     }
 
@@ -231,6 +232,18 @@ class DI {
         return null;
     }
 
+    private function loadAppVersion(): ?string {
+        $path = __DIR__ . '/../../../app/Utils/VersionControl.php';
+
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
+
+        require_once $path;
+
+        return \Utils\VersionControl::versionString();
+    }
+
     private function getConfig(): Config {
         if ($this->config !== null) {
             return $this->config;
@@ -240,13 +253,18 @@ class DI {
         $config = array_merge($config, getenv());
         $dbConfig = $this->parseDatabaseConfig($config);
 
+        $version = $this->loadAppVersion();
+        $ua = $config['USER_AGENT'] ?? null;
+        $ua = ($version && $ua) ? $ua . '/' . strval($version) : $ua;
+
         if (isset($dbConfig)) {
             $this->config = new Config(
-                databaseConfig: $dbConfig,
-                enrichmentApiUrl: $config['ENRICHMENT_API'] ?? null,
-                scoreApiUrl: $config['SCORE_API_URL'] ?? null,
-                userAgent: $config['USER_AGENT'] ?? null,
-                debugLog: isset($config['DEBUG']) ? (bool) $config['DEBUG'] : false,
+                databaseConfig:     $dbConfig,
+                enrichmentApiUrl:   $config['ENRICHMENT_API'] ?? null,
+                scoreApiUrl:        $config['SCORE_API_URL'] ?? null,
+                userAgent:          $ua,
+                debugLog:           isset($config['DEBUG']) ? (bool) $config['DEBUG'] : false,
+                allowEmailPhone:    $config['ALLOW_EMAIL_PHONE'] ?? false,
             );
 
             $this->getLogger()->logDebug('Config loaded from ENV variables: ' . json_encode($this->config, \JSON_THROW_ON_ERROR));

@@ -44,7 +44,7 @@ export class UserGridActionButtons {
     }
 
     onSuccessCount(data) {
-        const span = document.querySelector('span.reviewedUsersTile');
+        const span = document.querySelector('span.reviewed-users-tile');
         span.textContent = data.total;
     }
 

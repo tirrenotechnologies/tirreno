@@ -10,7 +10,7 @@ import {ReviewQueueChart} from '../parts/chart/ReviewQueue.js?v=2';
 export class ReviewQueuePage extends BasePage {
 
     constructor() {
-        super();
+        super('review-queue');
         this.tableId = 'review-queue-table';
         this.initUi();
     }
@@ -20,15 +20,7 @@ export class ReviewQueuePage extends BasePage {
         const searchFilter  = new SearchFilter();
         const rulesFilter   = new RulesFilter();
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'review-queue';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         const gridParams = {
             url:            '/admin/loadReviewQueue',

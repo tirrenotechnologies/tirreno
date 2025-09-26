@@ -18,8 +18,8 @@ declare(strict_types=1);
 namespace Type;
 
 class QueueAccountOperationActionType extends Enum {
-    public const Blacklist = 'blacklist';
-    public const CalulcateRiskScore = 'calculate_risk_score';
-    public const Delete = 'delete';
-    public const Enrichment = 'enrichment';
+    public const BLACKLIST              = 'blacklist';
+    public const CALCULATE_RISK_SCORE   = 'calculate_risk_score';
+    public const DELETE                 = 'delete';
+    public const ENRICHMENT             = 'enrichment';
 }

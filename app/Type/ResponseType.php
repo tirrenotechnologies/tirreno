@@ -18,6 +18,6 @@ declare(strict_types=1);
 namespace Type;
 
 class ResponseType extends Enum {
-    public const Single = 'single';
-    public const Collection = 'collection';
+    public const SINGLE     = 'single';
+    public const COLLECTION = 'collection';
 }

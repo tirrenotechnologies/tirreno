@@ -34,7 +34,6 @@ class Page extends \Controllers\Pages\Base {
             'HTML_FILE'                 => 'admin/api.html',
             'JS'                        => 'admin_api.js',
             'API_URL'                   => \Utils\Variables::getSiteWithProtocol() . '/sensor/',
-            'NOT_CHECKED'               => $dataController->getNotCheckedEntitiesForLoggedUser(),
             'SCHEDULED_FOR_ENRICHMENT'  => $scheduledForEnrichment,
         ];
 
@@ -52,6 +51,8 @@ class Page extends \Controllers\Pages\Base {
         [$isOwner, $apiKeys] = $dataController->getOperatorApiKeysDetails($operatorId);
         $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;
+
+        $pageParams['NOT_CHECKED'] = $dataController->getNotCheckedEntitiesForLoggedUser();
 
         return parent::applyPageParams($pageParams);
     }

@@ -17,7 +17,9 @@
 
     <div class="bottom-line">
         <div>
-            <a href="/forgot-password">{{ @Login_form_forgot_password_link }}</a>
+            <check if="{{ @ALLOW_FORGOT_PASSWORD }}">
+                <a href="/forgot-password">{{ @Login_form_forgot_password_link }}</a>
+            </check>
         </div>
         <div class="control">
             <button id="submit-button" class="button is-primary" type="submit">{{ @Login_form_signin_button }}</button>

@@ -10,7 +10,7 @@ export class IpTypeFilter extends BaseFilter {
             '#ip-type-selectors',
             renderIpTypeSelectorItem,
             renderIpTypeSelectorChoice,
-            'ipTypeFilterChanged',
+            'ipTypeFilterChanged'
         );
     }
 }

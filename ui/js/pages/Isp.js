@@ -11,68 +11,18 @@ import {IspTiles} from '../parts/details/IspTiles.js?v=2';
 export class IspPage extends BasePage {
 
     constructor() {
-        super();
+        super('isp', true);
 
         this.initUi();
     }
 
     initUi() {
-        const ISP_ID = parseInt(window.location.pathname.replace('/isp/', ''), 10);
-
-        const getParams = () => {
-            return {ispId: ISP_ID};
-        };
-
-        const usersGridParams = {
-            url:        '/admin/loadUsers',
-            tileId:     'totalUsers',
-            tableId:    'users-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const ispDetailsTiles = {
-            getParams: getParams,
-        };
-
-        const eventsGridParams = {
-            url:        '/admin/loadEvents',
-            tileId:     'totalEvents',
-            tableId:    'user-events-table',
-            panelType:  'event',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const ipsGridParams = {
-            url:        '/admin/loadIps',
-            tileId:     'totalIps',
-            tableId:    'ips-table',
-
-            isSortable:         false,
-            orderByLastseen:    true,
-
-            getParams:          getParams,
-        };
-
-        const mapParams = {
-            getParams:      getParams,
-            tooltipString:  'event',
-            tooltipField:   'total_visit',
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = ISP_ID;
-                const mode      = 'isp';
-
-                return {mode, id};
-            }
-        };
+        const ispDetailsTiles   = this.getSelfDetails();
+        const usersGridParams   = this.getUsersGridParams();
+        const eventsGridParams  = this.getEventsGridParams();
+        const ipsGridParams     = this.getIpsGridParams();
+        const mapParams         = this.getMapParams();
+        const chartParams       = this.getBarChartParams();
 
         new EventPanel();
 

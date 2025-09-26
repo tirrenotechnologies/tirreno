@@ -18,27 +18,27 @@ export class ReviewQueueGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'email-risk-score-short-col',
+                className: 'review-queue-user-col',
                 targets: 0
             },
             {
-                className: 'timestamp-col',
+                className: 'review-queue-timestamp-col',
                 targets: 1
             },
             {
-                className: 'user-firstname-col',
+                className: 'review-queue-name-col',
                 targets: 2
             },
             {
-                className: 'user-lastname-col',
+                className: 'review-queue-name-col',
                 targets: 3
             },
             {
-                className: 'date-col',
+                className: 'review-queue-date-col',
                 targets: 4
             },
             {
-                className: 'double-action-button-col',
+                className: 'review-queue-button-col',
                 targets: 5
             }
         ];

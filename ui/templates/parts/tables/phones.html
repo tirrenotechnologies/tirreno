@@ -24,16 +24,16 @@
                 <include href="templates/parts/forms/searchForm.html" />
                 </true>
             </check>
-            <table class="table" id="phones-table">
+            <table class="table dim-table" id="phones-table">
                 <thead>
                     <tr>
-                        <th class="tooltip phone-number-col" title="{{ @Base_table_column_user_phone_tooltip }}">{{ @Base_table_column_user_phone }}</th>
-                        <th class="tooltip yes-no-col" title="{{ @Base_table_column_phone_invalid_tooltip }}">{{ @Base_table_column_phone_invalid }}</th>
-                        <th class="tooltip country-full-name-col" title="{{ @Base_table_column_phone_country_tooltip }}">{{ @Base_table_column_country }}</th>
-                        <th class="tooltip phone-carrier-name-col" title="{{ @Base_table_column_phone_carrier_name_tooltip }}">{{ @Base_table_column_phone_carrier_name }}</th>
+                        <th class="tooltip phone-phonenumber-col" title="{{ @Base_table_column_user_phone_tooltip }}">{{ @Base_table_column_user_phone }}</th>
+                        <th class="tooltip phone-invalid-col" title="{{ @Base_table_column_phone_invalid_tooltip }}">{{ @Base_table_column_phone_invalid }}</th>
+                        <th class="tooltip phone-country-col" title="{{ @Base_table_column_phone_country_tooltip }}">{{ @Base_table_column_country }}</th>
+                        <th class="tooltip phone-carrier-col" title="{{ @Base_table_column_phone_carrier_name_tooltip }}">{{ @Base_table_column_phone_carrier_name }}</th>
                         <th class="tooltip phone-type-col" title="{{ @Base_table_column_phone_type_tooltip }}">{{ @Base_table_column_phone_type }}</th>
-                        <th class="tooltip phones-total-counters-col" title="{{ @Base_table_column_total_users_tooltip_phones }}">{{ @Base_table_column_total_users }}</th>
-                        <th class="tooltip yes-no-col" title="{{ @Base_table_column_phone_blacklist_tooltip }}">{{ @Base_table_column_phone_blacklist }}</th>
+                        <th class="tooltip phone-users-col" title="{{ @Base_table_column_total_users_tooltip_phones }}">{{ @Base_table_column_total_users }}</th>
+                        <th class="tooltip phone-blacklist-col" title="{{ @Base_table_column_phone_blacklist_tooltip }}">{{ @Base_table_column_phone_blacklist }}</th>
                         {***<!-- TODO: return alert_list back in next release -->
                         <!-- <th class="tooltip yes-no-col" title="{{ @Base_table_column_global_alert_tooltip }}">{{ @Base_table_column_global_alert }}</th> -->***}
                     </tr>

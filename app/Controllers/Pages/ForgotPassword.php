@@ -19,6 +19,10 @@ class ForgotPassword extends Base {
     public $page = 'ForgotPassword';
 
     public function getPageParams(): array {
+        if (!\Utils\Variables::getForgotPasswordAllowed()) {
+            return [];
+        }
+
         $pageParams = [
             'HTML_FILE' => 'forgotPassword.html',
         ];

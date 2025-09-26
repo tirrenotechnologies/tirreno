@@ -26,6 +26,7 @@ class Config implements \JsonSerializable {
         public ?string $scoreApiUrl = null,
         public ?string $userAgent = null,
         public bool $debugLog = false,
+        public bool $allowEmailPhone = false,
     ) {
     }
 

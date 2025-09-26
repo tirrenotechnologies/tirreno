@@ -18,8 +18,8 @@ declare(strict_types=1);
 namespace Type;
 
 class QueueAccountOperationStatusType extends Enum {
-    public const Waiting = 'waiting';
-    public const Executing = 'executing';
-    public const Completed = 'completed';
-    public const Failed = 'failed';
+    public const WAITING    = 'waiting';
+    public const EXECUTING  = 'executing';
+    public const COMPLETED  = 'completed';
+    public const FAILED     = 'failed';
 }

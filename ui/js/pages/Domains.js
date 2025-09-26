@@ -8,7 +8,7 @@ import {DomainsGrid} from '../parts/grid/Domains.js?v=2';
 export class DomainsPage extends BasePage {
 
     constructor() {
-        super();
+        super('domains');
 
         this.initUi();
     }
@@ -37,15 +37,7 @@ export class DomainsPage extends BasePage {
             }
         };
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'domains';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         new DomainsChart(chartParams);
         new DomainsGrid(gridParams);

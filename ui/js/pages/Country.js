@@ -11,67 +11,17 @@ import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 export class CountryPage extends BasePage {
 
     constructor() {
-        super();
+        super('country', true);
 
         this.initUi();
     }
 
     initUi() {
-        const COUNTRY_ID = parseInt(window.location.pathname.replace('/country/', ''), 10);
-
-        const getParams = () => {
-            return {countryId: COUNTRY_ID};
-        };
-
-        const usersGridParams = {
-            url:        '/admin/loadUsers',
-            tileId:     'totalUsers',
-            tableId:    'users-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const eventsGridParams = {
-            url:        '/admin/loadEvents',
-            tileId:     'totalEvents',
-            tableId:    'user-events-table',
-            panelType:  'event',
-
-            isSortable: false,
-
-            getParams: getParams,
-        };
-
-        const ispsGridParams = {
-            url:        '/admin/loadIsps',
-            tableId:    'isps-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const ipsGridParams = {
-            url:        '/admin/loadIps',
-            tileId:     'totalIps',
-            tableId:    'ips-table',
-
-            isSortable:         false,
-            orderByLastseen:    true,
-
-            getParams: getParams
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = COUNTRY_ID;
-                const mode      = 'country';
-
-                return {mode, id};
-            }
-        };
+        const usersGridParams   = this.getUsersGridParams();
+        const eventsGridParams  = this.getEventsGridParams();
+        const ispsGridParams    = this.getIspsGridParams();
+        const ipsGridParams     = this.getIpsGridParams();
+        const chartParams       = this.getBarChartParams();
 
         const tilesParams = {
             elems: ['totalUsers', 'totalIps', 'totalEvents']

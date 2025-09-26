@@ -7,6 +7,7 @@ export class EventsChart extends BaseLineChart {
             this.getSingleSeries('Regular events', 'green'),
             this.getSingleSeries('Warning events', 'yellow'),
             this.getSingleSeries('Alert events', 'red'),
+            this.getSingleSeries('Unauthenticated events', 'purple'),
         ];
     }
 }

@@ -22,7 +22,7 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
     public function __construct() {
         parent::__construct();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Enrichment);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         $this->apiKeysModel = new \Models\ApiKeys();

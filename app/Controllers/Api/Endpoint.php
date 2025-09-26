@@ -44,7 +44,7 @@ abstract class Endpoint {
         $this->connectToDb(false);
 
         $this->response = new \Views\Json();
-        $this->responseType = new \Type\ResponseType(\Type\ResponseType::Single);
+        $this->responseType = new \Type\ResponseType(\Type\ResponseType::SINGLE);
     }
 
     public function beforeRoute(): void {

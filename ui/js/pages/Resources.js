@@ -8,7 +8,7 @@ import {ResourcesGrid} from '../parts/grid/Resources.js?v=2';
 export class ResourcesPage extends BasePage {
 
     constructor() {
-        super();
+        super('resources');
 
         this.initUi();
     }
@@ -37,15 +37,7 @@ export class ResourcesPage extends BasePage {
             }
         };
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'resources';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         new ResourcesChart(chartParams);
         new ResourcesGrid(gridParams);

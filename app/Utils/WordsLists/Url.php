@@ -13,10 +13,10 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Utils;
+namespace Utils\WordsLists;
 
-class SuspiciousWordsUrl extends SuspiciousWords {
-    protected static string $extensionFile = 'url.txt';
+class Url extends Base {
+    protected static string $extensionFile = 'url.php';
 
     protected static array $words = [
         '%00',
@@ -47,16 +47,12 @@ class SuspiciousWordsUrl extends SuspiciousWords {
         '..\/',
         './',
         '.\\',
-        '.asp',
-        '.aspx',
         '.env',
         '.env.example',
         '.exe',
         '.git',
         '.htaccess',
         '.htpasswd',
-        '.jsp',
-        '.php',
         '.sh',
         '.well-known/',
         '/*',
@@ -75,7 +71,6 @@ class SuspiciousWordsUrl extends SuspiciousWords {
         '/old',
         '/pki-validation',
         '/proc',
-        '/query',
         '/sandbox',
         '/secrets',
         '/solr',
@@ -98,9 +93,7 @@ class SuspiciousWordsUrl extends SuspiciousWords {
         'CdRom0',
         'GLOBALROOT',
         'Inetpub',
-        'PHP',
         'SELECT%20',
-        'ads.txt',
         'alert(',
         'apache',
         'autoload',
@@ -144,7 +137,6 @@ class SuspiciousWordsUrl extends SuspiciousWords {
         'passwords.txt',
         'phpmyadmin',
         'plugins',
-        'robots.txt',
         'select%20',
         'sftp.json',
         'sh_history',

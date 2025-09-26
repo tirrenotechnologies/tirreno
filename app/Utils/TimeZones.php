@@ -78,9 +78,14 @@ class TimeZones {
         $now = time();
         $daySeconds = 24 * 60 * 60;
 
+        $date = new \DateTime();
+        $date->setTimestamp($now - ($daySeconds * $days) - (($now + $offset) % $daySeconds));
+
+        $date->setTime(0, 0, 0);
+
         return [
             'endDate'   => date(self::FORMAT, $now),
-            'startDate' => date(self::FORMAT, $now - ($daySeconds * $days) - (($now + $offset) % $daySeconds)),
+            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset),
             'offset'    => $offset,
         ];
     }
@@ -113,23 +118,6 @@ class TimeZones {
         return [
             'endDate'   => date(self::FORMAT, $now),
             'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset - (($dow - 1) * 24 * 60 * 60)),
-            'offset'    => $offset,
-        ];
-    }
-
-    public static function getCurMonthRange(int $offset = 0): array {
-        $now = time();
-
-        $date = new \DateTime();
-        $date->setTimestamp($now + $offset);
-
-        $date->setTime(0, 0, 0);
-
-        $day = (int) $date->format('j');
-
-        return [
-            'endDate'   => date(self::FORMAT, $now),
-            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset - (($day - 1) * 24 * 60 * 60)),
             'offset'    => $offset,
         ];
     }

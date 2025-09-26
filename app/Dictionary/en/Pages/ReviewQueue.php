@@ -17,7 +17,7 @@ return [
     'AdminReviewQueue_page_title' => 'Review queue',
     'AdminReviewQueue_breadcrumb_title' => 'Review queue',
 
-    'AdminReviewQueue_search_placeholder' => 'User Email, Name, Last seen and Signup date',
+    'AdminReviewQueue_search_placeholder' => 'User Name, Last seen and Signup date',
 
     'AdminReviewQueue_table_title' => 'Users for review',
     'AdminReviewQueue_table_title_tooltip' => 'This page lists users with low trust scores and facilitates their removal from the queue by performing a review process. To open a page with more information on a user, click on an email address. The chart shows the number of users added to the review queue each day during a selected period of time.',

@@ -84,16 +84,16 @@ class Query extends \Models\Grid\Base\Query {
             FULL OUTER JOIN event_url_query
             ON (event.query = event_url_query.id)
 
-            INNER JOIN event_device
+            LEFT JOIN event_device
             ON (event.device = event_device.id)
 
-            INNER JOIN event_type
+            LEFT JOIN event_type
             ON (event.type = event_type.id)
 
-            INNER JOIN event_ua_parsed
+            LEFT JOIN event_ua_parsed
             ON (event_device.user_agent = event_ua_parsed.id)
 
-            INNER JOIN event_ip
+            LEFT JOIN event_ip
             ON (event.ip = event_ip.id)
 
             LEFT JOIN event_isp
@@ -115,6 +115,7 @@ class Query extends \Models\Grid\Base\Query {
 
         $this->applySearch($query, $queryParams);
         $this->applyEventTypes($query, $queryParams);
+        $this->applyDeviceTypes($query, $queryParams);
         $this->applyRules($query, $queryParams);
         $this->applyOrder($query);
         $this->applyLimit($query, $queryParams);
@@ -181,11 +182,17 @@ class Query extends \Models\Grid\Base\Query {
                 INNER JOIN countries
                 ON (event_ip.country = countries.id)
 
-                INNER JOIN event_type
-                ON (event.type = event_type.id)
-
                 LEFT JOIN event_email
                 ON (event.email = event_email.id)
+
+                LEFT JOIN event_device
+                ON (event.device = event_device.id)
+
+                LEFT JOIN event_type
+                ON (event.type = event_type.id)
+
+                LEFT JOIN event_ua_parsed
+                ON (event_device.user_agent = event_ua_parsed.id)
 
                 WHERE
                     event.key = :api_key
@@ -194,6 +201,7 @@ class Query extends \Models\Grid\Base\Query {
 
             $this->applySearch($query, $queryParams);
             $this->applyEventTypes($query, $queryParams);
+            $this->applyDeviceTypes($query, $queryParams);
             $this->applyRules($query, $queryParams);
         }
 
@@ -301,6 +309,40 @@ class Query extends \Models\Grid\Base\Query {
         foreach ($eventTypeIds as $key => $eventTypeId) {
             $clauses[] = 'event.type = :event_type_id_' . $key;
             $queryParams[':event_type_id_' . $key] = $eventTypeId;
+        }
+
+        $query .= ' AND (' . implode(' OR ', $clauses) . ')';
+    }
+
+    private function applyDeviceTypes(string &$query, array &$queryParams): void {
+        $deviceTypes = $this->f3->get('REQUEST.deviceTypes');
+        if ($deviceTypes === null || !count($deviceTypes)) {
+            return;
+        }
+
+        $clauses = [];
+        foreach ($deviceTypes as $key => $deviceType) {
+            if ($deviceType === 'other') {
+                $placeholders = [];
+
+                foreach (\Utils\Constants::get('DEVICE_TYPES') as $device) {
+                    if ($device !== 'unknown' && $device !== 'other') {
+                        $param = ':device_exclude_' . $device;
+                        $placeholders[] = $param;
+                        $queryParams[$param] = $device;
+                    }
+                }
+
+                $params = implode(', ', $placeholders);
+
+                $clauses[] = '(event_ua_parsed.device NOT IN (' . $params . ') AND event_ua_parsed.device IS NOT NULL)';
+            } elseif ($deviceType === 'unknown') {
+                $clauses[] = 'event_ua_parsed.device IS NULL';
+            } else {
+                $param = ':device_' . $key;
+                $clauses[] = 'event_ua_parsed.device = ' . $param;
+                $queryParams[$param] = $deviceType;
+            }
         }
 
         $query .= ' AND (' . implode(' OR ', $clauses) . ')';

@@ -62,6 +62,10 @@ class Navigation extends Base {
     public function visitForgotPasswordPage(): void {
         $this->redirectIfLogged();
 
+        if (!\Utils\Variables::getForgotPasswordAllowed()) {
+            $this->f3->reroute('/');
+        }
+
         $pageController = new \Controllers\Pages\ForgotPassword();
         $this->response->data = $pageController->getPageParams();
     }

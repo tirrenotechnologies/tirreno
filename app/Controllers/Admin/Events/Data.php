@@ -87,4 +87,8 @@ class Data extends \Controllers\Base {
 
         return $model->getAll();
     }
+
+    public function getAllDeviceTypes(): array {
+        return \Utils\Constants::get('DEVICE_TYPES');
+    }
 }

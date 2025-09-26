@@ -9,7 +9,7 @@ import {LogbookChart} from '../parts/chart/Logbook.js?v=2';
 export class LogbookPage extends BasePage {
 
     constructor() {
-        super();
+        super('logbook');
 
         this.initUi();
     }
@@ -18,15 +18,7 @@ export class LogbookPage extends BasePage {
         const datesFilter   = new DatesFilter();
         const searchFilter  = new SearchFilter();
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'logbook';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         const gridParams = {
             url:            '/admin/loadLogbook',

@@ -14,58 +14,19 @@ import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
 export class DomainPage extends BasePage {
 
     constructor() {
-        super();
+        super('domain', true);
 
         this.initUi();
     }
 
     initUi() {
-        const DOMAIN_ID = parseInt(window.location.pathname.replace('/domain/', ''), 10);
-
-        const getParams = () => {
-            return {domainId: DOMAIN_ID};
-        };
-
-        const usersGridParams = {
-            url:        '/admin/loadUsers',
-            tileId:     'totalUsers',
-            tableId:    'users-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const eventsGridParams = {
-            url:        '/admin/loadEvents',
-            tileId:     'totalEvents',
-            tableId:    'user-events-table',
-            panelType:  'event',
-
-            isSortable: false,
-
-            getParams: getParams,
-        };
-
-        const ipsGridParams = {
-            url:        '/admin/loadIps',
-            tileId:     'totalIps',
-            tableId:    'ips-table',
-
-            isSortable:         false,
-            orderByLastseen:    true,
-
-            getParams: getParams,
-        };
-
-        const ispsGridParams = {
-            url:        '/admin/loadIsps',
-            tableId:    'isps-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
+        const usersGridParams       = this.getUsersGridParams();
+        const eventsGridParams      = this.getEventsGridParams();
+        const ipsGridParams         = this.getIpsGridParams();
+        const ispsGridParams        = this.getIspsGridParams();
+        const mapParams             = this.getMapParams();
+        const domainDetailsTiles    = this.getSelfDetails();
+        const chartParams           = this.getBarChartParams();
 
         const domainsGridParams = {
             url:        '/admin/loadDomains',
@@ -74,41 +35,21 @@ export class DomainPage extends BasePage {
 
             isSortable: false,
 
-            getParams: getParams,
-        };
-
-
-        const mapParams = {
-            getParams:      getParams,
-            tooltipString:  'event',
-            tooltipField:   'total_visit',
-        };
-
-        const domainDetailsTiles = {
-            getParams: getParams,
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = DOMAIN_ID;
-                const mode      = 'domain';
-
-                return {mode, id};
-            }
+            getParams: this.getParams,
         };
 
         new EventPanel();
         new ReenrichmentButton();
 
         const elements = [
-            [DomainTiles,           domainDetailsTiles],
-            [UsersGrid,             usersGridParams],
-            [DomainsGrid,           domainsGridParams],
-            [Map,                   mapParams],
-            [IpsGrid,               ipsGridParams],
-            [IspsGrid,              ispsGridParams],
-            [BaseBarChart,          chartParams],
-            [EventsGrid,            eventsGridParams],
+            [DomainTiles,   domainDetailsTiles],
+            [UsersGrid,     usersGridParams],
+            [DomainsGrid,   domainsGridParams],
+            [Map,           mapParams],
+            [IpsGrid,       ipsGridParams],
+            [IspsGrid,      ispsGridParams],
+            [BaseBarChart,  chartParams],
+            [EventsGrid,    eventsGridParams],
         ];
 
         new SequentialLoad(elements);

@@ -31,6 +31,7 @@ class LogbookManager {
         private LogbookRepository $logbookRepository,
         private ApiKeyRepository $apiKeyRepository,
         private EventIncorrectRepository $eventIncorrectRepository,
+        private bool $allowEmailPhone,
     ) {
     }
 
@@ -72,7 +73,7 @@ class LogbookManager {
     }
 
     public function getApiKeyDto(?string $apiKeyString): ?GetApiKeyDto {
-        return $apiKeyString !== null ? $this->apiKeyRepository->getApiKey($apiKeyString) : null;
+        return $apiKeyString !== null ? $this->apiKeyRepository->getApiKey($apiKeyString, $this->allowEmailPhone) : null;
     }
 
     public function setApiKeyDto(?GetApiKeyDto $apiKeyDto): void {

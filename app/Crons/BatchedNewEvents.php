@@ -26,7 +26,7 @@ class BatchedNewEvents extends AbstractCron {
         $this->cursorModel = new \Models\Queue\QueueNewEventsCursor();
         $this->eventsModel = new \Models\Events();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 

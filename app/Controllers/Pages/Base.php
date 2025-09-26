@@ -45,6 +45,7 @@ abstract class Base {
     }
 
     public function getInternalPageTitleWithPostfix(string $title): string {
+        $title = $title ? $title : \Utils\Constants::get('UNAUTHORIZED_USERID');
         $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
         $title = sprintf('%s %s', $safeTitle, \Utils\Constants::get('PAGE_TITLE_POSTFIX'));
 
@@ -113,6 +114,8 @@ abstract class Base {
             $params['TIME_HIS'] = date('H:i:s', $now);
             $params['TIMEZONE'] = 'UTC' . (($offset < 0) ? '-' . date('H:i', -$offset) : '+' . date('H:i', $offset));
         }
+
+        $params['ALLOW_EMAIL_PHONE'] = \Utils\Variables::getEmailPhoneAllowed();
 
         $page = $this->page;
         \Utils\DictManager::load($page);

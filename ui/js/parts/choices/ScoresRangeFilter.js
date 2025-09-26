@@ -10,7 +10,7 @@ export class ScoresRangeFilter extends BaseFilter {
             '#scores-range-selectors',
             renderScoresRangeSelectorItem,
             renderScoresRangeSelectorChoice,
-            'scoresRangeFilterChanged',
+            'scoresRangeFilterChanged'
         );
     }
 }

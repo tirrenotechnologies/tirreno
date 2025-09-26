@@ -19,19 +19,19 @@ export class PhonesGrid extends BaseGridWithPanel {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'phone-number-col',
+                className: 'phone-phonenumber-col',
                 targets: 0
             },
             {
-                className: 'yes-no-col',
+                className: 'phone-invalid-col',
                 targets: 1
             },
             {
-                className: 'country-full-name-col',
+                className: 'phone-country-col',
                 targets: 2
             },
             {
-                className: 'phone-carrier-name-col',
+                className: 'phone-carrier-col',
                 targets: 3
             },
             {
@@ -39,11 +39,11 @@ export class PhonesGrid extends BaseGridWithPanel {
                 targets: 4
             },
             {
-                className: 'phones-total-counters-col',
+                className: 'phone-users-col',
                 targets: 5
             },
             {
-                className: 'yes-no-col',
+                className: 'phone-blacklist-col',
                 targets: 6
             },
             //  TODO: return alert_list back in next release

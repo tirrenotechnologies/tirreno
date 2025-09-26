@@ -15,7 +15,7 @@ export class EmailsGrid extends BaseGridWithPanel {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'email-col',
+                className: 'email-email-col',
                 targets: 0
             },
             {
@@ -23,27 +23,27 @@ export class EmailsGrid extends BaseGridWithPanel {
                 targets: 1
             },
             {
-                className: 'yes-no-col',
+                className: 'email-free-provider-col',
                 targets: 2
             },
             {
-                className: 'medium-yes-no-col',
+                className: 'email-no-breach-col',
                 targets: 3
             },
             {
-                className: 'medium-yes-no-col',
+                className: 'email-total-breaches-col',
                 targets: 4
             },
             {
-                className: 'medium-yes-no-col',
+                className: 'email-disposable-col',
                 targets: 5
             },
             {
-                className: 'medium-yes-no-col',
+                className: 'email-spam-col',
                 targets: 6
             },
             {
-                className: 'short-yes-no-col',
+                className: 'email-blacklist-col',
                 targets: 7
             },
             //  TODO: return alert_list back in next release

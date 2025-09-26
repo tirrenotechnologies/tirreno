@@ -36,6 +36,7 @@ use Sensor\Model\Validated\UserAgent;
 use Sensor\Model\Validated\BrowserLanguage;
 use Sensor\Model\Validated\EventType;
 use Sensor\Model\Validated\HttpMethod;
+use Sensor\Model\Validated\UserCreated;
 use Sensor\Model\Validated\Payloads\FieldEditPayload;
 use Sensor\Model\Validated\Payloads\PageSearchPayload;
 use Sensor\Model\Validated\Payloads\EmailChangePayload;
@@ -57,7 +58,7 @@ class RequestFactory {
 
         $eventTime = new Timestamp($data['eventTime']);
 
-        $userCreated = isset($data['userCreated']) ? (new Timestamp($data['userCreated'])) : null;
+        $userCreated = isset($data['userCreated']) ? (new UserCreated($data['userCreated'])) : null;
 
         $referer = isset($data['httpReferer']) ? (new HttpReferer($data['httpReferer'])) : null;
         $httpCode = isset($data['httpCode']) ? (new HttpCode($data['httpCode'])) : null;
@@ -106,8 +107,14 @@ class RequestFactory {
 
         $changedParams = self::changedParams($validatedParams);
 
-        $email = !isset($data['emailAddress']) && !isset($data['userName']) ? Email::makePlaceholder() : $email;
-        $username = $username === null ? md5($email->value) : $username->value;
+        //$email = !isset($data['emailAddress']) && !isset($data['userName']) ? Email::makePlaceholder() : $email;
+        //$username = $username === null ? md5($email->value) : $username->value;
+
+        if ($email === null && $username === null) {
+            $username = 'N/A';
+        } else {
+            $username = $username === null ? md5($email->value) : $username->value;
+        }
 
         return new CreateEventDto(
             $firstname?->value,

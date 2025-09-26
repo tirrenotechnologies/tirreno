@@ -10,7 +10,7 @@ export class EntityTypeFilter extends BaseFilter {
             '#entity-type-selectors',
             renderEntityTypeSelectorItem,
             renderEntityTypeSelectorChoice,
-            'entityTypeFilterChanged',
+            'entityTypeFilterChanged'
         );
     }
 }

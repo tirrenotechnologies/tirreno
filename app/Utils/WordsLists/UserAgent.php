@@ -13,10 +13,10 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Utils;
+namespace Utils\WordsLists;
 
-class SuspiciousWordsUserAgent extends SuspiciousWords {
-    protected static string $extensionFile = 'user-agent.txt';
+class UserAgent extends Base {
+    protected static string $extensionFile = 'user-agent.php';
 
     protected static array $words = [
         '--',

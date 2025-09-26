@@ -8,7 +8,7 @@ import {IspsGrid} from '../parts/grid/Isps.js?v=2';
 export class IspsPage extends BasePage {
 
     constructor() {
-        super();
+        super('isps');
 
         this.initUi();
     }
@@ -37,15 +37,7 @@ export class IspsPage extends BasePage {
             }
         };
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'isps';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            }
-        };
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         new IspsChart(chartParams);
         new IspsGrid(gridParams);

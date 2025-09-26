@@ -22,6 +22,7 @@ import {
     MAX_STRING_USERID_LENGTH_IN_TABLE,
     MAX_STRING_USER_NAME_IN_TABLE,
     MAX_STRING_DEVICE_OS_LENGTH,
+    MAX_STRING_LENGTH_URL,
     MAX_TOOLTIP_URL_LENGTH,
     MAX_TOOLTIP_LENGTH,
 
@@ -42,7 +43,8 @@ import {
     HYPHEN,
 } from './utils/Constants.js?v=2';
 
-const isDashboardPage    = () => !!document.getElementById('mostActiveUsers');
+const isDashboardPage = () => !!document.getElementById('most-active-users');
+
 const getNumberOfSymbols = (length = 'default') => {
     if (isDashboardPage()) {
         return MAX_STRING_LENGTH_IN_TABLE_ON_DASHBOARD;
@@ -61,7 +63,7 @@ const getNumberOfSymbols = (length = 'default') => {
     }
 };
 
-const tooltipWrap = (tooltip, value, wrap = true) => {
+const tooltipWrap = (tooltip, value, wrap = true, wordBreak = false) => {
     let node = (typeof value === 'string') ? document.createTextNode(value) : value;
 
     let result = (wrap) ? document.createElement('span') : node;
@@ -72,13 +74,16 @@ const tooltipWrap = (tooltip, value, wrap = true) => {
 
     if (tooltip !== null && tooltip !== undefined && tooltip !== '') {
         result.classList.add('tooltip');
+        if (wordBreak) {
+            result.classList.add('tooltipster-word-break');
+        }
         result.title = tooltip;
     }
 
     return result;
 };
 
-const truncateWithHellip = (value, n) => {
+const truncateWithHellip = (value, n, wordBreak = false) => {
     let tooltip = value;
 
     if (value && value.length > (n + 2)) {
@@ -89,7 +94,7 @@ const truncateWithHellip = (value, n) => {
         tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
     }
 
-    return tooltipWrap(tooltip, renderDefaultIfEmpty(value), true);
+    return tooltipWrap(tooltip, renderDefaultIfEmpty(value), true, wordBreak);
 };
 
 const wrapWithCountryDiv = html => {
@@ -458,6 +463,42 @@ const renderIpTypeSelectorChoice = (classNames, data, itemSelectText) => {
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
+const renderDeviceTypeSelectorItem = (classNames, data) => {
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+
+    const deviceIsNormal = NORMAL_DEVICES.includes(value);
+    const deviceTypeImg = deviceIsNormal ? value : 'unknown';
+    const img = document.createElement('img');
+    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.className = 'device-choice';
+
+    const name = document.createTextNode(value);
+
+    innerHtml.appendChild(img);
+    innerHtml.appendChild(name);
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderDeviceTypeSelectorChoice = (classNames, data, itemSelectText) => {
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+
+    const deviceIsNormal = NORMAL_DEVICES.includes(value);
+    const deviceTypeImg = deviceIsNormal ? value : 'unknown';
+    const img = document.createElement('img');
+    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.className = 'device-choice';
+
+    const name = document.createTextNode(value);
+
+    innerHtml.appendChild(img);
+    innerHtml.appendChild(name);
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
 const renderEntityTypeSelectorItem = (classNames, data) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
@@ -562,8 +603,12 @@ const renderTotalFrame = (base, val) => {
     return frag;
 };
 
-const renderUserCounter = (data, critical = 1) => {
+const renderUserCounter = (data, critical = 1, hyphenOnEmpty = false) => {
     let span = null;
+
+    if (hyphenOnEmpty && !data) {
+        return renderDefaultIfEmptyElement(data);
+    }
 
     if (Number.isInteger(data) && data >= 0) {
         let style = (data >= critical) ? 'highlight' : 'nolight';
@@ -705,7 +750,9 @@ const renderSession = (record) => {
         const min_t = renderTimeString(record.session_min_t).split(' ');
         let value = `${cnt} action`;
         value += (cnt > 1) ? `s (${formatTime(record.session_duration)})` : '';
-        const tooltip = (cnt > 1) ? `${min_t[0]} ${min_t[1] || ''} - ${max_t[1] || ''}` : `${max_t[0]} ${max_t[1] || ''}`;
+        const tooltip = (cnt > 1)
+            ? `${min_t[0]} ${min_t[1] || ''} - ${max_t[1] || ''}`
+            : `${max_t[0]} ${max_t[1] || ''}`;
         const el = document.createTextNode(value);
         result = tooltipWrap(tooltip, el, true);
     } else {
@@ -1127,12 +1174,11 @@ const renderUsersList = (data) => {
 
 //Resource
 const renderResource = (value, tooltip) => {
-    const n = getNumberOfSymbols();
+    const n = isDashboardPage() ? getNumberOfSymbols() : MAX_STRING_LENGTH_URL;
     value = value ? value : '/';
-    tooltip = tooltip ? tooltip : '/';
 
-    const el = truncateWithHellip(value, n);
-    el.title = tooltip;
+    const el = truncateWithHellip(value, n, true);
+    el.title = tooltip ? tooltip : '/';
 
     return el;
 };
@@ -1163,10 +1209,10 @@ const renderResourceWithQueryAndEventType = record => {
 
     const el = document.createElement('p');
     el.className = `bullet ${record.event_type}`;
-    frag.appendChild(tooltipWrap(tooltip, el, false));
+    frag.appendChild(tooltipWrap(tooltip, el, false, true));
 
     const text = document.createTextNode(record.event_type_name);
-    frag.appendChild(tooltipWrap(tooltip, text, true));
+    frag.appendChild(tooltipWrap(tooltip, text, true, true));
 
     return frag;
 };
@@ -1286,7 +1332,7 @@ const renderNetName = (record, length = 'default') => {
         name = name.replace(/\b\w+/g, capitalizeValue);
 
         //TODO: move to constants
-        const len = length === 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE; 
+        const len = length === 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE;
         span = truncateWithHellip(name, len);
     }
 
@@ -1492,9 +1538,8 @@ const renderLanguage = record => {
 
     codeAndRegion = codeAndRegion.join('-');
     if (codeAndRegion) {
-        el = document.createElement('span');
-        el.className = 'nolight';
-        el.textContent = codeAndRegion;
+        el = tooltipWrap(language, codeAndRegion, true, true);
+        el.classList.add('nolight');
     }
 
     return renderDefaultIfEmptySpan(el);
@@ -1568,11 +1613,17 @@ const renderTextarea = (value, h=4, w=37) => {
 };
 
 const renderQuery = record => {
-    return renderTextarea(record.query);
+    const result = renderTextarea(record.query);
+    result.classList.add('word-break');
+
+    return result;
 };
 
 const renderReferer = record => {
-    return renderTextarea(record.referer);
+    const result = renderTextarea(record.referer);
+    result.classList.add('word-break');
+
+    return result;
 };
 
 const renderUserAgent = record => {
@@ -1802,9 +1853,15 @@ const renderRulePlayResult = (users, count, uid) => {
 
 const renderChartTooltipPart = (color, label, val) => {
     const span = document.createElement('span');
-    span.className = 'chart-tooltip';
-    span.style.backgroundColor = color;
-    span.textContent = `${label}: ${val}`;
+
+    if (label !== null) {
+        span.style.backgroundColor = color;
+        span.className = 'chart-tooltip';
+        span.textContent = `${label}: ${val}`;
+    } else {
+        span.style.color = color;
+        span.textContent = val;
+    }
 
     return span;
 };
@@ -1832,6 +1889,8 @@ export {
     renderEventTypeSelectorChoice,
     renderIpTypeSelectorItem,
     renderIpTypeSelectorChoice,
+    renderDeviceTypeSelectorItem,
+    renderDeviceTypeSelectorChoice,
     renderEntityTypeSelectorItem,
     renderEntityTypeSelectorChoice,
     renderScoresRangeSelectorItem,

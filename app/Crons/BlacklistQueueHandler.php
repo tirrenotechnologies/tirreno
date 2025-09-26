@@ -19,7 +19,7 @@ class BlacklistQueueHandler extends AbstractQueueCron {
     public function __construct() {
         parent::__construct();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
     }
 

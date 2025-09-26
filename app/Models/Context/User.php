@@ -37,6 +37,7 @@ class User extends Base {
         $query = (
             "SELECT
                 event_account.id                        AS ea_id,
+                event_account.userid                    AS ea_userid,
                 event_account.created                   AS ea_created,
                 event_account.lastseen                  AS ea_lastseen,
                 event_account.total_visit               AS ea_total_visit,

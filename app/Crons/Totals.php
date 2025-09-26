@@ -22,7 +22,7 @@ class Totals extends AbstractCron {
         $start = time();
         $models = \Utils\Constants::get('REST_TOTALS_MODELS');
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
         $queueModel = new \Models\Queue\AccountOperationQueue($actionType);
         $keys = $queueModel->getNextBatchKeysInQueue(\Utils\Variables::getAccountOperationQueueBatchSize());
 
@@ -33,6 +33,8 @@ class Totals extends AbstractCron {
             $s = time();
             $model = new $modelClass();
             foreach ($keys as $key) {
+                (new \Models\SessionStat())->updateStats($key);
+
                 $cnt = $model->updateAllTotals($key);
                 $res[$name]['cnt'] += $cnt;
                 if (time() - $start > \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {

@@ -29,7 +29,7 @@ class ApiKeyRepository {
     ) {
     }
 
-    public function getApiKey(string $apiKey): ?GetApiKeyDto {
+    public function getApiKey(string $apiKey, bool $allowEmailPhone): ?GetApiKeyDto {
         if (array_key_exists($apiKey, $this->cache)) {
             return $this->cache[$apiKey];
         }
@@ -55,11 +55,11 @@ class ApiKeyRepository {
             $result['key'],
             $result['token'],
             !$result['skip_blacklist_sync'],
-            \in_array(SkippedEnrichingAttributeType::Domain, $skipEnrichingAttributes, true),
-            \in_array(SkippedEnrichingAttributeType::Email, $skipEnrichingAttributes, true),
+            $allowEmailPhone ? \in_array(SkippedEnrichingAttributeType::Domain, $skipEnrichingAttributes, true) : true,
+            $allowEmailPhone ? \in_array(SkippedEnrichingAttributeType::Email, $skipEnrichingAttributes, true) : true,
             \in_array(SkippedEnrichingAttributeType::Ip, $skipEnrichingAttributes, true),
             \in_array(SkippedEnrichingAttributeType::UserAgent, $skipEnrichingAttributes, true),
-            \in_array(SkippedEnrichingAttributeType::Phone, $skipEnrichingAttributes, true),
+            $allowEmailPhone ? \in_array(SkippedEnrichingAttributeType::Phone, $skipEnrichingAttributes, true) : true,
         );
 
         return $this->cache[$apiKey];

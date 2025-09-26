@@ -8,12 +8,15 @@ import {BotsGrid} from '../parts/grid/Bots.js?v=2';
 export class BotsPage extends BasePage {
 
     constructor() {
-        super();
+        super('bots');
 
         this.initUi();
     }
 
     initUi() {
+        const datesFilter  = new DatesFilter();
+        const searchFilter = new SearchFilter();
+
         const gridParams = {
             url:        '/admin/loadBots',
             // tileId:  'totalDevices',
@@ -29,18 +32,7 @@ export class BotsPage extends BasePage {
             },
         };
 
-        const chartParams = {
-            getParams: function() {
-                const mode        = 'bots';
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            },
-        };
-
-        const datesFilter  = new DatesFilter();
-        const searchFilter = new SearchFilter();
+        const chartParams = this.getChartParams(datesFilter, searchFilter);
 
         new BotsChart(chartParams);
         new BotsGrid(gridParams);

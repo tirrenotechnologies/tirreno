@@ -25,8 +25,9 @@ class Events extends Base {
         $line1      = array_column($data, 'event_normal_type_count');
         $line2      = array_column($data, 'event_editing_type_count');
         $line3      = array_column($data, 'event_alert_type_count');
+        $line4      = array_column($data, 'unauthorized_event_count');
 
-        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3, $line4]);
     }
 
     private function getFirstLine(int $apiKey): array {
@@ -48,6 +49,7 @@ class Events extends Base {
             ':start_time'   => $dateRange['startDate'],
             ':resolution'   => $this->getResolution($request),
             ':offset'       => strval($offset),
+            ':unauth'       => \Utils\Constants::get('UNAUTHORIZED_USERID'),
         ];
         $params = array_merge($params, $alertTypesParams);
         $params = array_merge($params, $editTypesParams);
@@ -58,10 +60,14 @@ class Events extends Base {
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(CASE WHEN event.type IN ({$normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
                 COUNT(CASE WHEN event.type IN ({$editFlatIds})    THEN TRUE END) AS event_editing_type_count,
-                COUNT(CASE WHEN event.type IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count
+                COUNT(CASE WHEN event.type IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count,
+                COUNT(CASE WHEN event_account.userid = :unauth    THEN TRUE END) AS unauthorized_event_count
 
             FROM
                 event
+
+            LEFT JOIN event_account
+            ON event.account = event_account.id
 
             WHERE
                 event.key = :api_key AND

@@ -19,31 +19,31 @@ export class UsersGrid extends BaseGrid {
     get columnDefs() {
         const columnDefs = [
             {
-                className: 'email-risk-score-short-col',
+                className: 'user-user-col',
                 targets: 0
             },
             {
-                className: 'userid-col',
+                className: 'user-userid-col',
                 targets: 1
             },
             {
-                className: 'user-firstname-col',
+                className: 'user-name-col',
                 targets: 2
             },
             {
-                className: 'user-lastname-col',
+                className: 'user-name-col',
                 targets: 3
             },
             {
-                className: 'date-col',
+                className: 'user-date-col',
                 targets: 4
             },
             {
-                className: 'timespamp-col',
+                className: 'user-timestamp-col',
                 targets: 5
             },
             {
-                className: 'user-review-status-col',
+                className: 'user-status-col',
                 targets: 6
             },
             {

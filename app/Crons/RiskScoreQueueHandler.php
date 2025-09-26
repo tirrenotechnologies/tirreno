@@ -22,7 +22,7 @@ class RiskScoreQueueHandler extends AbstractQueueCron {
     public function __construct() {
         parent::__construct();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
         $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
         $this->rulesModel = new \Models\OperatorsRules();
 
@@ -33,9 +33,10 @@ class RiskScoreQueueHandler extends AbstractQueueCron {
     public function processQueue(): void {
         if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
             $this->log('Risk score queue is already being executed by another cron job.');
-        } else {
-            $this->processItems($this->accountOpQueueModel);
+
+            return;
         }
+        $this->processItems($this->accountOpQueueModel);
     }
 
     protected function processItem(array $item): void {

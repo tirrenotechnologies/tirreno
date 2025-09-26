@@ -6,9 +6,8 @@ import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 import {EventsGrid} from '../parts/grid/Events.js?v=2';
 import {DevicesGrid} from '../parts/grid/Devices.js?v=2';
 import {BaseBarChart} from '../parts/chart/BaseBar.js?v=2';
-import {StaticTiles} from '../parts/StaticTiles.js?v=2';
+import {BaseSparklineChart} from '../parts/chart/BaseSparkline.js?v=2';
 import {UserTiles} from '../parts/details/UserTiles.js?v=2';
-import {UserEnrichmentTiles} from '../parts/details/UserEnrichmentTiles.js?v=2';
 import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 import {SingleReviewButton} from '../parts/SingleReviewButton.js?v=2';
 import {ScoreDetails} from '../parts/ScoreDetails.js?v=2';
@@ -24,52 +23,33 @@ import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
 export class UserPage extends BasePage {
 
     constructor() {
-        super();
+        super('user', true);
 
         this.initUi();
     }
 
     initUi() {
-        const ACCOUNT_ID = parseInt(window.location.pathname.replace('/id/', ''), 10);
+        const userDetailsTiles  = this.getSelfDetails();
+        const devicesGridParams = this.getDevicesGridParams();
+        const ipsGridParams     = this.getIpsGridParams();
+        const ispsGridParams    = this.getIspsGridParams();
+        const eventsGridParams  = this.getEventsGridParams();
+        eventsGridParams.sessionGroup = true;
+        eventsGridParams.singleUser = true;
 
-        const getParams = () => {
-            return {userId: ACCOUNT_ID};
+        const mapParams         = this.getMapParams();
+        const chartParams       = this.getBarChartParams();
+        const statsChartParams  = {
+            getParams: () => ({
+                mode:   'stats',
+                id:     this.id,
+            }),
         };
 
-        const devicesGridParams = {
-            url:        '/admin/loadDevices',
-            tileId:     'totalDevices',
-            tableId:    'devices-table',
-            panelType:  'device',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const eventsGridParams = {
-            url:            '/admin/loadEvents',
-            tileId:         'totalEvents',
-            tableId:        'user-events-table',
-            panelType:      'event',
-
-            sessionGroup:   true,
-            singleUser:     true,
-            isSortable:     false,
-
-            getParams:      getParams,
-        };
-
-        const ipsGridParams = {
-            url:        '/admin/loadIps',
-            tileId:     'totalIps',
-            tableId:    'ips-table',
-
-            isSortable:         false,
-            orderByLastseen:    true,
-
-            getParams:  getParams,
-        };
+        ipsGridParams.tileId        = null;
+        eventsGridParams.tileId     = null;
+        devicesGridParams.tileId    = null;
+        mapParams.tileId            = null;
 
         const emailsGridParams = {
             url:        '/admin/loadEmails',
@@ -78,7 +58,7 @@ export class UserPage extends BasePage {
 
             isSortable: false,
 
-            getParams:  getParams,
+            getParams:  this.getParams,
         };
 
         const phonesGridParams = {
@@ -88,7 +68,7 @@ export class UserPage extends BasePage {
 
             isSortable: false,
 
-            getParams:  getParams,
+            getParams:  this.getParams,
         };
 
         const fieldAuditTrailGridParams = {
@@ -97,68 +77,44 @@ export class UserPage extends BasePage {
 
             isSortable: false,
 
-            getParams:  getParams,
-        };
-
-        const ispsGridParams = {
-            url:        '/admin/loadIsps',
-            tableId:    'isps-table',
-
-            isSortable: false,
-
-            getParams:  getParams,
-        };
-
-        const mapParams = {
-            getParams:      getParams,
-            tooltipString:  'event',
-            tooltipField:   'total_visit',
-        };
-
-        const userDetailsTiles = {
-            getParams:  getParams,
+            getParams:  this.getParams,
         };
 
         const userScoreDetails = {
-            userId:     ACCOUNT_ID,
-        };
-
-        const chartParams = {
-            getParams: function() {
-                const id        = ACCOUNT_ID;
-                const mode      = 'user';
-
-                return {mode, id};
-            }
-        };
-
-        const tilesParams = {
-            elems: ['totalCountries', 'totalIps', 'totalDevices', 'totalEvents']
+            userId:     this.id,
         };
 
         new ScoreDetails(userScoreDetails);
-        new StaticTiles(tilesParams);
 
-        new SingleReviewButton(ACCOUNT_ID);
+        new SingleReviewButton(this.id);
         new EventPanel();
-        new EmailPanel();
-        new PhonePanel();
         new DevicePanel();
         new ReenrichmentButton();
 
+        const isEmailPhone = !!document.getElementById('email-card');
+
+        if (isEmailPhone) {
+            new EmailPanel();
+            new PhonePanel();
+        }
+
         const elements = [
             [UserTiles,             userDetailsTiles],
-            [UserEnrichmentTiles,   userDetailsTiles],
+            [BaseSparklineChart,    statsChartParams],
             [Map,                   mapParams],
             [IpsGrid,               ipsGridParams],
             [IspsGrid,              ispsGridParams],
             [DevicesGrid,           devicesGridParams],
-            [EmailsGrid,            emailsGridParams],
-            [PhonesGrid,            phonesGridParams],
-            [FieldAuditTrailGrid,   fieldAuditTrailGridParams],
-            [BaseBarChart,          chartParams],
-            [EventsGrid,            eventsGridParams],
         ];
+
+        if (isEmailPhone) {
+            elements.push([EmailsGrid, emailsGridParams]);
+            elements.push([PhonesGrid, phonesGridParams]);
+        }
+
+        elements.push([FieldAuditTrailGrid, fieldAuditTrailGridParams]);
+        elements.push([BaseBarChart,        chartParams]);
+        elements.push([EventsGrid,          eventsGridParams]);
 
         new SequentialLoad(elements);
     }

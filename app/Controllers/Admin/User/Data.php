@@ -66,7 +66,7 @@ class Data extends \Controllers\Base {
 
         if ($apiKey) {
             $accountId = (int) $params['accountid'];
-            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Delete);
+            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
             $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
             $code = \Utils\ErrorCodes::REST_API_USER_ALREADY_SCHEDULED_FOR_DELETION;
@@ -157,7 +157,7 @@ class Data extends \Controllers\Base {
     }
 
     public function addToBlacklistQueue(int $accountId, bool $fraud, int $apiKey): void {
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
         $inQueue = $accountOpQueueModel->isInQueue($accountId, $apiKey);
 
@@ -179,7 +179,7 @@ class Data extends \Controllers\Base {
 
     public function addToCalulcateRiskScoreQueue(int $accountId): void {
         $apiKey = $this->getCurrentOperatorApiKeyObject();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
         $inQueue = $accountOpQueueModel->isInQueue($accountId, $apiKey->id);
 
@@ -192,7 +192,7 @@ class Data extends \Controllers\Base {
      * @param array{accountId: int, key: int}[] $accounts
      */
     public function addBatchToCalulcateRiskScoreQueue(array $accounts): void {
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CalulcateRiskScore);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         $accountOpQueueModel->addBatch($accounts);
@@ -234,22 +234,22 @@ class Data extends \Controllers\Base {
 
     public function getScheduledForDeletion(int $userId): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Delete);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         [$scheduled, $status] = $accountOpQueueModel->isInQueueStatus($userId, $apiKey);
 
-        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::Failed) ? \Utils\ErrorCodes::USER_DELETION_FAILED : null];
+        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::FAILED) ? \Utils\ErrorCodes::USER_DELETION_FAILED : null];
     }
 
     public function getScheduledForBlacklist(int $userId): array {
         $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::Blacklist);
+        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
         $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
 
         [$scheduled, $status] = $accountOpQueueModel->isInQueueStatus($userId, $apiKey);
 
-        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::Failed) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
+        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::FAILED) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
     }
 
     public function setFraudFlag(int $accountId, bool $fraud, int $apiKey): array {

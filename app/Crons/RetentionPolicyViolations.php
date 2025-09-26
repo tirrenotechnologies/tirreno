@@ -20,9 +20,9 @@ class RetentionPolicyViolations extends AbstractCron {
         $this->log('Start retention policy violations.');
 
         $eventsModel = new \Models\Events();
-        $retentionPoliciesModel = new \Models\RetentionPolicies();
+        $retentionModel = new \Models\RetentionPolicies();
 
-        $retentionKeys = $retentionPoliciesModel->getRetentionKeys();
+        $retentionKeys = $retentionModel->getRetentionKeys();
         $cnt = 0;
 
         foreach ($retentionKeys as $key) {

@@ -3,7 +3,7 @@
 namespace Controllers\Admin\Rules\Set;
 
 class E27 extends BaseRule {
-    public const NAME = 'Breaches';
+    public const NAME = 'Email breaches';
     public const DESCRIPTION = 'Email appears in data breaches.';
     public const ATTRIBUTES = ['email'];
 

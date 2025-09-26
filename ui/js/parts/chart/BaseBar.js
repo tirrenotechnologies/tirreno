@@ -51,7 +51,7 @@ export class BaseBarChart extends BaseChart {
         maxLvl = data.length;
 
         for (let i = 0; i < data[0].length; i++) {
-            let topMet = false;;
+            let topMet = false;
             for (let j = maxLvl; j > 1; j--) {
                 if (stacked[j][i] <= stacked[j-1][i] && !topMet) {
                     stacked[j][i] = null;
@@ -78,8 +78,21 @@ export class BaseBarChart extends BaseChart {
             accum[i] = 0;
         }
 
+        let el;
+
         for (i = 1; i < data.length; i++) {
-            data2.push(omit(i) ? data[i] : data[i].map((v, i) => (accum[i] += +v)));
+            el = data[i];
+
+            if (!omit(i)) {
+                el = el.map((v, j) => {
+                    let val = accum[j] + +v;
+                    accum[j] = val;
+
+                    return val;
+                });
+            }
+
+            data2.push(el);
         }
 
         for (i = 1; i < data.length; i++) {
@@ -106,9 +119,9 @@ export class BaseBarChart extends BaseChart {
 
         opts.bands = stacked.bands;
 
-        opts.series.forEach((s, si) => {
+        opts.series.forEach((s, sIdx) => {
             if (s) {
-                s.value = (u, v, si, i) => u.data[si][i];
+                s.value = (u, v, si, i) => u.data[sIdx][i];
 
                 s.points = s.points || {};
                 s.points.filter = (u, seriesIdx, show, gaps) => {
@@ -126,108 +139,72 @@ export class BaseBarChart extends BaseChart {
         return opts;
     }
 
-    tooltipsPlugin(opts, resolution = 'day', defaultVal = '0') {
-        let self = this;
-        let seriestt;
+    tooltipCursor(u, seriestt, opts, resolution, defaultVal) {
+        const left = u.cursor.left;
+        const idx  = u.cursor.idx;
+        const col  = [];
 
-        function init(u, opts, data) {
-            let over = u.over;
-
-            let tt = document.createElement('div');
-            tt.className = 'tooltipline';
-            tt.textContent = '';
-            tt.style.pointerEvents = 'none';
-            tt.style.position = 'absolute';
-            tt.style.background = 'rgba(0,0,0,1)';
-            over.appendChild(tt);
-            seriestt = tt;
-
-            over.addEventListener('mouseleave', () => {
-                if (!u.cursor._lock) {
-                    tt.style.display = 'none';
-                }
-            });
-
-            over.addEventListener('mouseenter', () => {
-                tt.style.display = u.data.length > 1 ? null : 'none';
-            });
-
-            tt.style.display = (u.cursor.left < 0) ? 'none' : null;
+        if (opts && opts.cursorMemo) {
+            opts.cursorMemo.set(left, top);
         }
 
-        function setCursor(u) {
-            const {left, idx} = u.cursor;
-            const col = [];
+        seriestt.style.display = 'none';
 
-            if (opts && opts.cursorMemo) {
-                opts.cursorMemo.set(left, top);
+        if (left >= 0 && u.data) {
+            let xVal = u.data[0][idx];
+
+            let maxLvl = u.data.length - 1;
+
+            for (let i = 0; i <= maxLvl; i++) {
+                col.push(u.data[i][idx]);
             }
 
-            if (left >= 0 && u.data) {
-                let xVal = u.data[0][idx];
+            const vtp = (resolution === 'day') ? 'DAY' : ((resolution === 'hour') ? 'HOUR' : 'MINUTE');
+            let ts = '';
 
-                let maxLvl = u.data.length - 1;
+            if (Number.isInteger(xVal)) {
+                const useTime = resolution === 'hour' || resolution === 'minute';
+                ts = formatIntTimeUtc(xVal * 1000, useTime);
+            }
 
-                for (let i = 0; i <= maxLvl; i++) {
-                    col.push(u.data[i][idx]);
-                }
+            let frag = document.createDocumentFragment();
+            frag.appendChild(document.createTextNode(ts.replace(/\./g, '/')));
 
-                const vtp = (resolution === 'day') ? 'DAY' : ((resolution === 'hour') ? 'HOUR' : 'MINUTE');
-                let ts = '';
+            let prev = null;
 
-                if (Number.isInteger(xVal)) {
-                    const useTime = resolution === 'hour' || resolution === 'minute';
-                    ts = formatIntTimeUtc(xVal * 1000, useTime);
-                }
+            let maxVal = 0;
+            let maxIdx = 0;
 
-                let frag = document.createDocumentFragment();
-                frag.appendChild(document.createTextNode(ts.replace(/\./g, '/')));
-
-                let prev = null;
-
-                let maxVal = 0;
-                let maxIdx = 0;
-
-                for (let i = maxLvl; i >= 1; i--) {
-                    if (col[i] === null) {
-                        col[i] = 0;
-                    } else {
-                        if (maxVal < col[i]) {
-                            maxVal = col[i];
-                            maxIdx = i;
-                        }
-
-                        if (prev !== null) {
-                            col[prev] -= col[i];
-                        }
-
-                        prev = i;
-                    }
-                }
-
-                for (let i = 2; i <= maxLvl; i++) {
-                    frag = self.extendTooltipFragment(i, null, col, defaultVal, u, frag);
-                }
-
-                if (frag.children.length > 1) {
-                    seriestt.replaceChildren(frag);
-
-                    seriestt.style.top = Math.round(u.valToPos(maxVal, u.series[maxIdx].scale)) + 'px';
-                    seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
-                    seriestt.style.display = null;
+            for (let i = maxLvl; i >= 1; i--) {
+                if (col[i] === null) {
+                    col[i] = 0;
                 } else {
-                    seriestt.style.display = 'none';
+                    if (maxVal < col[i]) {
+                        maxVal = col[i];
+                        maxIdx = i;
+                    }
+
+                    if (prev !== null) {
+                        col[prev] -= col[i];
+                    }
+
+                    prev = i;
                 }
-            } else {
-                seriestt.style.display = 'none';
+            }
+
+            for (let i = 2; i <= maxLvl; i++) {
+                frag = this.extendTooltipFragment(i, null, col, defaultVal, u, frag);
+            }
+
+            if (frag.children.length > 1) {
+                seriestt.replaceChildren(frag);
+
+                seriestt.style.top = Math.round(u.valToPos(maxVal, u.series[maxIdx].scale)) + 'px';
+                seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
+                seriestt.style.display = null;
             }
         }
 
-        return {
-            hooks: {
-                init,
-                setCursor,
-            },
-        };
+        return [seriestt, opts];
     }
 }

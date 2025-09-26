@@ -44,11 +44,11 @@ return [
     'AdminApi_data_enrichment_title_tooltip' => 'Choose the components of event information to enhance by additionally applying internal, external, and open-sourced data.',
     'AdminApi_data_enrichment_save_button' => 'Save',
     'AdminApi_data_enrichment_attributes' => [
-        'domain' => 'Domain',
-        'email' => 'Email',
-        'ip' => 'IP address',
-        'ua' => 'User agent',
-        'phone' => 'Phone',
+        'domain' => 'Domain enrichment',
+        'email' => 'Email enrichment',
+        'ip' => 'IP address enrichment',
+        'ua' => 'User agent enrichment',
+        'phone' => 'Phone enrichment',
     ],
     'AdminApi_data_enrichment_success_message' => 'Enrichment settings have been updated successfully.',
 
@@ -58,7 +58,7 @@ return [
     'AdminApi_form_field_token_label' => 'Enrichment key',
     'AdminApi_form_field_token_placeholder' => 'TIR:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=',
     'AdminApi_current_token_tooltip' => 'Current key: ',
-    'AdminApi_form_confirmationMessage' => 'You can use a limited version of tirreno without a paid subscription or choose to enrich one or several types of data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
+    'AdminApi_form_confirmationMessage' => 'You can use a limited version of tirreno without a paid subscription or choose to enrich IP data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
 
     'AdminApi_token_management_title' => 'Enrichment subscription management',
     'AdminApi_token_management_title_tooltip' => 'Usage statistics and subscription key management',

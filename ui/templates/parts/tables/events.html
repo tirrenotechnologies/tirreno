@@ -57,25 +57,26 @@
                     <include href="templates/parts/forms/searchForm.html" />
                     <include href="templates/parts/choices/eventType.html" />
                     <include href="templates/parts/choices/rules.html" />
+                    <include href="templates/parts/choices/deviceType.html" />
                 </true>
             </check>
 
-            <table class="table" id="user-events-table">
+            <table class="table dim-table" id="user-events-table">
                 <thead>
                     <tr>
                         <check if="{{ isset(@USER) }}">
                             <true>
-                                <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_session_tooltip }}">{{ @Base_table_column_session }}</th>
+                                <th class="tooltip event-user-col" title="{{ @Base_table_column_session_tooltip }}">{{ @Base_table_column_session }}</th>
                             </true>
                             <false>
-                                <th class="tooltip email-risk-score-short-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
+                                <th class="tooltip event-user-col" title="{{ @Base_table_column_user_risk_score_and_email_tooltip }}">{{ @Base_table_column_user_risk_score_and_email }}</th>
                             </false>
                         </check>
-                        <th class="tooltip timestamp-col" title="{{ @Base_table_column_last_action_timestamp_tooltip }}">{{ @Base_table_column_last_action_timestamp }}</th>
-                        <th class="tooltip event-type-col" title="{{ @Base_table_column_event_type_tooltip }}">{{ @Base_table_column_event_type }}</th>
-                        <th class="tooltip ip-col" title="{{ @Base_table_column_ip_tooltip }}">{{ @Base_table_column_ip }}</th>
-                        <th class="tooltip ip-type-col" title="{{ @Base_table_column_ip_type_tooltip }}">{{ @Base_table_column_ip_type }}</th>
-                        <th class="tooltip device-type-col" title="{{ @Base_table_column_device_tooltip }}">{{ @Base_table_column_device }}</th>
+                        <th class="tooltip event-timestamp-col" title="{{ @Base_table_column_last_action_timestamp_tooltip }}">{{ @Base_table_column_last_action_timestamp }}</th>
+                        <th class="tooltip event-event-type-col" title="{{ @Base_table_column_event_type_tooltip }}">{{ @Base_table_column_event_type }}</th>
+                        <th class="tooltip event-ip-col" title="{{ @Base_table_column_ip_tooltip }}">{{ @Base_table_column_ip }}</th>
+                        <th class="tooltip event-ip-type-col" title="{{ @Base_table_column_ip_type_tooltip }}">{{ @Base_table_column_ip_type }}</th>
+                        <th class="tooltip event-device-col" title="{{ @Base_table_column_device_tooltip }}">{{ @Base_table_column_device }}</th>
                     </tr>
                 </thead>
             </table>

@@ -5,4 +5,4 @@ chmod -R 740 config
 chmod -R 755 assets
 chmod -R 755 assets/rules
 chmod -R 755 assets/logs
-chmod -R 755 assets/suspiciousWords
+chmod -R 755 assets/lists

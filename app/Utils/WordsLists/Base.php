@@ -13,16 +13,24 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
-namespace Utils;
+namespace Utils\WordsLists;
 
-abstract class SuspiciousWords {
+abstract class Base {
     protected static string $extensionFile = '';
     protected static array $words = [];
 
     private static function getExtension(): ?array {
-        $filename =  dirname(__DIR__, 2) . '/assets/suspiciousWords/' . static::$extensionFile;
+        $filename =  dirname(__DIR__, 3) . '/assets/lists/' . static::$extensionFile;
 
-        return file_exists($filename) ? file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : null;
+        if (file_exists($filename) && is_readable($filename)) {
+            $data = include $filename;
+
+            if (is_array($data)) {
+                return $data;
+            }
+        }
+
+        return null;
     }
 
     public static function getWords(): array {

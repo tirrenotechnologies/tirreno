@@ -120,7 +120,7 @@ class Data extends \Controllers\Base {
             $messages[] = $this->getStatusNotification($newValidCnt, 'Added %s rule%s: %s', $iterates[5]);
             $messages[] = $this->getStatusNotification($updValidCnt, 'Updated %s rule%s: %s', $iterates[3]);
 
-            $msg = join(';\n', array_filter($messages));
+            $msg = join(";\n", array_filter($messages));
 
             if ($msg) {
                 $pageParams['SUCCESS_MESSAGE'] = $msg;
@@ -132,7 +132,7 @@ class Data extends \Controllers\Base {
             $messages[] = $this->getStatusNotification($updInvalidCnt, 'Updated %s invalid rule%s: %s', $iterates[2]);
             $messages[] = $this->getStatusNotification($missingCnt, 'Missing %s rule%s: %s', array_column($newMissingRules, 'uid'));
 
-            $msg = join(';\n', array_filter($messages));
+            $msg = join(";\n", array_filter($messages));
 
             if ($msg) {
                 $pageParams['ERROR_MESSAGE'] = $msg;
