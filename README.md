@@ -5,27 +5,21 @@
 
 <p align="center">
     <a href="https://www.tirreno.com/" target="_blank">
-        <img src="https://www.tirreno.com/double-screen.jpg" alt="tirreno screenshot" />
+        <img src="https://www.tirreno.com/firstscreen.jpg" alt="tirreno screenshot" />
     </a>
 </p>
 
-The open-source security analytics.
+The open-source security analytics that your application is missing.
 
-tirreno helps organizations to understand, monitor, and protect their digital platforms from cyber threats, account threats, and abuse. Proactively defend against internal and external threats, ensure sovereignty through on-premises deployment, and secure your digital platforms.
+tirreno helps understand, monitor, and protect your applications from cyber threats, account takeovers, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypass firewalls, SIEM, WAFs, and other defenses.
 
-* **Granular visibility**: Understand your application with detailed event tracking and smart monitoring. Capture all events: logins/logouts, data modification, page visits, API calls, along with user context and application errors to get complete operational awareness.
-* **Continuous monitoring**: Monitor user behaviour in near real time by choosing from a list of relevant event types. Proactively find cyber threats, account threats, and abuse in your digital platform, and respond to threats quickly based on in-app intelligence.
-* **Single user view**: Get comprehensive visibility into individual user activity. Analyze behaviour patterns, risk scores, connected identities, and activity timelines for specific users. Investigate suspicious activity and review detailed session data to make informed security decisions.
-* **User risk assessment**: Set up security rules to automatically identify malicious activity, and assess risk tailored to your specific requirements.
-* **Case management and auto-decision**: Accounts with risky events are sent to manual review or automatic suspension. Security team can investigate flagged cases and make informed decisions based on comprehensive security analytics.
-* **Field audit trail**: Automatically track modifications to important fields, including what changed and when. Centralized field audit trail lets you easily review data changes, streamlining audit and compliance.
-* **Enhanced threat intelligence**: tirreno can be enhanced with first-party threat intelligence via API enrichment. Eliminate blind spots and get the threat intelligence you need to build a multi-layered defense for your application. (Optional)
+Our platform detects threats where they actually happen, inside your application. It adds a security layer to internal (workforce) or external (customer-facing) applications to identify malicious activity by analyzing user behavior, account activity, field audit trail, and business logic abuse that infrastructure tools cannot detect.
 
-tirreno is a "low-tech" PHP and PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can immediately access real-time threat analytics.
+tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can ingest events from your application through API calls and immediately access real-time threat dashboard analytics.
 
-## Online demo
+## Live demo
 
-Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin/tirreno).
+Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (admin/tirreno).
 
 ## Requirements
 
@@ -38,6 +32,14 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
   * **PostgreSQL**: 512 MB RAM (4 GB recommended)
   * **Application**: 128 MB RAM (1 GB recommended)
   * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
+
+## Docker-based installation (optional)
+
+To run tirreno within docker container you may use image published on [dockerhub](https://hub.docker.com/r/tirreno/tirreno).
+
+```bash
+docker pull tirreno/tirreno:latest
+```
 
 ## Quickstart install
 
@@ -52,14 +54,6 @@ Check out the online demo at [play.tirreno.com](https://play.tirreno.com) (admin
 */10 * * * * cd /path/to/tirreno && /usr/bin/php /path/to/tirreno/index.php /cron >> /path/to/tirreno/assets/logs/error.log 2>&1
 ```
 
-## Using a docker-based installation (optional)
-
-To run tirreno within docker container you may use image published on [dockerhub](https://hub.docker.com/r/tirreno/tirreno).
-
-```bash
-docker pull tirreno/tirreno:latest
-```
-
 ## Using Heroku (optional)
 
 Click [here](https://heroku.com/deploy?template=https://github.com/tirrenotechnologies/tirreno) to launch heroku deployment.
@@ -68,29 +62,19 @@ Click [here](https://heroku.com/deploy?template=https://github.com/tirrenotechno
 
 See the [User Guide](https://docs.tirreno.com/) for details on how to use tirreno.
 
-## Optional non-free capabilities
-
-The open-sourced tirreno code is intended to be used for free as a standalone application. It provides general statistics, rule engine and risk-based alerting to a monitored system. As is, this tooling may be sufficient for bringing insights about user activity and behavioral patterns in a wide range of use cases, especially as a solution for small and medium-sized organizations.
-
-However, if you are looking to cover more advanced usage scenarios, the additional tirreno API enrichment capabilities can be enabled via [monthly-paid subscription](https://www.tirreno.com/pricing/). 
-
 ## About
 
 The tirreno project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
-Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in online business operations. We solve real people's challenges through love in ascétique code and sovereign technologies.
-
-tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine protection that has never existed before.
-
-The tirreno wordmark stands beyond the horizon line, as a metaphor for the evolutionary cycle of the threat landscape, and our commitment to stay ahead of it.
+ Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in cyberdefence. We solve real people's challenges through love in ascétique code and sovereign technologies. tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine protection that has never existed before.
 
 ## Why the name tirreno?
 
-History suggests that the Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as 800 BC. The term "Tyrrhenian” became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name — a name still in use today. This name is believed to be an exonym, possibly meaning “tower”.
+Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back as 800 BC. The term "Tyrrhenian" became more commonly associated with the Etruscans, and it is from them that the Tyrrhenian Sea derives its name, which is still in use today.
 
-While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book.
+According to historical sources, Tyrrhenian people were the first to use trumpets for signaling about coming threats, which was later adopted by Greek and Roman military forces.
 
-The tirreno wordmark, positioned beyond a horizon line, as a metaphor for the constant evolution of the fraud landscape and our commitment to staying ahead of change.
+While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book. The tirreno wordmark, positioned beyond a horizon line, serves as a metaphor for the constant evolution of the fraud landscape and our commitment to staying ahead of change.
 
 ## Links
 
