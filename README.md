@@ -17,6 +17,42 @@ Our platform detects threats where they actually happen, inside your application
 
 tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can ingest events from your application through API calls and immediately access real-time threat dashboard analytics.
 
+## Application types
+
+* **Self-hosted, internal and legacy apps**: Embed security layer
+  to extend your security through audit trails, protect user accounts
+  from takeover, detect cyber threats and monitor insider threats.
+* **SaaS and digital platforms**: Prevent cross-tenant data leakage,
+  online fraud, privilege escalation, data exfiltration and business
+  logic abuse.
+* **Mission critical applications**: Sensitive application protection,
+  even in air-gapped deployments.
+* **Non-human identities (NHIs)**: Monitor service accounts, API keys,
+  bot behaviors, and detect compromised machine identities.
+* **API-first applications**: Protect against abuse, rate limiting
+  bypasses, scraping, and unauthorized access.
+
+## Industries
+
+* **Government and public sector**: Protect citizen data, detect insider
+  threats, ensure compliance, and maintain data sovereignty.
+* **Banking and fintech**: Real-time transaction monitoring, anomalous
+  login detection, synthetic identity fraud protection, regulator
+  compliance.
+* **Energy and utilities**: Protect critical infrastructure, detect
+  unauthorized access to control systems, monitor insider threats,
+  and ensure compliance with energy sector regulations.
+* **Healthcare portals**: Protect patient data, monitor unauthorized
+  PHI/PII access, detect staff behaivour anomalies, ensure HIPAA compliance.
+* **Educational platforms**: Protect student data, detect account sharing
+  and cheating, ensure FERPA compliance.
+* **E-commerce and retail**: Detect payment fraud, bot attacks, credential
+  stuffing, and protect customer accounts.
+* **IoT and connected devices**: Monitor authentication, detect compromised
+  devices, prevent unauthorized access.
+* **Gaming platforms**: Detect account takeover, cheating, bot activity,
+  and protect in-game economies.
+
 ## Live demo
 
 Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (admin/tirreno).
