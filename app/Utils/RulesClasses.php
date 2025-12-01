@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,12 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Utils;
 
 class RulesClasses {
+    private const RULE_BROKEN = 'broken';
     private const RULES_WEIGHT = [
         -20 =>  'positive',
         10 =>   'medium',
@@ -36,11 +39,13 @@ class RulesClasses {
         'X' => 'Extra',
     ];
 
-    private static string $coreRulesNamespace = '\\Controllers\\Admin\\Rules\\Set';
-    private static string $assetsRulesNamespace = '\\ExtendedRules';
+    //private static string $coreRulesNamespace = '\\Controllers\\Admin\\Rules\\Set';
+    //private static string $assetsRulesNamespace = '\\ExtendedRules';
+    private static string $coreRulesNamespace = '\\CoreRules';
+    private static string $assetsRulesNamespace = '\\CustomRules';
 
-    public static function getRuleClass(?int $value): string {
-        return self::RULES_WEIGHT[$value ?? 0] ?? 'none';
+    public static function getRuleClass(?int $value, bool $broken): string {
+        return $broken ? self::RULE_BROKEN : self::RULES_WEIGHT[$value ?? 0] ?? 'none';
     }
 
     public static function getRuleTypeByUid(string $uid): string {
@@ -69,27 +74,30 @@ class RulesClasses {
     }
 
     private static function getCoreRulesDir(): string {
-        return dirname(__DIR__, 1) . '/Controllers/Admin/Rules/Set';
+        //return dirname(__DIR__, 1) . '/Controllers/Admin/Rules/Set';
+        return dirname(__DIR__, 2) . '/assets/rules/core';
     }
 
     private static function getAssetsRulesDir(): string {
-        return dirname(__DIR__, 2) . '/assets/rules';
+        //return dirname(__DIR__, 2) . '/assets/rules';
+        return dirname(__DIR__, 2) . '/assets/rules/custom';
     }
 
-    public static function getAllRulesObjects(?\Ruler\RuleBuilder $rb): array {
-        $local = self::getRulesClasses(false);
+    public static function getAllRulesObjects(?\Ruler\RuleBuilder $ruleBuilder): array {
         $core  = self::getRulesClasses(true);
+        $local = self::getRulesClasses(false);
+        //$core  = self::getRulesClasses(true);
 
         $total = $local['imported'] + $core['imported'];
 
         foreach ($total as $uid => $cls) {
-            $total[$uid] = new $cls($rb, []);
+            $total[$uid] = new $cls($ruleBuilder, []);
         }
 
         return $total;
     }
 
-    public static function getSingleRuleObject(string $uid, ?\Ruler\RuleBuilder $rb): ?\Controllers\Admin\Rules\Set\BaseRule {
+    public static function getSingleRuleObject(string $uid, ?\Ruler\RuleBuilder $ruleBuilder): ?\Assets\Rule {
         $obj = null;
         $cores = [false, true];
 
@@ -102,7 +110,7 @@ class RulesClasses {
 
             try {
                 self::validateRuleClass($uid, $filename, $cls, $core);
-                $obj = new $cls($rb, []);
+                $obj = new $cls($ruleBuilder, []);
                 break;
             } catch (\Throwable $e) {
                 error_log('Rule validation failed at file ' . $filename);
@@ -140,7 +148,7 @@ class RulesClasses {
                     $out[$name] = $cls;
                 } catch (\Throwable $e) {
                     $failed[] = $name;
-                    error_log('Fail on require_once: ' . $e->getMessage());
+                    error_log('Fail on include_once: ' . $e->getMessage());
                 }
             }
         }
@@ -166,7 +174,11 @@ class RulesClasses {
             throw new \LogicException("File {$filename} doesn't exist.");
         }
 
-        require_once $filename;
+        $res = include_once $filename;
+
+        if ($res === false) {
+            throw new \LogicException("Class {$classname} was not included due to include error for file {$filename}");
+        }
 
         if (!class_exists($classname, false)) {
             throw new \LogicException("Class {$classname} not found after including {$filename}");

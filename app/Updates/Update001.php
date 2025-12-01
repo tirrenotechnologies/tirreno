@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,18 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Updates;
 
 class Update001 extends Base {
     public static $version = 'v0.9.5';
 
-    public static function apply($db) {
+    public static function apply($database) {
         $queries = [
             'ALTER TABLE dshb_api ADD COLUMN blacklist_threshold INTEGER DEFAULT -1',
             'ALTER TABLE dshb_api ADD COLUMN review_queue_threshold INTEGER DEFAULT 33',
         ];
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,13 +13,15 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Logbook;
 
 class Query extends \Models\Grid\Base\Query {
     protected $defaultOrder = 'event_logbook.error_type DESC, event_logbook.id DESC';
     protected $dateRangeField = 'event_logbook.started';
 
-    protected $allowedColumns = ['ip', 'started', 'error_type', 'error_text'];
+    protected $allowedColumns = ['ip', 'started', 'endpoint', 'error_type', 'error_text', 'created'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -28,10 +30,12 @@ class Query extends \Models\Grid\Base\Query {
             'SELECT
                 event_logbook.id,
                 event_logbook.ip,
+                event_logbook.endpoint,
                 event_logbook.error_type,
                 event_logbook.error_text,
                 event_logbook.raw,
-                event_logbook.started,
+                event_logbook.started           AS created,
+                event_logbook.started           AS server_time,
                 event_error_type.name           AS error_name,
                 event_error_type.value          AS error_value
 
@@ -80,7 +84,7 @@ class Query extends \Models\Grid\Base\Query {
         //Add dates into request
         $this->applyDateRange($query, $queryParams);
 
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = '';
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -96,6 +100,7 @@ class Query extends \Models\Grid\Base\Query {
                 (
                     $extra
                     LOWER(event_logbook.raw::text)      LIKE LOWER(:search_value) OR
+                    LOWER(event_logbook.endpoint::text) LIKE LOWER(:search_value) OR
                     LOWER(event_logbook.error_text)     LIKE LOWER(:search_value) OR
                     LOWER(event_error_type.name)        LIKE LOWER(:search_value)
                 )"
@@ -106,5 +111,23 @@ class Query extends \Models\Grid\Base\Query {
 
         //Add search and ids into request
         $query = sprintf($query, $searchConditions);
+    }
+
+    protected function applyDateRange(string &$query, array &$queryParams): void {
+        // apply server offset to utc requested date range because dateRangeField is in server time zone
+        $serverOffset = \Utils\TimeZones::getServerOffset();
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest($serverOffset);
+
+        if ($dateRange) {
+            $searchConditions = (
+                " AND {$this->dateRangeField} >= :start_time AND
+                {$this->dateRangeField} <= :end_time
+                %s"
+            );
+
+            $query = sprintf($query, $searchConditions);
+            $queryParams[':end_time'] = $dateRange['endDate'];
+            $queryParams[':start_time'] = $dateRange['startDate'];
+        }
     }
 }

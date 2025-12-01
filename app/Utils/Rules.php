@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Utils;
 
@@ -27,31 +29,20 @@ class Rules {
     public static function eventDeviceIsNew(array $params, int $idx): bool {
         $deviceCreated = new \DateTime($params['event_device_created'][$idx]);
         $deviceLastseen = new \DateTime($params['event_device_lastseen'][$idx]);
-        $interval = $deviceCreated->diff($deviceLastseen);
 
-        return abs($interval->days * 24 * 60 + $interval->h * 60 + $interval->i) < \Utils\Constants::get('RULE_NEW_DEVICE_MAX_AGE_IN_MINUTES');
+        return abs($deviceLastseen->getTimestamp() - $deviceCreated->getTimestamp()) < \Utils\Constants::get('RULE_NEW_DEVICE_MAX_AGE_IN_SECONDS');
     }
 
     public static function countryIsNewByIpId(array $params, int $ipId): bool {
-        $filtered = array_filter($params['eip_country_id'], function ($value) {
-            return $value !== null;
-        });
-        $countryCounts = array_count_values($filtered);
-        $ipIdx = array_search($ipId, $params['eip_ip_id']);
-        $eventIpCountryId = $params['eip_country_id'][$ipIdx];
-        $count = $countryCounts[$eventIpCountryId] ?? 0;
+        $countryId = array_key_exists($ipId, $params['eip_ip_id']) ? $params['eip_ip_id'][$ipId]['country'] : null;
+        $count = $countryId !== null ? $params['eip_country_count'][$countryId] : null;
 
         return $count === 1;
     }
 
     public static function cidrIsNewByIpId(array $params, int $ipId): bool {
-        $filtered = array_filter($params['eip_cidr'], function ($value) {
-            return $value !== null;
-        });
-        $cidrCounts = array_count_values($filtered);
-        $ipIdx = array_search($ipId, $params['eip_ip_id']);
-        $eventIpCidr = $params['eip_cidr'][$ipIdx];
-        $count = $cidrCounts[$eventIpCidr] ?? 0;
+        $cidr = array_key_exists($ipId, $params['eip_ip_id']) ? $params['eip_ip_id'][$ipId]['cidr'] : null;
+        $count = $cidr !== null ? $params['eip_cidr_count'][$cidr] : null;
 
         return $count === 1;
     }

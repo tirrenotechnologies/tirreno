@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,26 +13,32 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class QueuesClearer extends AbstractCron {
-    public function clearQueues(): void {
-        $daysAgo = \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS');
-        $clearBefore = new \DateTime(sprintf('%s days ago', $daysAgo));
+class QueuesClearer extends Base {
+    public const DATETIME_FORMAT = 'Y-m-d H:i:s.u';
 
-        $actionTypes = [
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST),
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE),
-            new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE),
+    public function process(): void {
+        $days = \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS');
+        $before = (new \DateTime(strval($days) . ' days ago'))->format(self::DATETIME_FORMAT);
+
+        $queues = [
+            \Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'),
+            \Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'),
+            \Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'),
         ];
 
-        $clearedCount = 0;
+        $cnt = 0;
 
-        foreach ($actionTypes as $type) {
-            $queue = new \Models\Queue\AccountOperationQueue($type);
-            $clearedCount += $queue->clearCompleted($clearBefore);
+        $model = new \Models\Queue();
+
+        // delete completed records
+        foreach ($queues as $queue) {
+            $cnt += $model->clearQueue($queue, $before);
         }
 
-        $this->log(sprintf('Cleared %s completed items.', $clearedCount));
+        $this->addLog(sprintf('Cleared %s completed items.', $cnt));
     }
 }

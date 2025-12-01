@@ -1,4 +1,4 @@
-<form action="{{ 'logout' | alias }}" method="POST">
+<form action="{{ @BASE }}{{ 'logout' | alias }}" method="POST">
     <input type="hidden" name="token" value="{{ @CSRF }}">
 
     <p class="level-center">{{ @Logout_text }}</p>
@@ -7,7 +7,7 @@
 
     <div class="bottom-line">
         <div>
-            <a href="/login">{{ @Logout_form_cancel_link }}</a>
+            <a href="{{ @BASE }}/login">{{ @Logout_form_cancel_link }}</a>
         </div>
         <div class="control">
             <button id="submit-button" class="button is-primary" type="submit">{{ @Logout_form_submit }}</button>

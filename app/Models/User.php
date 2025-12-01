@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -32,8 +34,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                 event_account
 
             WHERE
-                event_account.id = :user_id
-                AND event_account.key = :api_key'
+                event_account.id = :user_id AND
+                event_account.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -55,8 +57,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                 event_account
 
             WHERE
-                event_account.userid = :user_id
-                AND event_account.key = :api_key
+                event_account.userid = :user_id AND
+                event_account.key = :api_key
 
             LIMIT 1'
         );
@@ -98,8 +100,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
             ON (event_account.lastemail = event_email.id)
 
             WHERE
-                event_account.id = :user_id
-                AND event_account.key = :api_key'
+                event_account.id = :user_id AND
+                event_account.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -116,28 +118,34 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
         $queries = [
             // Delete all user events.
             'DELETE FROM event
-            WHERE event.account = :user_id
-                AND event.key = :api_key;',
+            WHERE
+                event.account = :user_id AND
+                event.key = :api_key;',
             // Delete user account.
             'DELETE FROM event_account
-            WHERE event_account.id = :user_id
-                AND event_account.key = :api_key;',
+            WHERE
+                event_account.id = :user_id AND
+                event_account.key = :api_key;',
             // Delete all devices related to user.
             'DELETE FROM event_device
-            WHERE event_device.account_id = :user_id
-                AND event_device.key = :api_key;',
+            WHERE
+                event_device.account_id = :user_id AND
+                event_device.key = :api_key;',
             // Delete all emails related to user.
             'DELETE FROM event_email
-            WHERE event_email.account_id = :user_id
-                AND event_email.key = :api_key;',
+            WHERE
+                event_email.account_id = :user_id AND
+                event_email.key = :api_key;',
             // Delete all phones related to user.
             'DELETE FROM event_phone
-            WHERE event_phone.account_id = :user_id
-                AND event_phone.key = :api_key;',
+            WHERE
+                event_phone.account_id = :user_id AND
+                event_phone.key = :api_key;',
             // Delete all related sessions
             'DELETE FROM event_session
-            WHERE event_session.account_id = :user_id
-                AND event_session.key = :api_key',
+            WHERE
+                event_session.account_id = :user_id AND
+                event_session.key = :api_key',
         ];
 
         try {
@@ -229,7 +237,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                 dshb_rules.uid,
                 dshb_rules.name,
                 dshb_rules.descr,
-                dshb_rules.validated
+                dshb_rules.validated,
+                dshb_rules.attributes
 
             FROM
                 event_account
@@ -252,9 +261,11 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
 
         $results = $this->execQuery($query, $params);
 
-        usort($results, static function ($a, $b): int {
-            return $b['score'] <=> $a['score'];
+        usort($results, static function ($left, $right): int {
+            return $right['score'] <=> $left['score'];
         });
+        usort($results, [\Utils\Sort::class, 'cmpScore']);
+
 
         return $results;
     }
@@ -265,7 +276,7 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
         );
 
         if ($this->loaded()) {
-            $timestamp = (new \DateTime('now', new \DateTimeZone('UTC')))->format(\Utils\TimeZones::FORMAT);
+            $timestamp = (new \DateTime('now', \Utils\TimeZones::getUtcTimezone()))->format(\Utils\TimeZones::FORMAT);
             $this->score = $data['score'];
             $this->score_details = $data['details'];
             $this->score_updated_at = $timestamp;
@@ -295,8 +306,8 @@ class User extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizat
                 SET fraud = :fraud, latest_decision = :latest_decision
 
             WHERE
-                key = :api_key
-                AND id IN ({$placeHolders})"
+                id IN ({$placeHolders}) AND
+                key = :api_key"
         );
 
         $this->execQuery($query, $params);

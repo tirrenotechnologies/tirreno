@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -37,6 +37,13 @@ class Request {
         'httpMethod',
         'userCreated',
         'payload',
+        'fieldHistory',
+        'blacklisting',
+    ];
+
+    private const ARRAY_FIELDS = [
+        'payload',
+        'fieldHistory',
     ];
 
     /**
@@ -47,24 +54,52 @@ class Request {
         #[\SensitiveParameter]
         public ?string $apiKey,
         public ?string $traceId,
+        public bool $isWeb,
     ) {
-        // all acceptable $this->body values should be either string or null
-        foreach (self::ACCEPTABLE_FIELDS as $key) {
-            if (isset($this->body[$key])) {
-                $value = $this->body[$key];
+        if ($this->isWeb) {
+            // all acceptable $this->body values should be either string or null
+            foreach (self::ACCEPTABLE_FIELDS as $key) {
+                if (isset($this->body[$key])) {
+                    $value = $this->body[$key];
 
-                if (is_bool($value)) {
-                    $this->body[$key] = ($value) ? 'true' : 'false';
-                } elseif (is_array($value)) {
-                    $this->body[$key] = $this->cleanArrayEncoding($value);
-                    if ($key !== 'payload') {
-                        $this->body[$key] = json_encode($this->body[$key]);
+                    if (is_bool($value)) {
+                        $this->body[$key] = ($value) ? 'true' : 'false';
+                    } elseif (is_array($value)) {
+                        $this->body[$key] = $this->cleanArrayEncoding($value);
+                        if (!in_array($key, self::ARRAY_FIELDS)) {
+                            $this->body[$key] = json_encode($this->body[$key]);
+                        }
+                    } elseif ($value !== null) {
+                        $this->body[$key] = $this->cleanArrayEncoding(strval($value));
+                        if (in_array($key, self::ARRAY_FIELDS)) {
+                            $this->body[$key] = json_decode($this->body[$key], true);
+                        }
                     }
-                } elseif ($value !== null) {
-                    $this->body[$key] = $this->cleanArrayEncoding(strval($value));
+                } else {
+                    $this->body[$key] = $key === 'eventTime' ? '' : null;
                 }
-            } else {
-                $this->body[$key] = null;
+            }
+        } else {
+            $long = [];
+            foreach (self::ACCEPTABLE_FIELDS as $key) {
+                $long[] = $key . '::';
+            }
+            $opts = getopt('', $long) ?: [];
+
+            foreach (self::ACCEPTABLE_FIELDS as $key) {
+                if (array_key_exists($key, $opts)) {
+                    if ($opts[$key] !== false) {
+                        if (in_array($key, self::ARRAY_FIELDS)) {
+                            $this->body[$key] = $this->cleanArrayEncoding(json_decode($opts[$key], true));
+                        } else {
+                            $this->body[$key] = $this->cleanArrayEncoding($opts[$key]);
+                        }
+                    } else {
+                        $this->body[$key] = in_array($key, self::ARRAY_FIELDS) ? [] : '';
+                    }
+                } else {
+                    $this->body[$key] = $key === 'eventTime' ? '' : null;
+                }
             }
         }
         $this->body['hashEmailAddress'] = null;

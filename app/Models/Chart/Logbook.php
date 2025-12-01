@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Chart;
 
@@ -30,34 +32,40 @@ class Logbook extends Base {
     }
 
     private function getFirstLine(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
+        // apply server offset to utc requested date range because dateRangeField is in server time zone
+        $serverOffset = \Utils\TimeZones::getServerOffset();
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest($serverOffset);
+
         if (!$dateRange) {
             $dateRange = [
-                'endDate'   => date('Y-m-d H:i:s'),
-                'startDate' => date('Y-m-d H:i:s', 0),
+                'endDate'   => date('Y-m-d H:i:s', time() + $serverOffset),
+                'startDate' => date('Y-m-d H:i:s', $serverOffset),
             ];
         }
 
         //$dateRange['endDate']   = \Utils\TimeZones::localizeForActiveOperator($dateRange['endDate']);
         //$dateRange['startDate'] = \Utils\TimeZones::localizeForActiveOperator($dateRange['startDate']);
 
-        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('FAILED_LOGBOOK_EVENT_TYPES'), 'failed');
-        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('ISSUED_LOGBOOK_EVENT_TYPES'), 'issued');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('NORMAL_LOGBOOK_EVENT_TYPES'), 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => $this->getResolution($request),
+            ':resolution'   => \Utils\DateRange::getResolutionFromRequest(),
+            ':comb_offset'  => strval(\Utils\TimeZones::getCurrentOperatorOffset() - $serverOffset),
         ];
+
+        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('FAILED_LOGBOOK_EVENT_TYPES'), 'failed');
+        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('ISSUED_LOGBOOK_EVENT_TYPES'), 'issued');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Utils\Constants::get('NORMAL_LOGBOOK_EVENT_TYPES'), 'normal');
+
         $params = array_merge($params, $failedTypesParams);
         $params = array_merge($params, $issuedTypesParams);
         $params = array_merge($params, $normalTypesParams);
 
+        // use shift as substraction of server offset and addition of operator offset
         $query = (
             "SELECT
-                EXTRACT(EPOCH FROM date_trunc(:resolution, event_logbook.started))::bigint  AS ts,
+                EXTRACT(EPOCH FROM date_trunc(:resolution, event_logbook.started + :comb_offset))::bigint AS ts,
                 COUNT(CASE WHEN event_error_type.value IN ({$normalFlatIds}) THEN TRUE END) AS event_normal_type_count,
                 COUNT(CASE WHEN event_error_type.value IN ({$issuedFlatIds}) THEN TRUE END) AS event_issued_type_count,
                 COUNT(CASE WHEN event_error_type.value IN ({$failedFlatIds}) THEN TRUE END) AS event_failed_type_count

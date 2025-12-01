@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Api;
 
 class Users extends \Models\BaseSql {
@@ -21,7 +23,7 @@ class Users extends \Models\BaseSql {
     public function getUsersByApiKey(?int $userId, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
-            ':user_url' => \Utils\Variables::getSiteWithProtocol() . '/id/',
+            ':user_url' => \Utils\Variables::getHostWithProtocolAndBase() . '/id/',
         ];
 
         $query = (

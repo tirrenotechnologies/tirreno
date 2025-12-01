@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,30 +13,32 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class RiskScoreQueueHandler extends AbstractQueueCron {
-    private \Models\OperatorsRules $rulesModel;
+class RiskScoreQueueHandler extends BaseQueue {
     private \Controllers\Admin\Rules\Data $rulesController;
 
     public function __construct() {
-        parent::__construct();
-
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
-        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $this->rulesModel = new \Models\OperatorsRules();
-
         $this->rulesController = new \Controllers\Admin\Rules\Data();
         $this->rulesController->buildEvaluationModels();
     }
 
-    public function processQueue(): void {
-        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
-            $this->log('Risk score queue is already being executed by another cron job.');
+    public function process(): void {
+        $batchSize = \Utils\Variables::getAccountOperationQueueBatchSize();
+        $queueModel = new \Models\Queue();
+        $keys = $queueModel->getNextBatchKeys(\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'), $batchSize);
 
-            return;
+        parent::baseProcess(\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'));
+
+        $blacklist = new \Controllers\Admin\Blacklist\Data();
+        $reviewQueue = new \Controllers\Admin\ReviewQueue\Data();
+
+        foreach ($keys as $key) {
+            $blacklist->setBlacklistUsersCount(false, $key);
+            $reviewQueue->setNotReviewedCount(false, $key);
         }
-        $this->processItems($this->accountOpQueueModel);
     }
 
     protected function processItem(array $item): void {

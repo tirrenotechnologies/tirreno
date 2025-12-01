@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,19 +13,23 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Utils;
 
 class SystemMessages {
     public static function get(int $apiKey): array {
-        $f3 = \Base::instance();
+        $messages = \Utils\Routes::callExtra('SYSTEM_MESSAGES') ?? [];
 
-        $messages = [
-            self::getNoEventsMessage($apiKey),
-            self::getOveruseMessage($apiKey),
-        ];
+        // get last event timestamp from event_account.lastseen to avoid long reindexing on login
+        $lastLogbook = (new \Models\Logbook())->getLastSucceededEvent($apiKey);
+
+        $messages[] = self::getNoEventsMessage($lastLogbook);
+        $messages[] = self::getOveruseMessage($apiKey);
+
         // show no-crons warning only if events there are no valid incoming events
         if (!array_filter($messages)) {
-            $messages[] = self::getInactiveCronMessage($apiKey);
+            $messages[] = self::getInactiveCronMessage($lastLogbook, $apiKey);
         }
         $messages[] = self::getCustomErrorMessage($apiKey);
         $msg = [];
@@ -33,44 +37,53 @@ class SystemMessages {
         $iters = count($messages);
 
         for ($i = 0; $i < $iters; ++$i) {
-            $m = $messages[$i];
-            if ($m !== null) {
-                if ($m['id'] !== \Utils\ErrorCodes::CUSTOM_ERROR_FROM_DSHB_MESSAGES) {
-                    $code = sprintf('error_%s', $m['id']);
-                    $text = $f3->get($code);
+            $message = $messages[$i];
+            if ($message !== null) {
+                if ($message['id'] !== \Utils\ErrorCodes::CUSTOM_ERROR_FROM_DSHB_MESSAGES) {
+                    $code = sprintf('error_%s', $message['id']);
+                    $text = \Base::instance()->get($code);
 
                     $time = gmdate('Y-m-d H:i:s');
                     \Utils\TimeZones::localizeForActiveOperator($time);
 
-                    $m['text'] = $text;
-                    $m['created_at'] = $time;
-                    $m['class'] = 'is-warning';
+                    $message['text'] = $text;
+                    $message['created_at'] = $time;
+                    $message['class'] = 'is-warning';
                 }
 
-                $msg[] = $m;
+                $msg[] = $message;
             }
         }
 
         return $msg;
     }
 
-    private static function getNoEventsMessage(int $apiKey): ?array {
-        $f3 = \Base::instance();
-        $currentOperator = $f3->get('CURRENT_USER');
+    public static function syslogLine(int $facility, int $severity, string $app, string $msg): string {
+        // facility 0 -> 23
+        // severity 0 -> 7
+        $pri        = $facility * 8 + $severity;
+        $timestamp  = date('M j H:i:s');
+        $host       = 'tirreno';
+        $pid        = getmypid();
+        $msg        = str_replace(["\r","\n"], ' ', $msg);
 
+        return sprintf('<%d>%s %s %s[%d]: %s', $pri, $timestamp, $host, $app, $pid, $msg);
+    }
+
+    private static function getNoEventsMessage(array $lastLogbook): ?array {
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
         $takeFromCache = self::canTakeLastEventTimeFromCache($currentOperator);
-
         $lastEventTime = $currentOperator->last_event_time;
 
-        if (!$takeFromCache) {
-            $model = new \Models\Event();
-            $event = $model->getLastEvent($apiKey);
+        $interval   = \Base::instance()->get('NO_EVENTS_TIME');
+        $inInterval = \Utils\DateRange::inIntervalTillNow($lastEventTime, $interval);
 
-            if (!count($event)) {
+        if (!$takeFromCache || !$inInterval) {
+            if (!count($lastLogbook)) {
                 return ['id' => \Utils\ErrorCodes::THERE_ARE_NO_EVENTS_YET];
             }
 
-            $lastEventTime = $event[0]['time'];
+            $lastEventTime = $lastLogbook['lastseen'];
 
             $data = [
                 'id' => $currentOperator->id,
@@ -79,19 +92,12 @@ class SystemMessages {
 
             $model = new \Models\Operator();
             $model->updateLastEventTime($data);
+
+            $inInterval = \Utils\DateRange::inIntervalTillNow($lastEventTime, $interval);
         }
 
-        $currentTime = gmdate('Y-m-d H:i:s');
-
-        $dt1 = new \DateTime($currentTime);
-        $dt2 = new \DateTime($lastEventTime);
-        $diff = $dt1->getTimestamp() - $dt2->getTimestamp();
-
-        $noEventsThreshold = $f3->get('NO_EVENTS_TIME');
-        $noEventsLast24Hours = $diff > $noEventsThreshold;
-
-        if ($noEventsLast24Hours) {
-            return ['id' => \Utils\ErrorCodes::THERE_ARE_NO_EVENTS_LAST_24_HOURS];
+        if (!$inInterval) {
+            return ['id' => \Utils\ErrorCodes::THERE_ARE_NO_EVENTS_LAST_DAY];
         }
 
         return null;
@@ -108,11 +114,10 @@ class SystemMessages {
         return null;
     }
 
-    private static function getInactiveCronMessage(int $apiKey): ?array {
-        $cursorModel = new \Models\Queue\QueueNewEventsCursor();
-        $eventModel = new \Models\Event();
+    private static function getInactiveCronMessage(array $lastLogbook, int $apiKey): ?array {
+        $cursorModel = new \Models\Cursor();
 
-        if ($cursorModel->getCursor() === 0 && count($eventModel->getLastEvent($apiKey))) {
+        if ($cursorModel->getCursor() === 0 && count($lastLogbook)) {
             return ['id' => \Utils\ErrorCodes::CRON_JOB_MAY_BE_OFF];
         }
 
@@ -121,22 +126,9 @@ class SystemMessages {
 
     //TODO: think about custom function which receives three params: date1, date2 and diff.
     private static function canTakeLastEventTimeFromCache(\Models\Operator $currentOperator): bool {
-        $f3 = \Base::instance();
+        $interval = \Base::instance()->get('LAST_EVENT_CACHE_TIME');
 
-        $diff = PHP_INT_MAX;
-        $currentTime = gmdate('Y-m-d H:i:s');
-        $updatedAt = $currentOperator->last_event_time;
-
-        if ($updatedAt) {
-            $dt1 = new \DateTime($currentTime);
-            $dt2 = new \DateTime($updatedAt);
-
-            $diff = $dt1->getTimestamp() - $dt2->getTimestamp();
-        }
-
-        $cacheTime = $f3->get('LAST_EVENT_CACHE_TIME');
-
-        return $cacheTime > $diff;
+        return !!\Utils\DateRange::inIntervalTillNow($currentOperator->last_event_time, $interval);
     }
 
     private static function getCustomErrorMessage(): ?array {

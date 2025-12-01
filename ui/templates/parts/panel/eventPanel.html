@@ -1,4 +1,4 @@
-<div class="details-card is-hidden" id="event-card">
+<div class="details-card is-hidden" id="{{ !isset(@fromField) || !@fromField ? 'event-card' : 'field-card'}}">
     <header class="card-header">
         <p class="card-header-title">{{@Details_placeholder}}<button class="delete"></button></p>
     </header>

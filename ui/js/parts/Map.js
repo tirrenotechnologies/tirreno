@@ -37,7 +37,7 @@ export class Map {
 
             regionStyle: {
                 initial: {
-                    fill: '#575678'
+                    fill: '#575675'
                 },
                 selected: {
                     fill: '#01EE99'
@@ -74,7 +74,7 @@ export class Map {
 
     onRegionClick(value) {
         if (this.regions[value] !== undefined && this.regions[value][this.config.tooltipField] > 0) {
-            const url = `/country/${this.regions[value].id}`;
+            const url = `${window.app_base}/country/${this.regions[value].id}`;
             if (event.ctrlKey || event.metaKey) {
                 window.open(url, '_blank');
             } else {
@@ -147,7 +147,7 @@ export class Map {
 
         $.ajax({
             type: 'get',
-            url: `/admin/loadMap?token=${token}`,
+            url: `${window.app_base}/admin/loadMap?token=${token}`,
             data: data,
             scope: me,
             success: me.onCountriesListLoaded,

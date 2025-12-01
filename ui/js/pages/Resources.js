@@ -2,6 +2,7 @@ import {BasePage} from './Base.js';
 
 import {DatesFilter} from '../parts/DatesFilter.js?v=2';
 import {SearchFilter} from '../parts/SearchFilter.js?v=2';
+import {FileTypeFilter} from '../parts/choices/FileTypeFilter.js?v=2';
 import {ResourcesChart} from '../parts/chart/Resources.js?v=2';
 import {ResourcesGrid} from '../parts/grid/Resources.js?v=2';
 
@@ -14,11 +15,18 @@ export class ResourcesPage extends BasePage {
     }
 
     initUi() {
-        const datesFilter   = new DatesFilter();
-        const searchFilter  = new SearchFilter();
+        const datesFilter       = new DatesFilter();
+        const searchFilter      = new SearchFilter();
+        const fileTypeFilter    = new FileTypeFilter();
+
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+            fileTypeIds:    fileTypeFilter,
+        };
 
         const gridParams = {
-            url:            '/admin/loadResources',
+            url:            `${window.app_base}/admin/loadResources`,
             tileId:         'totalResources',
             tableId:        'resources-table',
 
@@ -26,15 +34,12 @@ export class ResourcesPage extends BasePage {
             calculateTotals:    true,
             totals: {
                 type: 'resource',
-                columns: ['total_visit', 'total_account', 'total_ip', 'total_country'],
+                columns: ['total_visit', 'total_account', 'total_ip', 'total_edit'],
             },
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
+            choicesFilterEvents: [fileTypeFilter.getEventType()],
 
-                return {dateRange, searchValue};
-            }
+            getParams: this.getParamsSection,
         };
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

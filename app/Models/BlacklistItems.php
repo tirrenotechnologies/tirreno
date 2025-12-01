@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -36,8 +38,10 @@ class BlacklistItems extends \Models\BaseSql {
                     SELECT ip, key
                     FROM event
                     WHERE
-                        account = :account_id
-                        AND key = :api_key)");
+                        account = :account_id AND
+                        key = :api_key
+                )
+        ");
 
         return $this->execQuery($query, $params);
     }
@@ -57,8 +61,8 @@ class BlacklistItems extends \Models\BaseSql {
             FROM
                 event_email
             WHERE
+                account_id = :account_id AND
                 key = :api_key
-                AND account_id = :account_id
         ");
 
         return $this->execQuery($query, $params);
@@ -79,8 +83,8 @@ class BlacklistItems extends \Models\BaseSql {
             FROM
                 event_phone
             WHERE
+                account_id = :account_id AND
                 key = :api_key
-                AND account_id = :account_id
         ");
 
         return $this->execQuery($query, $params);

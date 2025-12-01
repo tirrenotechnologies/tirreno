@@ -57,16 +57,28 @@ const data = {
     browserLanguage: '',
 
     // Type of user action from event types list (string)
+    // For ex. 'page_view', 'field_edit', etc.
     eventType: '',
 
     // Type of HTTP request from list (string)
     httpMethod: '',
 
     // User created UTC timestamp ('Y-m-d H:i:s' string)
-    userCreated: ''
+    userCreated: '',
 
-    // Payload (array),
+    // Payload, must have `page_search` or `account_email_change` event type (array)
     payload: [],
+
+    // Field history, must have `field_edit` event type (array)
+    fieldHistory: [
+        {
+            field_name: '',     // Name of the field
+            field_id: '',       // ID of the field
+            new_value: '',      // Field new value
+            old_value: '',      // Field old value
+            parent_id: ''       // ID of the field parent
+        }
+    ],
 };
 
 axios.post(url, qs.stringify(data), { headers: headers });

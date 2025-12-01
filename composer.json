@@ -1,7 +1,7 @@
 {
     "name": "tirreno/tirreno",
     "type": "project",
-    "description": "Open-source security platform",
+    "description": "Open security analytics",
     "keywords": [
         "tirreno",
         "fraud-detection",
@@ -55,6 +55,8 @@
             "chmod 755 tmp",
             "chmod 740 config",
             "chmod 755 assets",
+            "chmod 755 assets/rules/custom",
+            "chmod 755 assets/rules/core",
             "chmod 755 assets/rules",
             "chmod 755 assets/logs",
             "chmod 755 assets/lists",

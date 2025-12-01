@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,16 +13,16 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Country;
 
-class Page extends \Controllers\Pages\Base {
-    use \Traits\ApiKeys;
-
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminCountry';
 
     public function getPageParams(): array {
         $dataController = new Data();
-        $countryId = $this->integerParam($this->f3->get('PARAMS.countryId'));
+        $countryId = \Utils\Conversion::getIntUrlParam('countryId');
 
         $hasAccess = $dataController->checkIfOperatorHasAccess($countryId);
 

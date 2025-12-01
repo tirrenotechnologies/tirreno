@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Data;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     // POST requests
     public function enrichEntity(): array {
         $controller = new \Controllers\Admin\Enrichment\Navigation();
@@ -138,6 +140,12 @@ class Data extends \Controllers\Base {
         return $controller->getEventDetails();
     }
 
+    public function getFieldEventDetails(): array {
+        $controller = new \Controllers\Admin\FieldAuditTrail\Navigation();
+
+        return $controller->getFieldEventDetails();
+    }
+
     public function getLogbookDetails(): array {
         $controller = new \Controllers\Admin\Logbook\Navigation();
 
@@ -187,7 +195,13 @@ class Data extends \Controllers\Base {
     }
 
     public function getFieldAuditTrail(): array {
-        $controller = new \Controllers\Admin\Payloads\FieldAuditTrail\Navigation();
+        $controller = new \Controllers\Admin\FieldAuditTrail\Navigation();
+
+        return $controller->getList();
+    }
+
+    public function getFieldAudits(): array {
+        $controller = new \Controllers\Admin\FieldAudits\Navigation();
 
         return $controller->getList();
     }
@@ -219,7 +233,13 @@ class Data extends \Controllers\Base {
     public function getReviewUsersQueueCount(): array {
         $controller = new \Controllers\Admin\ReviewQueue\Navigation();
 
-        return $controller->getNumberOfNotReviewedUsers(false, true);   // do not use cache, overall count
+        return $controller->setNotReviewedCount(false);     // no cache
+    }
+
+    public function getBlacklistUsersCount(): array {
+        $controller = new \Controllers\Admin\Blacklist\Navigation();
+
+        return $controller->setBlacklistUsersCount(false);  // no cache
     }
 
     public function getIspDetails(): array {

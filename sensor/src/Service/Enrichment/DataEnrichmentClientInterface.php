@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -137,6 +137,4 @@ interface DataEnrichmentClientInterface {
      * @throws \RuntimeException
      */
     public function query(array $data, string $token): array;
-
-    public function track(string $token): void;
 }

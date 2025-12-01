@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,28 +13,19 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class EnrichmentQueueHandler extends AbstractQueueCron {
-    private \Models\ApiKeys $apiKeysModel;
+class EnrichmentQueueHandler extends BaseQueue {
     private \Controllers\Admin\Enrichment\Data $controller;
 
     public function __construct() {
-        parent::__construct();
-
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
-        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-
-        $this->apiKeysModel = new \Models\ApiKeys();
         $this->controller = new \Controllers\Admin\Enrichment\Data();
     }
 
-    public function processQueue(): void {
-        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
-            $this->log('Enrchment queue is already being executed by another cron job.');
-        } else {
-            $this->processItems($this->accountOpQueueModel);
-        }
+    public function process(): void {
+        parent::baseProcess(\Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'));
     }
 
     protected function processItem(array $item): void {
@@ -42,11 +33,12 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
         $apiKey = $item['key'];
         $userId = $item['event_account'];
 
-        $subscriptionKey = $this->apiKeysModel->getKeyById($apiKey)->token;
         $entities = $this->controller->getNotCheckedEntitiesByUserId($userId, $apiKey);
 
+        $subscriptionKey = (new \Models\ApiKeys())->getKeyById($apiKey)->token;
+
         // TODO: check key ?
-        $this->log(sprintf('Items to enrich for account %s: %s.', $userId, json_encode($entities)));
+        $this->addLog(sprintf('Items to enrich for account %s: %s.', $userId, json_encode($entities)));
 
         $summary = [];
         $success = 0;
@@ -68,6 +60,6 @@ class EnrichmentQueueHandler extends AbstractQueueCron {
 
         // TODO: if failed !== 0 add to queue again?
         // TODO: recalculate score after all?
-        $this->log(sprintf('Enrichment for account %s: %s enriched, %s failed in %s s (%s).', $userId, $success, $failed, time() - $start, json_encode($summary)));
+        $this->addLog(sprintf('Enrichment for account %s: %s enriched, %s failed in %s s (%s).', $userId, $success, $failed, time() - $start, json_encode($summary)));
     }
 }

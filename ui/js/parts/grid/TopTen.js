@@ -45,9 +45,11 @@ export class TopTenGrid extends BaseGrid {
 
         const config = {
             ajax: function(data, callback, settings) {
+                data.mode = mode;
+                data.token = token;
                 $.ajax({
-                    url: `/admin/loadTopTen?mode=${mode}&token=${token}`,
-                    method: 'GET',
+                    url: `${window.app_base}/admin/loadTopTen`,
+                    method: 'POST',
                     data: data,
                     dataType: 'json',
                     success: function(response, textStatus, jqXHR) {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Chart;
 
 class Bots extends Base {
@@ -21,10 +23,10 @@ class Bots extends Base {
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
-        $ox = array_column($data, 'ts');
-        $l1 = array_column($data, 'bot_count');
+        $timestamps = array_column($data, 'ts');
+        $line1 = array_column($data, 'bot_count');
 
-        return $this->addEmptyDays([$ox, $l1]);
+        return $this->addEmptyDays([$timestamps, $line1]);
     }
 
     private function getFirstLine(int $apiKey): array {

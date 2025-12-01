@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 return [
     'Base_table_column_user_registered' => 'Signup date',
@@ -37,6 +39,8 @@ return [
     'Base_table_column_event_type_tooltip' => 'A type of action performed.',
     'Base_table_column_suspicious_url' => 'Suspicious',
     'Base_table_column_suspicious_url_tooltip_resources' => 'URL matches with your suspicious words list.',
+    'Base_table_column_auth_status' => 'Auth status',
+    'Base_table_column_auth_status_tooltip_resources' => 'Unauthorized events VS. authorized events..',
 
     'Base_table_column_total_users' => 'Users',
     'Base_table_column_total_users_tooltip_ips' => 'The total number of users associated with an IP address.',
@@ -45,21 +49,27 @@ return [
     'Base_table_column_total_users_tooltip_isps' => 'The number of ISP-associated users over the specified and preceding period.',
     'Base_table_column_total_users_tooltip_resources' => 'The number of users that requested a resource over the specified and preceding period.',
     'Base_table_column_total_users_tooltip_phones' => 'The total number of users associated with a phone number.',
+    'Base_table_column_total_users_tooltip_field_audit' => 'The total number of users performed change of a field.',
     'Base_table_column_total_countries' => 'Countries',
     'Base_table_column_total_countries_tooltip_resources' => 'The number of countries from which a resource was requested over the specified and preceding period.',
+    'Base_table_column_total_edits_tooltip_resources' => 'The number of edits made on a resource was requested over the specified and preceding period.',
 
     'Base_table_column_total_ips' => 'IPs',
     'Base_table_column_total_ips_tooltip_resources' => 'The number of unique IP addresses from which a resource was requested over the specified and preceding period.',
     'Base_table_column_total_ips_tooltip_countries' => 'The number of IP addresses geolocated to a country over the specified and preceding period.',
     'Base_table_column_total_ips_tooltip_isps' => 'The number of ISP-belonging IP addresses over the specified and preceding period.',
 
-    'Base_table_column_total_actions' => 'Events',
+    'Base_table_column_total_actions' => 'Activities',
     'Base_table_column_total_actions_tooltip_ips' => 'The number of requests from an IP address over the specified and preceding period.',
     'Base_table_column_total_actions_tooltip_users' => 'The total number of requests made by a user.',
     'Base_table_column_total_actions_tooltip_isps' => 'The number of ISP-related events over the specified and preceding period.',
     'Base_table_column_total_actions_tooltip_resources' => 'The number of requests made to a resource over the specified and preceding period.',
     'Base_table_column_total_actions_tooltip_countries' => 'The number of requests made from a country over the specified and preceding period.',
-    'Base_table_column_total_actions_tooltip_devices' => 'The total number of requests made from this country.',
+    'Base_table_column_total_actions_tooltip_devices' => 'The total number of requests made from this device.',
+    'Base_table_column_total_actions_tooltip_field_audit' => 'The total number of requests made editing this field.',
+
+    'Base_table_column_total_edits' => 'Edits',
+    'Base_table_column_total_edits_tooltip_field_audit' => 'The total number of edits on this field.',
 
     'Base_table_column_ip' => 'IP',
     'Base_table_column_ip_tooltip' => 'An IP address associated with an event. Note that anonymizing services can hide the real IP address.',
@@ -196,15 +206,4 @@ return [
     'Base_table_column_error_text_tooltip' => 'An error message returned by an unsuccessful request processing.',
     'Base_table_column_local_timestamp' => 'Local timestamp',
     'Base_table_column_local_timestamp_tooltip' => 'Server time when API request was received.',
-
-    'Base_table_column_audit_trail_created' => 'Date',
-    'Base_table_column_audit_trail_created_tooltip' => 'The date the field was changed.',
-    'Base_table_column_audit_trail_field' => 'Field',
-    'Base_table_column_audit_trail_field_tooltip' => 'The name of the field that has been changed.',
-    'Base_table_column_audit_trail_old_value' => 'Old value',
-    'Base_table_column_audit_trail_old_value_tooltip' => 'Previous value of the field.',
-    'Base_table_column_audit_trail_new_value' => 'New value',
-    'Base_table_column_audit_trail_new_value_tooltip' => 'Updated value of the field.',
-    'Base_table_column_audit_trail_parent' => 'Parent ID',
-    'Base_table_column_audit_trail_parent_tooltip' => 'ID of the parent record related to the field change.',
 ];

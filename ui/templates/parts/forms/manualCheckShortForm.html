@@ -1,7 +1,7 @@
-<form method="POST" action="{{ 'manualCheck' | alias }}">
+<form method="POST" action="{{ @BASE }}{{ 'manualCheck' | alias }}">
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="type" value="{{ @value->type }}">
     <input type="hidden" name="search" value="{{ @value->search_query }}">
 
-    <a href="{{ 'manualCheck' | alias }}" data-item-id="manual-check-history-item">{{ @value->search_query }}</a>
+    <a href="{{ @BASE }}{{ 'manualCheck' | alias }}" data-item-id="manual-check-history-item">{{ @value->search_query }}</a>
 </form>

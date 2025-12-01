@@ -1,7 +1,7 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {renderAsn} from '../DataRenderers.js?v=2';
 
-const URL   = '/admin/loadIspDetails';
+const URL   = `${window.app_base}/admin/loadIspDetails`;
 const ELEMS = ['asn', 'total-ips', 'total-visits', 'total-accounts', 'total-fraud'];
 
 export class IspTiles extends BaseTiles {

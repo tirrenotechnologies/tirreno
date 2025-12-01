@@ -7,10 +7,16 @@
     <meta name="viewport" content="width=1216, initial-scale=0.6">
     <meta name="color-scheme" content="dark">
     <title>{{ @PAGE_TITLE }}</title>
-    <link rel="icon" href="/ui/images/favicon.png">
-    <link rel="stylesheet" type="text/css" href="/ui/css/admin.all.css?dc={{time()}}" />
+    <link rel="icon" href="{{ @BASE }}/ui/images/favicon.png">
+    <link rel="stylesheet" type="text/css" href="{{ @BASE }}/ui/css/admin.all.css?dc={{time()}}" />
     <meta name="format-detection" content="telephone=no">
     <meta name="google" content="notranslate">
     <meta name="generator" content="FrontPage 4.0">
+    <check if="isset(@JS)">
+        <true>
+            <script>window.app_base = "{{ @BASE }}"</script>
+            <script type="module" src="{{ @BASE }}/ui/js/endpoints/{{@JS}}?dc={{time()}}"></script>
+        </true>
+    </check>
 </head>
 <body>

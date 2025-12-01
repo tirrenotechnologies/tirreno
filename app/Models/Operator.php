@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -31,12 +33,10 @@ class Operator extends \Models\BaseSql {
         $this->save();
     }
 
-    public function updatePassword(array $data): void {
-        $operatorId = $data['id'];
+    public function updatePassword(string $password, int $operatorId): void {
         $this->getOperatorById($operatorId);
 
         if ($this->loaded()) {
-            $password = $data['new-password'];
             $this->password = self::hashPassword($password, PASSWORD_DEFAULT);
 
             $this->save();
@@ -54,22 +54,19 @@ class Operator extends \Models\BaseSql {
         }
     }
 
-    public function updateTimeZone(array $data): void {
-        $operatorId = $data['id'];
+    public function updateTimeZone(string $timezone, int $operatorId): void {
         $this->getOperatorById($operatorId);
 
         if ($this->loaded()) {
-            $this->timezone = $data['timezone'];
+            $this->timezone = $timezone;
 
             $this->save();
         }
     }
 
-    public function updateNotificationPreferences(
-        \Type\UnreviewedItemsReminderFrequencyType $unreviewedItemsReminderFrequency,
-    ): void {
+    public function updateNotificationPreferences(string $reminder): void {
         if ($this->loaded()) {
-            $this->unreviewed_items_reminder_freq = $unreviewedItemsReminderFrequency->value;
+            $this->unreviewed_items_reminder_freq = $reminder;
 
             $this->save();
         }
@@ -82,6 +79,17 @@ class Operator extends \Models\BaseSql {
         if ($this->loaded()) {
             $this->review_queue_cnt = $data['review_queue_cnt'];
             $this->review_queue_updated_at = gmdate('Y-m-d H:i:s');
+
+            $this->save();
+        }
+    }
+
+    public function updateBlacklistUsersCnt(array $data): void {
+        $operatorId = $data['id'];
+        $this->getOperatorById($operatorId);
+
+        if ($this->loaded()) {
+            $this->blacklist_users_cnt = $data['blacklist_users_cnt'];
 
             $this->save();
         }

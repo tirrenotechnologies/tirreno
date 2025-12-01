@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 return [
     'AdminRules_page_title' => 'Rules',
@@ -46,10 +48,13 @@ return [
     'AdminThresholdValues_form_title' => 'Thresholds settings',
     'AdminThresholdValues_form_title_tooltip' => 'Manage and set thresholds for review queue and automated user blacklisting.',
     'AdminThresholdValues_form_field_warning' => 'Set the threshold for user scores to trigger manual review or automatic blacklisting. Use auto-blacklisting with caution and only when truly necessary, as it could negatively impact the user experience due to potential misconfigurations.',
-    'AdminThresholdValues_form_field_blacklist_threshold_label' => 'Auto-block',
-    'AdminThresholdValues_form_field_review_queue_threshold_label' => 'Manual review queue',
+    'AdminThresholdValues_form_field_blacklist_threshold_label' => 'Auto-blacklisting',
+    'AdminThresholdValues_form_field_review_queue_threshold_label' => 'Manual review',
     'AdminThresholdValues_form_button_save' => 'Update',
     'AdminThresholdValues_form_value_prefix' => 'Score below',
     'AdminThresholdValues_form_value_zero_prefix' => 'Score is',
     'AdminThresholdValues_update_success_message' => 'Thresholds updated successfully',
+
+    'AdminThresholdValues_form_review_queue_threshold_placeholder' => 'Review queue threshold',
+    'AdminThresholdValues_form_blacklist_threshold_placeholder' => 'Off',
 ];

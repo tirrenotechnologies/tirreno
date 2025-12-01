@@ -29,7 +29,7 @@ export class DomainPage extends BasePage {
         const chartParams           = this.getBarChartParams();
 
         const domainsGridParams = {
-            url:        '/admin/loadDomains',
+            url:        `${window.app_base}/admin/loadDomains`,
             tileId:     'totalDomains',
             tableId:    'domains-table',
 

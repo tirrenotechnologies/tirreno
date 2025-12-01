@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,22 +13,13 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class DeletionQueueHandler extends AbstractQueueCron {
-    public function __construct() {
-        parent::__construct();
-
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
-        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-    }
-
-    public function processQueue(): void {
-        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
-            $this->log('Deletion queue is already being executed by another cron job.');
-        } else {
-            $this->processItems($this->accountOpQueueModel);
-        }
+class DeletionQueueHandler extends BaseQueue {
+    public function process(): void {
+        parent::baseProcess(\Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'));
     }
 
     protected function processItem(array $item): void {

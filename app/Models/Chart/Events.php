@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Chart;
 
@@ -25,14 +27,12 @@ class Events extends Base {
         $line1      = array_column($data, 'event_normal_type_count');
         $line2      = array_column($data, 'event_editing_type_count');
         $line3      = array_column($data, 'event_alert_type_count');
-        $line4      = array_column($data, 'unauthorized_event_count');
 
-        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3, $line4]);
+        return $this->addEmptyDays([$timestamps, $line1, $line2, $line3]);
     }
 
     private function getFirstLine(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
         if (!$dateRange) {
             $dateRange = [
                 'endDate' => date('Y-m-d H:i:s'),
@@ -47,9 +47,8 @@ class Events extends Base {
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => $this->getResolution($request),
+            ':resolution'   => \Utils\DateRange::getResolutionFromRequest(),
             ':offset'       => strval($offset),
-            ':unauth'       => \Utils\Constants::get('UNAUTHORIZED_USERID'),
         ];
         $params = array_merge($params, $alertTypesParams);
         $params = array_merge($params, $editTypesParams);
@@ -60,8 +59,7 @@ class Events extends Base {
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
                 COUNT(CASE WHEN event.type IN ({$normalFlatIds})  THEN TRUE END) AS event_normal_type_count,
                 COUNT(CASE WHEN event.type IN ({$editFlatIds})    THEN TRUE END) AS event_editing_type_count,
-                COUNT(CASE WHEN event.type IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count,
-                COUNT(CASE WHEN event_account.userid = :unauth    THEN TRUE END) AS unauthorized_event_count
+                COUNT(CASE WHEN event.type IN ({$alertFlatIds})   THEN TRUE END) AS event_alert_type_count
 
             FROM
                 event

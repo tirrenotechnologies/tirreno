@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -36,8 +38,8 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
             ON (event_country.country = countries.id)
 
             WHERE
-                event_country.key = :api_key
-                AND event_country.country = :country_id'
+                event_country.country = :country_id AND
+                event_country.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -80,8 +82,8 @@ class Country extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
                 event_country
 
             WHERE
-                event_country.key = :api_key
-                AND event_country.country = :country_id'
+                event_country.country = :country_id AND
+                event_country.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);

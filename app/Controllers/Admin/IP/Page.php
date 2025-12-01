@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,23 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\IP;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminIp';
 
     public function getPageParams(): array {
         $dataController = new Data();
-        $ipId = $this->integerParam($this->f3->get('PARAMS.ipId'));
-        $hasAccess = $dataController->checkIfOperatorHasAccess($ipId);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $ipId = \Utils\Conversion::getIntUrlParam('ipId');
+        $hasAccess = $dataController->checkIfOperatorHasAccess($ipId, $apiKey);
 
         if (!$hasAccess) {
             $this->f3->error(404);
         }
 
-        $ip = $dataController->getFullIpInfoById($ipId);
+        $ip = $dataController->getFullIpInfoById($ipId, $apiKey);
         $pageTitle = $this->getInternalPageTitleWithPostfix($ip['ip']);
-        $isEnrichable = $dataController->isEnrichable();
+        $isEnrichable = $dataController->isEnrichable($apiKey);
 
         $pageParams = [
             'LOAD_DATATABLE'                => true,
@@ -44,13 +47,11 @@ class Page extends \Controllers\Pages\Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
 
             $pageParams = array_merge($pageParams, $operationResponse);
-            $pageParams['CMD'] = $params['cmd'];
             // recall ip data
-            $pageParams['IP'] = $dataController->getFullIpInfoById($ipId);
+            $pageParams['IP'] = $dataController->getFullIpInfoById($ipId, $apiKey);
         }
 
         return parent::applyPageParams($pageParams);

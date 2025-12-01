@@ -9,13 +9,13 @@
     </a>
 </p>
 
-The open-source security analytics that your application is missing.
+tirreno is open security analytics.
 
-tirreno helps understand, monitor, and protect your applications from cyber threats, account takeovers, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypass firewalls, SIEM, WAFs, and other defenses.
+tirreno *[tir.ˈrɛ.no]* helps understand, monitor, and protect your applications from cyber threats, account takeovers, bots, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypasses firewalls, SIEM, WAFs, and other defenses.
 
-Our platform detects threats where they actually happen, inside your application. It adds a security layer to internal (workforce) or external (customer-facing) applications to identify malicious activity by analyzing user behavior, account activity, field audit trail, and business logic abuse that infrastructure tools cannot detect.
+tirreno detects threats where they actually happen: inside your product. It adds a security layer to internal or external applications to identify malicious activity by analyzing user behavior, account activity, field changes history, and business logic abuse that infrastructure tools are unable to detect.
 
-tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can ingest events from your application through API calls and immediately access real-time threat dashboard analytics.
+tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that can be downloaded and installed on your own web server. After a straightforward five-minute installation process, you can ingest events from your application through API calls and immediately access a real-time threat dashboard.
 
 ## Application types
 
@@ -27,6 +27,9 @@ tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that
   logic abuse.
 * **Mission critical applications**: Sensitive application protection,
   even in air-gapped deployments.
+* **Industrial control systems (ICS) and command & control (C2)**: Protect,
+  operational technology, command systems, and critical infrastructure
+  platforms from unauthorized access and malicious commands.
 * **Non-human identities (NHIs)**: Monitor service accounts, API keys,
   bot behaviors, and detect compromised machine identities.
 * **API-first applications**: Protect against abuse, rate limiting
@@ -55,7 +58,7 @@ tirreno is a few-dependency, "low-tech" PHP/PostgreSQL software application that
 
 ## Live demo
 
-Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (admin/tirreno).
+Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (*admin/tirreno*).
 
 ## Requirements
 
@@ -87,7 +90,7 @@ docker pull tirreno/tirreno:latest
 6. For cron jobs setup insert the following schedule (every 10 minutes) expression with `crontab -e` command or by editing `/var/spool/cron/your-web-server` file:
 
 ```
-*/10 * * * * cd /path/to/tirreno && /usr/bin/php /path/to/tirreno/index.php /cron >> /path/to/tirreno/assets/logs/error.log 2>&1
+*/10 * * * * /usr/bin/php /absolute/path/to/tirreno/index.php /cron
 ```
 
 ## Using Heroku (optional)
@@ -102,7 +105,8 @@ See the [User Guide](https://docs.tirreno.com/) for details on how to use tirren
 
 The tirreno project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
- Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in cyberdefence. We solve real people's challenges through love in ascétique code and sovereign technologies. tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine protection that has never existed before.
+Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in cyberdefence. We solve real people's challenges through love in *ascétique* code and open technologies. tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine
+the place of security in modern applications.
 
 ## Why the name tirreno?
 
@@ -110,7 +114,7 @@ Tyrrhenian people may have lived in Tuscany and eastern Switzerland as far back 
 
 According to historical sources, Tyrrhenian people were the first to use trumpets for signaling about coming threats, which was later adopted by Greek and Roman military forces.
 
-While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book. The tirreno wordmark, positioned beyond a horizon line, serves as a metaphor for the constant evolution of the fraud landscape and our commitment to staying ahead of change.
+While working on the logo, we conducted our own historical study and traced mentions of 'tirreno' back to the 15th-century printed edition of the Vulgate (the Latin Bible). We kept it lowercase to stay true to the original — quite literally, by the book. The tirreno wordmark stands behind the horizon line, as a metaphor of the endless evolutionary cycle of the threat landscape and our commitment to rise over it.
 
 ## Links
 

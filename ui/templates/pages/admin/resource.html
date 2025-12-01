@@ -1,6 +1,7 @@
 <include href="templates/parts/headerAdmin.html" />
 <div id="wrap">
     <include href="templates/parts/panel/eventPanel.html" />
+    <include href="templates/parts/panel/eventPanel.html" with="fromField=true"/>
     <include href="templates/parts/panel/devicePanel.html" />
     <include href="templates/parts/leftMenu.html" />
     <div class="main">
@@ -19,6 +20,7 @@
         <include href="templates/parts/mapWithIps.html" />
         <include href="templates/parts/tables/isps.html" />
         <include href="templates/parts/tables/devices.html" />
+        <include href="templates/parts/tables/fieldAuditTrail.html" />
         <include href="templates/parts/tables/events.html" with="showChart=1"/>
     </div>
 </div>

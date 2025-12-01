@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Enrichment;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function enrichEntity(string $type, ?string $search, ?int $entityId, int $apiKey, ?string $enrichmentKey): array {
         if ($enrichmentKey === null) {
-            return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_KEY_DOES_NOT_EXIST];
+            return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_KEY_NOT_EXISTS];
         }
         set_error_handler([\Utils\ErrorHandler::class, 'exceptionErrorHandler']);
         $search = $search !== null ? ['value' => $search] : null;
@@ -50,7 +52,7 @@ class Data extends \Controllers\Base {
         $attributes = $model->enrichableAttributes($apiKey);
 
         if (!array_key_exists($type, $attributes)) {
-            return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_ATTRIBUTE_IS_UNAVAILABLE];
+            return ['ERROR_CODE' => \Utils\ErrorCodes::ENRICHMENT_API_ATTR_UNAVAILABLE];
         }
 
         $modelDb = null;
@@ -181,34 +183,19 @@ class Data extends \Controllers\Base {
     }
 
     private function enrichEntityByValue(string $type, array $value, string $enrichmentKey): array {
-        $apiUrl = \Utils\Variables::getEnrichtmentApi();
         $postFields = [
             $type => $value['value'],
         ];
+        $response = \Utils\Network::sendApiRequest($postFields, '/query', 'POST', $enrichmentKey);
+        $code = $response['code'];
+        $result = $response['data'];
 
-        $options = [
-            'method' => 'POST',
-            'header' => [
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . $enrichmentKey,
-                'User-Agent: ' . $this->f3->get('USER_AGENT'),
-            ],
-            'content' => \json_encode($postFields),
-        ];
+        $jsonResponse = is_array($result) ? $result : [];
+        $statusCode = $code ?? 0;
 
-        /** @var array{request: array<string>, body: string, headers: array<string>, engine: string, cached: bool, error: string} $result */
-        $result = \Web::instance()->request(
-            url: sprintf('%s/query', $apiUrl),
-            options: $options,
-        );
+        $errorMessage = $response['error'] ?? '';
 
-        $matches = [];
-        preg_match('/^HTTP\/(\d+)(?:\.\d)? (\d{3})/', $result['headers'][0], $matches);
-
-        $jsonResponse = json_decode($result['body'], true);
-        $statusCode = (int) ($matches[2] ?? 0);
-
-        $errorMessages = $this->validateResponse($type, $statusCode, $jsonResponse, $result['error']);
+        $errorMessages = $this->validateResponse($type, $statusCode, $jsonResponse, $errorMessage);
 
         return [$statusCode, $jsonResponse, $errorMessages];
     }

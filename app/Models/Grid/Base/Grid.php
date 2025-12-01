@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Base;
 
 class Grid extends \Models\BaseSql {
-    use \Traits\Enrichment\TimeZones;
-    use \Traits\DateRange;
-
     protected $DB_TABLE_NAME = 'event';
 
     protected $idsModel = null;
@@ -28,14 +27,11 @@ class Grid extends \Models\BaseSql {
     protected function getGrid(?string $ids = null, array $idsParams = []): array {
         $this->setIds($ids, $idsParams);
 
-        $draw = $this->f3->get('REQUEST.draw');
-
-        $draw = $draw ?? 1;
+        $draw = $this->f3->get('REQUEST.draw') ?? 1;
         $data = $this->getData();
         $total = $this->getTotal();
 
-        $params = $this->f3->get('GET');
-        $dateRange = $this->getDatesRange($params);
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
 
         return [
             'data' => $data,
@@ -70,7 +66,7 @@ class Grid extends \Models\BaseSql {
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
-        $this->translateTimeZones($result);
+        \Utils\TimeZones::translateTimeZones($result);
     }
 
     protected function calculateCustomParams(array &$result): void {

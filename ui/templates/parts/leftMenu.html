@@ -3,50 +3,57 @@
     <include href="templates/parts/logoAdmin.html" />
         <ul class="menu-list">
             <li>
-                <set HOME_ACTIVE_CLASS="{{ '/' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @HOME_ACTIVE_CLASS }}" href="/">
-                    <include href="images/icons/dashboard.svg" />{{ @LeftMenu_home_link }}
+                <set REVIEW_QUEUE_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/review-queue') ? 'is-active': 'is-normal'}}" />
+                <a class="{{ @REVIEW_QUEUE_ACTIVE_CLASS }}" href="{{ @BASE }}/review-queue">
+                    <span class="reviewed-users-tile">{{ @NUMBER_OF_NOT_REVIEWED_USERS }}</span>{{ @LeftMenu_not_reviewed_users_link }}
                 </a>
             </li>
 
             <li>
-                <set REVIEW_QUEUE_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/review-queue') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @REVIEW_QUEUE_ACTIVE_CLASS }}" href="/review-queue">
-                    <include href="images/icons/watchlist.svg" />{{ @LeftMenu_not_reviewed_users_link }}<span class="reviewed-users-tile">{{ @NUMBER_OF_NOT_REVIEWED_USERS }}</span>
+                <set BLACKLIST_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/blacklist') ? 'is-active': 'is-normal'}}" />
+                <a class="{{ @BLACKLIST_ACTIVE_CLASS }}" href="{{ @BASE }}/blacklist">
+                    <span class="blacklist-users-tile">{{ @NUMBER_OF_BLACKLIST_USERS }}</span>{{ @LeftMenu_blacklist_link }}
+                </a>
+            </li>
+
+            <li>
+                <set HOME_ACTIVE_CLASS="{{ '/' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
+                <a class="{{ @HOME_ACTIVE_CLASS }}" href="{{ @BASE }}/">
+                    <include href="images/icons/dashboard.svg" />{{ @LeftMenu_home_link }}
                 </a>
             </li>
 {***
             <li>
                 <set WATCHLIST_ACTIVE_CLASS="{{ '/watchlist' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@WATCHLIST_ACTIVE_CLASS }}"  href="/watchlist">
+                <a class="{{@WATCHLIST_ACTIVE_CLASS }}"  href="{{ @BASE }}/watchlist">
                     <include href="images/icons/watchlist.svg" />{{ @LeftMenu_watchlist_link }}
                 </a>
             </li>
 ***}
             <li>
                 <set EVENTS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/event') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @EVENTS_ACTIVE_CLASS }}" href="/event">
+                <a class="{{ @EVENTS_ACTIVE_CLASS }}" href="{{ @BASE }}/event">
                     <include href="images/icons/events.svg" />{{ @LeftMenu_all_events_link }}
                 </a>
             </li>
 
             <li>
                 <set USERS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/id') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @USERS_ACTIVE_CLASS }}" href="/id">
+                <a class="{{ @USERS_ACTIVE_CLASS }}" href="{{ @BASE }}/id">
                     <include href="images/icons/users.svg" />{{ @LeftMenu_users_link }}
                 </a>
             </li>
 
             <li>
                 <set IPS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/ip') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @IPS_ACTIVE_CLASS }}" href="/ip">
+                <a class="{{ @IPS_ACTIVE_CLASS }}" href="{{ @BASE }}/ip">
                     <include href="images/icons/ips.svg" />{{ @LeftMenu_ips_link }}
                 </a>
             </li>
 
             <li>
                 <set COUNTRIES_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/country') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @COUNTRIES_ACTIVE_CLASS }}" href="/country">
+                <a class="{{ @COUNTRIES_ACTIVE_CLASS }}" href="{{ @BASE }}/country">
                     <include href="images/icons/countries.svg" />{{ @LeftMenu_countries_link }}
                 </a>
             </li>
@@ -54,14 +61,14 @@
 {***
             <li>
                 <set PHONES_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/phones') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @PHONES_ACTIVE_CLASS }}" href="/phones">
+                <a class="{{ @PHONES_ACTIVE_CLASS }}" href="{{ @BASE }}/phones">
                     <include href="images/icons/phones.svg" />{{ @LeftMenu_phones_link }}
                 </a>
             </li>
 ***}
             <li>
                 <set ISPS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/isp') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @ISPS_ACTIVE_CLASS }}" href="/isp">
+                <a class="{{ @ISPS_ACTIVE_CLASS }}" href="{{ @BASE }}/isp">
                     <include href="images/icons/isp.svg" />{{ @LeftMenu_isps_link }}
                 </a>
             </li>
@@ -69,7 +76,7 @@
             <check if="{{ @ALLOW_EMAIL_PHONE }}">
                 <li>
                     <set DOMAINS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/domain') ? 'is-active': 'is-normal'}}" />
-                    <a class="{{ @DOMAINS_ACTIVE_CLASS }}" href="/domain">
+                    <a class="{{ @DOMAINS_ACTIVE_CLASS }}" href="{{ @BASE }}/domain">
                         <include href="images/icons/domains.svg" />{{ @LeftMenu_domains_link }}
                     </a>
                 </li>
@@ -77,68 +84,68 @@
 
             <li>
                 <set RESOURCES_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/resource') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @RESOURCES_ACTIVE_CLASS }}" href="/resource">
+                <a class="{{ @RESOURCES_ACTIVE_CLASS }}" href="{{ @BASE }}/resource">
                     <include href="images/icons/resources.svg" />{{ @LeftMenu_resources_link }}
                 </a>
             </li>
 {***
             <li>
                 <set DEVICES_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/device') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @DEVICES_ACTIVE_CLASS }}" href="/device">
+                <a class="{{ @DEVICES_ACTIVE_CLASS }}" href="{{ @BASE }}/device">
                     <include href="images/icons/ios-ipados-devices.svg" />{{ @LeftMenu_devices_link }}
                 </a>
             </li>
             <li>
                 <set BOTS_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/bot') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @BOTS_ACTIVE_CLASS }}" href="/bot">
+                <a class="{{ @BOTS_ACTIVE_CLASS }}" href="{{ @BASE }}/bot">
                     <include href="images/icons/bot.svg" />{{ @LeftMenu_bots_link }}
                 </a>
             </li>
 ***}
             <li>
-                <set BLACKLIST_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/blacklist') ? 'is-active': 'is-normal'}}" />
-                <a class="{{ @BLACKLIST_ACTIVE_CLASS }}" href="/blacklist">
-                    <include href="images/icons/alert-diamond.svg" />{{ @LeftMenu_blacklist_link }}
+                <set FIELD_AUDIT_TRAIL_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/field') ? 'is-active': 'is-normal'}}" />
+                <a class="{{ @FIELD_AUDIT_TRAIL_ACTIVE_CLASS }}" href="{{ @BASE }}/field">
+                    <include href="images/icons/history.svg" />{{ @LeftMenu_field_audit_trail_link }}
                 </a>
             </li>
 {***
             <li>
                 <set MANUAL_CHECK_ACTIVE_CLASS="{{ false !== strpos(@CURRENT_PATH, '/manual-check' ? 'is-active': 'is-normal' }}" />
-                <a class="{{@MANUAL_CHECK_ACTIVE_CLASS}}" href="/manual-check">
+                <a class="{{@MANUAL_CHECK_ACTIVE_CLASS}}" href="{{ @BASE }}/manual-check">
                     <include href="images/icons/search.svg" />{{ @LeftMenu_manual_check_link }}
                 </a>
             </li>
 ***}
             <li>
                 <set RULES_ACTIVE_CLASS="{{ '/rules' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@RULES_ACTIVE_CLASS }}" href="/rules">
+                <a class="{{@RULES_ACTIVE_CLASS }}" href="{{ @BASE }}/rules">
                     <include href="images/icons/alert-dashboard.svg" />{{ @LeftMenu_rules_link }}
                 </a>
             </li>
 
             <li>
                 <set API_KEYS_ACTIVE_CLASS="{{ '/api' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@API_KEYS_ACTIVE_CLASS }}"  href="/api">
+                <a class="{{@API_KEYS_ACTIVE_CLASS }}"  href="{{ @BASE }}/api">
                     <include href="images/icons/apikeys.svg" />{{ @LeftMenu_api_keys_link }}
                 </a>
             </li>
 
             <li>
                 <set SETTINGS_ACTIVE_CLASS="{{ '/settings' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@SETTINGS_ACTIVE_CLASS }}"  href="/settings">
+                <a class="{{@SETTINGS_ACTIVE_CLASS }}"  href="{{ @BASE }}/settings">
                     <include href="images/icons/settings.svg" />{{ @LeftMenu_settings_link }}
                 </a>
             </li>
 
             <li>
                 <set LOGBOOK_ACTIVE_CLASS="{{ '/logbook' == @CURRENT_PATH ? 'is-active': 'is-normal'}}" />
-                <a class="{{@LOGBOOK_ACTIVE_CLASS }}"  href="/logbook">
+                <a class="{{@LOGBOOK_ACTIVE_CLASS }}"  href="{{ @BASE }}/logbook">
                     <include href="images/icons/rules.svg" />{{ @LeftMenu_logbook_link }}
                 </a>
             </li>
 
             <li>
-                <a class="is-normal" href="/logout">
+                <a class="is-normal" href="{{ @BASE }}/logout">
                     <include href="images/icons/logout.svg" />{{ @LeftMenu_logout_link }}
                 </a>
             </li>

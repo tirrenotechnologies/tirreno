@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 return [
     'AdminHome_page_title' => 'Dashboard',
@@ -25,7 +27,7 @@ return [
     'AdminHome_table_column_client_ip' => 'Client IP',
     'AdminHome_table_column_country' => 'Country',
 
-    'AdminHome_total_events' => 'Events',
+    'AdminHome_total_events' => 'Activities',
     'AdminHome_total_events_tooltip' => 'The number of events during a selected period of time and in total.',
     'AdminHome_total_users' => 'Users',
     'AdminHome_total_users_tooltip' => 'The number of active users during a selected period of time and in total.',

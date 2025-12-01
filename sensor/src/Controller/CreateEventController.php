@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -77,8 +77,34 @@ class CreateEventController {
             return new ErrorResponse('API key from the "Api-Key" header is not found', 401);
         }
 
-        $this->connectionService->finishRequestForUser();
-        $this->profiler->finish('user');
+        $blacklisting = $dto->blacklisting;
+        if (!$blacklisting) {
+            if ($this->connectionService->finishRequestForUser()) {
+                $this->profiler->finish('user');
+            }
+        }
+
+        // Check if ip/email/phone is blacklisted
+        $fraudDetected = $this->fraudDetectionService->getEarlierDetectedFraud(
+            $apiKeyDto->id,
+            $dto->emailAddress?->value,
+            $dto->ipAddress->value,
+            $dto->phoneNumber?->value,
+        );
+
+        if ($blacklisting) {
+            $data = [
+                'value'         => $dto->ipAddress->value,
+                'blacklisted'   => $fraudDetected->ip,
+            ];
+
+            header('Content-type: application/json');
+            echo json_encode($data);
+
+            if ($this->connectionService->finishRequestForUser()) {
+                $this->profiler->finish('user');
+            }
+        }
 
         // Get account ID
         $account = new AccountEntity(
@@ -104,14 +130,6 @@ class CreateEventController {
             $dto->emailAddress,
             $dto->emailDomain,
             $dto->phoneNumber,
-        );
-
-        // Check if ip/email/phone is blacklisted
-        $fraudDetected = $this->fraudDetectionService->getEarlierDetectedFraud(
-            $apiKeyDto->id,
-            $dto->emailAddress?->value,
-            $dto->ipAddress->value,
-            $dto->phoneNumber?->value,
         );
 
         $deviceDetected = $this->deviceDetectorService->parse($apiKeyDto, $dto->userAgent);
@@ -150,6 +168,9 @@ class CreateEventController {
             throw $e;
         }
 
-        return new RegularResponse($insertDto->eventId, $dto->changedParams);
+        return new RegularResponse(
+            $insertDto->eventId,
+            $dto->changedParams,
+        );
     }
 }

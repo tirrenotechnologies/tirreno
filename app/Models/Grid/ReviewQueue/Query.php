@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\ReviewQueue;
 
@@ -86,30 +88,11 @@ class Query extends \Models\Grid\Base\Query {
         return [$query, $queryParams];
     }
 
-    public function getTotalOverall(): array {
-        $queryParams = $this->getQueryParams();
-
-        $query = (
-            'SELECT
-                COUNT(event_account.id) AS count
-
-            FROM
-                event_account
-
-            WHERE
-                event_account.key = :api_key AND
-                event_account.fraud IS NULL AND
-                event_account.added_to_review IS NOT NULL'
-        );
-
-        return [$query, $queryParams];
-    }
-
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
@@ -123,12 +106,13 @@ class Query extends \Models\Grid\Base\Query {
                     LOWER(event_email.email)        LIKE LOWER(:search_value) OR
                     LOWER(event_account.userid)     LIKE LOWER(:search_value) OR
 
-                    TO_CHAR(event_account.lastseen::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value OR
-                    TO_CHAR(event_account.created::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
+                    TO_CHAR((event_account.lastseen + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value OR
+                    TO_CHAR((event_account.created + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
                 )"
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
+            $queryParams[':offset'] = strval(\Utils\TimeZones::getCurrentOperatorOffset());
         }
 
         //Add search and ids into request
@@ -136,8 +120,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = $this->f3->get('REQUEST.ruleUids');
-        if ($ruleUids === null) {
+        $ruleUids = \Utils\Conversion::getArrayRequestParam('ruleUids');
+        if (!$ruleUids) {
             return;
         }
 

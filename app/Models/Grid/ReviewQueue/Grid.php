@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\ReviewQueue;
 
@@ -28,20 +30,9 @@ class Grid extends \Models\Grid\Base\Grid {
         return $this->getGrid();
     }
 
-    public function getTotalUnderReviewUsers(): int {
-        return $this->getTotal();
-    }
-
-    public function getTotalUnderReviewUsersOverall(): int {
-        [$query, $params] = $this->query->getTotalOverall();
-        $results = $this->execQuery($query, $params);
-
-        return $results[0]['count'];
-    }
-
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['lastseen', 'created', 'score_updated_at', 'added_to_review'];
 
-        $this->translateTimeZones($result, $fields);
+        \Utils\TimeZones::translateTimeZones($result, $fields);
     }
 }

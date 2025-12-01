@@ -1,4 +1,4 @@
-<form action="/signup" method="POST">
+<form action="{{ @BASE }}/signup" method="POST">
     <input type="hidden" name="token" value="{{ @CSRF }}">
 
     <div class="field">
@@ -24,7 +24,7 @@
 
     <div class="bottom-line">
         <div>
-            <a href="/login">{{ @ForgotPassword_form_login_link }}</a>
+            <a href="{{ @BASE }}/login">{{ @ForgotPassword_form_login_link }}</a>
         </div>
 
         <div class="control has-text-right">

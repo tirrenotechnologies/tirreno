@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Events;
 
@@ -159,6 +161,9 @@ class Query extends \Models\Grid\Base\Query {
                             event_device.user_agent = :item_id'
                     );
                     break;
+                case 'fieldId':
+                    $query = 'SELECT total_visit AS count FROM event_field_audit WHERE key = :api_key AND id = :item_id';
+                    break;
             }
         }
 
@@ -215,8 +220,20 @@ class Query extends \Models\Grid\Base\Query {
         //Apply itemId into request
         $this->applyRelatedToIdSearchConitions($query);
 
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = '';
-        $search = $this->f3->get('REQUEST.search');
+
+        // WARN only for field_id filter
+        if ($this->itemId !== null && $this->itemKey === 'fieldId') {
+            $pattern = '/\bFROM\s+event\b/';
+            $replacement = (
+                'FROM event_field_audit_trail
+                INNER JOIN event
+                ON (event_field_audit_trail.event_id = event.id)
+            ');
+
+            $query = preg_replace($pattern, $replacement, $query, 1);
+        }
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             //TODO: user isIp function here
@@ -243,11 +260,12 @@ class Query extends \Models\Grid\Base\Query {
                         ELSE
                             '' END                          LIKE LOWER(:search_value) OR
 
-                        TO_CHAR(event.time::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
+                        TO_CHAR((event.time + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
                     )"
                 );
 
                 $queryParams[':search_value'] = '%' . $search['value'] . '%';
+                $queryParams[':offset'] = strval(\Utils\TimeZones::getCurrentOperatorOffset());
             }
         }
 
@@ -290,6 +308,9 @@ class Query extends \Models\Grid\Base\Query {
                 case 'deviceId':
                     $searchConditions = ' AND event_ua_parsed.id = :item_id %s';
                     break;
+                case 'fieldId':
+                    $searchConditions = ' AND event_field_audit_trail.field_id = :item_id %s';
+                    break;
             }
         }
 
@@ -300,8 +321,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyEventTypes(string &$query, array &$queryParams): void {
-        $eventTypeIds = $this->f3->get('REQUEST.eventTypeIds');
-        if ($eventTypeIds === null || !count($eventTypeIds)) {
+        $eventTypeIds = \Utils\Conversion::getArrayRequestParam('eventTypeIds');
+        if (!$eventTypeIds) {
             return;
         }
 
@@ -315,8 +336,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyDeviceTypes(string &$query, array &$queryParams): void {
-        $deviceTypes = $this->f3->get('REQUEST.deviceTypes');
-        if ($deviceTypes === null || !count($deviceTypes)) {
+        $deviceTypes = \Utils\Conversion::getArrayRequestParam('deviceTypes');
+        if (!$deviceTypes) {
             return;
         }
 
@@ -349,8 +370,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = $this->f3->get('REQUEST.ruleUids');
-        if ($ruleUids === null) {
+        $ruleUids = \Utils\Conversion::getArrayRequestParam('ruleUids');
+        if (!$ruleUids) {
             return;
         }
 

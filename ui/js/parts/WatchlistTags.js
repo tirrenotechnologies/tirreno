@@ -21,7 +21,7 @@ export class WatchlistTags {
 
         $.ajax({
             type: 'POST',
-            url: '/admin/removeWatchlisted',
+            url: `${window.app_base}/admin/removeWatchlisted`,
             data: data,
             scope: me,
             success: me.onUserTagRemoveCallback,

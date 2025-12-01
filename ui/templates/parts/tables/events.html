@@ -35,7 +35,7 @@
                     <repeat group="{{ @IMPORTANT_USERS }}" value="{{ @RECORD }}" >
                     <div class="control">
                         <div class="tags has-addons">
-                            <a class="tag is-link" data-id="{{ @RECORD.id }}" href="/id/{{ @RECORD.id }}">{{ @RECORD.userid }}</a>
+                            <a class="tag is-link" data-id="{{ @RECORD.id }}" href="{{ @BASE }}/id/{{ @RECORD.id }}">{{ @RECORD.userid }}</a>
                             <a class="tag is-delete"></a>
                         </div>
                     </div>

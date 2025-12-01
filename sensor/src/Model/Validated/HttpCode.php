@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -23,7 +23,7 @@ class HttpCode extends Base {
 
     public function __construct(string $value) {
         parent::__construct($value, 'httpCode');
-        $this->value = (int) (ctype_digit($value) ? $value : self::INVALIDPLACEHOLDER);
+        $this->value = intval(ctype_digit($value) ? $value : self::INVALIDPLACEHOLDER);
         $this->invalid = !ctype_digit($value);
     }
 }

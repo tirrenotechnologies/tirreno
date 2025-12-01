@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Utils;
 
@@ -28,8 +30,15 @@ class Variables {
         return getenv('CONFIG_FILE') ?: 'local/config.local.ini';
     }
 
-    public static function getSite(): string {
-        return getenv('SITE') ?: self::getF3()->get('SITE');
+    public static function getHosts(): array {
+        $env = getenv('SITE');
+        $conf = self::getF3()->get('SITE');
+
+        return $env ? explode(',', $env) : (is_array($conf) ? $conf : [$conf]);
+    }
+
+    public static function getHost(): string {
+        return self::getHosts()[0];
     }
 
     public static function getAdminEmail(): ?string {
@@ -44,7 +53,7 @@ class Variables {
         return getenv('MAIL_PASS') ?: self::getF3()->get('MAIL_PASS');
     }
 
-    public static function getEnrichtmentApi(): string {
+    public static function getEnrichmentApi(): string {
         return getenv('ENRICHMENT_API') ?: self::getF3()->get('ENRICHMENT_API');
     }
 
@@ -55,7 +64,7 @@ class Variables {
     public static function getLogbookLimit(): int {
         $value = getenv('LOGBOOK_LIMIT') ?: self::getF3()->get('LOGBOOK_LIMIT') ?: \Utils\Constants::get('LOGBOOK_LIMIT');
 
-        return is_int($value) ? $value : (ctype_digit($value) ? intval($value) : \Utils\Constants::get('LOGBOOK_LIMIT'));
+        return \Utils\Conversion::intValCheckEmpty($value, \Utils\Constants::get('LOGBOOK_LIMIT'));
     }
 
     public static function getForgotPasswordAllowed(): bool {
@@ -77,20 +86,28 @@ class Variables {
         return filter_var($variable, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
     }
 
-    public static function getSiteWithProtocol(): string {
-        return (self::getForceHttps() ? 'https://' : 'http://') . self::getSite();
+    public static function getHostWithProtocol(): string {
+        return (self::getForceHttps() ? 'https://' : 'http://') . self::getHost();
+    }
+
+    public static function getHostWithProtocolAndBase(): string {
+        return self::getHostWithProtocol() . self::getF3()->get('BASE');
     }
 
     public static function getAccountOperationQueueBatchSize(): int {
-        return getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE') ? intval(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE')) : \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE');
+        return \Utils\Conversion::intValCheckEmpty(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'), \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'));
     }
 
     public static function getNewEventsBatchSize(): int {
-        return getenv('NEW_EVENTS_BATCH_SIZE') ? intval(getenv('NEW_EVENTS_BATCH_SIZE')) : \Utils\Constants::get('NEW_EVENTS_BATCH_SIZE');
+        return \Utils\Conversion::intValCheckEmpty(getenv('NEW_EVENTS_BATCH_SIZE'), \Utils\Constants::get('NEW_EVENTS_BATCH_SIZE'));
     }
 
     public static function getRuleUsersBatchSize(): int {
-        return getenv('RULE_USERS_BATCH_SIZE') ? intval(getenv('RULE_USERS_BATCH_SIZE')) : \Utils\Constants::get('RULE_USERS_BATCH_SIZE');
+        return \Utils\Conversion::intValCheckEmpty(getenv('RULE_USERS_BATCH_SIZE'), \Utils\Constants::get('RULE_USERS_BATCH_SIZE'));
+    }
+
+    public static function getAvailableTimezones(): array {
+        return array_intersect_key(self::getF3()->get('timezones'), array_flip(\DateTimeZone::listIdentifiers()));
     }
 
     public static function completedConfig(): bool {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -55,8 +57,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                 event_url
 
             WHERE
-                event_url.id = :resource_id
-                AND event_url.key = :api_key'
+                event_url.id = :resource_id AND
+                event_url.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -115,27 +117,32 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
 
         $totalIp = $this->execQuery($query, $params);
 
+        $params[':field_edit'] = \Utils\Constants::FIELD_EDIT_EVENT_TYPE_ID;
         $query = (
             "SELECT
-                event.url AS id,
-                COUNT(DISTINCT(event_ip.country)) AS cnt
+                event.url   AS id,
+                COUNT(*)    AS cnt
             FROM event
-            INNER JOIN event_ip
-            ON event.ip = event_ip.id
             WHERE
                 event.url IN ({$flatIds}) AND
+                event.type = :field_edit AND
                 event.key = :key AND
                 event.time > :start_date AND
                 event.time < :end_date
             GROUP BY event.url"
         );
 
-        $totalCountry = $this->execQuery($query, $params);
+        $totalEdit = $this->execQuery($query, $params);
 
         $result = [];
 
         foreach ($ids as $id) {
-            $result[$id] = ['total_visit' => 0, 'total_account' => 0, 'total_ip' => 0, 'total_country' => 0];
+            $result[$id] = [
+                'total_visit'   => 0,
+                'total_account' => 0,
+                'total_ip'      => 0,
+                'total_edit'    => 0,
+            ];
         }
 
         foreach ($totalVisit as $rec) {
@@ -150,8 +157,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
             $result[$rec['id']]['total_ip'] = $rec['cnt'];
         }
 
-        foreach ($totalCountry as $rec) {
-            $result[$rec['id']]['total_country'] = $rec['cnt'];
+        foreach ($totalEdit as $rec) {
+            $result[$rec['id']]['total_edit'] = $rec['cnt'];
         }
 
         return $result;
@@ -164,6 +171,7 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
 
         [$params, $flatIds] = $this->getArrayPlaceholders($ids);
         $params[':key'] = $apiKey;
+        $params[':field_edit'] = \Utils\Constants::FIELD_EDIT_EVENT_TYPE_ID;
         $extraClause = $force ? '' : ' AND event_url.lastseen >= event_url.updated';
 
         $query = (
@@ -174,6 +182,7 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                 total_ip = COALESCE(sub.total_ip, 0),
                 total_device = COALESCE(sub.total_device, 0),
                 total_country = COALESCE(sub.total_country, 0),
+                total_edit = COALESCE(sub.total_edit, 0),
                 updated = date_trunc('milliseconds', now())
             FROM (
                 SELECT
@@ -182,7 +191,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                     COUNT(DISTINCT event.account) AS total_account,
                     COUNT(DISTINCT event.ip) AS total_ip,
                     COUNT(DISTINCT event.device) AS total_device,
-                    COUNT(DISTINCT event_ip.country) AS total_country
+                    COUNT(DISTINCT event_ip.country) AS total_country,
+                    COUNT(CASE WHEN event.type = :field_edit THEN TRUE END) AS total_edit
                 FROM event
                 LEFT JOIN event_ip ON event.ip = event_ip.id
                 WHERE
@@ -203,7 +213,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
 
     public function updateAllTotals(int $apiKey): int {
         $params = [
-            ':key' => $apiKey,
+            ':key'          => $apiKey,
+            ':field_edit'   => \Utils\Constants::FIELD_EDIT_EVENT_TYPE_ID,
         ];
 
         $query = (
@@ -214,6 +225,7 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                 total_ip = COALESCE(sub.total_ip, 0),
                 total_device = COALESCE(sub.total_device, 0),
                 total_country = COALESCE(sub.total_country, 0),
+                total_edit = COALESCE(sub.total_edit, 0),
                 updated = date_trunc(\'milliseconds\', now())
             FROM (
                 SELECT
@@ -222,7 +234,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                     COUNT(DISTINCT event.account) AS total_account,
                     COUNT(DISTINCT event.ip) AS total_ip,
                     COUNT(DISTINCT event.device) AS total_device,
-                    COUNT(DISTINCT event_ip.country) AS total_country
+                    COUNT(DISTINCT event_ip.country) AS total_country,
+                    COUNT(CASE WHEN event.type = :field_edit THEN TRUE END) AS total_edit
                 FROM event
                 LEFT JOIN event_ip ON event.ip = event_ip.id
                 WHERE
@@ -247,7 +260,7 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
                 id,
                 total_ip,
                 total_visit,
-                total_country,
+                total_edit,
                 total_account
             FROM event_url
             WHERE id IN ({$flatIds}) AND key = :key"
@@ -262,8 +275,8 @@ class Resource extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthor
 
         foreach ($res as $idx => $item) {
             $item['total_ip'] = $indexedResult[$item['id']]['total_ip'];
+            $item['total_edit'] = $indexedResult[$item['id']]['total_edit'];
             $item['total_visit'] = $indexedResult[$item['id']]['total_visit'];
-            $item['total_country'] = $indexedResult[$item['id']]['total_country'];
             $item['total_account'] = $indexedResult[$item['id']]['total_account'];
             $res[$idx] = $item;
         }

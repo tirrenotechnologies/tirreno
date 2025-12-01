@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Api;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
+class Data extends \Controllers\Admin\Base\Data {
     protected $ENRICHED_ATTRIBUTES = [];
 
     public function __construct() {
@@ -26,13 +26,11 @@ class Data extends \Controllers\Base {
         $this->ENRICHED_ATTRIBUTES = array_keys(\Utils\Constants::get('ENRICHING_ATTRIBUTES'));
     }
 
-    public function proceedPostRequest(array $params): array {
-        $cmd = $params['cmd'] ?? '';
-
-        return match ($cmd) {
-            'resetKey'                      => $this->resetApiKey($params),
-            'updateApiUsage'                => $this->updateApiUsage($params),
-            'enrichAll'                     => $this->enrichAll($params),
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'resetKey'          => $this->resetApiKey(),
+            'updateApiUsage'    => $this->updateApiUsage(),
+            'enrichAll'         => $this->enrichAll(),
             default => []
         };
     }
@@ -89,7 +87,7 @@ class Data extends \Controllers\Base {
     }
 
     public function getOperatorApiKeysDetails(int $operatorId): array {
-        [$isOwner, $apiKeys] = $this->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = \Utils\ApiKeys::getOperatorApiKeys($operatorId);
 
         $resultKeys = [];
 
@@ -110,40 +108,27 @@ class Data extends \Controllers\Base {
     }
 
     private function getSubscriptionStats(string $token): array {
-        $api = \Utils\Variables::getEnrichtmentApi();
+        $response = \Utils\Network::sendApiRequest(null, '/usage-stats', 'GET', $token);
+        $code = $response['code'];
+        $result = $response['data'];
 
-        $options = [
-            'method' => 'GET',
-            'header' => [
-                'Authorization: Bearer ' . $token,
-                'User-Agent: ' . $this->f3->get('USER_AGENT'),
-            ],
-        ];
+        $jsonResponse = is_array($result) ? $result : [];
+        $statusCode = $code ?? 0;
 
-        /** @var array{request: array<string>, body: string, headers: array<string>, engine: string, cached: bool, error: string} $result */
-        $result = \Web::instance()->request(
-            url: sprintf('%s/usage-stats', $api),
-            options: $options,
-        );
-
-        $matches = [];
-        preg_match('/^HTTP\/(\d+)(?:\.\d)? (\d{3})/', $result['headers'][0], $matches);
-        $statusCode = (int) ($matches[2] ?? 0);
-
-        $errorMessage = $result['error'];
-        $jsonResponse = json_decode($result['body'], true);
+        $errorMessage = $response['error'] ?? '';
 
         return [$statusCode, $jsonResponse, $errorMessage];
     }
 
-    public function resetApiKey(array $params): array {
+    public function resetApiKey(): array {
         $pageParams = [];
-        $errorCode = $this->validateResetApiKey($params);
+        $params = $this->extractRequestParams(['token', 'keyId']);
+        $errorCode = \Utils\Validators::validateResetApiKey($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
+            $keyId = \Utils\Conversion::getIntRequestParam('keyId');
 
             $model = new \Models\ApiKeys();
             $model->getKeyById($keyId);
@@ -155,70 +140,25 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function enrichAll(array $data): array {
+    public function enrichAll(): array {
         $pageParams = [];
-        $errorCode = $this->validateEnrichAll($data);
+        $params = $this->extractRequestParams(['token']);
+        $errorCode = \Utils\Validators::validateEnrichAll($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $apiKey = $this->getCurrentOperatorApiKeyId();
+            $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
 
             $model = new \Models\Users();
             $accountsForEnrichment = $model->notCheckedUsers($apiKey);
 
-            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
-            $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-
-            $accountOpQueueModel->addBatchIds($accountsForEnrichment, $apiKey);
+            (new \Models\Queue())->addBatchIds($accountsForEnrichment, \Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'), $apiKey);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_manual_enrichment_success_message');
         }
 
         return $pageParams;
-    }
-
-    public function validateEnrichAll(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        return false;
-    }
-
-    public function validateResetApiKey(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-        if (!$keyId) {
-            return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
-        }
-
-        if ($keyId !== $this->getCurrentOperatorApiKeyId()) {
-            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
-        }
-
-        return false;
-    }
-
-    private function validateApiKeyAccess(int $keyId, int $operatorId): bool {
-        $model = new \Models\ApiKeys();
-        $model->getByKeyAndOperatorId($keyId, $operatorId);
-
-        if (!$model->loaded()) {
-            $coOwnerModel = new \Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
-
-            if (!$coOwnerModel->loaded()) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public function getEnrichedAttributes(\Models\ApiKeys $key): array {
@@ -231,19 +171,24 @@ class Data extends \Controllers\Base {
         return $enrichedAttributes;
     }
 
-    public function updateApiUsage(array $params): array {
-        $errorCode = $this->validateUpdateApiUsage($params);
+    public function updateApiUsage(): array {
         $pageParams = [];
+        // apiToken, exchangeBlacklist optional
+        $params = $this->extractRequestParams(['token', 'keyId', 'enrichedAttributes']);
+        $errorCode = \Utils\Validators::validateUpdateApiUsage($params, $this->ENRICHED_ATTRIBUTES);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
+            $keyId = \Utils\Conversion::getIntRequestParam('keyId');
+
             $model = new \Models\ApiKeys();
             $model->getKeyById($keyId);
 
-            if ($params['apiToken'] !== null) {
-                $apiToken = trim($params['apiToken']);
+            $apiToken = \Utils\Conversion::getStringRequestParam('apiToken', true);
+
+            if ($apiToken !== null) {
+                $apiToken = trim($apiToken);
                 [$code, , $error] = $this->getSubscriptionStats($apiToken);
                 if (strlen($error) > 0 || $code > 201) {
                     $pageParams['ERROR_CODE'] = \Utils\ErrorCodes::SUBSCRIPTION_KEY_INVALID_UPDATE;
@@ -252,11 +197,11 @@ class Data extends \Controllers\Base {
                 $model->updateInternalToken($apiToken);
             }
 
-            $enrichedAttributes = $params['enrichedAttributes'] ?? [];
+            $enrichedAttributes = \Utils\Conversion::getArrayRequestParam('enrichedAttributes');
             $skipEnrichingAttributes = \array_diff($this->ENRICHED_ATTRIBUTES, \array_keys($enrichedAttributes));
             $model->updateSkipEnrichingAttributes($skipEnrichingAttributes);
 
-            $skipBlacklistSync = !isset($params['exchangeBlacklist']);
+            $skipBlacklistSync = !\Utils\Conversion::getStringRequestParam('exchangeBlacklist');
             $model->updateSkipBlacklistSynchronisation($skipBlacklistSync);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_data_enrichment_success_message');
@@ -265,45 +210,18 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function validateUpdateApiUsage(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-        if (!$keyId) {
-            return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
-        }
-
-        $currentOperator = $this->f3->get('CURRENT_USER');
-        $operatorId = $currentOperator->id;
-        if (!$this->validateApiKeyAccess($keyId, $operatorId)) {
-            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
-        }
-
-        $enrichedAttributes = $params['enrichedAttributes'] ?? [];
-        $unknownAttributes = \array_diff(\array_keys($enrichedAttributes), $this->ENRICHED_ATTRIBUTES);
-        if ($unknownAttributes) {
-            return \Utils\ErrorCodes::UNKNOWN_ENRICHMENT_ATTRIBUTES;
-        }
-
-        return false;
-    }
-
     public function getNotCheckedEntitiesForLoggedUser(): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
         $controller = new \Controllers\Admin\Enrichment\Data();
 
         return $controller->getNotCheckedExists($apiKey);
     }
 
     public function getScheduledForEnrichment(): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::ENRICHMENT);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $model = new \Models\Queue();
 
         // do not use isInQueue() to prevent true on failed state
-        return $accountOpQueueModel->actionIsInQueueProcessing($apiKey);
+        return $model->actionIsInQueueProcessing(\Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'), $apiKey);
     }
 }

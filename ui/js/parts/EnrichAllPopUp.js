@@ -1,5 +1,5 @@
 import {Loader} from './Loader.js?v=2';
-import {fireEvent} from './utils/Event.js?v=2';
+import {fireEvent, handleEscape} from './utils/Event.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {renderEnrichmentCalculation} from './DataRenderers.js?v=2';
 
@@ -21,21 +21,8 @@ export class EnrichAllPopUp {
         this.closePopUpButton.addEventListener('click', onCloseButtonClick, false);
     }
 
-    //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
     onKeydown(e) {
-        if (e.defaultPrevented) {
-            return; // Do nothing if the event was already processed
-        }
-        switch (e.key) {
-            case 'Esc': // IE/Edge specific value
-            case 'Escape':
-                this.close();
-                break;
-            default:
-                return;
-        }
-        // Cancel the default action to avoid it being handled twice
-        e.preventDefault();
+        handleEscape(e, () => this.close(), false);
     }
 
     onConfirmEnrichAllButton(e) {
@@ -73,7 +60,7 @@ export class EnrichAllPopUp {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: '/admin/enrichmentDetails',
+            url: `${window.app_base}/admin/enrichmentDetails`,
             type: 'get',
             data: {token: token},
             success: onDetailsLoaded,

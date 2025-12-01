@@ -35,8 +35,10 @@ export class BaseGrid {
             }
         }
 
+        const onSearchFilterChanged = this.onSearchFilterChanged.bind(this);
+        window.addEventListener(this.config.tableId + '-searchFilterChanged', onSearchFilterChanged, false);
+
         if (!this.config.sequential) {
-            const onSearchFilterChanged = this.onSearchFilterChanged.bind(this);
             window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
         }
     }
@@ -92,7 +94,7 @@ export class BaseGrid {
             ajax: function(data, callback, settings) {
                 $.ajax({
                     url: url,
-                    method: 'GET',
+                    method: 'POST',
                     data: data,
                     dataType: 'json',
                     success: function(response, textStatus, jqXHR) {
@@ -173,7 +175,7 @@ export class BaseGrid {
             });
             $.ajax({
                 type: 'GET',
-                url: '/admin/timeFrameTotal',
+                url: `${window.app_base}/admin/timeFrameTotal`,
                 data: requestData,
                 success: (data) => this.onTotalsSuccess(data, config, preparedBase),
                 error: handleAjaxError,
@@ -306,9 +308,7 @@ export class BaseGrid {
     }
 
     onBeforeLoad(e, settings, data) {
-        if (!this.config.sequential) {
-            this.startLoader();
-        }
+        this.startLoader();
         this.updateTableTitle(MIDLINE_HELLIP);
 
         fireEvent('dateFilterChangedCaught');
@@ -363,17 +363,6 @@ export class BaseGrid {
         }
     }
 
-    //TODO: leave blank and move to the events table
-    addTableRowsEvents() {
-        const tableId    = this.config.tableId;
-        const onRowClick = this.onRowClick.bind(this);
-
-        if ($(this.table).DataTable().data().any()) {
-            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-            rows.forEach(row => row.addEventListener('click', onRowClick, false));
-        }
-    }
-
     startLoader() {
         const tableId    = this.config.tableId;
         const loaderPath = `${tableId}_processing`;
@@ -391,24 +380,9 @@ export class BaseGrid {
         table.classList.add('dim-table');
     }
 
-    onRowClick(e) {
-        const selection = window.getSelection();
-        if ('Range' === selection.type) {
-            return;
-        }
-
-        e.preventDefault();
-
-        const row    = e.target.closest('tr');
-        const itemId = row.dataset.itemId;
-        const data   = {itemId: itemId};
-
-        fireEvent('tableRowClicked', data);
-    }
-
     onError(e, settings, techNote, message) {
         if (settings.jqXHR !== undefined && 403 === settings.jqXHR.status) {
-            window.location.href = escape('/');
+            window.location.href = escape(window.app_base + '/');
         }
 
         //console.warn('An error has been reported by DataTables: ', message);

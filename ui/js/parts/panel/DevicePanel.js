@@ -15,7 +15,7 @@ export class DevicePanel extends BasePanel {
             //enrichment: true,
             enrichemnt: false,
             type: 'device',
-            url: '/admin/deviceDetails',
+            url: `${window.app_base}/admin/deviceDetails`,
             cardId: 'device-card',
             panelClosed: 'devicePanelClosed',
             closePanel: 'closeDevicePanel',

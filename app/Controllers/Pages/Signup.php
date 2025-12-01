@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Controllers\Pages;
 
@@ -30,8 +32,10 @@ class Signup extends Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $errorCode = $this->validate($params);
+            \Utils\Updates::syncUpdates();
+
+            $params = $this->extractRequestParams(['token', 'email', 'password', 'timezone']);
+            $errorCode = \Utils\Validators::validateSignup($params);
 
             $pageParams['ERROR_CODE'] = $errorCode;
 
@@ -52,7 +56,7 @@ class Signup extends Base {
         return parent::applyPageParams($pageParams);
     }
 
-    private function addDefaultApiKey($operatorId) {
+    private function addDefaultApiKey(int $operatorId): int {
         $data = [
             'quote' => $this->f3->get('DEFAULT_API_KEY_QUOTE'),
             'operator_id' => $operatorId,
@@ -65,7 +69,7 @@ class Signup extends Base {
         return $model->add($data);
     }
 
-    private function addDefaultRules(int $apiKey): void {
+    protected function addDefaultRules(int $apiKey): void {
         $model = new \Models\OperatorsRules();
         $defaultRules = \Utils\Constants::get('DEFAULT_RULES');
 
@@ -78,7 +82,7 @@ class Signup extends Base {
         }
     }
 
-    private function addUser($data) {
+    private function addUser(array $data): \Models\Operator {
         $model = new \Models\Operator();
         $model->add($data);
 
@@ -86,7 +90,7 @@ class Signup extends Base {
     }
 
     private function sendActivationEmail(\Models\Operator $operatorModel): void {
-        $url = \Utils\Variables::getSiteWithProtocol();
+        $url = \Utils\Variables::getHostWithProtocolAndBase();
 
         $toName = $operatorModel->firstname;
         $toAddress = $operatorModel->email;
@@ -99,48 +103,5 @@ class Signup extends Base {
         $message = sprintf($message, $activationUrl);
 
         \Utils\Mailer::send($toName, $toAddress, $subject, $message);
-    }
-
-    private function validate(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $email = $params['email'];
-        $password = $params['password'];
-
-        if (!$email) {
-            return \Utils\ErrorCodes::EMAIL_DOES_NOT_EXIST;
-        }
-
-        $audit = \Audit::instance();
-        if (!$audit->email($email, true)) {
-            return \Utils\ErrorCodes::EMAIL_IS_NOT_CORRECT;
-        }
-
-        $operatorsModel = new \Models\Operator();
-        $operator = $operatorsModel->getByEmail($email);
-        if ($operator) {
-            return \Utils\ErrorCodes::EMAIL_ALREADY_EXIST;
-        }
-
-        if (!$password) {
-            return \Utils\ErrorCodes::PASSWORD_DOES_NOT_EXIST;
-        }
-
-        $passwordLegth = strlen($password);
-        $minPasswordLegth = $this->f3->get('MIN_PASSWORD_LENGTH');
-        if ($passwordLegth < $minPasswordLegth) {
-            return \Utils\ErrorCodes::PASSWORD_IS_TO_SHORT;
-        }
-
-        $timezone = $params['timezone'] ?? null;
-        $timezones = $this->f3->get('timezones');
-        if (!$timezone || !array_key_exists($timezone, $timezones)) {
-            return \Utils\ErrorCodes::TIME_ZONE_DOES_NOT_EXIST;
-        }
-
-        return false;
     }
 }

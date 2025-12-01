@@ -1,6 +1,6 @@
 import {Loader} from '../Loader.js?v=2';
 import {Tooltip} from '../Tooltip.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
+import {fireEvent, handleEscape} from '../utils/Event.js?v=2';
 import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 
 export class BasePanel {
@@ -36,6 +36,7 @@ export class BasePanel {
         }
 
         this.allPanels = {
+            'field':    {id: 'field-card',  closeEvent: 'fieldPanelClosed'},
             'event':    {id: 'event-card',  closeEvent: 'eventPanelClosed'},
             'logbook':  {id: 'logbook-card',closeEvent: 'logbookPanelClosed'},
             'email':    {id: 'email-card',  closeEvent: 'emailPanelClosed'},
@@ -44,25 +45,8 @@ export class BasePanel {
         };
     }
 
-    //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
     onKeydown(e) {
-        // procced keydown even if event was processed
-
-        switch (e.key) {
-            case 'Esc': // IE/Edge specific value
-            case 'Escape': {
-                this.close();
-
-                break;
-            }
-
-            default: {
-                return;
-            }
-        }
-
-        // Cancel the default action to avoid it being handled twice
-        e.preventDefault();
+        handleEscape(e, () => this.close(), true);
     }
 
     onEnrichmentButtonClick(e) {
@@ -80,7 +64,7 @@ export class BasePanel {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: '/admin/reenrichment',
+            url: `${window.app_base}/admin/reenrichment`,
             type: 'post',
             data: {type: this.type, entityId: this.itemId, token: token},
             success: onEnrichmentLoaded,
@@ -152,11 +136,25 @@ export class BasePanel {
         this.contentDiv.classList.remove('is-hidden');
         this.loaderDiv.classList.add('is-hidden');
 
+        this.substituteData(data);
+
+        this.initTooltips();
+    }
+
+    substituteData(data) {
         let span = null;
+        let prev = null;
         //todo: foreach and arrow fn ?
         for (const key in data) {
             span = this.card.querySelector(`#details_${key}`);
             if (span) {
+                span.classList.remove('is-hidden');
+
+                prev = span.previousElementSibling;
+                if (prev) {
+                    prev.classList.remove('is-hidden');
+                }
+
                 if (data[key] instanceof Node) {
                     span.replaceChildren(data[key]);
                 } else {
@@ -164,8 +162,6 @@ export class BasePanel {
                 }
             }
         }
-
-        this.initTooltips();
     }
 
     initTooltips() {

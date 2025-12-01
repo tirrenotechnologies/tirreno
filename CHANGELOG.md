@@ -1,5 +1,21 @@
 # tirreno changelog
 
+## tirreno v0.9.10
+
+* only strict_types
+* API overload protection
+* CLI adaptation for sensor
+* core rules in `/assets/rules/core/`
+* blacklist export in blacklist.log
+* file extensions filter for grid in /resource
+* API requests optimization
+* field audit trail page
+* validation enhancement
+* cron jobs enhancement
+* usage interface for F3 variables
+* average instead of median for per-user stats
+* blacklisted accounts counter in menu
+
 ## tirreno v0.9.9
 
 * user activity sparklines charts

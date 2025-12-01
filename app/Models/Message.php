@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Message extends \Models\BaseSql {
@@ -23,7 +25,7 @@ class Message extends \Models\BaseSql {
 
         $this->save();
 
-        return (int) $this->id;
+        return \Utils\Conversion::intVal($this->id, 0);
     }
 
     public function getMessage(): self|null|false {

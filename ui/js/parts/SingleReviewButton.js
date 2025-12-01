@@ -4,10 +4,12 @@ import {
 } from './DataRenderers.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {replaceAll} from './utils/String.js?v=2';
+import {Button} from './Button.js?v=2';
 
-export class SingleReviewButton {
+export class SingleReviewButton extends Button {
 
     constructor(userId) {
+        super();
         this.userId = userId;
 
         const me = this;
@@ -42,7 +44,7 @@ export class SingleReviewButton {
 
         const me = this;
         const target = e.target;
-        const url = '/admin/manageUser';
+        const url = `${window.app_base}/admin/manageUser`;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const data = {userId: this.userId, type: target.dataset.type, token: token};
 
@@ -122,6 +124,9 @@ export class SingleReviewButton {
             userTitleSpan.classList.remove('high', 'medium', 'low', 'empty');
             userTitleSpan.classList.add((reviewStatus === 'Blacklisted') ? 'low' : 'high');
         }
+
+        me.setMenuCount();
+        me.setBlacklistMenuCount();
     }
 
     get legitFraudButtonsBlock() {

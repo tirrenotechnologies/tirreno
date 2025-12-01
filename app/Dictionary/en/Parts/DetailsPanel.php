@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 return [
     'Details_placeholder' => 'Event report',
@@ -98,6 +100,7 @@ return [
 
     //Logbook
     'Details_local_timestamp' => 'Local timestamp',
+    'Details_endpoint' => 'Endpoint',
     'Details_error_type' => 'Status',
     'Details_error_text' => 'Warning message',
     'Details_request' => 'Raw POST data',

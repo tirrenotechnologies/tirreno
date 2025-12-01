@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,22 +13,22 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Settings;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return match ($params['cmd']) {
-            'changeEmail'                   => $this->changeEmail($params),
-            'changeTimeZone'                => $this->changeTimeZone($params),
-            'changePassword'                => $this->changePassword($params),
-            'closeAccount'                  => $this->closeAccount($params),
-            'updateNotificationPreferences' => $this->updateNotificationPreferences($params),
-            'changeRetentionPolicy'         => $this->changeRetentionPolicy($params),
-            'inviteCoOwner'                 => $this->inviteCoOwner($params),
-            'removeCoOwner'                 => $this->removeCoOwner($params),
-            'checkUpdates'                  => $this->checkUpdates($params),
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'changeEmail'                   => $this->changeEmail(),
+            'changeTimeZone'                => $this->changeTimeZone(),
+            'changePassword'                => $this->changePassword(),
+            'closeAccount'                  => $this->closeAccount(),
+            'updateNotificationPreferences' => $this->updateNotificationPreferences(),
+            'changeRetentionPolicy'         => $this->changeRetentionPolicy(),
+            'inviteCoOwner'                 => $this->inviteCoOwner(),
+            'removeCoOwner'                 => $this->removeCoOwner(),
+            'checkUpdates'                  => $this->checkUpdates(),
             default => []
         };
     }
@@ -39,18 +39,19 @@ class Data extends \Controllers\Base {
         return $model->getSharedApiKeyOperators($operatorId);
     }
 
-    public function changePassword(array $params): array {
+    protected function changePassword(): array {
         $pageParams = [];
-        $errorCode = $this->validateChangePassword($params);
+        $params = $this->extractRequestParams(['token', 'current-password', 'new-password', 'password-confirmation']);
+        $errorCode = \Utils\Validators::validateChangePassword($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $currentOperator = $this->f3->get('CURRENT_USER');
-            $params['id'] = $currentOperator->id;
+            $password = \Utils\Conversion::getStringRequestParam('new-password');
+            $operatorId = \Utils\Routes::getCurrentRequestOperator()->id;
 
             $model = new \Models\Operator();
-            $model->updatePassword($params);
+            $model->updatePassword($password, $operatorId);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminSettings_changePassword_success_message');
         }
@@ -58,17 +59,18 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function changeEmail(array $params): array {
+    protected function changeEmail(): array {
         $pageParams = [];
-        $errorCode = $this->validateChangeEmail($params);
+        $params = $this->extractRequestParams(['token', 'email']);
+        $errorCode = \Utils\Validators::validateChangeEmail($params);
 
         if ($errorCode) {
             $pageParams['EMAIL_VALUES'] = $params;
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $currentOperator = $this->f3->get('CURRENT_USER');
+            $currentOperator = \Utils\Routes::getCurrentRequestOperator();
+            $email = \Utils\Conversion::getStringRequestParam('email');
             $operatorId = $currentOperator->id;
-            $email = $params['email'];
 
             // Create change email record
             $changeEmailModel = new \Models\ChangeEmail();
@@ -83,23 +85,23 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function changeTimeZone(array $params): array {
+    protected function changeTimeZone(): array {
         $pageParams = [];
-        $errorCode = $this->validateChangeTimeZone($params);
+        $params = $this->extractRequestParams(['token', 'timezone']);
+        $errorCode = \Utils\Validators::validateChangeTimeZone($params);
 
         if ($errorCode) {
             $pageParams['TIME_ZONE_VALUES'] = $params;
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $currentOperator = $this->f3->get('CURRENT_USER');
-            $params['id'] = $currentOperator->id;
+            $timezone = \Utils\Conversion::getStringRequestParam('timezone');
+            $operatorId = \Utils\Routes::getCurrentRequestOperator()->id;
 
             $model = new \Models\Operator();
-            $model->updateTimeZone($params);
+            $model->updateTimeZone($timezone, $operatorId);
 
             // update operator in f3 hive for clock
-            $this->f3->set('CURRENT_USER', null);
-            $this->f3->set('CURRENT_USER', $this->getLoggedInOperator());
+            \Utils\Routes::setCurrentRequestOperator();
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminTimeZone_changeTimeZone_success_message');
         }
@@ -107,14 +109,15 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function closeAccount(array $data): array {
+    protected function closeAccount(): array {
         $pageParams = [];
-        $errorCode = $this->validateCloseAccount($data);
+        $params = $this->extractRequestParams(['token']);
+        $errorCode = \Utils\Validators::validateCloseAccount($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $currentOperator = $this->f3->get('CURRENT_USER');
+            $currentOperator = \Utils\Routes::getCurrentRequestOperator();
             $currentOperator->closeAccount();
             $currentOperator->removeData();
 
@@ -127,29 +130,24 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function checkUpdates(array $data): array {
+    protected function checkUpdates(): array {
         $pageParams = [];
-        $errorCode = $this->validateCheckUpdates($data);
+        $params = $this->extractRequestParams(['token']);
+        $errorCode = \Utils\Validators::validateCheckUpdates($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
             $currentVersion = \Utils\VersionControl::versionString();
 
-            $result = \Web::instance()->request(
-                url: \Utils\Variables::getEnrichtmentApi() . '/version',
-                options: [
-                    'method' => 'GET',
-                    'header' => [
-                        'User-Agent: ' . $this->f3->get('USER_AGENT'),
-                    ],
-                ],
-            );
-            $matches = [];
-            preg_match('/^HTTP\/(\d+)(?:\.\d)? (\d{3})/', $result['headers'][0], $matches);
-            $jsonResponse = json_decode($result['body'], true);
-            $statusCode = (int) ($matches[2] ?? 0);
-            $errorMessage = $result['error'];
+            $response = \Utils\Network::sendApiRequest(null, '/version', 'GET', null);
+            $code = $response['code'];
+            $result = $response['data'];
+
+            $jsonResponse = is_array($result) ? $result : [];
+            $statusCode = $code ?? 0;
+
+            $errorMessage = $response['error'] ?? '';
 
             if (strlen($errorMessage) > 0 || $statusCode !== 200 || !is_array($jsonResponse)) {
                 $pageParams['ERROR_CODE'] = \Utils\ErrorCodes::ENRICHMENT_API_IS_NOT_AVAILABLE;
@@ -165,27 +163,19 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function validateCheckUpdates(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        return false;
-    }
-
-    public function updateNotificationPreferences(array $params): array {
+    protected function updateNotificationPreferences(): array {
         $pageParams = [];
-        $errorCode = $this->validateUpdateNotificationPreferences($params);
+        $params = $this->extractRequestParams(['token', 'review-reminder-frequency']);
+        $errorCode = \Utils\Validators::validateUpdateNotificationPreferences($params);
 
         if ($errorCode) {
             $pageParams['PROFILE_VALUES'] = $params;
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $unreviewedItemsReminderFrequency = $params['review-reminder-frequency'];
-            $currentOperator = $this->f3->get('CURRENT_USER');
+            $reminder = \Utils\Conversion::getStringRequestParam('review-reminder-frequency');
+            $currentOperator = \Utils\Routes::getCurrentRequestOperator();
 
-            $currentOperator->updateNotificationPreferences(\Type\UnreviewedItemsReminderFrequencyType::from($unreviewedItemsReminderFrequency));
+            $currentOperator->updateNotificationPreferences($reminder);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminSettings_notificationPreferences_success_message');
         }
@@ -193,55 +183,36 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function changeRetentionPolicy(array $params): array {
+    protected function changeRetentionPolicy(): array {
         $pageParams = [];
-        $errorCode = $this->validateRetentionPolicy($params);
+        $params = $this->extractRequestParams(['token', 'keyId', 'retention-policy']);
+        $errorCode = \Utils\Validators::validateRetentionPolicy($params);
 
         if ($errorCode) {
             $pageParams['RETENTION_POLICY_VALUES'] = $params;
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
+            $keyId = \Utils\Conversion::getIntRequestParam('keyId');
+            $retentionPolicy = \Utils\Conversion::getIntRequestParam('retention-policy');
+
             $model = new \Models\ApiKeys();
             $model->getKeyById($keyId);
-            $model->updateRetentionPolicy((int) ($params['retention-policy'] ?? 0));
+            $model->updateRetentionPolicy($retentionPolicy);
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminRetentionPolicy_changeTimeZone_success_message');
         }
 
         return $pageParams;
     }
 
-    public function validateRetentionPolicy(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $keyId = isset($params['keyId']) ? (int) $params['keyId'] : null;
-        if (!$keyId) {
-            return \Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST;
-        }
-
-        if ($keyId !== $this->getCurrentOperatorApiKeyId()) {
-            return \Utils\ErrorCodes::API_KEY_WAS_CREATED_FOR_ANOTHER_USER;
-        }
-
-        $retentionPolicy = (int) ($params['retention-policy'] ?? 0);
-        if ($retentionPolicy < 0 || $retentionPolicy > 12) {
-            return \Utils\ErrorCodes::RETENTION_POLICY_DOES_NOT_EXIST;
-        }
-
-        return false;
-    }
-
-    public function inviteCoOwner(array $params): array {
-        $errorCode = $this->validateInvitingCoOwner($params);
+    protected function inviteCoOwner(): array {
         $pageParams = [];
+        $params = $this->extractRequestParams(['token', 'email']);
+        $errorCode = \Utils\Validators::validateInvitingCoOwner($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $currentOperator = $this->f3->get('CURRENT_USER');
+            $currentOperator = \Utils\Routes::getCurrentRequestOperator();
             $operatorId = $currentOperator->id;
 
             $apiKeyModel = new \Models\ApiKeys();
@@ -263,21 +234,22 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    public function removeCoOwner(array $params): array {
-        $errorCode = $this->validateRemovingCoOwner($params);
+    protected function removeCoOwner(): array {
         $pageParams = [];
+        $params = $this->extractRequestParams(['token', 'operatorId']);
+        $errorCode = \Utils\Validators::validateRemovingCoOwner($params);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
         } else {
-            $operatorId = isset($params['operatorId']) ? (int) $params['operatorId'] : null;
+            $operatorId = \Utils\Conversion::getIntRequestParam('operatorId');
 
             $coOwnerModel = new \Models\ApiKeyCoOwner();
             $coOwnerModel->getCoOwnership($operatorId);
 
-            $apiKeyObj = $this->getCurrentOperatorApiKeyObject();
+            $apiKeyObj = \Utils\ApiKeys::getCurrentOperatorApiKeyObject();
 
-            if ($apiKeyObj->id === $coOwnerModel->api && $this->f3->get('CURRENT_USER')->id === $apiKeyObj->creator) {
+            if ($apiKeyObj->id === $coOwnerModel->api && \Utils\Routes::getCurrentRequestOperator()->id === $apiKeyObj->creator) {
                 $coOwnerModel->deleteCoOwnership();
 
                 $operatorModel = new \Models\Operator();
@@ -293,13 +265,13 @@ class Data extends \Controllers\Base {
         return $pageParams;
     }
 
-    private function makeOperatorCoOwner(\Models\Operator $operator, \Models\ApiKeys $key): void {
+    protected function makeOperatorCoOwner(\Models\Operator $operator, \Models\ApiKeys $key): void {
         $model = new \Models\ApiKeyCoOwner();
         $model->create($operator->id, $key->id);
     }
 
-    private function sendInvitationEmail(\Models\Operator $inviter, \Models\Operator $operator, \Models\ForgotPassword $forgotPassword): void {
-        $site = \Utils\Variables::getSite();
+    protected function sendInvitationEmail(\Models\Operator $inviter, \Models\Operator $operator, \Models\ForgotPassword $forgotPassword): void {
+        $site = \Utils\Variables::getHostWithProtocolAndBase();
 
         $inviterDisplayName = $inviter->email;
         if ($inviter->firstname && $inviter->lastname) {
@@ -319,166 +291,8 @@ class Data extends \Controllers\Base {
         \Utils\Mailer::send($toName, $toAddress, $subject, $message);
     }
 
-    private function validateInvitingCoOwner(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $email = $params['email'] ?? null;
-        if (!$email) {
-            return \Utils\ErrorCodes::EMAIL_DOES_NOT_EXIST;
-        }
-
-        $audit = \Audit::instance();
-        if (!$audit->email($email, true)) {
-            return \Utils\ErrorCodes::EMAIL_IS_NOT_CORRECT;
-        }
-
-        $operatorsModel = new \Models\Operator();
-        $operatorsModel->getByEmail($email);
-        if ($operatorsModel->loaded()) {
-            return \Utils\ErrorCodes::EMAIL_ALREADY_EXIST;
-        }
-
-        return false;
-    }
-
-    public function validateRemovingCoOwner(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $operatorId = isset($params['operatorId']) ? (int) $params['operatorId'] : null;
-        if (!$operatorId) {
-            return \Utils\ErrorCodes::OPERATOR_ID_DOES_NOT_EXIST;
-        }
-
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $coOwnerModel = new \Models\ApiKeyCoOwner();
-        $coOwnerModel->getCoOwnership($operatorId);
-
-        if (!$coOwnerModel->loaded() || $coOwnerModel->api !== $apiKey) {
-            return \Utils\ErrorCodes::OPERATOR_IS_NOT_A_CO_OWNER;
-        }
-
-        return false;
-    }
-
-    public function validateChangePassword(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $currentPassword = $params['currentPassword'];
-        if (!$currentPassword) {
-            return \Utils\ErrorCodes::CURRENT_PASSWORD_DOES_NOT_EXIST;
-        }
-
-        $currentOperator = $this->f3->get('CURRENT_USER');
-        $operatorId = $currentOperator->id;
-
-        $model = new \Models\Operator();
-        $model->getOperatorById($operatorId);
-        if (!$model->verifyPassword($currentPassword)) {
-            return \Utils\ErrorCodes::CURRENT_PASSWORD_IS_NOT_CORRECT;
-        }
-
-        $newPassword = $params['new-password'];
-        if (!$newPassword) {
-            return \Utils\ErrorCodes::NEW_PASSWORD_DOES_NOT_EXIST;
-        }
-
-        $newPasswordLegth = strlen($newPassword);
-        $minPasswordLegth = $this->f3->get('MIN_PASSWORD_LENGTH');
-        if ($newPasswordLegth < $minPasswordLegth) {
-            return \Utils\ErrorCodes::PASSWORD_IS_TO_SHORT;
-        }
-
-        $passwordConfirmation = $params['password-confirmation'];
-        if (!$passwordConfirmation) {
-            return \Utils\ErrorCodes::PASSWORD_CONFIRMATION_DOES_NOT_EXIST;
-        }
-
-        if ($newPassword !== $passwordConfirmation) {
-            return \Utils\ErrorCodes::PASSWORDS_ARE_NOT_EQUAL;
-        }
-
-        return false;
-    }
-
-    public function validateChangeEmail(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $email = $params['email'] ?? null;
-        if (!$email) {
-            return \Utils\ErrorCodes::EMAIL_DOES_NOT_EXIST;
-        }
-
-        $audit = \Audit::instance();
-        if (!$audit->email($email, true)) {
-            return \Utils\ErrorCodes::EMAIL_IS_NOT_CORRECT;
-        }
-
-        $currentOperator = $this->f3->get('CURRENT_USER');
-        if (\strtolower($currentOperator->email) === \strtolower($email)) {
-            return \Utils\ErrorCodes::EMAIL_IS_NOT_NEW;
-        }
-
-        $operatorModel = new \Models\Operator();
-        $operatorModel->getByEmail($email);
-        if ($operatorModel->loaded() && $currentOperator->id !== $operatorModel->id) {
-            return \Utils\ErrorCodes::EMAIL_ALREADY_EXIST;
-        }
-
-        return false;
-    }
-
-    public function validateChangeTimeZone(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $timezone = $params['timezone'] ?? null;
-        $timezones = $this->f3->get('timezones');
-        if (!$timezone || !array_key_exists($timezone, $timezones)) {
-            return \Utils\ErrorCodes::TIME_ZONE_DOES_NOT_EXIST;
-        }
-
-        return false;
-    }
-
-    public function validateCloseAccount(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        return false;
-    }
-
-    public function validateUpdateNotificationPreferences(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $unreviewedItemsReminderFrequency = $params['review-reminder-frequency'] ?? null;
-        if (!$unreviewedItemsReminderFrequency || !\Type\UnreviewedItemsReminderFrequencyType::tryFrom($unreviewedItemsReminderFrequency)) {
-            return \Utils\ErrorCodes::UNREVIEWED_ITEMS_REMINDER_FREQUENCY_DOES_NOT_EXIST;
-        }
-
-        return false;
-    }
-
-    private function sendChangeEmailEmail(\Models\Operator $currentOperator, \Models\ChangeEmail $changeEmailModel): void {
-        $url = \Utils\Variables::getSiteWithProtocol();
+    protected function sendChangeEmailEmail(\Models\Operator $currentOperator, \Models\ChangeEmail $changeEmailModel): void {
+        $url = \Utils\Variables::getHostWithProtocolAndBase();
 
         $toName = $currentOperator->firstname;
         $toAddress = $changeEmailModel->email;

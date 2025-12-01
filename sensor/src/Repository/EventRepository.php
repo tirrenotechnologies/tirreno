@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -36,6 +36,7 @@ class EventRepository {
         private PhoneRepository $phoneRepository,
         private EventCountryRepository $eventCountryRepository,
         private FieldAuditTrailRepository $fieldAuditTrailRepository,
+        private FieldAuditRepository $fieldAuditRepository,
         private PayloadRepository $payloadRepository,
         private \PDO $pdo,
     ) {
@@ -92,7 +93,8 @@ class EventRepository {
         );
 
         if ($eventTypeId === Constants::FIELD_EDIT_EVENT_TYPE_ID) {
-            $this->fieldAuditTrailRepository->insert($event->payload, $eventId);
+            $fieldIds = $this->fieldAuditRepository->insert($event->fieldHistory, $eventId);
+            $this->fieldAuditTrailRepository->insert($fieldIds, $event->fieldHistory, $eventId);
         }
 
         // Update last email/phone, if changed or was empty
@@ -168,7 +170,7 @@ class EventRepository {
 
         $result = $stmt->fetchColumn();
 
-        return $result === false ? null : (int) $result;
+        return $result === false ? null : intval($result);
     }
 
     private function getHttpMethod(string $method): ?int {
@@ -179,6 +181,6 @@ class EventRepository {
 
         $result = $stmt->fetchColumn();
 
-        return $result === false ? null : (int) $result;
+        return $result === false ? null : intval($result);
     }
 }

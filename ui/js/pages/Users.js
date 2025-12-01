@@ -23,8 +23,15 @@ export class UsersPage extends BasePage {
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);
 
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+            ruleUids:       rulesFilter,
+            scoresRange:    scoresRangeFilter,
+        };
+
         const gridParams = {
-            url:            '/admin/loadUsers',
+            url:            `${window.app_base}/admin/loadUsers`,
             tileId:         'totalUsers',
             tableId:        'users-table',
 
@@ -32,14 +39,7 @@ export class UsersPage extends BasePage {
 
             choicesFilterEvents: [rulesFilter.getEventType(), scoresRangeFilter.getEventType()],
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-                const ruleUids    = rulesFilter.getValues();
-                const scoresRange = scoresRangeFilter.getValues();
-
-                return {dateRange, searchValue, ruleUids, scoresRange};
-            },
+            getParams: this.getParamsSection,
         };
 
         new UsersGrid(gridParams);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -21,20 +21,22 @@ class ConnectionService {
     /**
      * Try to close connection with user.
      */
-    public function finishRequestForUser(): void {
+    public function finishRequestForUser(): bool {
         http_response_code(204);
 
         if (function_exists('fastcgi_finish_request')) {
-            fastcgi_finish_request();
-
-            return;
+            return fastcgi_finish_request();
         }
 
         // Fallback to old method
         header('Connection: close');
         $size = ob_get_length();
         header("Content-Length: $size");
-        ob_end_flush();
+        if (ob_get_level() > 0) {
+            ob_end_flush();
+        }
         flush();
+
+        return true;
     }
 }

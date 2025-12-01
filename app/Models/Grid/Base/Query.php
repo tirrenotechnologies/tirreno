@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Base;
 
 class Query {
-    use \Traits\Debug;
-    use \Traits\DateRange;
-
     protected $f3 = null;
     protected $apiKey = null;
     protected $ids = null;
@@ -46,10 +45,8 @@ class Query {
     }
 
     protected function applyOrder(string &$query): void {
-        $request = $this->f3->get('REQUEST');
-
-        $order = $request['order'] ?? [];
-        $columns = $request['columns'] ?? [];
+        $order = \Utils\Conversion::getArrayRequestParam('order');
+        $columns = \Utils\Conversion::getArrayRequestParam('columns');
 
         $orderCondition = $this->defaultOrder;
 
@@ -75,13 +72,12 @@ class Query {
     }
 
     protected function applyDateRange(string &$query, array &$queryParams): void {
-        $params = $this->f3->get('GET');
-        $dateRange = $this->getDatesRange($params);
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
 
         if ($dateRange) {
             $searchConditions = (
-                "AND {$this->dateRangeField} >= :start_time
-                AND {$this->dateRangeField} <= :end_time
+                " AND {$this->dateRangeField} >= :start_time AND
+                {$this->dateRangeField} <= :end_time
                 %s"
             );
 
@@ -92,10 +88,8 @@ class Query {
     }
 
     protected function applyLimit(string &$query, array &$queryParams): void {
-        $request = $this->f3->get('REQUEST');
-
-        $start = $request['start'] ?? null;
-        $length = $request['length'] ?? null;
+        $start = \Utils\Conversion::getIntRequestParam('start');
+        $length = \Utils\Conversion::getIntRequestParam('length');
 
         if (isset($start) && isset($length)) {
             $query .= ' LIMIT :length OFFSET :start';

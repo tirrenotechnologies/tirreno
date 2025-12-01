@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Context;
 
@@ -70,8 +72,8 @@ class Phone extends Base {
                 event_phone
 
             WHERE
-                event_phone.key = :api_key
-                AND event_phone.account_id IN ({$placeHolders})"
+                event_phone.account_id IN ({$placeHolders}) AND
+                event_phone.key = :api_key"
         );
 
         return $this->execQuery($query, $params);

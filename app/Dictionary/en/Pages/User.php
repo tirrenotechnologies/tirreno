@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 return [
-    'AdminUser_page_title' => 'Events',
-    'AdminUser_breadcrumb_title' => 'Events',
+    'AdminUser_page_title' => 'Activities',
+    'AdminUser_breadcrumb_title' => 'Activities',
 
     'AdminUser_widgets_id' => 'User',
     'AdminUser_widgets_id_tooltip' => 'Basic user account information.',

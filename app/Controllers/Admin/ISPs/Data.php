@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,37 +13,24 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ISPs;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
         $model = new \Models\Grid\Isps\Grid($apiKey);
 
-        $userId = $this->f3->get('REQUEST.userId');
-        $domainId = $this->f3->get('REQUEST.domainId');
-        $countryId = $this->f3->get('REQUEST.countryId');
-        $resourceId = $this->f3->get('REQUEST.resourceId');
+        $map = [
+            'userId'        => 'getIspsByUserId',
+            'domainId'      => 'getIspsByDomainId',
+            'countryId'     => 'getIspsByCountryId',
+            'resourceId'    => 'getIspsByResourceId',
+            'fieldId'       => 'getIspsByFieldId',
+        ];
 
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getIspsByUserId($userId);
-        }
-
-        if (isset($domainId) && is_numeric($domainId)) {
-            $result = $model->getIspsByDomainId($domainId);
-        }
-
-        if (isset($countryId) && is_numeric($countryId)) {
-            $result = $model->getIspsByCountryId($countryId);
-        }
-
-        if (isset($resourceId) && is_numeric($resourceId)) {
-            $result = $model->getIspsByResourceId($resourceId);
-        }
-
-        if (!$result) {
-            $result = $model->getAllIsps();
-        }
+        $result = $this->idMapIterate($map, $model, 'getAllIsps');
 
         $ids = array_column($result['data'], 'id');
         if ($ids) {

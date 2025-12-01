@@ -1,9 +1,11 @@
 import {renderUserActionButtons} from './DataRenderers.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {Button} from './Button.js?v=2';
 
-export class UserGridActionButtons {
+export class UserGridActionButtons extends Button {
 
     constructor(tableId) {
+        super();
         this.tableId = tableId;
         const onTableLoaded = this.onTableLoaded.bind(this);
         window.addEventListener('tableLoaded', onTableLoaded, false);
@@ -23,7 +25,7 @@ export class UserGridActionButtons {
 
         const me = this;
         const target = e.target;
-        const url = '/admin/manageUser';
+        const url = `${window.app_base}/admin/manageUser`;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
         const data = {userId: target.dataset.userId, type: target.dataset.type, token: token};
 
@@ -41,22 +43,6 @@ export class UserGridActionButtons {
         });
 
         return false;
-    }
-
-    onSuccessCount(data) {
-        const span = document.querySelector('span.reviewed-users-tile');
-        span.textContent = data.total;
-    }
-
-    setMenuCount() {
-        const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        $.ajax({
-            type: 'GET',
-            url: '/admin/loadReviewQueueCount',
-            data: {token: token},
-            success: this.onSuccessCount,
-            error: handleAjaxError,
-        });
     }
 
     onSuccess() {
@@ -114,6 +100,7 @@ export class UserGridActionButtons {
                 const dataTable = $(`#${me.tableId}`).DataTable();
                 dataTable.row(tableRow).remove().draw(false);
                 me.setMenuCount();
+                me.setBlacklistMenuCount();
             }
         }
 

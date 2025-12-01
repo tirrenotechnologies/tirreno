@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Sensor\Model\Validated\Payloads;
 
-class PageSearchPayload extends Base {
+class PageSearchPayload extends \Sensor\Model\Validated\BaseArray {
     public function __construct(mixed $value) {
         $this->requiredFields = [
             'field_id',

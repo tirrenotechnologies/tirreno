@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -22,6 +22,7 @@ class LogbookEntity {
     public const ERROR_TYPE_VALIDATION_ERROR = 1;
     public const ERROR_TYPE_CRITICAL_VALIDATION_ERROR = 2;
     public const ERROR_TYPE_CRITICAL_ERROR = 3;
+    public const ERROR_TYPE_RATE_LIMIT_EXCEEDED = 4;
 
     public function __construct(
         public int $apiKeyId,

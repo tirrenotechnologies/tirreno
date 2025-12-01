@@ -19,8 +19,14 @@ export class IpsPage extends BasePage {
         const searchFilter = new SearchFilter();
         const ipTypeFilter = new IpTypeFilter();
 
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+            ipTypeIds:      ipTypeFilter,
+        };
+
         const gridParams = {
-            url:        '/admin/loadIps',
+            url:        `${window.app_base}/admin/loadIps`,
             tileId:     'totalIps',
             tableId:    'ips-table',
 
@@ -36,13 +42,7 @@ export class IpsPage extends BasePage {
 
             choicesFilterEvents: [ipTypeFilter.getEventType()],
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-                const ipTypeIds   = ipTypeFilter.getValues();
-
-                return {dateRange, searchValue, ipTypeIds};
-            }
+            getParams: this.getParamsSection,
         };
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

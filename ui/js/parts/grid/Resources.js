@@ -1,6 +1,7 @@
 import {BaseGrid} from './Base.js?v=2';
 import {
     renderClickableResourceWithoutQuery,
+    renderAuthStatus,
     renderHttpCode,
     renderBoolean,
 } from '../DataRenderers.js?v=2';
@@ -69,8 +70,8 @@ export class ResourcesGrid extends BaseGrid {
                 render: this.renderTotalsLoader
             },
             {
-                data: 'total_country',
-                name: 'total_country',
+                data: 'total_edit',
+                name: 'total_edit',
                 render: this.renderTotalsLoader
             },
             {

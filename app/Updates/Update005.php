@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Updates;
 
 class Update005 extends Base {
     public static $version = 'v0.9.9';
 
-    public static function apply($db) {
+    public static function apply($database) {
         $queries = [
             'CREATE INDEX event_ua_parsed_device_idx ON event_ua_parsed USING btree (device)',
             'ALTER TABLE event_device DROP CONSTRAINT event_device_account_id_key_user_agent_key',
@@ -60,7 +62,7 @@ class Update005 extends Base {
         ];
 
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
     }
 }

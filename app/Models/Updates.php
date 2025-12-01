@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Updates extends \Models\BaseSql {
@@ -22,41 +24,25 @@ class Updates extends \Models\BaseSql {
 
     public function __construct($f3) {
         $this->f3 = $f3;
-        $db = $this->getDbConnection(\Utils\Variables::getDB());
-        $this->f3->set('API_DATABASE', $db);
-        $this->db = $db;
-        \DB\SQL\Mapper::__construct($db, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
-        $this->db = $db;
+
+        \Utils\Database::initConnect(false);
+        $this->db = \Utils\Database::getDb();
+
+        \DB\SQL\Mapper::__construct($this->db, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
+
         $this->createIfNotExists();
     }
 
-    private function getDbConnection(string $url): ?\DB\SQL {
-        $urlComponents = parse_url($url);
-
-        $host = $urlComponents['host'];
-        $port = $urlComponents['port'];
-        $user = $urlComponents['user'];
-        $pass = $urlComponents['pass'];
-        $db = ltrim($urlComponents['path'], '/');
-
-        $dsn = sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $db);
-        $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-        ];
-        try {
-            return new \DB\SQL($dsn, $user, $pass, $options);
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to establish database connection: ' . $e->getMessage());
-        }
-    }
-
-    public function checkDb(string $service, array $updatesList) {
+    public function checkDb(string $service, array $updatesList): bool {
+        $applied = false;
         try {
             $this->db->begin();
             foreach ($updatesList as $migration) {
                 if (!$migration::isApplied($this)) {
+                    $this->addStub($migration::$version, $service);
                     $migration::apply($this->db);
-                    $this->add($migration::$version, $service);
+                    $this->addCompleted($migration::$version, $service);
+                    $applied = true;
                 }
             }
             $this->db->commit();
@@ -65,6 +51,8 @@ class Updates extends \Models\BaseSql {
             error_log($e->getMessage());
             throw $e;
         }
+
+        return $applied;
     }
 
     public function isApplied(string $version, string $name): bool {
@@ -73,20 +61,31 @@ class Updates extends \Models\BaseSql {
             ':service'  => $name,
         ];
 
-        $query = 'SELECT 1 FROM dshb_updates WHERE version = :version and service = :service LIMIT 1';
+        $query = 'SELECT 1 FROM dshb_updates WHERE version = :version AND (service = :service OR service = :service || \'_processing\') LIMIT 1';
 
         $results = $this->execQuery($query, $params);
 
         return (bool) count($results);
     }
 
-    public function add(string $version, string $name): void {
+    private function addStub(string $version, string $name): void {
+        $params = [
+            ':version'  => $version,
+            ':service'  => $name . '_processing',
+        ];
+
+        $query = 'INSERT INTO dshb_updates (service, version) VALUES (:service, :version)';
+
+        $this->execQuery($query, $params);
+    }
+
+    private function addCompleted(string $version, string $name): void {
         $params = [
             ':version'  => $version,
             ':service'  => $name,
         ];
 
-        $query = 'INSERT INTO dshb_updates (service, version) VALUES (:service, :version)';
+        $query = 'UPDATE dshb_updates set service = :service where version = :version AND service = :service || \'_processing\'';
 
         $this->execQuery($query, $params);
     }

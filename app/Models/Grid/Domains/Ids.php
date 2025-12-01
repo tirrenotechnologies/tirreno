@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Domains;
 
 class Ids extends \Models\Grid\Base\Ids {
@@ -22,17 +24,17 @@ class Ids extends \Models\Grid\Base\Ids {
                 event_domain.id AS itemid
             FROM event_domain
             WHERE
-                event_domain.key = :api_key
-                AND event_domain.ip = (
+                event_domain.ip = (
                     SELECT
                         ip
                     FROM event_domain
                     WHERE
+                        event_domain.id = :domain_id AND
                         event_domain.key = :api_key
-                        AND event_domain.id = :domain_id
                     LIMIT 1
-                )
-                AND event_domain.id != :domain_id'
+                ) AND
+                event_domain.key = :api_key AND
+                event_domain.id != :domain_id'
         );
     }
 }

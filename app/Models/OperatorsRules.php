@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -66,6 +68,7 @@ class OperatorsRules extends \Models\BaseSql {
                 dshb_rules.uid,
                 dshb_rules.validated,
                 dshb_rules.missing,
+                (NOT COALESCE(dshb_rules.validated, FALSE) OR COALESCE(dshb_rules.missing, FALSE)) AS broken,
                 dshb_rules.name,
                 dshb_rules.descr,
                 dshb_rules.attributes,

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -32,8 +34,8 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_isp
 
             WHERE
-                event_isp.key = :api_key
-                AND event_isp.id = :isp_id'
+                event_isp.id = :isp_id AND
+                event_isp.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -52,8 +54,8 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_isp.id
             FROM event_isp
             WHERE
-                event_isp.key = :api_key AND
-                event_isp.asn = :asn
+                event_isp.asn = :asn AND
+                event_isp.key = :api_key
             LIMIT 1'
         );
 
@@ -92,6 +94,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_isp.asn,
                 event_isp.name,
                 event_isp.description,
+                event_isp.total_ip,
                 event_isp.total_visit,
                 event_isp.total_account,
                 event_isp.lastseen,
@@ -115,8 +118,8 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_isp
 
             WHERE
+                event_isp.id = :ispid AND
                 event_isp.key = :api_key
-                AND event_isp.id = :ispid
 
             GROUP BY
                 event_isp.id'
@@ -240,6 +243,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         $query = (
             "UPDATE event_isp
             SET
+                total_ip = COALESCE(sub.total_ip, 0),
                 total_visit = COALESCE(sub.total_visit, 0),
                 total_account = COALESCE(sub.total_account, 0),
                 updated = date_trunc('milliseconds', now())
@@ -247,6 +251,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 SELECT
                     event_ip.isp,
                     COUNT(*) AS total_visit,
+                    COUNT(DISTINCT event_ip.id) AS total_ip,
                     COUNT(DISTINCT account) AS total_account
                 FROM event
                 LEFT JOIN event_ip
@@ -274,6 +279,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         $query = (
             'UPDATE event_isp
             SET
+                total_ip = COALESCE(sub.total_ip, 0),
                 total_visit = COALESCE(sub.total_visit, 0),
                 total_account = COALESCE(sub.total_account, 0),
                 updated = date_trunc(\'milliseconds\', now())
@@ -281,6 +287,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 SELECT
                     event_ip.isp,
                     COUNT(*) AS total_visit,
+                    COUNT(DISTINCT event_ip.id) AS total_ip,
                     COUNT(DISTINCT account) AS total_account
                 FROM event
                 LEFT JOIN event_ip ON event.ip = event_ip.id
@@ -304,6 +311,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         $query = (
             "SELECT
                 id,
+                total_ip,
                 total_visit,
                 total_account
             FROM event_isp
@@ -318,6 +326,7 @@ class Isp extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
         }
 
         foreach ($res as $idx => $item) {
+            $item['total_ip'] = $indexedResult[$item['id']]['total_ip'];
             $item['total_visit'] = $indexedResult[$item['id']]['total_visit'];
             $item['total_account'] = $indexedResult[$item['id']]['total_account'];
             $res[$idx] = $item;

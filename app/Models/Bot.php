@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -27,8 +29,8 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_ua_parsed
 
             WHERE
-                event_ua_parsed.key    = :api_key
-                AND event_ua_parsed.id = :ua_id'
+                event_ua_parsed.id  = :ua_id AND
+                event_ua_parsed.key = :api_key'
         );
 
         $params = [
@@ -86,8 +88,8 @@ class Bot extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizati
                 event_ua_parsed
 
             WHERE
+                event_ua_parsed.id = :id AND
                 event_ua_parsed.key = :api_key
-                AND event_ua_parsed.id = :id
 
             LIMIT 1"
         );

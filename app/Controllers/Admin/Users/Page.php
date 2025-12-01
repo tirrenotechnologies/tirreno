@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,20 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Users;
 
-class Page extends \Controllers\Pages\Base {
-    use \Traits\ApiKeys;
-
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminUsers';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminUsers_search_placeholder');
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
         $rulesController = new \Controllers\Admin\Rules\Data();
 
-        $ruleUid = $this->f3->get('GET.ruleUid');
-        $ruleUid = $ruleUid !== null ? strtoupper($ruleUid) : null;
+        $ruleUid = \Utils\Conversion::getStringRequestParam('ruleUid');
+        $ruleUid = $ruleUid ? strtoupper($ruleUid) : null;
 
         $pageParams = [
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,

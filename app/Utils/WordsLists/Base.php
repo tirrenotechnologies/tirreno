@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,14 +13,16 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Utils\WordsLists;
 
 abstract class Base {
     protected static string $extensionFile = '';
     protected static array $words = [];
 
-    private static function getExtension(): ?array {
-        $filename =  dirname(__DIR__, 3) . '/assets/lists/' . static::$extensionFile;
+    protected static function getExtension(): ?array {
+        $filename = dirname(__DIR__, 3) . '/assets/lists/' . static::$extensionFile;
 
         if (file_exists($filename) && is_readable($filename)) {
             $data = include $filename;

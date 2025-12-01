@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -26,14 +26,14 @@ class FieldAuditTrailRepository {
     ) {
     }
 
-    public function insert(?PayloadEntity $payload, int $eventId): int {
-        if ($payload === null) {
+    public function insert(array $fieldIds, ?PayloadEntity $payload, int $eventId): int {
+        if ($payload === null || $fieldIds === []) {
             return 0;
         }
 
         $cnt = 0;
 
-        foreach ($payload->payload as $item) {
+        foreach ($payload->payload as $idx => $item) {
             $sql = 'INSERT INTO event_field_audit_trail
                     (account_id, key, created, event_id, field_id, field_name, old_value, new_value, parent_id, parent_name)
                 VALUES
@@ -44,7 +44,7 @@ class FieldAuditTrailRepository {
             $stmt->bindValue(':key', $payload->apiKeyId);
             $stmt->bindValue(':created', $payload->lastSeen->format(Timestamp::EVENTFORMAT));
             $stmt->bindValue(':event_id', $eventId);
-            $stmt->bindValue(':field_id', $item['field_id']);
+            $stmt->bindValue(':field_id', $fieldIds[$idx]);
             $stmt->bindValue(':field_name', $item['field_name']);
             $stmt->bindValue(':old_value', $item['old_value']);
             $stmt->bindValue(':new_value', $item['new_value']);

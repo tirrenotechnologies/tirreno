@@ -95,7 +95,7 @@ export class BaseChart {
         fireEvent('dateFilterChangedCaught');
 
         $.ajax({
-            url: '/admin/loadChart',
+            url: `${window.app_base}/admin/loadChart`,
             type: 'get',
             data: data,
             success: (responseData, status) => this.onChartLoaded(responseData, status, data['resolution']),
@@ -143,14 +143,14 @@ export class BaseChart {
     getAxisConfig() {
         const xAxis = {
             scale: 'DAY',
-            stroke: '#8180a0',
+            stroke: '#90a1b9',
             grid: {
                 width: 1 / devicePixelRatio,
-                stroke: '#2b2a3d',
+                stroke: '#2b2a39',
             },
             ticks: {
                 width: 1 / devicePixelRatio,
-                stroke: '#2b2a3d',
+                stroke: '#2b2a39',
             },
             values: [
                 //Copied from https://github.com/leeoniya/uPlot/tree/master/docs#axis--grid-opts
@@ -159,15 +159,15 @@ export class BaseChart {
             ],
         };
         const yAxis = {
-            stroke: '#8180a0',
+            stroke: '#90a1b9',
             values: (u, vals, space) => vals.map(v => this.formatKiloValue(u, v)),
             grid: {
                 width: 1 / devicePixelRatio,
-                stroke: '#2b2a3d',
+                stroke: '#2b2a39',
             },
             ticks: {
                 width: 1 / devicePixelRatio,
-                stroke: '#2b2a3d',
+                stroke: '#2b2a39',
             },
         };
 

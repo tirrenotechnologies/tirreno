@@ -6,7 +6,7 @@ import {
     renderOs,
 } from '../DataRenderers.js?v=2';
 
-const URL   = '/admin/loadBotDetails';
+const URL   = `${window.app_base}/admin/loadBotDetails`;
 const ELEMS = ['title', 'os', 'browser', 'modified'];
 
 export class BotTiles extends BaseTiles {

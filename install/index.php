@@ -16,7 +16,7 @@ $logo = (
 $style = (
 '<style>
   body {
-    background-color: #2b2a3d;
+    background-color: #2b2a39;
     color: #d7e6e1;
     font-family: monospace, monospace;
     padding: 50px;
@@ -40,28 +40,29 @@ $style = (
 $installerHead = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Installer</title>' . $style . '<head>';
 $okTile = '[  <span style="color: #01ee99;">OK</span>  ]';
 $failTile = '[ <span style="color: #fb6e88;">FAIL</span> ]';
+$warnTile = '[ <span style="color: #f5b944;">WARN</span> ]';
 $nullTile = '[  --  ]';
 $backButton = '<input action="action" onclick="window.history.go(-1); return false;" type="submit" value="Try again"/>';
 
 $formBody = (
 '<body>
-<h3>Database connection details</h3>
-<form action="/install/index.php" method="post">
-  <table width="688" cellpadding="5" cellspacing="0" border="0">
+<h3>PostgreSQL connection details</h3>
+<form action="./index.php" method="post">
+  <table width="715" cellpadding="5" cellspacing="0" border="0">
     <tr>
-      <td><label for="db_user">Username</label></td>
+      <td><label for="db_user">Database username</label></td>
       <td><input type="text" id="db-user" name="db_user" autocomplete="off" autocapitalize="off" required></td>
     </tr>
     <tr>
-      <td><label for="db_pass">Password</label></td>
+      <td><label for="db_pass">Database password</label></td>
       <td><input type="text" id="db-pass" name="db_pass" autocomplete="off" autocapitalize="off" required></td>
     </tr>
     <tr>
-      <td><label for="db_host">Host</label></td>
+      <td><label for="db_host">Database host</label></td>
       <td><input type="text" id="db-host" name="db_host" autocomplete="off" autocapitalize="off" required></td>
     </tr>
     <tr>
-      <td><label for="db_port">Port</label></td>
+      <td><label for="db_port">Database port</label></td>
       <td><input type="text" id="db-port" name="db_port" autocomplete="off" autocapitalize="off" required></td>
     </tr>
     <tr>
@@ -100,9 +101,15 @@ function formHtml() {
 }
 
 function finishOk() {
+    $uri = $_SERVER['REQUEST_URI'] ?? '/';
+    $pos = strrpos($uri, '/install');
+    $path = $pos === false ? rtrim($uri, '/') : substr($uri, 0, $pos);
+
+    $url = htmlspecialchars($path, ENT_QUOTES, 'UTF-8');
+
     $out = "\n\n======================== Setup completed! ========================";
     $out .= "\n* Please delete the ./install directory and all its included files.";
-    $out .= "\n* Visit <a href=\"/signup\">/signup</a> to create your account.";
+    $out .= "\n* Visit <a href=\"$url/signup\">/signup</a> to create your account.";
 
     return $out;
 }
@@ -118,9 +125,16 @@ function finishError() {
 
 $steps = [
     [
+        'description' => 'tirreno version',
+        'tasks' => [
+            ['description' => 'Latest version check', 'status' => null],
+        ],
+    ],
+    [
         'description' => 'Compatibility checks',
         'tasks' => [
             ['description' => 'PHP version', 'status' => null],
+            ['description' => 'Apache Rewrite (mod_rewrite)', 'status' => null],
             ['description' => 'PDO PostgreSQL driver', 'status' => null],
             ['description' => 'Configuration folder (/config) read/write permission', 'status' => null],
             ['description' => '.htaccess available', 'status' => null],
@@ -184,28 +198,31 @@ function execute(array $values) {
 
     $out = '';
 
-    compatibilityCheck(0, $steps);
-    $out .= printTasks($steps[0]);
-    if (!tasksCompleted($steps[0])) {
-        return [false, $out, null];
-    }
+    versionCheck(0, $steps);
+    $out .= printVersionCheck($steps[0]);
 
-    dbConfig(1, $values, $steps);
+    compatibilityCheck(1, $steps);
     $out .= printTasks($steps[1]);
     if (!tasksCompleted($steps[1])) {
         return [false, $out, null];
     }
 
-    dbSaveConfig(2, $values, $steps);
+    dbConfig(2, $values, $steps);
     $out .= printTasks($steps[2]);
     if (!tasksCompleted($steps[2])) {
         return [false, $out, null];
     }
 
+    dbSaveConfig(3, $values, $steps);
+    $out .= printTasks($steps[3]);
+    if (!tasksCompleted($steps[3])) {
+        return [false, $out, null];
+    }
+
     if (strval($values['mode'] ?? '') !== 'schema') {
-        $config = saveConfig(3, $values, $steps);
-        $out .= printTasks($steps[3]);
-        if (!tasksCompleted($steps[3])) {
+        $config = saveConfig(4, $values, $steps);
+        $out .= printTasks($steps[4]);
+        if (!tasksCompleted($steps[4])) {
             return [false, $out, null];
         }
     }
@@ -224,7 +241,7 @@ function substituteFormWithEnv(): void {
         $formBody = preg_replace(
             '/(<form\b[^>]*>)/i',
             '$1<input type="hidden" name="mode" value="schema">',
-            $formBody
+            $formBody,
         );
     }
 
@@ -241,37 +258,55 @@ function substituteFormWithEnv(): void {
             ];
 
             foreach ($values as $key => $value) {
-                $safe = htmlspecialchars($value, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8');
+                $safe = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
                 $formBody = preg_replace(
                     '/(<input\b[^>]*\bname="' . preg_quote($key, '/') . '"(?![^>]*\bvalue=)[^>]*)(>)/i',
                     '$1 value="' . $safe . '"$2',
-                    $formBody
+                    $formBody,
                 );
             }
         }
     }
 }
 
+function versionCheck(int $step, array &$steps) {
+    $versionStatus = checkLatestVersion();
+    $steps[$step]['tasks'][0]['status'] = $versionStatus;
+
+    if ($versionStatus === false) {
+        $steps[$step]['tasks'][0]['description'] = 'A newer version of tirreno is available';
+    } elseif ($versionStatus === null) {
+        $steps[$step]['tasks'][0]['description'] = 'Unable to connect to version server';
+    } else {
+        $steps[$step]['tasks'][0]['description'] = 'This is the latest version of tirreno';
+    }
+}
+
 function compatibilityCheck(int $step, array &$steps) {
     $steps[$step]['tasks'][0]['status'] = version_compare(PHP_VERSION, MIN_PHP_VERSION) >= 0;
-    $steps[$step]['tasks'][1]['status'] = extension_loaded('pdo_pgsql') && extension_loaded('pgsql');
+    $steps[$step]['tasks'][1]['status'] = function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules());
+    $steps[$step]['tasks'][2]['status'] = extension_loaded('pdo_pgsql') && extension_loaded('pgsql');
 
     try {
         if (is_writable('../config')) {
-            $f = fopen('../config/local/config.local.ini', 'w');
-            fclose($f);
-            unlink('../config/local/config.local.ini');
-            $steps[$step]['tasks'][2]['status'] = true;
+            $file = fopen('../config/local/config.local.ini', 'w');
+            if ($file !== false) {
+                fclose($file);
+                unlink('../config/local/config.local.ini');
+                $steps[$step]['tasks'][3]['status'] = true;
+            } else {
+                $steps[$step]['tasks'][3]['status'] = false;
+            }
         } else {
-            $steps[$step]['tasks'][2]['status'] = false;
+            $steps[$step]['tasks'][3]['status'] = false;
         }
     } catch (\Exception $e) {
-        $steps[$step]['tasks'][2]['status'] = false;
+        $steps[$step]['tasks'][3]['status'] = false;
     }
 
-    $steps[$step]['tasks'][3]['status'] = is_file('../.htaccess') && is_readable('../.htaccess');
+    $steps[$step]['tasks'][4]['status'] = is_file('../.htaccess') && is_readable('../.htaccess');
 
-    $steps[$step]['tasks'][4]['status'] = extension_loaded('curl');
+    $steps[$step]['tasks'][5]['status'] = extension_loaded('curl');
 
     $memoryLimit = @ini_get('memory_limit');
     $memLim = $memoryLimit;
@@ -282,7 +317,7 @@ function compatibilityCheck(int $step, array &$steps) {
         'k'     => intval($memLim) * 1024,
         default => intval($memLim),
     };
-    $steps[$step]['tasks'][5]['status'] = $memLim >= MIN_MEMORY_LIM;
+    $steps[$step]['tasks'][6]['status'] = $memLim >= MIN_MEMORY_LIM;
 }
 
 function dbConfig(int $step, array &$values, array &$steps) {
@@ -298,16 +333,22 @@ function dbConfig(int $step, array &$values, array &$steps) {
 function saveConfig(int $step, array $values, array &$steps): ?array {
     $configData = null;
     try {
-        $httpHost = strtolower(filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL));
-        if (strpos($httpHost, 'www.') === 0) {
-            $httpHost = substr($httpHost, 4);
-        } elseif (substr_count($httpHost, '.') == 1) {
-            $httpHost = 'www.' . $httpHost;
+        $currentHttpHost = strtolower(filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL));
+        if (strpos($currentHttpHost, 'www.') === 0) {
+            $currentHttpHost = substr($currentHttpHost, 4);
+        } elseif (substr_count($currentHttpHost, '.') == 1) {
+            $currentHttpHost = 'www.' . $currentHttpHost;
         }
-        $httpHost = explode(':', $httpHost)[0];
+
+        $hosts = [$currentHttpHost];
+
+        $forceHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on')
+            || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https'); // loadbalancer
 
         $configData = [
-            'SITE'          => $httpHost,
+            'FORCE_HTTPS'   => $forceHttps,
+            'SITE'          => implode(',', $hosts),
             'DATABASE_URL'  => "postgres://$values[db_user]:$values[db_pass]@$values[db_host]:$values[db_port]/$values[db_name]",
             'PEPPER'        => strval(bin2hex(random_bytes(32))),
         ];
@@ -322,9 +363,13 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
 
         $configPath = '../config/local/config.local.ini';
         $configFile = fopen($configPath, 'w');
-        fwrite($configFile, $config);
-        fclose($configFile);
-        $steps[$step]['tasks'][0]['status'] = true;
+        if ($configFile !== false) {
+            fwrite($configFile, $config);
+            fclose($configFile);
+            $steps[$step]['tasks'][0]['status'] = true;
+        } else {
+            $steps[$step]['tasks'][0]['status'] = false;
+        }
     } catch (\Exception $e) {
         $steps[$step]['tasks'][0]['status'] = false;
         $steps[$step]['tasks'][0]['error'] = $e->getMessage();
@@ -360,8 +405,14 @@ function dbSaveConfig(int $step, array $values, array &$steps) {
     $steps[$step]['tasks'][1]['status'] = true;*/
 
     try {
-        $sql = file_get_contents('./install.sql');
+        if (!lockDb($database)) {
+            $steps[$step]['tasks'][1]['status'] = false;
+            $steps[$step]['tasks'][1]['error'] = 'Database already locked by another installation process.';
+            return;
+        }
+        $sql = safeFileGetContents('./install.sql', null)['content'];
         $database->exec($sql);
+        unlockDb($database);
     } catch (\Exception $e) {
         $steps[$step]['tasks'][1]['status'] = false;
         $steps[$step]['tasks'][1]['error'] = $e->getMessage();
@@ -371,17 +422,62 @@ function dbSaveConfig(int $step, array $values, array &$steps) {
     $steps[$step]['tasks'][1]['status'] = true;
 }
 
+function lockDb(\PDO $database): bool {
+    $query = (
+        'CREATE TABLE IF NOT EXISTS dshb_install_flag (
+            id smallint primary key,
+            started timestamp without time zone DEFAULT now()
+        )'
+    );
+
+    $database->exec($query);
+
+    $query = 'INSERT INTO dshb_install_flag (id) VALUES (1) ON CONFLICT DO NOTHING';
+    $stmt = $database->prepare($query);
+    $stmt->execute();
+
+    // rowCount() 0 if id already exists
+    return $stmt->rowCount() === 1;
+}
+
+function unlockDb(\PDO $database): void {
+    $query = 'DROP TABLE IF EXISTS dshb_install_flag';
+
+    $database->exec($query);
+}
+
 function printTasks(array $tasks) {
     global $okTile, $failTile, $nullTile;
 
     $out = '';
     $side = intdiv(64 - strlen($tasks['description']), 2);
     $header = str_repeat('=', $side) . ' ' . $tasks['description'] . ' ' . str_repeat('=', $side);
+    if ($side * 2 + strlen($tasks['description']) < 64) {
+        $header .= '=';
+    }
     $out .= "\n\n" . $header;
     foreach ($tasks['tasks'] as $task) {
-        $st = ($task['status'] === true) ? $okTile : (($task['status'] === false) ? $failTile : $nullTile);
+        $status = ($task['status'] === true) ? $okTile : (($task['status'] === false) ? $failTile : $nullTile);
         $err = array_key_exists('error', $task) ? ' (' . $task['error'] . ')' : '';
-        $out .=  "\n" . $st . ' ' . $task['description'] . $err;
+        $out .=  "\n" . $status . ' ' . $task['description'] . $err;
+    }
+
+    return $out;
+}
+
+function printVersionCheck(array $tasks) {
+    global $okTile, $warnTile, $failTile;
+
+    $out = '';
+    $side = intdiv(64 - strlen($tasks['description']), 2);
+    $header = str_repeat('=', $side) . ' ' . $tasks['description'] . ' ' . str_repeat('=', $side);
+    if ($side * 2 + strlen($tasks['description']) < 64) {
+        $header .= '=';
+    }
+    $out .= "\n\n" . $header;
+    foreach ($tasks['tasks'] as $task) {
+        $status = ($task['status'] === true) ? $okTile : $warnTile;
+        $out .=  "\n" . $status . ' ' . $task['description'];
     }
 
     return $out;
@@ -391,6 +487,130 @@ function tasksCompleted(array $tasks) {
     $results = array_column($tasks['tasks'], 'status');
 
     return count(array_filter($results)) === count($results);
+}
+
+function safeFileGetContents(string $path, ?array $options): array {
+    set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+        if (!(error_reporting() & $severity)) {
+            return false;
+        }
+        throw new \ErrorException($message, 0, $severity, $file, $line);
+
+        return true;
+    });
+
+    $result = null;
+
+    try {
+        $context = null;
+        if ($options) {
+            $context = stream_context_create($options);
+        }
+        $result = file_get_contents($path, false, $context);
+    } catch (\Throwable $e) {
+        return [
+            'content' => null,
+            'headers' => [],
+        ];
+    }
+
+    restore_error_handler();
+
+    return [
+        'content'   => $result !== false ? $result : null,
+        'headers'   => isset($http_response_header) ? $http_response_header : [],
+    ];
+}
+
+function checkLatestVersion(): ?bool {
+    $path = __DIR__ . '/../app/Utils/VersionControl.php';
+
+    if (!file_exists($path) || !is_file($path) || !is_readable($path)) {
+        return null;
+    }
+
+    require_once $path;
+
+    $version = \Utils\VersionControl::versionString();
+
+    $useragent = 'tirreno-install';
+    $useragent = ($version && $useragent) ? $useragent . '/' . $version : $useragent;
+    $useragent = 'User-Agent: ' . $useragent;
+
+    $path = __DIR__ . '/../config/config.ini';
+    if (!file_exists($path) || !is_file($path) || !is_readable($path)) {
+        return null;
+    }
+    $config = parse_ini_file($path, false, INI_SCANNER_TYPED);
+
+    $url = $config['ENRICHMENT_API'] ?? null;
+
+    if (!$url) {
+        return null;
+    }
+
+    $url .= '/version';
+
+    $code = null;
+    $response = null;
+    $error = null;
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        if ($ch === false) {
+            return null;
+        }
+
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPGET         => true,
+            CURLOPT_HTTPHEADER      => [$useragent],
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_CONNECTTIMEOUT  => 30,
+            CURLOPT_TIMEOUT         => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            $response = null;
+        }
+
+        curl_close($ch);
+    } else {
+        $options = [
+            'http' => [
+                'method'    => 'GET',
+                'header'    => $useragent,
+                'timeout'   => 30,
+            ],
+        ];
+
+        $result = safeFileGetContents($url, $options);
+        $response = $result['content'];
+        $responseHeaders = $result['headers'];
+
+        $code = null;
+
+        if (isset($responseHeaders[0])) {
+            preg_match('{HTTP/\d\.\d\s+(\d+)}', $responseHeaders[0], $match);
+            $code = intval($match[1]);
+        }
+    }
+
+    $result = json_decode($response, true);
+    $jsonResponse = is_array($result) ? $result : [];
+    $statusCode = $code ?? 0;
+    $error = $error ?? '';
+
+    if (strlen($error) > 0 || $statusCode !== 200 || !isset($jsonResponse['version'])) {
+        return null;
+    } elseif (version_compare($version, $jsonResponse['version'], '<')) {
+        return false;
+    }
+
+    return true;
 }
 
 

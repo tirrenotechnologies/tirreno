@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,21 +13,24 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ISP;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminIsp';
 
     public function getPageParams(): array {
         $dataController = new Data();
-        $ispId = $this->integerParam($this->f3->get('PARAMS.ispId'));
-        $hasAccess = $dataController->checkIfOperatorHasAccess($ispId);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $ispId = \Utils\Conversion::getIntUrlParam('ispId');
+        $hasAccess = $dataController->checkIfOperatorHasAccess($ispId, $apiKey);
 
         if (!$hasAccess) {
             $this->f3->error(404);
         }
 
-        $isp = $dataController->getFullIspInfoById($ispId);
+        $isp = $dataController->getFullIspInfoById($ispId, $apiKey);
         $pageTitle = $this->getInternalPageTitleWithPostfix(strval($isp['asn']));
 
         $pageParams = [

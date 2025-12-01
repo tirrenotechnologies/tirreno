@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -51,8 +53,8 @@ class UsersStat extends \Models\BaseSql {
             ON event_ip.country = countries.id
 
             WHERE
+                event_account.userid = :user_id AND
                 event.key = :api_key
-                AND event_account.userid = :user_id
                 %s
 
             GROUP BY
@@ -69,8 +71,8 @@ class UsersStat extends \Models\BaseSql {
 
         if ($dateRange) {
             $searchConditions = (
-                'AND event.time >= :start_time
-                AND event.time <= :end_time'
+                'AND event.time >= :start_time AND
+                event.time <= :end_time'
             );
 
             $params[':end_time'] = $dateRange['endDate'];

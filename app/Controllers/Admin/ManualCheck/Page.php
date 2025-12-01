@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ManualCheck;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminManualCheck';
 
     public function getPageParams(): array {
@@ -28,13 +30,11 @@ class Page extends \Controllers\Pages\Base {
             'JS'                => 'admin_manual_check.js',
         ];
 
-        $currentOperator = $this->f3->get('CURRENT_USER');
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
         $operatorId = $currentOperator->id;
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $params['operator'] = $operatorId;
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
             $pageParams = array_merge($pageParams, $operationResponse);
         }
 
@@ -44,8 +44,7 @@ class Page extends \Controllers\Pages\Base {
     }
 
     public static function stylizeKey(string $key): string {
-        $f3 = \Base::instance();
-        $overwrites = $f3->get('AdminManualCheck_key_overwrites');
+        $overwrites = \Base::instance()->get('AdminManualCheck_key_overwrites');
 
         if (array_key_exists($key, $overwrites)) {
             return $overwrites[$key];

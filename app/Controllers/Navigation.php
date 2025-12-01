@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Controllers;
 
@@ -46,21 +48,21 @@ class Navigation extends Base {
     }
 
     public function visitSignupPage(): void {
-        $this->redirectIfLogged();
+        \Utils\Routes::redirectIfLogged();
 
         $pageController = new \Controllers\Pages\Signup();
         $this->response->data = $pageController->getPageParams();
     }
 
     public function visitLoginPage(): void {
-        $this->redirectIfLogged();
+        \Utils\Routes::redirectIfLogged();
 
         $pageController = new \Controllers\Pages\Login();
         $this->response->data = $pageController->getPageParams();
     }
 
     public function visitForgotPasswordPage(): void {
-        $this->redirectIfLogged();
+        \Utils\Routes::redirectIfLogged();
 
         if (!\Utils\Variables::getForgotPasswordAllowed()) {
             $this->f3->reroute('/');
@@ -71,14 +73,14 @@ class Navigation extends Base {
     }
 
     public function visitPasswordRecoveringPage(): void {
-        $this->redirectIfLogged();
+        \Utils\Routes::redirectIfLogged();
 
         $pageController = new \Controllers\Pages\PasswordRecovering();
         $this->response->data = $pageController->getPageParams();
     }
 
     public function visitLogoutPage(): void {
-        $this->redirectIfUnlogged();
+        \Utils\Routes::redirectIfUnlogged();
 
         $pageController = new \Controllers\Pages\Logout();
         $this->response->data = $pageController->getPageParams();

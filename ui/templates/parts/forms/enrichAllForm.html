@@ -1,5 +1,5 @@
 <div class="card events-card" data-item-id="profile-form">
-    <form method="POST" action="/api" id="enrich-all-form">
+    <form method="POST" action="{{ @BASE }}/api" id="enrich-all-form">
         <input type="hidden" name="token" value="{{ @CSRF }}">
         <input type="hidden" name="cmd" value="enrichAll" />
         <header class="card-header">

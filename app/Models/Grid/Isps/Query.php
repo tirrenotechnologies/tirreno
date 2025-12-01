@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Isps;
 
@@ -30,6 +32,7 @@ class Query extends \Models\Grid\Base\Query {
                 event_isp.asn,
                 event_isp.name,
                 -- event_isp.description,
+                event_isp.total_ip,
                 event_isp.total_visit,
                 event_isp.total_account,
                 (
@@ -41,20 +44,7 @@ class Query extends \Models\Grid\Base\Query {
                         event_ip.isp = event_isp.id AND
                         event.key = :api_key AND
                         event_account.fraud IS TRUE
-                ) AS fraud,
-                (
-                    SELECT
-                        COUNT ( DISTINCT eip.ip )
-
-                    FROM
-                        event_ip AS eip
-
-                    WHERE
-                        eip.isp = event_isp.id
-                        AND eip.key = event_isp.key
-                        AND eip.isp IS NOT NULL
-
-                ) AS total_ip
+                ) AS fraud
             FROM
                 event_isp
 
@@ -96,16 +86,16 @@ class Query extends \Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_isp.id', $queryParams);
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (
-                    LOWER(event_isp.asn::text)      LIKE LOWER(:search_value)
-                    OR LOWER(event_isp.name)        LIKE LOWER(:search_value)
-                    OR LOWER(event_isp.description) LIKE LOWER(:search_value)
+                    LOWER(event_isp.asn::text)      LIKE LOWER(:search_value) OR
+                    LOWER(event_isp.name)           LIKE LOWER(:search_value) OR
+                    LOWER(event_isp.description)    LIKE LOWER(:search_value)
                 )'
             );
 

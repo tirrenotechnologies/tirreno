@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,15 +13,15 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Context;
 
 class User extends Base {
-    use \Traits\Enrichment\Emails;
-
     public function getContext(array $accountIds, int $apiKey): array {
         $results = $this->getDetails($accountIds, $apiKey);
 
-        $this->calculateEmailReputationForContext($results);
+        \Utils\Enrichment::calculateEmailReputationForContext($results);
 
         $recordsByAccount = [];
         foreach ($results as $item) {
@@ -109,8 +109,8 @@ class User extends Base {
             ON lastemail_record.domain = lastdomain_record.id
 
             WHERE
-                event_account.key = :api_key
-                AND event_account.id IN ({$placeHolders})"
+                event_account.id IN ({$placeHolders}) AND
+                event_account.key = :api_key"
         );
 
         return $this->execQuery($query, $params);

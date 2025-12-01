@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Updates;
 
 class Update003 extends Base {
     public static $version = 'v0.9.7';
 
-    public static function apply($db) {
+    public static function apply($database) {
         $data = [':type' => \Utils\Constants::get('PAGE_ERROR_EVENT_TYPE_ID')];
 
         $queries = [
@@ -37,11 +39,11 @@ class Update003 extends Base {
         ];
 
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
 
         $sql = 'INSERT INTO event_type (id, value, name) VALUES (:type, \'page_error\', \'Page Error\')';
-        $db->exec($sql, $data);
+        $database->exec($sql, $data);
 
         $queries = [
             'ALTER TABLE countries RENAME COLUMN id TO iso',
@@ -53,7 +55,7 @@ class Update003 extends Base {
         ];
 
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
 
         $sql = (
@@ -62,6 +64,6 @@ class Update003 extends Base {
             WHERE http_code >= 400'
         );
 
-        $db->exec($sql, $data);
+        $database->exec($sql, $data);
     }
 }

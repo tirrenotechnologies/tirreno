@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,39 +13,38 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Blacklist;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
 
-    public function showIndexPage(): void {
-        $this->redirectIfUnlogged();
-
-        $pageController = new Page();
-        $this->response = new \Views\Frontend();
-        $this->response->data = $pageController->getPageParams();
+        $this->controller = new Data();
+        $this->page = new Page();
     }
 
     public function getList(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        return $this->apiKey ? $this->controller->getList($this->apiKey) : [];
+    }
 
-        return $apiKey ? (new Data())->getList($apiKey) : [];
+    public function setBlacklistUsersCount(bool $cache = false): array {
+        return $this->apiKey ? $this->controller->setBlacklistUsersCount($cache, $this->apiKey) : [];
     }
 
     public function removeItemFromList(): array {
-        $dataController = new Data();
+        if (!$this->apiKey || !$this->id) {
+            return [];
+        }
 
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $id = $this->f3->get('REQUEST.id');
-        $type = $this->f3->get('REQUEST.type');
-
-        $dataController->removeItemFromBlacklist($id, $type, $apiKey);
-        $successCode = \Utils\ErrorCodes::ITEM_HAS_BEEN_SUCCESSFULLY_REMOVED_FROM_BLACK_LIST;
+        $type   = \Utils\Conversion::getStringRequestParam('type');
+        $this->controller->removeItemFromBlacklist($this->id, $type, $this->apiKey);
+        $successCode = \Utils\ErrorCodes::ITEM_REMOVED_FROM_BLACKLIST;
 
         return [
-            'success' => $successCode,
-            'id' => $id,
+            'success'   => $successCode,
+            'id'        => $this->id,
         ];
     }
 }

@@ -1,5 +1,5 @@
 <div class="card events-card" data-item-id="notification-preferences-form">
-    <form method="POST" action="{{ 'settings' | alias }}">
+    <form method="POST" action="{{ @BASE }}{{ 'settings' | alias }}">
         <input type="hidden" name="token" value="{{ @CSRF }}">
         <input type="hidden" name="cmd" value="updateNotificationPreferences" />
 
@@ -16,9 +16,7 @@
                     <div class="control">
                         <div class="selector">
                             <select class="input" name="review-reminder-frequency" id="review-reminder-frequency">
-                                <repeat
-                                    group="{{ \Type\UnreviewedItemsReminderFrequencyType::getValues() }}"
-                                    value="{{ @key }}">
+                                <repeat group="{{ \Utils\Constants::get('NOTIFICATION_REMINDER_TYPES') }}" value="{{ @key }}">
                                     <set active="{{ @frequency === @key }}" />
                                     <option value="{{ @key }}" {{ @active ? 'selected' : '' }}>{{
                                         @AdminSettings_notificationPreferences_reviewReminderFrequency_options[@key] }}

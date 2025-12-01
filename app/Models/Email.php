@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInterface {
-    use \Traits\Enrichment\Emails;
-
     protected $DB_TABLE_NAME = 'event';
 
     public function getEmailDetails(int $id, int $apiKey): array {
@@ -71,7 +71,7 @@ class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInter
 
         $results = $this->execQuery($query, $params);
 
-        $this->calculateEmailReputation($results);
+        \Utils\Enrichment::calculateEmailReputation($results);
 
         return $results[0] ?? [];
     }
@@ -83,8 +83,8 @@ class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInter
             FROM
                 event_email
             WHERE
-                event_email.key = :api_key
-                AND event_email.email = :email_value'
+                event_email.email = :email_value AND
+                event_email.key = :api_key'
         );
 
         $params = [
@@ -120,10 +120,10 @@ class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInter
             JOIN
                 dshb_api ON event_account.key = dshb_api.id
             WHERE
-                event_email.lastseen >= CURRENT_DATE - 1
-                AND (:includeAlertListed = TRUE OR event_email.alert_list != TRUE OR event_email.alert_list IS NULL)
-                AND (:includeWithoutHash = TRUE OR event_email.hash IS NOT NULL)
-                AND (:includeWithBlacklistSyncSkipped = TRUE OR dshb_api.skip_blacklist_sync != TRUE)'
+                event_email.lastseen >= CURRENT_DATE - 1 AND
+                (:includeAlertListed = TRUE OR event_email.alert_list != TRUE OR event_email.alert_list IS NULL) AND
+                (:includeWithoutHash = TRUE OR event_email.hash IS NOT NULL) AND
+                (:includeWithBlacklistSyncSkipped = TRUE OR dshb_api.skip_blacklist_sync != TRUE)'
         );
 
         return $this->execQuery($query, $params);
@@ -160,8 +160,8 @@ class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInter
                 SET fraud_detected = :fraud
 
             WHERE
-                key = :api_key
-                AND id IN ({$placeHolders})"
+                id IN ({$placeHolders}) AND
+                key = :api_key"
         );
 
         $this->execQuery($query, $params);
@@ -182,8 +182,8 @@ class Email extends \Models\BaseSql implements \Interfaces\FraudFlagUpdaterInter
                 event_email
 
             WHERE
+                event_email.id = :id AND
                 event_email.key = :api_key
-                AND event_email.id = :id
 
             LIMIT 1"
         );

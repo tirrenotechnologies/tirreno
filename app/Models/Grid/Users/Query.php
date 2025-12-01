@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Users;
 
@@ -98,7 +100,7 @@ class Query extends \Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_account.id', $queryParams);
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -113,11 +115,12 @@ class Query extends \Models\Grid\Base\Query {
                     LOWER(event_email.email)       LIKE LOWER(:search_value) OR
                     LOWER(event_account.userid)     LIKE LOWER(:search_value) OR
 
-                    TO_CHAR(event_account.created::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
+                    TO_CHAR((event_account.created + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
                 )"
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
+            $queryParams[':offset'] = strval(\Utils\TimeZones::getCurrentOperatorOffset());
         }
 
         //Add search and ids into request
@@ -125,8 +128,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = $this->f3->get('REQUEST.ruleUids');
-        if ($ruleUids === null) {
+        $ruleUids = \Utils\Conversion::getArrayRequestParam('ruleUids');
+        if (!$ruleUids) {
             return;
         }
 
@@ -140,15 +143,15 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyScore(string &$query, array &$queryParams): void {
-        $scoresRanges = $this->f3->get('REQUEST.scoresRange');
-        if ($scoresRanges  === null) {
+        $scoresRanges = \Utils\Conversion::getArrayRequestParam('scoresRange');
+        if (!$scoresRanges) {
             return;
         }
 
         $clauses = [];
         foreach ($scoresRanges as $key => $scoreBase) {
             $clauses[] = sprintf('event_account.score >= :score_base_%s AND event_account.score <= :score_base_%s + 10', $key, $key);
-            $queryParams[':score_base_' . $key] = intval($scoreBase);
+            $queryParams[':score_base_' . $key] = \Utils\Conversion::intValCheckEmpty($scoreBase, 0);
         }
 
         $query .= ' AND (' . implode(' OR ', $clauses) . ')';

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Sensor\Service;
 
 use Sensor\Dto\GetApiKeyDto;
@@ -22,6 +24,7 @@ use Sensor\Model\Http\RegularResponse;
 use Sensor\Repository\ApiKeyRepository;
 use Sensor\Repository\EventIncorrectRepository;
 use Sensor\Repository\LogbookRepository;
+use Sensor\Exception\RateLimitException;
 
 class LogbookManager {
     private ?GetApiKeyDto $apiKeyDto = null;
@@ -32,6 +35,8 @@ class LogbookManager {
         private ApiKeyRepository $apiKeyRepository,
         private EventIncorrectRepository $eventIncorrectRepository,
         private bool $allowEmailPhone,
+        private int $leakyBucketRps,
+        private int $leakyBucketWindow,
     ) {
     }
 
@@ -52,12 +57,14 @@ class LogbookManager {
     public function logException(
         \DateTime $startedTime,
         string $exception,
+        bool $rateLimit,
     ): void {
         if ($this->apiKeyDto?->id !== null) {
             $logbook = $this->logbookFactory->createFromException(
                 $this->apiKeyDto->id,
                 $startedTime,
                 $exception,
+                $rateLimit,
             );
             $this->logbookRepository->insert($logbook);
         }
@@ -78,5 +85,13 @@ class LogbookManager {
 
     public function setApiKeyDto(?GetApiKeyDto $apiKeyDto): void {
         $this->apiKeyDto = $apiKeyDto;
+    }
+
+    public function checkRps(): void {
+        if (isset($this->apiKeyDto) && $this->apiKeyDto?->id) {
+            if (!$this->logbookRepository->checkRps($this->leakyBucketRps, $this->leakyBucketWindow, $this->apiKeyDto->id)) {
+                throw new RateLimitException('Rate limit', 429);
+            }
+        }
     }
 }

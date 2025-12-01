@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,18 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Phones;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
         $model = new \Models\Grid\Phones\Grid($apiKey);
 
-        $userId = $this->f3->get('REQUEST.userId');
+        $map = [
+            'userId' => 'getPhonesByUserId',
+        ];
 
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getPhonesByUserId($userId);
-        }
+        $result = $this->idMapIterate($map, $model);
 
         $ids = array_column($result['data'], 'id');
         if ($ids) {
@@ -36,12 +38,8 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function getPhoneDetails(int $apiKey): array {
-        $params = $this->f3->get('GET');
-        $id = $params['id'];
-        $model = new \Models\Phone();
-
-        $details = $model->getPhoneDetails($id, $apiKey);
+    public function getPhoneDetails(int $id, int $apiKey): array {
+        $details = (new \Models\Phone())->getPhoneDetails($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
         $tsColumns = ['created', 'lastseen'];
@@ -51,8 +49,6 @@ class Data extends \Controllers\Base {
     }
 
     private function isEnrichable(int $apiKey): bool {
-        $model = new \Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('phone', $apiKey);
+        return (new \Models\ApiKeys())->attributeIsEnrichable('phone', $apiKey);
     }
 }

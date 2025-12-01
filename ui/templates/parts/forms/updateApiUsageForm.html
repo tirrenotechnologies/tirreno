@@ -1,4 +1,4 @@
-<form method="POST" action="/api">
+<form method="POST" action="{{ @BASE }}/api">
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="cmd" value="updateApiUsage">
     <input type="hidden" name="keyId" value="{{ @API_KEY.id }}">
@@ -9,13 +9,22 @@
             <textarea class="textarea" name="apiToken" placeholder="{{ @AdminApi_form_field_token_placeholder }}" rows="2" cols="84" required>{{ @API_KEY.apiToken }}</textarea>
 
             <repeat group="{{ @API_KEY.enrichedAttributes }}" key="{{ @attribute }}" value="{{ @enabled }}">
-                <check if="{{ @ALLOW_EMAIL_PHONE || @attribute === 'ip' }}">
-                    <div class="field">
-                        <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
-                        <div class="control">
-                            <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
+                <check if="{{ @ALLOW_EMAIL_PHONE }}">
+                    <true>
+                        <div class="field">
+                            <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
+                            <div class="control">
+                                <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
+                            </div>
                         </div>
-                    </div>
+                    </true>
+                    <false>
+                        <check if="{{ @attribute === 'ip' }}">
+                            <true>
+                                <input type="hidden" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" checked />
+                            </true>
+                        </check>
+                    </false>
                 </check>
             </repeat>
 {***

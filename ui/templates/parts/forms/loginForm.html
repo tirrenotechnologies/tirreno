@@ -1,4 +1,4 @@
-<form action="/login" method="POST">
+<form action="{{ @BASE }}/login" method="POST">
     <input type="hidden" name="token" value="{{ @CSRF }}">
 
     <div class="field">
@@ -18,7 +18,7 @@
     <div class="bottom-line">
         <div>
             <check if="{{ @ALLOW_FORGOT_PASSWORD }}">
-                <a href="/forgot-password">{{ @Login_form_forgot_password_link }}</a>
+                <a href="{{ @BASE }}/forgot-password">{{ @Login_form_forgot_password_link }}</a>
             </check>
         </div>
         <div class="control">

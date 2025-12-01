@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Utils;
 
@@ -24,8 +26,9 @@ class ErrorCodes {
     public const EMAIL_IS_NOT_CORRECT = 603;
     public const EMAIL_ALREADY_EXIST = 604;
     public const PASSWORD_DOES_NOT_EXIST = 605;
-    public const PASSWORD_IS_TO_SHORT = 606;
+    public const PASSWORD_IS_TOO_SHORT = 606;
     public const ACCOUNT_CREATED = 607;
+    public const INSTALL_DIR_EXISTS = 608;
 
     //Activation
     public const ACTIVATION_KEY_DOES_NOT_EXIST = 610;
@@ -36,7 +39,7 @@ class ErrorCodes {
 
     //Api
     public const API_KEY_ID_DOESNT_EXIST = 630;
-    public const API_KEY_WAS_CREATED_FOR_ANOTHER_USER = 631;
+    public const API_KEY_ID_INVALID = 631;
     public const OPERATOR_ID_DOES_NOT_EXIST = 632;
     public const OPERATOR_IS_NOT_A_CO_OWNER = 633;
     public const UNKNOWN_ENRICHMENT_ATTRIBUTES = 634;
@@ -52,13 +55,13 @@ class ErrorCodes {
     public const ZIP_DOES_NOT_EXIST = 646;
     public const TIME_ZONE_DOES_NOT_EXIST = 647;
     public const RETENTION_POLICY_DOES_NOT_EXIST = 648;
-    public const UNREVIEWED_ITEMS_REMINDER_FREQUENCY_DOES_NOT_EXIST = 649;
+    public const INVALID_REMINDER_FREQUENCY = 649;
 
     //Settings
     public const CURRENT_PASSWORD_DOES_NOT_EXIST = 650;
     public const CURRENT_PASSWORD_IS_NOT_CORRECT = 651;
     public const NEW_PASSWORD_DOES_NOT_EXIST = 652;
-    public const PASSWORD_CONFIRMATION_DOES_NOT_EXIST = 653;
+    public const PASSWORD_CONFIRMATION_MISSING = 653;
     public const PASSWORDS_ARE_NOT_EQUAL = 654;
     public const EMAIL_IS_NOT_NEW = 655;
 
@@ -71,17 +74,16 @@ class ErrorCodes {
 
     //Account messages
     public const THERE_ARE_NO_EVENTS_YET = 670;
-    public const THERE_ARE_NO_EVENTS_LAST_24_HOURS = 671;
+    public const THERE_ARE_NO_EVENTS_LAST_DAY = 671;
     public const CUSTOM_ERROR_FROM_DSHB_MESSAGES = 672;
 
     //Watchlist
-    public const OPERATOR_DOES_NOT_HAVE_ACCESS_TO_ACCOUNT = 680;
-    public const USER_HAS_BEEN_SUCCESSFULLY_ADDED_TO_WATCH_LIST = 681;
-    public const USER_HAS_BEEN_SUCCESSFULLY_REMOVED_FROM_WATCH_LIST = 682;
-    public const USER_FRAUD_FLAG_HAS_BEEN_SET = 683;
-    public const USER_FRAUD_FLAG_HAS_BEEN_UNSET = 684;
-    public const USER_REVIEWED_FLAG_HAS_BEEN_SET = 685;
-    public const USER_REVIEWED_FLAG_HAS_BEEN_UNSET = 686;
+    public const USER_ADDED_TO_WATCHLIST = 681;
+    public const USER_REMOVED_FROM_WATCHLIST = 682;
+    public const USER_FRAUD_FLAG_SET = 683;
+    public const USER_FRAUD_FLAG_UNSET = 684;
+    public const USER_REVIEWED_FLAG_SET = 685;
+    public const USER_REVIEWED_FLAG_UNSET = 686;
     public const USER_DELETION_FAILED = 687;
     public const USER_BLACKLISTING_FAILED = 688;
     public const USER_BLACKLISTING_QUEUED = 689;
@@ -93,10 +95,10 @@ class ErrorCodes {
     public const CHANGE_EMAIL_KEY_WAS_EXPIRED = 693;
 
     //Rules
-    public const RULES_HAS_BEEN_SUCCESSFULLY_UPDATED = 800;
-    public const BLACKLIST_THRESHOLD_DOES_NOT_EXIST = 801;
-    public const REVIEW_QUEUE_THRESHOLD_DOES_NOT_EXIST = 802;
-    public const BLACKLIST_THRESHOLD_EXCEEDS_REVIEW_QUEUE_THRESHOLD = 803;
+    public const RULES_SUCCESSFULLY_UPDATED = 800;
+    public const INVALID_BLACKLIST_THRESHOLD = 801;
+    public const INVALID_REVIEW_QUEUE_THRESHOLD = 802;
+    public const INVALID_THRESHOLDS_COMBINATION = 803;
 
     // REST API
     public const REST_API_KEY_DOES_NOT_EXIST = 900;
@@ -104,11 +106,11 @@ class ErrorCodes {
     public const REST_API_NOT_AUTHORIZED = 902;
     public const REST_API_MISSING_PARAMETER = 903;
     public const REST_API_VALIDATION_ERROR = 904;
-    public const REST_API_USER_ALREADY_SCHEDULED_FOR_DELETION = 905;
-    public const REST_API_USER_SUCCESSFULLY_ADDED_FOR_DELETION = 906;
+    public const REST_API_USER_ALREADY_DELETING = 905;
+    public const REST_API_USER_ADDED_FOR_DELETION = 906;
 
     // Manual check
-    public const ENRICHMENT_API_KEY_DOES_NOT_EXIST = 1000;
+    public const ENRICHMENT_API_KEY_NOT_EXISTS = 1000;
     public const TYPE_DOES_NOT_EXIST = 1001;
     public const SEARCH_QUERY_DOES_NOT_EXIST = 1002;
     public const ENRICHMENT_API_UNKNOWN_ERROR = 1003;
@@ -116,11 +118,12 @@ class ErrorCodes {
     public const ENRICHMENT_API_IP_NOT_FOUND = 1005;
     public const RISK_SCORE_UPDATE_UNKNOWN_ERROR = 1006;
     public const ENRICHMENT_API_KEY_OVERUSE = 1007;
-    public const ENRICHMENT_API_ATTRIBUTE_IS_UNAVAILABLE = 1008;
+    public const ENRICHMENT_API_ATTR_UNAVAILABLE = 1008;
     public const ENRICHMENT_API_IS_NOT_AVAILABLE = 1009;
 
     //Blacklist
-    public const ITEM_HAS_BEEN_SUCCESSFULLY_REMOVED_FROM_BLACK_LIST = 1010;
+    public const ITEM_REMOVED_FROM_BLACKLIST = 1010;
+    public const ITEM_REMOVE_FAIL_FROM_BLACKLIST = 1011;
 
     //Subscription
     public const SUBSCRIPTION_KEY_INVALID_UPDATE = 1100;

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -86,28 +86,5 @@ class DataEnrichmentCurlClient implements DataEnrichmentClientInterface {
         }
 
         return $data;
-    }
-
-    public function track(string $token): void {
-        $ch = curl_init($this->baseUrl . '/track');
-        if ($ch === false) {
-            throw new \RuntimeException('Error cURL init');
-        }
-
-        $headers = [
-            'Authorization: Bearer ' . $token,
-            'User-Agent: ' . $this->userAgent,
-        ];
-
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, null);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-        curl_exec($ch);
-
-        curl_close($ch);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Context;
 
@@ -34,6 +36,7 @@ class Session extends Base {
         $query = (
             "SELECT
                 event_session.account_id                        AS accountid,
+                BOOL_AND(event_session.total_visit = 1)         AS event_session_single_event,
                 BOOL_OR(event_session.total_country > 1)        AS event_session_multiple_country,
                 BOOL_OR(event_session.total_ip > 1)             AS event_session_multiple_ip,
                 BOOL_OR(event_session.total_device > 1)         AS event_session_multiple_device,

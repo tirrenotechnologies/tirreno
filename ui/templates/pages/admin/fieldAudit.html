@@ -1,0 +1,19 @@
+<include href="templates/parts/headerAdmin.html" />
+<div id="wrap">
+    <include href="templates/parts/panel/eventPanel.html" />
+    <include href="templates/parts/panel/eventPanel.html" with="fromField=true"/>
+    <include href="templates/parts/leftMenu.html" />
+    <div class="main">
+        <include href="templates/parts/forms/globalSearchForm.html" />
+        <include href="templates/parts/systemNotification.html" />
+        <include href="templates/parts/welcomeMessage.html" />
+        <include href="templates/parts/infoHeader.html" with="title={{@FIELD.field_id}}"/>
+
+        <include href="templates/parts/widgets/fieldAudit.html" />
+        <include href="templates/parts/tables/users.html" />
+        <include href="templates/parts/tables/ips.html" />
+        <include href="templates/parts/tables/isps.html" />
+        <include href="templates/parts/tables/fieldAuditTrail.html" />
+    </div>
+</div>
+<include href="templates/parts/footerAdmin.html" />

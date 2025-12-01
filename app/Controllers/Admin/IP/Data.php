@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,38 +13,36 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\IP;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return match ($params['cmd']) {
-            'reenrichment' => $this->enrichEntity($params),
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'reenrichment' => $this->enrichEntity(),
             default => []
         };
     }
 
-    public function enrichEntity(array $params): array {
+    public function enrichEntity(): array {
         $dataController = new \Controllers\Admin\Enrichment\Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
-        $type = $params['type'];
-        $search = $params['search'] ?? null;
-        $entityId = isset($params['entityId']) ? (int) $params['entityId'] : null;
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $enrichmentKey = \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
+
+        $type       = \Utils\Conversion::getStringRequestParam('type');
+        $search     = \Utils\Conversion::getStringRequestParam('search', true);
+        $entityId   = \Utils\Conversion::getIntRequestParam('entityId', true);
 
         return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
-    public function checkIfOperatorHasAccess(int $ipId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Ip();
-
-        return $model->checkAccess($ipId, $apiKey);
+    public function checkIfOperatorHasAccess(int $ipId, int $apiKey): bool {
+        return (new \Models\Ip())->checkAccess($ipId, $apiKey);
     }
 
-    public function getIpDetails(int $ipId): array {
-        $result = $this->getFullIpInfoById($ipId);
+    public function getIpDetails(int $ipId, int $apiKey): array {
+        $result = $this->getFullIpInfoById($ipId, $apiKey);
 
         return [
             'full_country'      => $result['full_country'],
@@ -62,18 +60,15 @@ class Data extends \Controllers\Base {
         ];
     }
 
-    public function getFullIpInfoById(int $ipId): array {
+    public function getFullIpInfoById(int $ipId, int $apiKey): array {
         $model = new \Models\Ip();
-        $result = $model->getFullIpInfoById($ipId);
+        $result = $model->getFullIpInfoById($ipId, $apiKey);
         $result['lastseen'] = \Utils\ElapsedDate::short($result['lastseen']);
 
         return $result;
     }
 
-    public function isEnrichable(): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('ip', $apiKey);
+    public function isEnrichable(int $apiKey): bool {
+        return (new \Models\ApiKeys())->attributeIsEnrichable('ip', $apiKey);
     }
 }

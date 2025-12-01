@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Chart;
 
 class BaseEventsCount extends \Models\BaseSql {
-    use \Traits\DateRange;
-
     protected $DB_TABLE_NAME = 'event';
 
     protected $alertTypesParams;
@@ -47,13 +47,12 @@ class BaseEventsCount extends \Models\BaseSql {
                 $item['event_alert_type_count'],
             ];
         }
-        $request = $this->f3->get('REQUEST');
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        $datesRange = $this->getLatestNDatesRange(180, $offset);
+        $datesRange = \Utils\DateRange::getLatestNDatesRangeFromRequest(180, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
+        $step = \Utils\Constants::get('CHART_RESOLUTION')[\Utils\DateRange::getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
@@ -68,33 +67,32 @@ class BaseEventsCount extends \Models\BaseSql {
 
         ksort($itemsByDate);
 
-        $ox = [];
-        $l1 = [];
-        $l2 = [];
-        $l3 = [];
+        $timestamps = [];
+        $line1 = [];
+        $line2 = [];
+        $line3 = [];
 
         foreach ($itemsByDate as $key => $value) {
-            $ox[] = $key;
-            $l1[] = $value[0];
-            $l2[] = $value[1];
-            $l3[] = $value[2];
+            $timestamps[] = $key;
+            $line1[] = $value[0];
+            $line2[] = $value[1];
+            $line3[] = $value[2];
         }
 
-        return [$ox, $l1, $l2, $l3];
+        return [$timestamps, $line1, $line2, $line3];
     }
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = $this->getLatestNDatesRange(180);
+        $dateRange = \Utils\DateRange::getLatestNDatesRangeFromRequest(180);
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => $this->getResolution($request),
-            ':id'           => $request['id'],
+            ':resolution'   => \Utils\DateRange::getResolutionFromRequest(),
+            ':id'           => \Utils\Conversion::getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];
 

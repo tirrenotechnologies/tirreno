@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Sensor\Factory;
 
@@ -49,7 +51,7 @@ class LogbookEntityFactory {
 
         return new LogbookEntity(
             $apiKeyId,
-            $_SERVER['REMOTE_ADDR'],
+            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
             $eventId,
             $errorType,
             $errorText,
@@ -62,12 +64,14 @@ class LogbookEntityFactory {
         int $apiKeyId,
         \DateTime $startedTime,
         string $errorText,
+        bool $rateLimit,
     ): LogbookEntity {
+
         return new LogbookEntity(
             $apiKeyId,
-            $_SERVER['REMOTE_ADDR'],
+            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
             null,
-            3,
+            $rateLimit ? LogbookEntity::ERROR_TYPE_RATE_LIMIT_EXCEEDED : LogbookEntity::ERROR_TYPE_CRITICAL_ERROR,
             $errorText,
             $this->getRawRequest(),
             $this->formatStarted($startedTime),
@@ -75,11 +79,21 @@ class LogbookEntityFactory {
     }
 
     private function getRawRequest(): string {
-        return json_encode(array_intersect_key($_POST, array_flip(Request::ACCEPTABLE_FIELDS)));
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            $body = $_POST;
+        } else {
+            $long = [];
+            foreach (Request::ACCEPTABLE_FIELDS as $key) {
+                $long[] = $key . '::';
+            }
+            $body = getopt('', $long) ?: [];
+        }
+
+        return json_encode(array_intersect_key($body, array_flip(Request::ACCEPTABLE_FIELDS))) ?: json_encode($body);
     }
 
     private function formatStarted(\DateTime $startedTime): string {
-        $milliseconds = (int) ($startedTime->format('u') / 1000);
+        $milliseconds = intval(intval($startedTime->format('u')) / 1000);
 
         return $startedTime->format('Y-m-d H:i:s') . '.' . sprintf('%03d', $milliseconds);
     }

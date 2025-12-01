@@ -1,6 +1,6 @@
 {
     "name": "tirreno",
-    "description": "Open-source user intelligence platform. Monitor, analyze, and protect your app from cyber and account threats. ",
+    "description": "Open security analytics. Understand, monitor, and protect your application from cyber threats, account takeovers, and abuse.",
     "website": "https://www.tirreno.com",
     "repository": "https://github.com/tirrenotechnologies/tirreno",
     "logo": "https://www.tirreno.com/tirreno-logo-public.png",
@@ -19,7 +19,7 @@
         {
             "plan": "heroku-postgresql",
             "options": {
-                "version": "14"
+                "version": "15"
             }
         },
         {

@@ -3,7 +3,7 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder>{{ @AdminEvents_event_type_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @AdminEvents_event_type_search_placeholder }}</option>
                     <repeat group="{{ @EVENT_TYPES }}" value="{{ @record }}">
                         <option value="{{ @record['id'] }}">{{ @record['value'] }}|{{ @record['name'] }}</option>
                     </repeat>

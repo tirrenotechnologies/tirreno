@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Events;
 
 class Grid extends \Models\Grid\Base\Grid {
-    use \Traits\Enrichment\Ips;
-    use \Traits\Enrichment\Devices;
-
     public function __construct(int $apiKey) {
         parent::__construct();
 
@@ -69,18 +68,24 @@ class Grid extends \Models\Grid\Base\Grid {
         return $this->getGrid(null, $ids);
     }
 
+    public function getEventsByFieldId(int $fieldId): array {
+        $ids = ['fieldId' => $fieldId];
+
+        return $this->getGrid(null, $ids);
+    }
+
     public function getAllEvents() {
         return $this->getGrid();
     }
 
     protected function calculateCustomParams(array &$result): void {
-        $this->calculateIpType($result);
-        $this->applyDeviceParams($result);
+        \Utils\Enrichment::calculateIpType($result);
+        \Utils\Enrichment::applyDeviceParams($result);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['time', 'lastseen', 'session_max_t', 'session_min_t', 'score_updated_at'];
 
-        $this->translateTimeZones($result, $fields);
+        \Utils\TimeZones::translateTimeZones($result, $fields);
     }
 }

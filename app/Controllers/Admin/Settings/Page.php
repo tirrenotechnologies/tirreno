@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,20 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Settings;
 
-class Page extends \Controllers\Pages\Base {
-    use \Traits\ApiKeys;
-
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminSettings';
 
     public function getPageParams(): array {
         $dataController = new Data();
 
-        $currentOperator = $this->f3->get('CURRENT_USER');
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
         $operatorId = $currentOperator->id;
 
-        [$isOwner, $apiKeys] = $this->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = \Utils\ApiKeys::getOperatorApiKeys($operatorId);
 
         $pageParams = [
             'LOAD_DATATABLE'    => true,
@@ -38,12 +38,9 @@ class Page extends \Controllers\Pages\Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
 
             $pageParams = array_merge($pageParams, $operationResponse);
-            $pageParams['CMD'] = $params['cmd'];
-
             //$this->f3->reroute('/account');
         }
 
@@ -51,7 +48,7 @@ class Page extends \Controllers\Pages\Base {
         $coOwners = $dataController->getSharedApiKeyOperators($operatorId);
         $pageParams['SHARED_OPERATORS'] = $coOwners;
 
-        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = \Utils\ApiKeys::getOperatorApiKeys($operatorId);
 
         $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;

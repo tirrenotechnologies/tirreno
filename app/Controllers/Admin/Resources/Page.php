@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Resources;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminResources';
 
     public function getPageParams(): array {
@@ -25,9 +27,11 @@ class Page extends \Controllers\Pages\Base {
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,
             'LOAD_UPLOT'            => true,
             'LOAD_DATATABLE'        => true,
+            'LOAD_CHOICES'          => true,
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/resources.html',
             'JS'                    => 'admin_resources.js',
+            'FILE_TYPES'            => \Utils\WordsLists\FileExtensions::getKeys(),
         ];
 
         return parent::applyPageParams($pageParams);

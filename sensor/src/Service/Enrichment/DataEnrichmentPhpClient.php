@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -48,11 +48,14 @@ class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
             ],
         ];
 
-        $context = stream_context_create($options);
-        $response = file_get_contents($this->baseUrl . '/query', false, $context);
-        if ($response === false) {
-            if (isset($http_response_header[0])) {
-                preg_match('{HTTP/\d\.\d\s+(\d+)}', $http_response_header[0], $match);
+        $result = $this->safeFileGetContents($this->baseUrl . '/query', $options);
+
+        $response = $result['content'];
+        $responseHeaders = $result['headers'];
+
+        if ($response === null) {
+            if (isset($responseHeaders[0])) {
+                preg_match('{HTTP/\d\.\d\s+(\d+)}', $responseHeaders[0], $match);
                 $httpCode = intval($match[1]);
 
                 // Handle unauthorized status
@@ -82,20 +85,36 @@ class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
         return $data;
     }
 
-    public function track(string $token): void {
-        $options = [
-            'http' => [
-                'method' => 'POST',
-                'header' => sprintf(
-                    "Authorization: Bearer %s\r\n" .
-                    "User-Agent: %s\r\n",
-                    $token,
-                    $this->userAgent,
-                ),
-            ],
-        ];
+    private function safeFileGetContents(string $path, ?array $options): array {
+        set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+            if (!(error_reporting() & $severity)) {
+                return false;
+            }
+            throw new \ErrorException($message, 0, $severity, $file, $line);
 
-        $context = stream_context_create($options);
-        file_get_contents($this->baseUrl . '/track', false, $context);
+            return true;
+        });
+
+        $result = null;
+
+        try {
+            $context = null;
+            if ($options) {
+                $context = stream_context_create($options);
+            }
+            $result = file_get_contents($path, false, $context);
+        } catch (\Throwable $e) {
+            return [
+                'content' => null,
+                'headers' => [],
+            ];
+        }
+
+        restore_error_handler();
+
+        return [
+            'content'   => $result !== false ? $result : null,
+            'headers'   => isset($http_response_header) ? $http_response_header : [],
+        ];
     }
 }

@@ -8,11 +8,22 @@ export class BasePage {
         if (name) {
             this.name = name;
             if (single) {
-                let path = (this.name !== 'user') ? this.name : 'id';
-                this.id = parseInt(window.location.pathname.replace('/' + path + '/', ''), 10);
+                let parts = window.location.pathname.split('/');
+                this.id = parseInt(parts[parts.length -1], 10);
                 const key = this.name + 'Id';
                 this.getParams = () => {
                     return {[key]: this.id};
+                };
+            } else {
+                this.filters = {};
+                this.getParamsSection = () => {
+                    let result = {};
+
+                    for (const [key, value] of Object.entries(this.filters)) {
+                        result[key] = value.getValue();
+                    }
+
+                    return result;
                 };
             }
         }
@@ -56,9 +67,16 @@ export class BasePage {
         }
     }
 
+    setBaseFilters(datesFilter, searchFilter) {
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+        };
+    }
+
     getDevicesGridParams() {
         return {
-            url:        '/admin/loadDevices',
+            url:        `${window.app_base}/admin/loadDevices`,
             tileId:     'totalDevices',
             tableId:    'devices-table',
             panelType:  'device',
@@ -71,7 +89,7 @@ export class BasePage {
 
     getIpsGridParams() {
         return {
-            url:        '/admin/loadIps',
+            url:        `${window.app_base}/admin/loadIps`,
             tileId:     'totalIps',
             tableId:    'ips-table',
 
@@ -84,7 +102,7 @@ export class BasePage {
 
     getEventsGridParams() {
         return {
-            url:        '/admin/loadEvents',
+            url:        `${window.app_base}/admin/loadEvents`,
             tileId:     'totalEvents',
             tableId:    'user-events-table',
             panelType:  'event',
@@ -97,7 +115,7 @@ export class BasePage {
 
     getUsersGridParams() {
         return {
-            url:        '/admin/loadUsers',
+            url:        `${window.app_base}/admin/loadUsers`,
             tileId:     'totalUsers',
             tableId:    'users-table',
 
@@ -109,8 +127,22 @@ export class BasePage {
 
     getIspsGridParams() {
         return {
-            url:        '/admin/loadIsps',
+            url:        `${window.app_base}/admin/loadIsps`,
+            tileId:     'totalIsps',
             tableId:    'isps-table',
+
+            isSortable: false,
+
+            getParams:  this.getParams,
+        };
+    }
+
+    getFieldAuditTrailParams() {
+        return {
+            url:        `${window.app_base}/admin/loadFieldAuditTrail`,
+            tileId:     'totalEdits',
+            tableId:    'field-audit-trail-table',
+            panelType:  'field',
 
             isSortable: false,
 

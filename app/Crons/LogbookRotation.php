@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,13 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class LogbookRotation extends AbstractCron {
-    public function rotateRequests(): void {
-        $this->log('Start logbook rotation.');
+class LogbookRotation extends Base {
+    public function process(): void {
+        $this->addLog('Start logbook rotation.');
 
         $model = new \Models\ApiKeys();
         $keys = $model->getAllApiKeyIds();
@@ -30,6 +32,6 @@ class LogbookRotation extends AbstractCron {
             $cnt += $model->rotateRequests($key['id']);
         }
 
-        $this->log(sprintf('Deleted %s events for %s keys in logbook.', $cnt, count($keys)));
+        $this->addLog(sprintf('Deleted %s events for %s keys in logbook.', $cnt, count($keys)));
     }
 }

@@ -15,7 +15,7 @@ export class EmailPanel extends BasePanel {
         let eventParams = {
             enrichment: true,
             type: 'email',
-            url: '/admin/emailDetails',
+            url: `${window.app_base}/admin/emailDetails`,
             cardId: 'email-card',
             panelClosed: 'emailPanelClosed',
             closePanel: 'closeEmailPanel',

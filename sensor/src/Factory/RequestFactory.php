@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -37,7 +37,8 @@ use Sensor\Model\Validated\BrowserLanguage;
 use Sensor\Model\Validated\EventType;
 use Sensor\Model\Validated\HttpMethod;
 use Sensor\Model\Validated\UserCreated;
-use Sensor\Model\Validated\Payloads\FieldEditPayload;
+use Sensor\Model\Validated\FieldHistory;
+use Sensor\Model\Validated\Blacklisting;
 use Sensor\Model\Validated\Payloads\PageSearchPayload;
 use Sensor\Model\Validated\Payloads\EmailChangePayload;
 use Sensor\Repository\EventRepository;
@@ -56,53 +57,56 @@ class RequestFactory {
             }
         }
 
-        $eventTime = new Timestamp($data['eventTime']);
+        $eventTime      = new Timestamp($data['eventTime']);
 
-        $userCreated = isset($data['userCreated']) ? (new UserCreated($data['userCreated'])) : null;
+        $userCreated    = isset($data['userCreated']) ? (new UserCreated($data['userCreated'])) : null;
 
-        $referer = isset($data['httpReferer']) ? (new HttpReferer($data['httpReferer'])) : null;
-        $httpCode = isset($data['httpCode']) ? (new HttpCode($data['httpCode'])) : null;
+        $referer        = isset($data['httpReferer']) ? (new HttpReferer($data['httpReferer'])) : null;
+        $httpCode       = isset($data['httpCode']) ? (new HttpCode($data['httpCode'])) : null;
 
-        $ipAddress = new IpAddress($data['ipAddress']);
+        $ipAddress      = new IpAddress($data['ipAddress']);
 
-        $phone = isset($data['phoneNumber']) ? (new Phone($data['phoneNumber'])) : null;
+        $phone          = isset($data['phoneNumber']) ? (new Phone($data['phoneNumber'])) : null;
 
-        $email =        isset($data['emailAddress']) ? (new Email($data['emailAddress'])) : null;
-        $firstname =    isset($data['firstName']) ? (new Firstname($data['firstName'])) : null;
-        $lastname =     isset($data['lastName']) ? (new Lastname($data['lastName'])) : null;
-        $fullname =     isset($data['fullName']) ? (new Fullname($data['fullName'])) : null;
-        $username =     isset($data['userName']) ? (new Userid($data['userName'])) : null;
-        $pageTitle =    isset($data['pageTitle']) ? (new PageTitle($data['pageTitle'])) : null;
-        $url =          isset($data['url']) ? (new Url($data['url'])) : null;
-        $userAgent =    isset($data['userAgent']) ? (new UserAgent($data['userAgent'])) : null;
-        $browserLang =  isset($data['browserLanguage']) ? (new BrowserLanguage($data['browserLanguage'])) : null;
-        $eventType =    isset($data['eventType']) ? (new EventType($data['eventType'])) : null;
-        $httpMethod =   isset($data['httpMethod']) ? (new HttpMethod($data['httpMethod'])) : null;
+        $email          = isset($data['emailAddress']) ? (new Email($data['emailAddress'])) : null;
+        $firstname      = isset($data['firstName']) ? (new Firstname($data['firstName'])) : null;
+        $lastname       = isset($data['lastName']) ? (new Lastname($data['lastName'])) : null;
+        $fullname       = isset($data['fullName']) ? (new Fullname($data['fullName'])) : null;
+        $username       = isset($data['userName']) ? (new Userid($data['userName'])) : null;
+        $pageTitle      = isset($data['pageTitle']) ? (new PageTitle($data['pageTitle'])) : null;
+        $url            = isset($data['url']) ? (new Url($data['url'])) : null;
+        $userAgent      = isset($data['userAgent']) ? (new UserAgent($data['userAgent'])) : null;
+        $browserLang    = isset($data['browserLanguage']) ? (new BrowserLanguage($data['browserLanguage'])) : null;
+        $eventType      = isset($data['eventType']) ? (new EventType($data['eventType'])) : null;
+        $httpMethod     = isset($data['httpMethod']) ? (new HttpMethod($data['httpMethod'])) : null;
+
+        $blacklisting   = isset($data['blacklisting']) ? (new Blacklisting($data['blacklisting'])) : null;
+
+        $eventTypeId = $eventType?->value ? $eventRepository->getEventType($eventType->value) : null;
 
         $payload = null;
         $payloadRaw = $data['payload'] ?? null;
 
-        if ($eventType?->value) {
-            $eventTypeId = $eventRepository->getEventType($eventType->value);
+        $fieldHistory = null;
+        $fieldHistoryRaw = $data['fieldHistory'] ?? null;
 
-            if ($eventTypeId === Constants::FIELD_EDIT_EVENT_TYPE_ID) {
-                $payload = new FieldEditPayload($payloadRaw);
-            } elseif ($payloadRaw) {
-                switch ($eventTypeId) {
-                    case Constants::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID:
-                        $payload = new EmailChangePayload($payloadRaw);
-                        break;
-                    case Constants::PAGE_SEARCH_EVENT_TYPE_ID:
-                        $payload = new PageSearchPayload($payloadRaw);
-                        break;
-                }
-            }
+        switch ($eventTypeId) {
+            case Constants::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID:
+                $payload = new EmailChangePayload($payloadRaw);
+                break;
+            case Constants::PAGE_SEARCH_EVENT_TYPE_ID:
+                $payload = new PageSearchPayload($payloadRaw);
+                break;
+            case Constants::FIELD_EDIT_EVENT_TYPE_ID:
+                $fieldHistory = new FieldHistory($fieldHistoryRaw);
+                break;
         }
 
         $validatedParams = [
             $email, $eventTime, $userCreated, $referer, $httpCode, $ipAddress,
             $phone, $firstname, $lastname, $fullname, $username, $pageTitle,
             $url, $userAgent, $browserLang, $eventType, $httpMethod, $payload,
+            $fieldHistory, $blacklisting,
         ];
 
         $changedParams = self::changedParams($validatedParams);
@@ -137,7 +141,9 @@ class RequestFactory {
             $userCreated?->value,
             $traceId,
             $payload?->value,
+            $fieldHistory?->value,
             $changedParams,
+            $blacklisting?->value,
         );
     }
 

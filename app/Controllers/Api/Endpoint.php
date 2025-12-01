@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,26 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Api;
 
 abstract class Endpoint {
-    use \Traits\Db;
-    use \Traits\Debug;
-
     public const API_KEY = 'Api-Key';
 
     protected $f3;
 
     protected \Views\Json $response;
-    protected \Type\ResponseType $responseType;
+    protected string $responseType;
     protected int $error;
     protected array $validationErrors = [];
+    protected \DateTime $startTime;
 
     private string $apiKeyString;
     protected \Models\ApiKeys $apiKey;
     protected \Interfaces\ApiKeyAccessAuthorizationInterface $authorizationModel;
 
-    private array $body = [];
+    protected array $body = [];
 
     protected array|null $data = null;
 
@@ -41,13 +41,14 @@ abstract class Endpoint {
         $this->f3->set('ONERROR', function (): void {
             $this->handleInternalServerError();
         });
-        $this->connectToDb(false);
+        \Utils\Database::initConnect(false);
 
         $this->response = new \Views\Json();
-        $this->responseType = new \Type\ResponseType(\Type\ResponseType::SINGLE);
+        $this->responseType = \Utils\Constants::get('SINGLE_RESPONSE_TYPE');
     }
 
     public function beforeRoute(): void {
+        $this->startTime = new \DateTime();
         $this->identify();
         $this->authenticate();
         $this->parseBody();
@@ -62,6 +63,10 @@ abstract class Endpoint {
                 'message' => $errorMessage,
             ];
             $this->data = null;
+        }
+
+        if (!isset($this->error) || (!in_array($this->error, [400, 401, 403]))) {
+            $this->saveLogbook();
         }
 
         if (($this->data !== null)) {
@@ -119,6 +124,26 @@ abstract class Endpoint {
         }
 
         return $value;
+    }
+
+    protected function saveLogbook(): void {
+        $model = new \Models\Logbook();
+        $model->add(
+            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
+            $this->f3->PATH,
+            null,
+            !isset($this->error) ? \Utils\Constants::get('LOGBOOK_ERROR_TYPE_SUCCESS') : \Utils\Constants::get('LOGBOOK_ERROR_TYPE_CRITICAL_ERROR'),
+            !isset($this->error) ? null : json_encode(['Undefined error']),
+            json_encode($this->body),
+            $this->formatStartTime(),
+            $this->apiKey->id,
+        );
+    }
+
+    protected function formatStartTime(): string {
+        $milliseconds = intval(intval($this->startTime->format('u')) / 1000);
+
+        return $this->startTime->format('Y-m-d H:i:s') . '.' . sprintf('%03d', $milliseconds);
     }
 
     protected function setError(int $statusCode, int $errorCode): void {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Resources;
 
 class Grid extends \Models\Grid\Base\Grid {
@@ -22,6 +24,17 @@ class Grid extends \Models\Grid\Base\Grid {
         $this->apiKey = $apiKey;
         $this->idsModel = new Ids($apiKey);
         $this->query = new Query($apiKey);
+    }
+
+    public function getResourcesByUserId(int $userId): array {
+        $params = [':account_id' => $userId];
+
+        $data = $this->getGrid($this->idsModel->getResourcesIdsByUserId(), $params);
+        if (isset($data['data'])) {
+            $data['data'] = $this->extendWithSuspiciousUrl($data['data']);
+        }
+
+        return $data;
     }
 
     public function getAllResources(): array {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,35 +13,41 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Home;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
+
+        $this->controller = new Data();
+        $this->page = new Page();
+    }
 
     public function showIndexPage(): void {
-        $this->redirectIfUnlogged('/login');
+        \Utils\Routes::redirectIfUnlogged('/login');
 
-        $pageController = new Page();
-        $this->response = new \Views\Frontend();
-        $this->response->data = $pageController->getPageParams();
+        parent::showIndexPage();
     }
 
     public function getDashboardStat(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $mode = \Utils\Conversion::getStringRequestParam('mode');
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
 
-        return $apiKey ? (new Data())->getStat($apiKey) : [];
+        return $this->apiKey ? $this->controller->getStat($mode, $dateRange, $this->apiKey) : [];
     }
 
     public function getTopTen(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $mode = \Utils\Conversion::getStringRequestParam('mode');
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
 
-        return $apiKey ? (new Data())->getTopTen($apiKey) : [];
+        return $this->apiKey ? $this->controller->getTopTen($mode, $dateRange, $this->apiKey) : [];
     }
 
     public function getChart(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $mode = \Utils\Conversion::getStringRequestParam('mode');
 
-        return $apiKey ? (new Data())->getChart($apiKey) : [];
+        return $this->apiKey ? $this->controller->getChart($mode, $this->apiKey) : [];
     }
 }

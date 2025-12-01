@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,13 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Event extends \Models\BaseSql {
-    use \Traits\Enrichment\Ips;
-    use \Traits\Enrichment\Emails;
-    use \Traits\Enrichment\TimeZones;
-
     protected $DB_TABLE_NAME = 'event';
 
     public function getLastEvent(int $apiKey): array {
@@ -149,8 +147,6 @@ class Event extends \Models\BaseSql {
                 event_type.name         AS event_type_name,
                 event_type.value        AS event_type,
 
-                event_payload.payload   AS event_payload,
-
                 event_http_method.name  AS event_http_method_name
 
             FROM
@@ -204,19 +200,16 @@ class Event extends \Models\BaseSql {
             LEFT JOIN event_http_method
             ON (event.http_method = event_http_method.id)
 
-            LEFT JOIN event_payload
-            ON (event.payload = event_payload.id)
-
             WHERE
+                event.id = :id AND
                 event.key = :api_key
-                AND event.id = :id
             LIMIT 1'
         );
 
         $results = $this->execQuery($query, $params);
 
-        $this->calculateIpType($results);
-        $this->calculateEmailReputation($results);
+        \Utils\Enrichment::calculateIpType($results);
+        \Utils\Enrichment::calculateEmailReputation($results);
         //$this->translateTimeZones($results, ['event_time', 'domain_creation_date']);
 
         if (count($results)) {

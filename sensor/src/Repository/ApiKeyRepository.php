@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -51,7 +51,7 @@ class ApiKeyRepository {
         $skipEnrichingAttributes = (array) \json_decode($result['skip_enriching_attributes'], true);
 
         $this->cache[$apiKey] = new GetApiKeyDto(
-            (int) $result['id'],
+            intval($result['id']),
             $result['key'],
             $result['token'],
             !$result['skip_blacklist_sync'],

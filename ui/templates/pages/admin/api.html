@@ -48,26 +48,26 @@
 
                                 <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
                                     <div id="php">
-                                        <textarea class="code-snippet" rows="93" cols="84"
+                                        <textarea class="code-snippet" rows="108" cols="84"
                                             readonly><include href="templates/snippets/php.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}" /></textarea>
                                     </div>
 
                                     <div id="python" class="is-hidden">
-                                        <textarea class="code-snippet" rows="72" cols="84"
+                                        <textarea class="code-snippet" rows="91" cols="84"
                                             readonly><include href="templates/snippets/python.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}" /></textarea>
                                     </div>
 
                                     <div id="nodejs" class="is-hidden">
-                                        <textarea class="code-snippet" rows="70" cols="84"
+                                        <textarea class="code-snippet" rows="85" cols="84"
                                             readonly><include href="templates/snippets/nodejs.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}" /></textarea>
                                     </div>
 
                                     <div id="ruby" class="is-hidden">
-                                        <textarea class="code-snippet" rows="74" cols="84"
+                                        <textarea class="code-snippet" rows="98" cols="84"
                                             readonly><include href="templates/snippets/ruby.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}" /></textarea>
                                     </div>
                                     <div id="curl" class="is-hidden">
-                                        <textarea class="code-snippet" rows="22" cols="84"
+                                        <textarea class="code-snippet" rows="24" cols="84"
                                             readonly><include href="templates/snippets/curl.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}" /></textarea>
                                     </div>
                                 </repeat>

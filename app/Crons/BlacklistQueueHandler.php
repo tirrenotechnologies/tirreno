@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,24 +13,13 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class BlacklistQueueHandler extends AbstractQueueCron {
-    public function __construct() {
-        parent::__construct();
-
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
-        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-    }
-
-    public function processQueue(): void {
-        if ($this->accountOpQueueModel->isExecuting() && !$this->accountOpQueueModel->unclog()) {
-            $this->log('Blacklist queue is already being executed by another cron job.');
-
-            return;
-        }
-
-        $this->processItems($this->accountOpQueueModel);
+class BlacklistQueueHandler extends BaseQueue {
+    public function process(): void {
+        parent::baseProcess(\Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'));
     }
 
     protected function processItem(array $item): void {
@@ -46,8 +35,8 @@ class BlacklistQueueHandler extends AbstractQueueCron {
         $model = new \Models\User();
         $username = $model->getUser($item['event_account'], $item['key'])['userid'] ?? '';
 
-        $logger = new \Log('blacklist.log');
-        $logger->write('[BlacklistQueue] ' . $username . ' added to blacklist.');
+        $msg = \Utils\SystemMessages::syslogLine(10, 5, 'BlacklistQueue', 'blacklisted userid=' . $username);
+        \Base::instance()->write(\Base::instance()->LOGS . 'blacklist.log', $msg . PHP_EOL, true);
 
         $model = new \Models\ApiKeys();
         $model->getKeyById($item['key']);
@@ -57,55 +46,14 @@ class BlacklistQueueHandler extends AbstractQueueCron {
             $userEmail = $user->getUser($item['event_account'], $item['key'])['email'] ?? null;
 
             if ($userEmail !== null) {
-                $hashes = $this->getHashes($items, $userEmail);
-                $errorMessage = $this->sendBlacklistReportPostRequest($hashes, $model->token);
+                $hashes = \Utils\Cron::getHashes($items, $userEmail);
+                $errorMessage = \Utils\Cron::sendBlacklistReportPostRequest($hashes, $model->token);
                 if (strlen($errorMessage) > 0) {
-                    // Log error to database
-                    \Utils\Logger::log('Fraud enrichment API curl error', $errorMessage);
-                    $this->log('Fraud enrichment API curl error logged to database.');
+                    // TODO: log error into database?
+                    $this->addLog('Enrichment API cURL ' . $errorMessage);
+                    $this->addLog('Enrichment API cURL logged to database.');
                 }
             }
         }
-    }
-
-    /**
-     * @param array<array{type: string, value: string}> $items
-     */
-    private function getHashes(array $items, string $userEmail): array {
-        $userHash = hash('sha256', $userEmail);
-
-        return array_map(function ($item) use ($userHash) {
-            return [
-                'type'  => $item['type'],
-                'value' => hash('sha256', $item['value']),
-                'id'    => $userHash,
-            ];
-        }, $items);
-    }
-
-    /**
-     * @param array<array{type: string, value: string}> $hashes
-     */
-    private function sendBlacklistReportPostRequest(array $hashes, string $enrichmentKey): string {
-        $postFields = [
-            'data' => $hashes,
-        ];
-        $options = [
-            'method' => 'POST',
-            'header' => [
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . $enrichmentKey,
-                'User-Agent: ' . $this->f3->get('USER_AGENT'),
-            ],
-            'content' => \json_encode($postFields),
-        ];
-
-        /** @var array{request: array<string>, body: string, headers: array<string>, engine: string, cached: bool, error: string} $result */
-        $result = \Web::instance()->request(
-            url: \Utils\Variables::getEnrichtmentApi() . '/global_alert_report',
-            options: $options,
-        );
-
-        return $result['error'];
     }
 }

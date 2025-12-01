@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -32,8 +34,8 @@ class Domain extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthoriz
                 event_domain
 
             WHERE
-                event_domain.key = :api_key
-                AND event_domain.id = :domain_id'
+                event_domain.id = :domain_id AND
+                event_domain.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -73,8 +75,8 @@ class Domain extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthoriz
                 event_domain
 
             WHERE
+                event_domain.id = :domain_id AND
                 event_domain.key = :api_key
-                AND event_domain.id = :domain_id
 
             GROUP BY
                 event_domain.id'
@@ -99,8 +101,8 @@ class Domain extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthoriz
                 event_domain
 
             WHERE
+                event_domain.id = :id AND
                 event_domain.key = :api_key
-                AND event_domain.id = :id
 
             LIMIT 1"
         );

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Ips;
 
@@ -102,18 +104,18 @@ class Query extends \Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_ip.id', $queryParams);
 
         if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (
-                    TEXT(event_ip.ip)                   LIKE LOWER(:search_value)
-                    OR LOWER(event_isp.asn::text)       LIKE LOWER(:search_value)
-                    OR LOWER(event_isp.name)            LIKE LOWER(:search_value)
-                    OR LOWER(countries.value)           LIKE LOWER(:search_value)
-                    OR LOWER(countries.iso)             LIKE LOWER(:search_value)
+                    TEXT(event_ip.ip)                   LIKE LOWER(:search_value) OR
+                    LOWER(event_isp.asn::text)          LIKE LOWER(:search_value) OR
+                    LOWER(event_isp.name)               LIKE LOWER(:search_value) OR
+                    LOWER(countries.value)              LIKE LOWER(:search_value) OR
+                    LOWER(countries.iso)                LIKE LOWER(:search_value)
                 )'
             );
 
@@ -125,8 +127,8 @@ class Query extends \Models\Grid\Base\Query {
     }
 
     private function applyIpTypes(string &$query): void {
-        $ipTypeIds = $this->f3->get('REQUEST.ipTypeIds');
-        if ($ipTypeIds === null) {
+        $ipTypeIds = \Utils\Conversion::getArrayRequestParam('ipTypeIds');
+        if (!$ipTypeIds) {
             return;
         }
 

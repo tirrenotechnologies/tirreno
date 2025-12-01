@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -15,6 +15,7 @@
 
 declare(strict_types=1);
 
+use Sensor\Exception\RateLimitException;
 use Sensor\Model\Http\RegularResponse;
 use Sensor\Model\Http\Request;
 use Sensor\Service\DI;
@@ -29,23 +30,51 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 }
 
 // Register autoloader
-spl_autoload_register(fn (string $c) => @include_once __DIR__ . '/src/' . str_replace(['Sensor\\', '\\'], ['', '/'], $c) . '.php');
+spl_autoload_register(function (string $className): void {
+    require_once __DIR__ . '/src/' . str_replace(['Sensor\\', '\\'], ['', '/'], $className) . '.php';
+});
 
 $requestStartTime = new \DateTime('now');
 
-$di = new DI();
+$di = null;
+
+try {
+    $di = new DI();
+} catch (Throwable $e) {
+    if (str_contains($e->getMessage(), 'DATABASE_URL') || str_contains($e->getMessage(), 'SQLSTATE[08006]')) {
+        http_response_code(503);
+        exit;
+    }
+
+    error_log($e->getMessage());
+    http_response_code(500);
+    exit;
+}
+
 $profiler = $di->getProfiler();
 $logger = $di->getLogger();
 $logbookManager = $di->getLogbookManager();
+
 $profiler->start('total');
 
 $request = null;
 try {
-    $apiKeyString = $_SERVER['HTTP_API_KEY'] ?? null;
+    $isWeb = isset($_SERVER['REQUEST_METHOD']);
+
+    $body = [];
+    if (isset($_SERVER['REQUEST_METHOD'])) {
+        $body = $_POST;
+    } else {
+        $body = $argv;
+    }
+
+    $apiKeyString = $isWeb ? ($_SERVER['HTTP_API_KEY'] ?? null) : (getopt('', ['apiKey::'])['apiKey'] ?? null);
     $apiKeyDto = $logbookManager->getApiKeyDto($apiKeyString);    // GetApiKeyDto or null
     $logbookManager->setApiKeyDto($apiKeyDto);
 
-    $request = new Request($_POST, $apiKeyString, $_SERVER['HTTP_X_REQUEST_ID'] ?? null);
+    $request = new Request($isWeb ? $_POST : array_slice($argv, 1), $apiKeyString, $_SERVER['HTTP_X_REQUEST_ID'] ?? null, $isWeb);
+
+    $logbookManager->checkRps();
 
     $controller = $di->getController();
     $response = $controller->index($request, $apiKeyDto);
@@ -55,22 +84,29 @@ try {
     } else {
         $logger->logError($e);
     }
+
+    $rateLimit = $e instanceof RateLimitException;
+
     // get apikey
     $logbookManager->logException(
         $requestStartTime,
         $e->getMessage(),
+        $rateLimit,
     );
-    $logbookManager->logIncorrectRequest(
-        $request?->body ?? [],
-        $e::class . ': ' . $e->getMessage(),
-        $request?->traceId ?? null,
-    );
+
+    if (!$rateLimit) {
+        $logbookManager->logIncorrectRequest(
+            $request?->body ?? [],
+            $e::class . ': ' . $e->getMessage(),
+            $request?->traceId ?? null,
+        );
+    }
 
     // Log profiler data and queries before exit
     $profiler->finish('total');
     $logger->logProfilerData($profiler->getData());
 
-    http_response_code(500);
+    http_response_code(!$rateLimit ? 500 : 429);
     exit;
 }
 

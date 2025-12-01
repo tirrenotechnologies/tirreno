@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,19 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Rules;
 
-class Page extends \Controllers\Pages\Base {
-    use \Traits\ApiKeys;
-
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminRules';
 
     public function getPageParams(): array {
         $dataController = new Data();
-        $rules = $dataController->getRulesForLoggedUser();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $rules = $dataController->getRulesForApiKey($apiKey);
         $searchPlacholder = $this->f3->get('AdminRules_search_placeholder');
 
-        $currentOperator = $this->f3->get('CURRENT_USER');
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
         $operatorId = $currentOperator->id;
 
         $ruleValues = [
@@ -47,17 +48,14 @@ class Page extends \Controllers\Pages\Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $params['id'] = $operatorId;
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
 
             $pageParams = array_merge($pageParams, $operationResponse);
-            $pageParams['CMD'] = $params['cmd'];
-            $pageParams['RULES'] = $dataController->getRulesForLoggedUser();
+            $pageParams['RULES'] = $dataController->getRulesForApiKey($apiKey);
         }
 
         // set api_keys param after proccessing POST request
-        [$isOwner, $apiKeys] = $dataController->getOperatorApiKeys($operatorId);
+        [$isOwner, $apiKeys] = \Utils\ApiKeys::getOperatorApiKeys($operatorId);
 
         $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;

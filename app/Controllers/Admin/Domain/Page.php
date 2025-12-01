@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,24 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Domain;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminDomain';
 
     public function getPageParams(): array {
         $dataController = new Data();
-
-        $domainId = $this->integerParam($this->f3->get('PARAMS.domainId'));
-        $hasAccess = $dataController->checkIfOperatorHasAccess($domainId);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $domainId = \Utils\Conversion::getIntUrlParam('domainId');
+        $hasAccess = $dataController->checkIfOperatorHasAccess($domainId, $apiKey);
 
         if (!$hasAccess) {
             $this->f3->error(404);
         }
 
-        $domain = $dataController->getDomainDetails($domainId);
+        $domain = $dataController->getDomainDetails($domainId, $apiKey);
         $pageTitle = $this->getInternalPageTitleWithPostfix($domain['domain']);
-        $isEnrichable = $dataController->isEnrichable();
+        $isEnrichable = $dataController->isEnrichable($apiKey);
 
         $pageParams = [
             'LOAD_DATATABLE'                => true,
@@ -46,13 +48,11 @@ class Page extends \Controllers\Pages\Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
 
             $pageParams = array_merge($pageParams, $operationResponse);
-            $pageParams['CMD'] = $params['cmd'];
             // recall domain data
-            $pageParams['DOMAIN'] = $dataController->getDomainDetails($domainId);
+            $pageParams['DOMAIN'] = $dataController->getDomainDetails($domainId, $apiKey);
         }
 
         return parent::applyPageParams($pageParams);

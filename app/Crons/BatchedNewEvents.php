@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,51 +13,65 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class BatchedNewEvents extends AbstractCron {
-    private \Models\Queue\QueueNewEventsCursor $cursorModel;
-    private \Models\Queue\AccountOperationQueue $accountOpQueueModel;
-    private \Models\Events $eventsModel;
+class BatchedNewEvents extends Base {
+    protected function readyToProcess(): bool {
+        $model = new \Models\Cursor();
 
-    public function __construct() {
-        parent::__construct();
+        // was not locked; locking now
+        if ($model->safeLock()) {
+            return true;
+        }
 
-        $this->cursorModel = new \Models\Queue\QueueNewEventsCursor();
-        $this->eventsModel = new \Models\Events();
+        $result = $model->getLock();
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
-        $this->accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+        if (\Utils\DateRange::isQueueTimeouted($result['updated'])) {
+            return false;
+        }
+
+        $model->forceLock();
+
+        return true; // relocked
     }
 
-    public function gatherNewEventsBatch(): void {
-        if (!$this->cursorModel->acquireLock() && !$this->cursorModel->unclog()) {
-            $this->log('Could not acquire the lock; another cron is probably already working on recently added events.');
+    public function process(): void {
+        if (!$this->readyToProcess()) {
+            $this->addLog('Could not acquire the lock; another cron is probably already working on recently added events.');
 
             return;
         }
 
+        $model = new \Models\Cursor();
+
         try {
-            $cursor = $this->cursorModel->getCursor();
-            $next = $this->cursorModel->getNextCursor($cursor, \Utils\Variables::getNewEventsBatchSize());
+            $cursor = $model->getCursor();
+            $next = $model->getNextCursor($cursor, \Utils\Variables::getNewEventsBatchSize());
 
-            if ($next) {
-                $accounts = $this->eventsModel->getDistinctAccounts($cursor, $next);
+            if (!$next) {
+                $this->addLog('No new events.');
+                $model->unlock();
 
-                $this->accountOpQueueModel->addBatch($accounts);
-                $this->cursorModel->updateCursor($next);
-
-                // Log new events cursor to database.
-                \Utils\Logger::log('Updated \'last_event_id\' in \'queue_new_events_cursor\' table to ', $next);
-
-                $this->log(sprintf('Added %s accounts to the risk score queue.', count($accounts)));
-            } else {
-                $this->log('No new events.');
+                return;
             }
+
+            $accounts = (new \Models\Events())->getDistinctAccounts($cursor, $next);
+
+            \Utils\Routes::callExtra('BATCHING_NEW_EVENTS', $cursor, $next);
+
+            (new \Models\Queue())->addBatch($accounts, \Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'));
+
+            $model->updateCursor($next);
+
+            // TODO: Log new events cursor to database?
+            $this->addLog('Updated \'last_event_id\' in \'queue_new_events_cursor\' table to ' . strval($next));
+            $this->addLog(sprintf('Added %s accounts to the risk score queue.', count($accounts)));
         } catch (\Throwable $e) {
-            $this->log(sprintf('Batched new events error %s.', $e->getMessage()));
-        } finally {
-            $this->cursorModel->releaseLock();
+            $this->addLog(sprintf('Batched new events error %s.', $e->getMessage()));
         }
+
+        $model->unlock();
     }
 }

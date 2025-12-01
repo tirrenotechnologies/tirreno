@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -18,9 +18,6 @@ declare(strict_types=1);
 namespace Sensor\Model;
 
 class CreateEventDto {
-    /**
-     * @param array<mixed, mixed>|null $payload
-     */
     public function __construct(
         public ?string $firstName,
         public ?string $lastName,
@@ -42,7 +39,9 @@ class CreateEventDto {
         public ?\DateTimeImmutable $userCreated,
         public ?string $traceId,
         public array|string|null $payload,
+        public array|string|null $fieldHistory,
         public array $changedParams,
+        public ?bool $blacklisting,
     ) {
     }
 }

@@ -7,12 +7,16 @@ const getRuleClass = (value) => {
     switch (value) {
         case -20:
             return 'positive';
+
         case 10:
             return 'medium';
+
         case 20:
             return 'high';
+
         case 70:
             return 'extreme';
+
         default:
             return 'none';
     }

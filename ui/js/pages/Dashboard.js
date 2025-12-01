@@ -13,7 +13,7 @@ import {
 export class DashboardPage extends BasePage {
 
     constructor() {
-        super();
+        super('dashboard');
 
         this.initUi();
     }

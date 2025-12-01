@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,43 +13,36 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Rules;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
 
-    public function showIndexPage(): void {
-        $this->redirectIfUnlogged();
-
-        $pageController = new Page();
-        $this->response = new \Views\Frontend();
-        $this->response->data = $pageController->getPageParams();
+        $this->controller = new Data();
+        $this->page = new Page();
     }
 
     public function saveRule(): array {
-        $params = $this->f3->get('POST');
-        $key = explode('_', $params['rule']);
-        $ruleUid = end($key);
-        $score = $params['value'];
+        $ruleUid = \Utils\Conversion::getStringRequestParam('rule');
+        $score = \Utils\Conversion::getIntRequestParam('value');
 
-        $dataController = new Data();
-        $dataController->saveUserRule($ruleUid, $score);
+        $this->controller->saveUserRule($ruleUid, $score, $this->apiKey);
 
         return ['success' => true];
     }
 
     public function checkRule(): array {
         set_time_limit(0);
-        ini_set('max_execution_time', 0);
+        ini_set('max_execution_time', '0');
 
-        $params = $this->f3->get('GET');
-        $ruleUid = $params['ruleUid'];
+        $ruleUid = \Utils\Conversion::getStringRequestParam('ruleUid');
 
-        $dataController = new Data();
-        [$allUsersCnt, $users] = $dataController->checkRule($ruleUid);
-        $proportion = $dataController->getRuleProportion($allUsersCnt, count($users));
-        $dataController->saveRuleProportion($ruleUid, $proportion);
+        [$allUsersCnt, $users] = $this->controller->checkRule($ruleUid, $this->apiKey);
+        $proportion = $this->controller->getRuleProportion($allUsersCnt, count($users));
+        $this->controller->saveRuleProportion($ruleUid, $proportion, $this->apiKey);
 
         return [
             'users'                 => array_slice($users, 0, \Utils\Constants::get('RULE_CHECK_USERS_PASSED_TO_CLIENT')),

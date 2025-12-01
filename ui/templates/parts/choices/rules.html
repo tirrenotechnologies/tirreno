@@ -3,10 +3,10 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder>{{ @AdminUsers_rules_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @AdminUsers_rules_search_placeholder }}</option>
                     <repeat group="{{ @RULES }}" value="{{ @record }}">
                         <option value="{{ @record['uid'] }}" {{ isset(@DEFAULT_RULE) && @DEFAULT_RULE === @record['uid'] ? 'selected' : '' }}
-                            >{{ @record['uid'] }}|{{ \Utils\RulesClasses::getRuleClass(@record['value']) }}|{{ @record['name'] }}</option>
+                            >{{ @record['uid'] }}|{{ \Utils\RulesClasses::getRuleClass(@record['value'], @record['broken']) }}|{{ @record['name'] }}</option>
                     </repeat>
                 </select>
             </div>

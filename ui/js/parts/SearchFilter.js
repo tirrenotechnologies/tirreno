@@ -2,22 +2,21 @@ import {fireEvent} from './utils/Event.js?v=2';
 import {debounce} from './utils/Functions.js?v=2';
 
 export class SearchFilter {
-    constructor() {
-        const onSearchInputChange = this.onSearchInputChange.bind(this);
+    constructor(id=null) {
+        this.id = id;
+
+        const onSearchInputChange = this.onSearchInputChange.bind(this, this.id);
         const debouncedOnSearchInputChange = debounce(onSearchInputChange);
         this.searchField.addEventListener('input', debouncedOnSearchInputChange, false);
-
-        const onDateFilterChanged = this.onDateFilterChanged.bind(this);
-        window.addEventListener('dateFilterChanged', onDateFilterChanged, false);
     }
 
-    onSearchInputChange({target}) {
+    onSearchInputChange(id, {target}) {
         const value = target.value;
-        fireEvent('searchFilterChanged', {query: value});
-    }
-
-    onDateFilterChanged() {
-        this.searchField.value = '';
+        let eventName = 'searchFilterChanged';
+        if (id !== null) {
+            eventName = id + '-' + eventName;
+        }
+        fireEvent(eventName, {query: value});
     }
 
     getValue() {

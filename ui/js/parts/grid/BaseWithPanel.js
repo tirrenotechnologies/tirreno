@@ -10,6 +10,12 @@ export class BaseGridWithPanel extends BaseGrid {
         this.markerClass = 'marker';
 
         this.allPanels = {
+            'field': {
+                id:             'field-card',
+                closedEvent:    'fieldPanelClosed',
+                close:          'closeFieldPanel',
+                rowClicked:     'fieldTableRowClicked',
+            },
             'event': {
                 id:             'event-card',
                 closedEvent:    'eventPanelClosed',
@@ -56,7 +62,13 @@ export class BaseGridWithPanel extends BaseGrid {
     drawCallback(settings) {
         super.drawCallback(settings);
 
-        this.addTableRowsEvents();
+        const tableId    = this.config.tableId;
+        const onRowClick = this.onRowClick.bind(this);
+
+        if ($(this.table).DataTable().data().any()) {
+            const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+            rows.forEach(row => row.addEventListener('click', onRowClick, false));
+        }
     }
 
     onDetailsPanelClosed() {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Devices;
 
 class Grid extends \Models\Grid\Base\Grid {
-    use \Traits\Enrichment\Devices;
-
     public function __construct(int $apiKey) {
         parent::__construct();
 
@@ -49,12 +49,12 @@ class Grid extends \Models\Grid\Base\Grid {
     }
 
     protected function calculateCustomParams(array &$result): void {
-        $this->applyDeviceParams($result);
+        \Utils\Enrichment::applyDeviceParams($result);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['created'];
 
-        $this->translateTimeZones($result, $fields);
+        \Utils\TimeZones::translateTimeZones($result, $fields);
     }
 }

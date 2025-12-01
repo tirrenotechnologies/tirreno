@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\UserDetails;
 
@@ -32,8 +34,8 @@ class Id extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 event_account
 
             WHERE
-                event_account.id = :user_id
-                AND event_account.key = :api_key'
+                event_account.id = :user_id AND
+                event_account.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -71,8 +73,8 @@ class Id extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             ON (event_account.lastemail = event_email.id)
 
             WHERE
-                event_account.id = :user_id
-                AND event_account.key = :api_key'
+                event_account.id = :user_id AND
+                event_account.key = :api_key'
         );
 
 

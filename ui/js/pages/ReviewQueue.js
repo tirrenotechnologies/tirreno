@@ -22,21 +22,21 @@ export class ReviewQueuePage extends BasePage {
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);
 
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+            ruleUids:       rulesFilter,
+        };
+
         const gridParams = {
-            url:            '/admin/loadReviewQueue',
+            url:            `${window.app_base}/admin/loadReviewQueue`,
             tileId:         'totalUsers',
             tableId:        'review-queue-table',
             dateRangeGrid:  true,
 
             choicesFilterEvents: [rulesFilter.getEventType()],
 
-            getParams: function() {
-                const dateRange     = datesFilter.getValue();
-                const searchValue   = searchFilter.getValue();
-                const ruleUids      = rulesFilter.getValues();
-
-                return {dateRange, searchValue, ruleUids};
-            }
+            getParams: this.getParamsSection,
         };
 
         new ReviewQueueChart(chartParams);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,27 +13,33 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ReviewQueue;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $model = new \Models\Grid\ReviewQueue\Grid($apiKey);
 
         return $model->getAllUnderReviewUsers() ?? [];
     }
 
-    public function getNumberOfNotReviewedUsers(int $apiKey, bool $useCache = true, bool $overall = false): array {
-        $currentOperator = $this->f3->get('CURRENT_USER');
+    public function setNotReviewedCount(bool $cache, int $apiKey): array {
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
+
+        if (!$currentOperator) {
+            $model = new \Models\ApiKeys();
+            $model = $model->getKeyById($apiKey);
+            $creator = $model->creator;
+            $model = new \Models\Operator();
+            $currentOperator = $model->getOperatorById($creator);
+        }
+
         $takeFromCache = $this->canTakeNumberOfNotReviewedUsersFromCache($currentOperator);
 
         $total = $currentOperator->review_queue_cnt;
-        if (!$useCache || !$takeFromCache) {
-            $model = new \Models\Grid\ReviewQueue\Grid($apiKey);
-            $total = !$overall ? $model->getTotalUnderReviewUsers() : $model->getTotalUnderReviewUsersOverall();
-
-            if ($total > 999) {
-                $total = 999;
-            }
+        if (!$cache || !$takeFromCache) {
+            $total = (new \Models\ReviewQueue())->getCountShort($apiKey);
 
             $data = [
                 'id' => $currentOperator->id,
@@ -48,19 +54,8 @@ class Data extends \Controllers\Base {
     }
 
     private function canTakeNumberOfNotReviewedUsersFromCache(\Models\Operator $currentOperator): bool {
-        $diff = PHP_INT_MAX;
-        $currentTime = gmdate('Y-m-d H:i:s');
-        $updatedAt = $currentOperator->review_queue_updated_at;
+        $interval = \Base::instance()->get('REVIEWED_QUEUE_CNT_CACHE_TIME');
 
-        if ($updatedAt) {
-            $dt1 = new \DateTime($currentTime);
-            $dt2 = new \DateTime($updatedAt);
-
-            $diff = $dt1->getTimestamp() - $dt2->getTimestamp();
-        }
-
-        $cacheTime = $this->f3->get('REVIEWED_QUEUE_CNT_CACHE_TIME');
-
-        return $cacheTime > $diff;
+        return !!\Utils\DateRange::inIntervalTillNow($currentOperator->review_queue_updated_at, $interval);
     }
 }

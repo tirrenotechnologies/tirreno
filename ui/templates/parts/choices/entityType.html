@@ -3,7 +3,7 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder>{{ @AdminBlacklist_entity_type_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @AdminBlacklist_entity_type_search_placeholder }}</option>
                     <repeat group="{{ @ENTITY_TYPES }}" key="{{ @key }}" value="{{ @value }}">
                         <option value="{{ @key }}">{{ @value }}</option>
                     </repeat>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -50,8 +50,7 @@ class AccountRepository {
             SET
                 lastip = EXCLUDED.lastip, lastseen = EXCLUDED.lastseen, firstname = COALESCE(EXCLUDED.firstname, event_account.firstname),
                 fullname = COALESCE(EXCLUDED.fullname, event_account.fullname), lastname = COALESCE(EXCLUDED.lastname, event_account.lastname),
-                created = COALESCE(:created, event_account.created),
-                session_id = CASE
+                created = COALESCE(:created, event_account.created), session_id = CASE
                     WHEN ABS(EXTRACT(epoch FROM (EXCLUDED.lastseen - event_account.lastseen))) > 1800
                         OR event_account.session_id IS NULL
                         OR (SELECT EXTRACT(epoch FROM (event_session.lastseen - event_session.created)) FROM event_session WHERE event_session.id = event_account.session_id LIMIT 1) > 14400

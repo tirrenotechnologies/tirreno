@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -104,12 +104,6 @@ class DataEnrichmentService {
 
         if (!count($query)) {
             $this->logger->logDebug('Skipping calling enrichment API, because data is already enriched or skipped');
-
-            try {
-                $this->dataEnrichmentClient->track($token);
-            } catch (\Throwable $e) {
-                $this->logger->logError($e, 'Error sending track event for the enrichment API');
-            }
 
             return null;
         }

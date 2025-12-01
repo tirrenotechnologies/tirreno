@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,13 +13,13 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Resource;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
+class Data extends \Controllers\Admin\Base\Data {
     public function checkIfOperatorHasAccess(int $resourceId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
         $model = new \Models\Resource();
 
         return $model->checkAccess($resourceId, $apiKey);

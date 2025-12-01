@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 abstract class BaseSql extends \DB\SQL\Mapper {
-    use \Traits\Debug;
-
     protected $f3 = null;
     protected $DB_TABLE_TTL = 0;
     protected $DB_TABLE_NAME = null;
@@ -27,13 +27,13 @@ abstract class BaseSql extends \DB\SQL\Mapper {
         $this->f3 = \Base::instance();
 
         if ($this->DB_TABLE_NAME) {
-            $DB = $this->getDatabaseConnection();
-            parent::__construct($DB, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
+            $database = $this->getDatabaseConnection();
+            parent::__construct($database, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
         }
     }
 
     private function getDatabaseConnection(): ?\DB\SQL {
-        return $this->f3->get('API_DATABASE');
+        return \Utils\Database::getDb();
     }
 
     public function getHash(string $string): string {
@@ -50,7 +50,7 @@ abstract class BaseSql extends \DB\SQL\Mapper {
     }
 
     public function printLog(): void {
-        echo $this->f3->get('API_DATABASE')->log();
+        echo \Utils\Database::getDb()->log();
     }
 
     public function getArrayPlaceholders(array $ids, string $postfix = ''): array {

@@ -1,6 +1,7 @@
 <include href="templates/parts/headerAdmin.html" />
 <div id="wrap">
     <include href="templates/parts/panel/eventPanel.html" />
+    <include href="templates/parts/panel/eventPanel.html" with="fromField=true"/>
     <include href="templates/parts/panel/devicePanel.html" />
 
     <check if="{{ @ALLOW_EMAIL_PHONE }}">
@@ -28,11 +29,11 @@
             <include href="templates/parts/tables/emails.html" />
             <include href="templates/parts/tables/phones.html" />
         </check>
-        <include href="templates/parts/tables/payloads/fieldAuditTrail.html" />
 
+        <include href="templates/parts/tables/fieldAuditTrail.html" />
         <include href="templates/parts/tables/events.html" with="showChart=1" />
 
-        <div>
+        <div class="level-right">
             <include href="templates/parts/forms/deleteUserForm.html" />
         </div>
     </div>

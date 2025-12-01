@@ -3,7 +3,7 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder>{{ @AdminEvents_device_type_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @AdminEvents_device_type_search_placeholder }}</option>
                     <repeat group="{{ @DEVICE_TYPES }}" value="{{ @value }}">
                         <option value="{{ @value }}">{{ @value }}</option>
                     </repeat>

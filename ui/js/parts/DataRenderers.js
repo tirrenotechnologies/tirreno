@@ -23,6 +23,7 @@ import {
     MAX_STRING_USER_NAME_IN_TABLE,
     MAX_STRING_DEVICE_OS_LENGTH,
     MAX_STRING_LENGTH_URL,
+    MAX_STRING_LENGTH_ENDPOINT,
     MAX_TOOLTIP_URL_LENGTH,
     MAX_TOOLTIP_LENGTH,
 
@@ -46,7 +47,9 @@ import {
 const isDashboardPage = () => !!document.getElementById('most-active-users');
 
 const getNumberOfSymbols = (length = 'default') => {
-    if (isDashboardPage()) {
+    if (length === 'tile') {
+        return MAX_STRING_USER_LONG_LENGTH_IN_TILE;
+    } else if (isDashboardPage()) {
         return MAX_STRING_LENGTH_IN_TABLE_ON_DASHBOARD;
     } else {
         if (length === 'long') {
@@ -55,8 +58,6 @@ const getNumberOfSymbols = (length = 'default') => {
             return MAX_STRING_USER_SHORT_LENGTH_IN_TABLE;
         } else if (length === 'medium') {
             return MAX_STRING_USER_MEDIUM_LENGTH_IN_TABLE;
-        } else if (length === 'tile') {
-            return MAX_STRING_USER_LONG_LENGTH_IN_TILE;
         } else {
             return MAX_STRING_LENGTH_IN_TABLE;
         }
@@ -83,15 +84,15 @@ const tooltipWrap = (tooltip, value, wrap = true, wordBreak = false) => {
     return result;
 };
 
-const truncateWithHellip = (value, n, wordBreak = false) => {
+const truncateWithHellip = (value, n, wordBreak = false, length = MAX_TOOLTIP_LENGTH) => {
     let tooltip = value;
 
     if (value && value.length > (n + 2)) {
         value = value.slice(0, n) + HELLIP;
     }
 
-    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
-        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    if (tooltip && tooltip.length > length) {
+        tooltip = tooltip.slice(0, length) + HELLIP;
     }
 
     return tooltipWrap(tooltip, renderDefaultIfEmpty(value), true, wordBreak);
@@ -119,7 +120,7 @@ const wrapWithImportantSpan = (span, record) => {
 
 const wrapWithUserLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/id/${record.accountid}`;
+    el.href = `${window.app_base}/id/${record.accountid}`;
     el.appendChild(span);
 
     return el;
@@ -127,7 +128,7 @@ const wrapWithUserLink = (span, record) => {
 
 const wrapWithResourceLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/resource/${record.url_id}`;
+    el.href = `${window.app_base}/resource/${record.url_id}`;
     el.appendChild(span);
 
     return el;
@@ -136,7 +137,7 @@ const wrapWithResourceLink = (span, record) => {
 
 const wrapWithIpLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/ip/${record.ipid}`;
+    el.href = `${window.app_base}/ip/${record.ipid}`;
     el.appendChild(span);
 
     return el;
@@ -148,7 +149,7 @@ const wrapWithIspLink = (span, record) => {
     }
 
     const el = document.createElement('a');
-    el.href = `/isp/${record.ispid}`;
+    el.href = `${window.app_base}/isp/${record.ispid}`;
     el.appendChild(span);
 
     return el;
@@ -156,7 +157,7 @@ const wrapWithIspLink = (span, record) => {
 
 const wrapWithCountryLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/country/${record.country_id}`;
+    el.href = `${window.app_base}/country/${record.country_id}`;
     el.appendChild(span);
 
     return el;
@@ -164,7 +165,7 @@ const wrapWithCountryLink = (span, record) => {
 
 const wrapWithBotLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/bot/${record.id}`;
+    el.href = `${window.app_base}/bot/${record.id}`;
     el.appendChild(span);
 
     return el;
@@ -172,7 +173,7 @@ const wrapWithBotLink = (span, record) => {
 
 const wrapWithPhoneLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/phones/${record.id}`;
+    el.href = `${window.app_base}/phones/${record.id}`;
     el.appendChild(span);
 
     return el;
@@ -180,7 +181,7 @@ const wrapWithPhoneLink = (span, record) => {
 
 const wrapWithDomainLink = (span, record) => {
     const el = document.createElement('a');
-    el.href = `/domain/${record.id}`;
+    el.href = `${window.app_base}/domain/${record.id}`;
     el.appendChild(span);
 
     return el;
@@ -188,7 +189,15 @@ const wrapWithDomainLink = (span, record) => {
 
 const wrapWithRuleLink = (span, ruleUid) => {
     const el = document.createElement('a');
-    el.href = `/id?ruleUid=${ruleUid}`;
+    el.href = `${window.app_base}/id?ruleUid=${ruleUid}`;
+    el.appendChild(span);
+
+    return el;
+};
+
+const wrapWithFieldIdLink = (span, record) => {
+    const el = document.createElement('a');
+    el.href = `${window.app_base}/field/${record.id}`;
     el.appendChild(span);
 
     return el;
@@ -332,6 +341,13 @@ const renderDate = (data) => {
     return span;
 };
 
+const renderDateWithTimestampTooltip = (data) => {
+    const span = renderDate(data);
+    const tooltip = data ? renderTimeString(data) : renderDefaultIfEmpty(data);
+
+    return tooltipWrap(tooltip, span, false);
+};
+
 const renderChoicesSelectorItem = (classNames, data, innerHtml) => {
     const itemClass = data.highlighted ? classNames.highlightedState : classNames.itemSelectable;
 
@@ -463,6 +479,22 @@ const renderIpTypeSelectorChoice = (classNames, data, itemSelectText) => {
     return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
 };
 
+const renderFileTypeSelectorItem = (classNames, data) => {
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
+
+    return renderChoicesSelectorItem(classNames, data, innerHtml);
+};
+
+const renderFileTypeSelectorChoice = (classNames, data, itemSelectText) => {
+    const [value] = splitLabel(data.label);
+    const innerHtml = document.createElement('span');
+    innerHtml.textContent = value;
+
+    return renderChoicesSelectorChoice(classNames, data, itemSelectText, innerHtml);
+};
+
 const renderDeviceTypeSelectorItem = (classNames, data) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
@@ -470,7 +502,7 @@ const renderDeviceTypeSelectorItem = (classNames, data) => {
     const deviceIsNormal = NORMAL_DEVICES.includes(value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
-    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
     img.className = 'device-choice';
 
     const name = document.createTextNode(value);
@@ -488,7 +520,7 @@ const renderDeviceTypeSelectorChoice = (classNames, data, itemSelectText) => {
     const deviceIsNormal = NORMAL_DEVICES.includes(value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
-    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
     img.className = 'device-choice';
 
     const name = document.createTextNode(value);
@@ -542,18 +574,23 @@ const renderHttpCode = record => {
             case 1:
                 tooltip = 'Informational responses (100 – 199)';
                 break;
+
             case 2:
                 tooltip = 'Successful responses (200 – 299)';
                 break;
+
             case 3:
                 tooltip = 'Redirection messages (300 – 399)';
                 break;
+
             case 4:
                 tooltip = 'Client error responses (400 – 499)';
                 break;
+
             case 5:
                 tooltip = 'Server error responses (500 – 599)';
                 break;
+
             default:
                 tooltip = 'Unexpected status code';
                 break;
@@ -1053,7 +1090,7 @@ const renderReputation = record => {
 
     const frag = document.createDocumentFragment();
     const img = document.createElement('img');
-    img.src = `/ui/images/icons/${icon}.svg`;
+    img.src = `${window.app_base}/ui/images/icons/${icon}.svg`;
     img.alt = reputation;
     frag.appendChild(tooltipWrap(reputation, img, false));
 
@@ -1080,7 +1117,7 @@ const renderPhone = (record) => {
         const frag = document.createDocumentFragment();
 
         const img = document.createElement('img');
-        img.src = `/ui/images/flags/${code.toLowerCase()}.svg`;
+        img.src = `${window.app_base}/ui/images/flags/${code.toLowerCase()}.svg`;
         img.alt = tooltip;
 
         frag.appendChild(tooltipWrap(tooltip, img, true));
@@ -1133,7 +1170,7 @@ const renderPhoneType = record => {
         const tooltip = type.toLowerCase().replace(/_/g, ' ');
 
         const img = document.createElement('img');
-        img.src = `/ui/images/icons/${src}`;
+        img.src = `${window.app_base}/ui/images/icons/${src}`;
 
         span = tooltipWrap(tooltip, img, true);
     }
@@ -1224,6 +1261,19 @@ const renderClickableResourceWithoutQuery = record => {
     return html;
 };
 
+const renderAuthStatus = record => {
+    const frag = document.createDocumentFragment();
+
+    const span = document.createElement('span');
+    span.className = 'addlight';
+    span.textContent = `${record.unauthorized_events || 0}/`;
+
+    frag.appendChild(span);
+    frag.appendChild(document.createTextNode(record.authorized_events || 0));
+
+    return frag;
+};
+
 //IP
 const renderIp = record => {
     const n = getNumberOfSymbols();
@@ -1258,7 +1308,7 @@ const renderIpAndFlag = (ip, record) => {
     const frag = document.createDocumentFragment();
 
     const img = document.createElement('img');
-    img.src = `/ui/images/flags/${code}.svg`;
+    img.src = `${window.app_base}/ui/images/flags/${code}.svg`;
     img.alt = alternative;
     frag.appendChild(img);
 
@@ -1369,7 +1419,7 @@ const renderCountry = (code, value, tooltip) => {
     const frag = document.createDocumentFragment();
 
     const img = document.createElement('img');
-    img.src = `/ui/images/flags/${code.toLowerCase()}.svg`;
+    img.src = `${window.app_base}/ui/images/flags/${code.toLowerCase()}.svg`;
     img.alt = tooltip ? tooltip : value;
     frag.appendChild(img);
 
@@ -1424,7 +1474,7 @@ const renderClickableCountryTruncated = record => {
 //Audit Trail
 const renderAuditValue = (data, type, record, meta) => {
     if (data) {
-        data = truncateWithHellip(data, getNumberOfSymbols());
+        data = truncateWithHellip(data, 400, true, 600);
     }
 
     return renderDefaultIfEmptySpan(data);
@@ -1464,6 +1514,33 @@ const renderAuditField = record => {
     return tooltipWrap(renderDefaultIfEmpty(tooltip), renderDefaultIfEmpty(value), true);
 };
 
+const renderAuditFieldName = (record, length = 'medium') => {
+    let fieldName = record.field_name;
+
+    if (fieldName) {
+        fieldName = truncateWithHellip(fieldName, getNumberOfSymbols(length));
+    }
+
+    return renderDefaultIfEmptySpan(fieldName);
+};
+
+const renderAuditFieldId = (record, length = 'medium') => {
+    let fieldId = record.field_id;
+
+    if (fieldId) {
+        fieldId = truncateWithHellip(fieldId, getNumberOfSymbols(length));
+    }
+
+    return renderDefaultIfEmptySpan(fieldId);
+};
+
+const renderClickableAuditFieldId = (record, length = 'medium') => {
+    let span = renderAuditFieldId(record, length);
+    const el = (record.id !== null && record.id !== undefined) ? wrapWithFieldIdLink(span, record) : span;
+
+    return el;
+};
+
 //Device
 const renderClickableBotId = record => {
     const device = document.createTextNode(record.id);
@@ -1477,7 +1554,7 @@ const renderDevice = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = deviceIsNormal ? record.device_name : 'unknown';
 
-    let deviceTypeName = 'unknown';
+    let deviceTypeName = 'N/A';
 
     if (record.device_name && record.device_name !== 'unknown') {
         deviceTypeName = deviceIsNormal ? record.device_name : 'other device';
@@ -1486,7 +1563,7 @@ const renderDevice = record => {
     const frag = document.createDocumentFragment();
 
     const img = document.createElement('img');
-    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
     frag.appendChild(tooltipWrap(deviceTypeTooltip, img, true));
 
     const el = document.createTextNode(deviceTypeName);
@@ -1509,7 +1586,7 @@ const renderDeviceWithOs = record => {
     const frag = document.createDocumentFragment();
 
     const img = document.createElement('img');
-    img.src = `/ui/images/icons/${deviceTypeImg}.svg`;
+    img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
     frag.appendChild(tooltipWrap(deviceTypeTooltip, img, true));
 
     const el = document.createTextNode(os);
@@ -1708,12 +1785,23 @@ const renderSensorError = record => {
     return renderTextarea(s);
 };
 
+const renderTimeMsLogbook = (record) => {
+    const span = renderTimeMs(record.created);
+    const tooltip = renderTimeString(record.server_time);
+
+    return tooltipWrap(tooltip, span, false);
+};
+
+const renderEndpoint = record => {
+    return truncateWithHellip(record.endpoint, MAX_STRING_LENGTH_ENDPOINT, true);
+};
+
 const renderJsonTextarea = value => {
     const obj = openJson(value);
     const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
 
     const rows = s ? s.split(/\r\n|\r|\n/).length : 0;
-    const h = rows > 24 ? 24 : (rows < 4 ? 4 : rows);;
+    const h = rows > 24 ? 24 : (rows < 4 ? 4 : rows);
 
     return renderTextarea(s, h);
 };
@@ -1881,6 +1969,7 @@ export {
     renderTime,
     renderDate,
     renderTimeMs,
+    renderDateWithTimestampTooltip,
 
     //Choices selector
     renderRuleSelectorItem,
@@ -1889,6 +1978,8 @@ export {
     renderEventTypeSelectorChoice,
     renderIpTypeSelectorItem,
     renderIpTypeSelectorChoice,
+    renderFileTypeSelectorItem,
+    renderFileTypeSelectorChoice,
     renderDeviceTypeSelectorItem,
     renderDeviceTypeSelectorChoice,
     renderEntityTypeSelectorItem,
@@ -1940,6 +2031,7 @@ export {
     renderResourceWithQueryAndEventType,
     renderResourceWithoutQuery,                 //! only internal usage
     renderClickableResourceWithoutQuery,
+    renderAuthStatus,
 
     //IP
     renderIp,
@@ -1958,6 +2050,8 @@ export {
     renderAuditField,
     renderAuditValue,
     renderAuditParent,
+    renderClickableAuditFieldId,
+    renderAuditFieldName,
 
     //Device
     renderDevice,
@@ -1990,6 +2084,8 @@ export {
     //Logbook
     renderSensorErrorColumn,
     renderSensorError,
+    renderTimeMsLogbook,
+    renderEndpoint,
     renderJsonTextarea,
     renderErrorType,
     renderMailto,

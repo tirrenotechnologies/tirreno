@@ -1,6 +1,6 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
 import {
-    renderDate,
+    renderDateWithTimestampTooltip,
     renderBoolean,
     renderUserCounter,
     renderReputation,
@@ -10,7 +10,7 @@ import {
     renderUserReviewedStatus,
 } from '../DataRenderers.js?v=2';
 
-const URL   = '/admin/loadUserDetails';
+const URL   = `${window.app_base}/admin/loadUserDetails`;
 
 export class UserTiles extends BaseTiles {
     updateTiles(data) {
@@ -30,9 +30,9 @@ export class UserTiles extends BaseTiles {
         const record = data.userDetails;
         this.removeLoaderBackground(tile);
 
-        tile.querySelector('#signup-date').replaceChildren(renderDate(record.created));
-        tile.querySelector('#lastseen').replaceChildren(renderDate(record.lastseen));
-        tile.querySelector('#latest-decision').replaceChildren(renderDate(record.latest_decision));
+        tile.querySelector('#signup-date').replaceChildren(renderDateWithTimestampTooltip(record.created));
+        tile.querySelector('#lastseen').replaceChildren(renderDateWithTimestampTooltip(record.lastseen));
+        tile.querySelector('#latest-decision').replaceChildren(renderDateWithTimestampTooltip(record.latest_decision));
         tile.querySelector('#review-status').replaceChildren(renderUserReviewedStatus(record));
         tile.querySelector('#firstname').replaceChildren(renderUserFirstname(record));
         tile.querySelector('#lastname').replaceChildren(renderUserLastname(record));
@@ -59,35 +59,25 @@ export class UserTiles extends BaseTiles {
     }
 
     updateDayDetails(data) {
-        const limits = {
-            median_event_cnt:   20,
-            login_cnt:          3,
-            session_cnt:        5,
-        };
-
-        this.updateDateRangeDetails(data.dayDetails, '#day-behaviour-tile', limits);
+        this.updateDateRangeDetails(data.dayDetails, '#day-behaviour-tile', false);
     }
 
     updateWeekDetails(data) {
-        const limits = {
-            median_event_cnt:   20,
-            login_cnt:          10,
-            session_cnt:        25,
-        };
-
-        this.updateDateRangeDetails(data.weekDetails, '#week-behaviour-tile', limits);
+        this.updateDateRangeDetails(data.weekDetails, '#week-behaviour-tile', false);
     }
 
-    updateDateRangeDetails(record, tileId, limits) {
+    updateDateRangeDetails(record, tileId, na_tile = true) {
         const tile = document.querySelector(tileId);
 
         if (!tile) {
             return;
         }
 
+        const limits = record.limits;
+
         const span = document.createElement('span');
         span.className = 'nolight';
-        span.textContent = 'N/A';
+        span.textContent = na_tile ? 'N/A' : '0';
 
         this.removeLoaderBackground(tile);
 
@@ -96,7 +86,7 @@ export class UserTiles extends BaseTiles {
             tile.querySelector('#password-reset-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#auth-error-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#off-hours-login-count').replaceChildren(span.cloneNode(true));
-            tile.querySelector('#median-event-count').replaceChildren(span.cloneNode(true));
+            tile.querySelector('#avg-event-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#login-count').replaceChildren(span.cloneNode(true));
             tile.querySelector('#session-count').replaceChildren(span.cloneNode(true));
         } else {
@@ -105,7 +95,7 @@ export class UserTiles extends BaseTiles {
                 ['#password-reset-count',   'password_reset_cnt'],
                 ['#auth-error-count',       'auth_error_cnt'],
                 ['#off-hours-login-count',  'off_hours_login_cnt'],
-                ['#median-event-count',     'median_event_cnt'],
+                ['#avg-event-count',        'avg_event_cnt'],
                 ['#login-count',            'login_cnt'],
                 ['#session-count',          'session_cnt'],
             ];

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -27,6 +27,8 @@ class Config implements \JsonSerializable {
         public ?string $userAgent = null,
         public bool $debugLog = false,
         public bool $allowEmailPhone = false,
+        public int $leakyBucketRps = 5,
+        public int $leakyBucketWindow = 5,
     ) {
     }
 

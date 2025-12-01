@@ -17,19 +17,16 @@ export class BotsPage extends BasePage {
         const datesFilter  = new DatesFilter();
         const searchFilter = new SearchFilter();
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:        '/admin/loadBots',
+            url:        `${window.app_base}/admin/loadBots`,
             // tileId:  'totalDevices',
             tableId:    'bots-table',
 
             dateRangeGrid:  true,
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            },
+            getParams: this.getParamsSection,
         };
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

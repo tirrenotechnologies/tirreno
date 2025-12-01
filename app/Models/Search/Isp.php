@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Search;
 
@@ -35,8 +37,8 @@ class Isp extends \Models\BaseSql {
                 event_isp
 
             WHERE
+                LOWER(event_isp.asn::text) LIKE LOWER(:query) AND
                 event_isp.key = :api_key
-                AND LOWER(event_isp.asn::text) LIKE LOWER(:query)
 
             LIMIT 25 OFFSET 0"
         );

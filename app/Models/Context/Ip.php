@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,60 +13,78 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Context;
 
 class Ip extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $records = $this->getDetails($accountIds, $apiKey);
-        $recordsByAccount = $this->groupRecordsByAccount($records);
+        $details = $this->getIpDetails($accountIds, $apiKey);
 
-        foreach ($recordsByAccount as $key => $value) {
-            $recordsByAccount[$key] = [
-                'eip_ip_id'             => array_column($value, 'eip_ip_id'),
-                'eip_ip'                => array_column($value, 'eip_ip'),
-                'eip_cidr'              => array_column($value, 'eip_cidr'),
-                'eip_data_center'       => array_column($value, 'eip_data_center'),
-                'eip_tor'               => array_column($value, 'eip_tor'),
-                'eip_vpn'               => array_column($value, 'eip_vpn'),
-                'eip_relay'             => array_column($value, 'eip_relay'),
-                'eip_starlink'          => array_column($value, 'eip_starlink'),
-                'eip_total_visit'       => array_column($value, 'eip_total_visit'),
-                'eip_blocklist'         => array_column($value, 'eip_blocklist'),
-                'eip_shared'            => array_column($value, 'eip_shared'),
-                //'eip_domains'         => $this->getUniqueArray(array_column($value, 'eip_domains')),
-                'eip_domains_count_len' => array_column($value, 'eip_domains_count_len'),
-                'eip_country_id'        => array_column($value, 'eip_country_id'),
-                'eip_fraud_detected'    => array_column($value, 'eip_fraud_detected'),
-                'eip_alert_list'        => array_column($value, 'eip_alert_list'),
-            ];
+        $recordsByAccount = [];
+
+        foreach ($details as $record) {
+            $accountId = $record['accountid'];
+            if (!isset($recordsByAccount[$accountId])) {
+                $recordsByAccount[$accountId] = [
+                    'eip_ip_id'         => [],
+                    'eip_cidr_count'    => [],
+                    'eip_country_count' => [],
+                ];
+            }
+
+            $ipId       = $record['ip'];
+            $cidr       = $record['cidr'];
+            $countryId  = $record['country'];
+            if (!isset($recordsByAccount[$accountId]['eip_ip_id'][$ipId])) {
+                $recordsByAccount[$accountId]['eip_ip_id'][$ipId] = [
+                    'cidr'      => $cidr,
+                    'country'   => $countryId,
+                ];
+            }
+
+            if (!isset($recordsByAccount[$accountId]['eip_cidr_count'][$cidr])) {
+                $recordsByAccount[$accountId]['eip_cidr_count'][$cidr] = 0;
+            }
+
+            if (!isset($recordsByAccount[$accountId]['eip_country_count'][$countryId])) {
+                $recordsByAccount[$accountId]['eip_country_count'][$countryId] = 0;
+            }
+
+            $recordsByAccount[$accountId]['eip_cidr_count'][$cidr]++;
+            $recordsByAccount[$accountId]['eip_country_count'][$countryId]++;
+        }
+
+        $records = $this->getDetails($accountIds, $apiKey);
+
+        foreach ($records as $record) {
+            $accountId = $record['accountid'];
+            $recordsByAccount[$accountId]['eip_data_center']        = $record['eip_data_center'];               // bool
+            $recordsByAccount[$accountId]['eip_tor']                = $record['eip_tor'];                       // bool
+            $recordsByAccount[$accountId]['eip_vpn']                = $record['eip_vpn'];                       // bool
+            $recordsByAccount[$accountId]['eip_starlink']           = $record['eip_starlink'];                  // bool
+            $recordsByAccount[$accountId]['eip_blocklist']          = $record['eip_blocklist'];                 // bool
+            $recordsByAccount[$accountId]['eip_has_fraud']          = $record['eip_has_fraud'];                 // bool
+            $recordsByAccount[$accountId]['eip_lan']                = $record['eip_lan'];                       // bool
+            $recordsByAccount[$accountId]['eip_shared']             = $record['eip_shared'];                    // int
+            $recordsByAccount[$accountId]['eip_domains_count_len']  = $record['eip_domains_count_len'];         // int
+            $recordsByAccount[$accountId]['eip_unique_cidrs']       = $record['eip_unique_cidrs'];              // int
+            $recordsByAccount[$accountId]['eip_country_id']         = json_decode($record['eip_country_id']);   // array
         }
 
         return $recordsByAccount;
     }
 
-    protected function getDetails(array $accountIds, int $apiKey): array {
+    protected function getIpDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
+        // count account related ips in cidr and country in php
         $query = (
-            "SELECT DISTINCT
-                event.account                                   AS accountid,
-
-                event_ip.id                                     AS eip_ip_id,
-                event_ip.ip                                     AS eip_ip,
-                event_ip.cidr::text                             AS eip_cidr,
-                event_ip.country                                AS eip_country_id,
-                event_ip.data_center                            AS eip_data_center,
-                event_ip.tor                                    AS eip_tor,
-                event_ip.vpn                                    AS eip_vpn,
-                event_ip.relay                                  AS eip_relay,
-                event_ip.starlink                               AS eip_starlink,
-                event_ip.total_visit                            AS eip_total_visit,
-                event_ip.blocklist                              AS eip_blocklist,
-                event_ip.shared                                 AS eip_shared,
-                -- event_ip.domains_count                          AS eip_domains,
-                json_array_length(event_ip.domains_count::json) AS eip_domains_count_len,
-                event_ip.fraud_detected                         AS eip_fraud_detected,
-                event_ip.alert_list                             AS eip_alert_list
+            "SELECT
+                event.account                       AS accountid,
+                event_ip.id                         AS ip,
+                event_ip.cidr::text                 AS cidr,
+                event_ip.country                    AS country
 
             FROM
                 event_ip
@@ -75,16 +93,53 @@ class Ip extends Base {
             ON (event_ip.id = event.ip)
 
             WHERE
+                event.account IN ({$placeHolders}) AND
+                event_ip.checked IS TRUE AND
                 event_ip.key = :api_key
-                AND event_ip.checked = 'True'
-                AND event.account IN ({$placeHolders})
 
-            -- ORDER BY event_ip.id DESC"
+            GROUP BY event.account, event_ip.id
+            ORDER BY event_ip.lastseen DESC"
         );
 
         if (count($accountIds) === 1) {
             $query .= ' LIMIT 100 OFFSET 0';
         }
+
+        return $this->execQuery($query, $params);
+    }
+
+    protected function getDetails(array $accountIds, int $apiKey): array {
+        [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
+
+        $query = (
+            "SELECT
+                event.account                                                                       AS accountid,
+
+                COALESCE(BOOL_OR(event_ip.data_center), false)                                      AS eip_data_center,
+                COALESCE(BOOL_OR(event_ip.tor), false)                                              AS eip_tor,
+                COALESCE(BOOL_OR(event_ip.vpn), false)                                              AS eip_vpn,
+                COALESCE(BOOL_OR(event_ip.starlink), false)                                         AS eip_starlink,
+                COALESCE(BOOL_OR(event_ip.blocklist), false)                                        AS eip_blocklist,
+                COALESCE(BOOL_OR(event_ip.fraud_detected), false)                                   AS eip_has_fraud,
+                COALESCE(MAX(event_ip.shared), 0)                                                   AS eip_shared,
+                COALESCE(MAX(json_array_length(event_ip.domains_count::json)), 0)                   AS eip_domains_count_len,
+                COALESCE(BOOL_OR(event_ip.cidr IS NULL AND event_ip.data_center IS FALSE), false)   AS eip_lan,
+                array_to_json(array_agg(DISTINCT event_ip.country))                                 AS eip_country_id,
+                COUNT(DISTINCT (event_ip.cidr IS NULL, event_ip.cidr))                              AS eip_unique_cidrs
+
+            FROM
+                event_ip
+
+            INNER JOIN event
+            ON (event_ip.id = event.ip)
+
+            WHERE
+                event.account IN ({$placeHolders}) AND
+                event_ip.checked IS TRUE AND
+                event_ip.key = :api_key
+
+            GROUP BY event.account"
+        );
 
         return $this->execQuery($query, $params);
     }

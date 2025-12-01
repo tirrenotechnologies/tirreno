@@ -17,8 +17,10 @@ export class IspsPage extends BasePage {
         const datesFilter  = new DatesFilter();
         const searchFilter = new SearchFilter();
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:        '/admin/loadIsps',
+            url:        `${window.app_base}/admin/loadIsps`,
             tileId:     'totalIsps',
             tableId:    'isps-table',
 
@@ -29,12 +31,7 @@ export class IspsPage extends BasePage {
                 columns: ['total_visit', 'total_account', 'total_ip'],
             },
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            }
+            getParams: this.getParamsSection,
         };
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

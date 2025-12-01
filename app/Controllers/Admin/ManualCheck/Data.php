@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,23 +13,25 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ManualCheck;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return $this->performSearch($params);
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return $this->performSearch();
     }
 
-    public function performSearch(array $params): array {
+    public function performSearch(): array {
+        $params = $this->extractRequestParams(['token', 'search', 'type']);
+
         $pageParams = [
             'SEARCH_VALUES' => $params,
         ];
 
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
-        $errorCode = $this->validateSearch($params, $enrichmentKey);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $enrichmentKey = \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
+        $errorCode = \Utils\Validators::validateSearch($params, $enrichmentKey);
 
         if ($errorCode) {
             $pageParams['ERROR_CODE'] = $errorCode;
@@ -37,10 +39,11 @@ class Data extends \Controllers\Base {
             return $pageParams;
         }
 
-        $type = $params['type'];
+        $type   = \Utils\Conversion::getStringRequestParam('type');
+        $search = \Utils\Conversion::getStringRequestParam('search');
 
         $controller = new \Controllers\Admin\Enrichment\Data();
-        $result = $controller->enrichEntity($type, $params['search'], null, $apiKey, $enrichmentKey);
+        $result = $controller->enrichEntity($type, $search, null, $apiKey, $enrichmentKey);
 
         if (isset($result['ERROR_CODE'])) {
             $pageParams['ERROR_CODE'] = $result['ERROR_CODE'];
@@ -48,7 +51,13 @@ class Data extends \Controllers\Base {
             return $pageParams;
         }
 
-        $this->saveSearch($params);
+        $save = [
+            'operator'  => \Utils\Routes::getCurrentRequestOperator()->id,
+            'type'      => $type,
+            'search'    => $search,
+        ];
+
+        $this->saveSearch($save);
 
         // TODO: return alert_list back in next release
         if (array_key_exists('alert_list', $result[$type])) {
@@ -67,32 +76,6 @@ class Data extends \Controllers\Base {
         $pageParams['RESULT'] = [$type => $result[$type]];
 
         return $pageParams;
-    }
-
-    private function validateSearch(array $params, string $enrichmentKey): bool|int {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $api = \Utils\Variables::getEnrichtmentApi();
-
-        if (!$enrichmentKey || !$api) {
-            return \Utils\ErrorCodes::ENRICHMENT_API_KEY_DOES_NOT_EXIST;
-        }
-
-        $type = $params['type'] ?? null;
-        $types = $this->f3->get('AdminManualCheck_form_types');
-        if (!$type || !array_key_exists($type, $types)) {
-            return \Utils\ErrorCodes::TYPE_DOES_NOT_EXIST;
-        }
-
-        $search = $params['search'] ?? null;
-        if (!$search || strlen($search) < 1) {
-            return \Utils\ErrorCodes::SEARCH_QUERY_DOES_NOT_EXIST;
-        }
-
-        return false;
     }
 
     private function saveSearch(array $params): void {

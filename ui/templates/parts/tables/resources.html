@@ -22,7 +22,8 @@
         <div class="content">
             <check if="false !== strpos(@CURRENT_PATH, 'resource')">
                 <true>
-                <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/forms/searchForm.html" />
+                    <include href="templates/parts/choices/fileTypes.html" />
                 </true>
             </check>
             <table class="table dim-table" id="resources-table">
@@ -31,7 +32,7 @@
                         <th class="tooltip resource-url-col" title="{{ @Base_table_column_url_tooltip }}">{{ @Base_table_column_url }}</th>
                         <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_code_tooltip }}">{{ @Base_table_column_code }}</th>
                         <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_total_users_tooltip_resources }}">{{ @Base_table_column_total_users }}</th>
-                        <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_total_countries_tooltip_resources }}">{{ @Base_table_column_total_countries }}</th>
+                        <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_total_edits_tooltip_resources }}">{{ @Base_table_column_total_edits }}</th>
                         <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_total_ips_tooltip_resources }}">{{ @Base_table_column_total_ips }}</th>
                         <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_total_actions_tooltip_resources }}">{{ @Base_table_column_total_actions }}</th>
                         <th class="tooltip resource-cnt-col" title="{{ @Base_table_column_suspicious_url_tooltip_resources }}">{{ @Base_table_column_suspicious_url }}</th>

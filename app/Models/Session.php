@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -27,8 +29,8 @@ class Session extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthori
                 event_session
 
             WHERE
-                event_session.key    = :api_key
-                AND event_session.id = :session_id'
+                event_session.id    = :session_id AND
+                event_session.key   = :api_key'
         );
 
         $params = [

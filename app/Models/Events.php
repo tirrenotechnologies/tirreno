@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,18 +13,17 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Events extends \Models\BaseSql {
-    use \Traits\DateRange;
-    use \Traits\Enrichment\Ips;
-
     protected $DB_TABLE_NAME = 'event';
 
-    public function getDistinctAccounts(int $after, int $to): array {
+    public function getDistinctAccounts(int $after, int $until): array {
         $params = [
             ':cursor' => $after,
-            ':next_cursor' => $to,
+            ':next_cursor' => $until,
         ];
 
         $query = (
@@ -36,34 +35,11 @@ class Events extends \Models\BaseSql {
             JOIN
                 event_account ON event.account = event_account.id
             WHERE
-                event.id > :cursor
-                AND event.id <= :next_cursor'
+                event.id > :cursor AND
+                event.id <= :next_cursor'
         );
 
         return $this->execQuery($query, $params);
-    }
-
-    private function getEvents(array $queryParams): array {
-        $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
-        $data = $this->getData($queryParams, $dateRange);
-        $total = $this->getTotal($queryParams, $dateRange);
-
-        return [
-            'draw' => $request['draw'] ?? 1,
-            'recordsTotal' => $total,
-            'recordsFiltered' => $total,
-            'data' => $data,
-        ];
-    }
-
-    public function getEventsByUser(int $userId, int $apiKey): array {
-        $params = [
-            ':user_id' => $userId,
-            ':api_key' => $apiKey,
-        ];
-
-        return $this->getEvents($params);
     }
 
     private function getData(array $params, ?array $dateRange): array {
@@ -152,7 +128,7 @@ class Events extends \Models\BaseSql {
         $this->applyLimit($query, $params);
 
         $results = $this->execQuery($query, $params);
-        $this->calculateIpType($results);
+        \Utils\Enrichment::calculateIpType($results);
 
         return $results;
     }
@@ -197,8 +173,8 @@ class Events extends \Models\BaseSql {
         $searchConditions = '';
         if ($dateRange) {
             $searchConditions = (
-                'AND event.time >= :start_time
-                AND event.time <= :end_time'
+                'AND event.time >= :start_time AND
+                event.time <= :end_time'
             );
 
             $params[':end_time'] = $dateRange['endDate'];
@@ -209,10 +185,8 @@ class Events extends \Models\BaseSql {
     }
 
     protected function applyLimit(string &$query, array &$queryParams): void {
-        $request = $this->f3->get('REQUEST');
-
-        $start = $request['start'] ?? null;
-        $length = $request['length'] ?? null;
+        $start = \Utils\Conversion::getIntRequestParam('start');
+        $length = \Utils\Conversion::getIntRequestParam('length');
 
         if (isset($start) && isset($length)) {
             $query .= ' LIMIT :length OFFSET :start';
@@ -270,15 +244,16 @@ class Events extends \Models\BaseSql {
         }
 
         $params = [
-            ':api_key' => $apiKey,
-            ':weeks' => $weeks,
+            ':api_key'  => $apiKey,
+            ':weeks'    => $weeks,
+            ':week_sec' => \Utils\Constants::get('SECONDS_IN_WEEK'),
         ];
 
         $query = (
             'DELETE FROM event
             WHERE
                 event.key = :api_key AND
-                (EXTRACT(EPOCH FROM (NOW() - event.time)) / (60 * 60 * 24 * 7)) >= :weeks'
+                (EXTRACT(EPOCH FROM (NOW() - event.time)) / :week_sec) >= :weeks'
         );
 
         return $this->execQuery($query, $params);

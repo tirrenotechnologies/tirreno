@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Pages;
 
 class ChangeEmail extends Base {
@@ -23,8 +25,7 @@ class ChangeEmail extends Base {
             'HTML_FILE' => 'changeEmail.html',
         ];
 
-        $renewKey = $this->f3->get('PARAMS.renewKey');
-        $errorCode = $this->validate($renewKey);
+        $errorCode = \Utils\Validators::validateChangeEmailPage($this->f3->get('PARAMS'));
         $pageParams['SUCCESS_CODE'] = $errorCode;
 
         if (!$errorCode) {
@@ -34,7 +35,7 @@ class ChangeEmail extends Base {
 
             //change email
             $changeEmailModel = new \Models\ChangeEmail();
-            $changeEmailModel->getByRenewKey($renewKey);
+            $changeEmailModel->getByRenewKey($this->f3->get('PARAMS.renewKey'));
 
             $newEmail = $changeEmailModel->email;
             $operatorId = $changeEmailModel->operator_id;
@@ -53,27 +54,5 @@ class ChangeEmail extends Base {
         }
 
         return parent::applyPageParams($pageParams);
-    }
-
-    private function validate($renewKey): int|false {
-        if (!$renewKey) {
-            return \Utils\ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST;
-        }
-
-        $changeEmailModel = new \Models\ChangeEmail();
-        $changeEmailModel->getByRenewKey($renewKey);
-        if (!$changeEmailModel->loaded()) {
-            return \Utils\ErrorCodes::CHANGE_EMAIL_KEY_IS_NOT_CORRECT;
-        }
-
-        $currentTime = time();
-        $linkTime = strtotime($changeEmailModel->created_at);
-        $lifeTime = $this->f3->get('RENEW_PASSWORD_LINK_TIME');
-
-        if ($currentTime > $linkTime + $lifeTime) {
-            return \Utils\ErrorCodes::CHANGE_EMAIL_KEY_WAS_EXPIRED;
-        }
-
-        return false;
     }
 }

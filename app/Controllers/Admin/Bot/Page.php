@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,23 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Bot;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminBot';
 
     public function getPageParams(): array {
         $dataController = new Data();
-        $botId = $this->integerParam($this->f3->get('PARAMS.botId'));
-        $hasAccess = $dataController->checkIfOperatorHasAccess($botId);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $botId = \Utils\Conversion::getIntUrlParam('botId');
+        $hasAccess = $dataController->checkIfOperatorHasAccess($botId, $apiKey);
 
         if (!$hasAccess) {
             $this->f3->error(404);
         }
 
-        $bot = $dataController->getBotDetails($botId);
-        $pageTitle = $this->getInternalPageTitleWithPostfix($bot['id']);
-        $isEnrichable = $dataController->isEnrichable();
+        $bot = $dataController->getBotDetails($botId, $apiKey);
+        $pageTitle = $this->getInternalPageTitleWithPostfix(strval($bot['id']));
+        $isEnrichable = $dataController->isEnrichable($apiKey);
 
         $pageParams = [
             'LOAD_DATATABLE'                => true,
@@ -45,13 +48,11 @@ class Page extends \Controllers\Pages\Base {
         ];
 
         if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $operationResponse = $dataController->proceedPostRequest($params);
+            $operationResponse = $dataController->proceedPostRequest();
 
             $pageParams = array_merge($pageParams, $operationResponse);
-            $pageParams['CMD'] = $params['cmd'];
             // recall bot data
-            $pageParams['BOT'] = $dataController->getBotDetails($botId);
+            $pageParams['BOT'] = $dataController->getBotDetails($botId, $apiKey);
         }
 
         return parent::applyPageParams($pageParams);

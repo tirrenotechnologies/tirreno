@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,22 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\UserDetails;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
+
+        $this->controller = new Data();
+        $this->page = null;
+    }
 
     public function getUserDetails(): array {
-        $dataController = new Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $userId = $this->f3->get('GET.userId');
-        $hasAccess = $dataController->checkIfOperatorHasAccess($userId, $apiKey);
+        $userId = \Utils\Conversion::getIntRequestParam('userId');
+        $hasAccess = $this->controller->checkIfOperatorHasAccess($userId, $this->apiKey);
 
         if (!$hasAccess) {
             $this->f3->error(404);
         }
 
-        return $dataController->getUserDetails($userId, $apiKey);
+        return $this->controller->getUserDetails($userId, $this->apiKey);
     }
 }

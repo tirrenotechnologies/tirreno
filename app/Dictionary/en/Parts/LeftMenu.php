@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,15 +13,17 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 return [
     'LeftMenu_ips_link' => 'IP addresses',
     'LeftMenu_home_link' => 'Dashboard',
     'LeftMenu_users_link' => 'Users',
-    'LeftMenu_not_reviewed_users_link' => 'Review queue',
+    'LeftMenu_not_reviewed_users_link' => 'Manual review',
     'LeftMenu_countries_link' => 'Countries',
     'LeftMenu_resources_link' => 'Resources',
     'LeftMenu_api_keys_link' => 'API',
-    'LeftMenu_all_events_link' => 'Events',
+    'LeftMenu_all_events_link' => 'Activity',
     'LeftMenu_settings_link' => 'Settings',
     'LeftMenu_logout_link' => 'Sign out',
     'LeftMenu_watchlist_link' => 'Watchlist',
@@ -33,6 +35,7 @@ return [
     'LeftMenu_bots_link' => 'Bots',
     'LeftMenu_isps_link' => 'Networks',
     'LeftMenu_domains_link' => 'Domains',
+    'LeftMenu_field_audit_trail_link' => 'Field history',
     'LeftMenu_blacklist_link' => 'Blacklist',
     'LeftMenu_logbook_link' => 'Logbook',
 ];

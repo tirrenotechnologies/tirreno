@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Domains;
 
@@ -87,18 +89,19 @@ class Query extends \Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = $this->f3->get('REQUEST.search');
+        $search = \Utils\Conversion::getArrayRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_domain.id', $queryParams);
 
         if (isset($search) && $search['value'] !== null) {
             $searchConditions .= (
-                ' AND (
-                    LOWER(event_domain.domain)             LIKE LOWER(:search_value)
-                    OR TEXT(event_domain.creation_date)    LIKE LOWER(:search_value)
-                )'
+                " AND (
+                    LOWER(event_domain.domain)             LIKE LOWER(:search_value) OR
+                    TO_CHAR((event_domain.creation_date + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
+                )"
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
+            $queryParams[':offset'] = strval(\Utils\TimeZones::getCurrentOperatorOffset());
         }
 
         //Add search and ids into request

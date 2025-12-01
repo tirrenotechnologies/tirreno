@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,7 +13,19 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Resources;
 
 class Ids extends \Models\Grid\Base\Ids {
+    public function getResourcesIdsByUserId(): string {
+        return (
+            'SELECT DISTINCT
+                event.url AS itemid
+            FROM event
+            WHERE
+                event.key = :api_key AND
+                event.account = :account_id'
+        );
+    }
 }

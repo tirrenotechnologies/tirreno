@@ -11,7 +11,7 @@ export class SearchLine {
 
         const me = this;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        const url = `/admin/search?token=${token}`;
+        const url = `${window.app_base}/admin/search?token=${token}`;
 
         $('#auto-complete').autocomplete({
             serviceUrl: url,
@@ -22,7 +22,7 @@ export class SearchLine {
             noSuggestionNotice: 'Sorry, no matching results',
 
             onSelect: function(suggestion) {
-                window.open(`/${suggestion.entityId}/${suggestion.id}`, '_self');
+                window.open(`${window.app_base}/${suggestion.entityId}/${suggestion.id}`, '_self');
             },
 
             onSearchStart: function(params) {
@@ -39,7 +39,7 @@ export class SearchLine {
             onSearchError: handleAjaxError,
         });
 
-        setInterval(this.updateTime.bind(this), 1000);
+        //setInterval(this.updateTime.bind(this), 1000);
     }
 
     updateTime() {

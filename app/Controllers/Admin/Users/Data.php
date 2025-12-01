@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,49 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Users;
 
-class Data extends \Controllers\Base {
-    use \Traits\DateRange;
-
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
         $model = new \Models\Grid\Users\Grid($apiKey);
 
-        $ipId = $this->f3->get('REQUEST.ipId');
-        $ispId = $this->f3->get('REQUEST.ispId');
-        $botId = $this->f3->get('REQUEST.botId');
-        $domainId = $this->f3->get('REQUEST.domainId');
-        $countryId = $this->f3->get('REQUEST.countryId');
-        $resourceId = $this->f3->get('REQUEST.resourceId');
+        $map = [
+            'ipId'          => 'getUsersByIpId',
+            'ispId'         => 'getUsersByIspId',
+            'botId'         => 'getUsersByDeviceId',
+            'domainId'      => 'getUsersByDomainId',
+            'countryId'     => 'getUsersByCountryId',
+            'resourceId'    => 'getUsersByResourceId',
+            'fieldId'       => 'getUsersByFieldId',
+        ];
 
-        if (isset($ipId) && is_numeric($ipId)) {
-            $result = $model->getUsersByIpId($ipId, $apiKey);
-        }
-
-        if (isset($ispId)) {
-            $result = $model->getUsersByIspId($ispId, $apiKey);
-        }
-
-        if (isset($domainId) && is_numeric($domainId)) {
-            $result = $model->getUsersByDomainId($domainId, $apiKey);
-        }
-
-        if (isset($countryId) && is_numeric($countryId)) {
-            $result = $model->getUsersByCountryId($countryId, $apiKey);
-        }
-
-        if (isset($botId) && is_numeric($botId)) {
-            $result = $model->getUsersByDeviceId($botId, $apiKey);
-        }
-
-        if (isset($resourceId) && is_numeric($resourceId)) {
-            $result = $model->getUsersByResourceId($resourceId, $apiKey);
-        }
-
-        if (!$result) {
-            $result = $model->getAllUsers();
-        }
+        $result = $this->idMapIterate($map, $model, 'getAllUsers');
 
         $ids = array_column($result['data'], 'id');
         if ($ids) {

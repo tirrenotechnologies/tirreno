@@ -12,7 +12,7 @@ import {
 export class RulesPage extends BasePage {
 
     constructor() {
-        super();
+        super('rules');
 
         this.initUi();
     }
@@ -46,7 +46,7 @@ export class RulesPage extends BasePage {
         const params  = {ruleUid: currentPlayButton.dataset.ruleUid, token: token};
 
         $.ajax({
-            url: '/admin/checkRule',
+            url: `${window.app_base}/admin/checkRule`,
             type: 'get',
             context: {currentPlayButton: currentPlayButton, ruleUid: ruleUid},
             data: params,
@@ -129,7 +129,7 @@ export class RulesPage extends BasePage {
         };
 
         $.ajax({
-            url: '/admin/saveRule',
+            url: `${window.app_base}/admin/saveRule`,
             type: 'post',
             data: params,
             context: {currentSaveButton: currentSaveButton},
@@ -156,10 +156,10 @@ export class RulesPage extends BasePage {
 
     searchTable() {
         let td, i, txtValue;
-        const input =   document.getElementById('search');
-        const filter =  input.value.toLowerCase();
-        const table =   document.getElementById('rules-table');
-        const tr =      table.getElementsByTagName('tr');
+        const input     = document.getElementById('search');
+        const filter    = input.value.toLowerCase();
+        const table     = document.getElementById('rules-table');
+        const tr        = table.getElementsByTagName('tr');
 
         // i = 1 because search must skip first line with column names
         for (i = 1; i < tr.length; i++) {

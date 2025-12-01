@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Updates;
 
@@ -127,7 +129,7 @@ class Update002 extends Base {
         110 => 'B24',
     ];
 
-    public static function apply($db) {
+    public static function apply($database) {
         $queries = [
             'INSERT INTO dshb_rules (id) VALUES (109), (110)',
             'CREATE INDEX event_account_lastseen_key_idx ON event_account USING btree (lastseen, key)',
@@ -148,11 +150,11 @@ class Update002 extends Base {
             'UPDATE event_error_type SET name = \'Success with warnings\' WHERE id = 1',
         ];
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
 
         $sql        = 'SELECT id FROM dshb_rules';
-        $rulesIds   = array_column($db->exec($sql), 'id');
+        $rulesIds   = array_column($database->exec($sql), 'id');
 
         $rules    = self::extendIds($rulesIds);
 
@@ -175,21 +177,21 @@ class Update002 extends Base {
                     validated = EXCLUDED.validated, attributes = EXCLUDED.attributes'
             );
 
-            $db->exec($query, $params);
+            $database->exec($query, $params);
         }
 
         // add uid to dshb_operators_rules
         $sql = 'ALTER TABLE dshb_operators_rules ADD COLUMN rule_uid VARCHAR';
-        $db->exec($sql);
+        $database->exec($sql);
 
         foreach ($rulesIds as $id) {
             $sql = 'UPDATE dshb_operators_rules SET rule_uid = :uid WHERE rule_id = :id';
-            $db->exec($sql, [':id' => $id, ':uid' => self::$rulesMap[$id]]);
+            $database->exec($sql, [':id' => $id, ':uid' => self::$rulesMap[$id]]);
         }
 
         // update event_account score details
         $sql = 'ALTER TABLE event_account ALTER COLUMN score_details TYPE JSONB USING score_details::jsonb';
-        $db->exec($sql);
+        $database->exec($sql);
 
         $sql = (
             'UPDATE event_account
@@ -202,7 +204,7 @@ class Update002 extends Base {
             )
             WHERE event_account.score_details IS NOT NULL'
         );
-        $db->exec($sql);
+        $database->exec($sql);
 
         // cleanup
         $queries = [
@@ -217,7 +219,7 @@ class Update002 extends Base {
         ];
 
         foreach ($queries as $sql) {
-            $db->exec($sql);
+            $database->exec($sql);
         }
     }
 

@@ -9,7 +9,7 @@ import {EventsGrid} from '../parts/grid/Events.js?v=2';
 export class WatchlistPage extends BasePage {
 
     constructor() {
-        super();
+        super('watchlist');
 
         this.initUi();
     }
@@ -18,8 +18,10 @@ export class WatchlistPage extends BasePage {
         const datesFilter   = new DatesFilter();
         const searchFilter  = new SearchFilter();
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:            '/admin/loadEvents?watchlist=true',
+            url:            `${window.app_base}/admin/loadEvents?watchlist=true`,
             tileId:         'totalEvents',
             tableId:        'user-events-table',
             panelType:      'event',
@@ -27,12 +29,7 @@ export class WatchlistPage extends BasePage {
             dateRangeGrid:  true,
             isSortable:     false,
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            },
+            getParams:      this.getParamsSection,
         };
 
         new EventPanel();

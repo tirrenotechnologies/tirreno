@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Chart;
 
@@ -33,22 +35,25 @@ class Resources extends Base {
         $query = (
             'SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event.time + :offset))::bigint AS ts,
-                COUNT(DISTINCT event.id) AS url_count,
+                COUNT(DISTINCT event.url) AS url_count,
 
                 COUNT(DISTINCT (
-                    CASE WHEN event.http_code=200 OR event.http_code IS NULL THEN event.id END)
+                    CASE WHEN event.http_code = 200 OR event.http_code IS NULL THEN event.url END)
                 ) AS count_200,
 
                 COUNT(DISTINCT (
-                    CASE WHEN event.http_code = 404 THEN event.id END)
+                    CASE WHEN event.http_code = 404 THEN event.url END)
                 ) AS count_404,
 
                 COUNT(DISTINCT (
-                    CASE WHEN event.http_code IN(403, 500) THEN event.id END)
+                    CASE WHEN event.http_code IN(403, 500) THEN event.url END)
                 ) AS count_500
 
             FROM
                 event
+
+            LEFT JOIN event_account
+            ON event.account = event_account.id
 
             WHERE
                 event.key = :api_key AND

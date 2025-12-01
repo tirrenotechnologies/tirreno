@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -35,6 +35,7 @@ use Sensor\Repository\EventCountryRepository;
 use Sensor\Repository\EventIncorrectRepository;
 use Sensor\Repository\EventRepository;
 use Sensor\Repository\FieldAuditTrailRepository;
+use Sensor\Repository\FieldAuditRepository;
 use Sensor\Repository\PayloadRepository;
 use Sensor\Repository\IpAddressRepository;
 use Sensor\Repository\IspRepository;
@@ -63,7 +64,16 @@ class DI {
     private ?Profiler $profiler = null;
     private ?Config $config = null;
 
-    public function getController(): CreateEventController {
+    public function __construct() {
+        $config = $this->getConfig();
+
+        if ($config === null) {
+            throw new \RuntimeException('DATABASE_URL is not set');
+        }
+    }
+
+    public function getController(): ?CreateEventController {
+        $config = $this->getConfig();
         $pdo = $this->getPdo();
         $profiler = $this->getProfiler();
         $logger = $this->getLogger();
@@ -74,7 +84,6 @@ class DI {
         $phoneRepository = new PhoneRepository($pdo);
         $userAgentRepository = new UserAgentRepository($pdo);
 
-        $config = $this->getConfig();
         $enrichmentService = null;
 
         if (!empty($config->enrichmentApiUrl)) {
@@ -119,6 +128,7 @@ class DI {
                 $phoneRepository,
                 new EventCountryRepository($pdo),
                 new FieldAuditTrailRepository($pdo),
+                new FieldAuditRepository($pdo),
                 new PayloadRepository($pdo),
                 $pdo,
             ),
@@ -130,7 +140,7 @@ class DI {
     }
 
     public function getLogger(): Logger {
-        return $this->logger ??= new Logger($this->getConfig()->debugLog);
+        return $this->logger ??= new Logger($this->getConfig(true)?->debugLog || false);
     }
 
     public function getProfiler(): Profiler {
@@ -146,6 +156,8 @@ class DI {
             new ApiKeyRepository($pdo),
             new EventIncorrectRepository($pdo),
             $this->config?->allowEmailPhone ?? false,
+            $this->config?->leakyBuckerRps ?? 5,
+            $this->config?->leakyBucketWindow ?? 5,
         );
     }
 
@@ -222,7 +234,7 @@ class DI {
 
             return new DatabaseConfig(
                 dbHost: $dbParts['host'],
-                dbPort: (int) $dbParts['port'],
+                dbPort: is_numeric($dbParts['port']) ? intval($dbParts['port']) : 0,
                 dbUser: $dbParts['user'],
                 dbPassword: $dbParts['pass'],
                 dbDatabaseName: ltrim($dbParts['path'], '/'),
@@ -239,39 +251,68 @@ class DI {
             return null;
         }
 
-        require_once $path;
+        $res = include_once $path;
+        if ($res === false) {
+            return null;
+        }
 
         return \Utils\VersionControl::versionString();
     }
 
-    private function getConfig(): Config {
+    private function loadConfigFromEnv(): array {
+        $data = [];
+        $keys = [
+            'DATABASE_URL',
+            'APP_USER_AGENT',
+            'ENRICHMENT_API_URL',
+            'ALLOW_EMAIL_PHONE',
+            'LEAKY_BUCKET_RPS',
+            'LEAKY_BUCKET_WINDOW',
+            'DEBUG',
+        ];
+
+        foreach ($keys as $key) {
+            $val = getenv($key);
+            if ($val !== false) {
+                $data[$key] = $val;
+            }
+        }
+
+        return $data;
+    }
+
+    private function getConfig(bool $silent = false): ?Config {
         if ($this->config !== null) {
             return $this->config;
         }
 
-        $config = $this->loadConfigFromFile();
-        $config = array_merge($config, getenv());
+        $config = array_merge($this->loadConfigFromFile(), $this->loadConfigFromEnv());
         $dbConfig = $this->parseDatabaseConfig($config);
 
-        $version = $this->loadAppVersion();
-        $ua = $config['USER_AGENT'] ?? null;
-        $ua = ($version && $ua) ? $ua . '/' . strval($version) : $ua;
-
-        if (isset($dbConfig)) {
-            $this->config = new Config(
-                databaseConfig:     $dbConfig,
-                enrichmentApiUrl:   $config['ENRICHMENT_API'] ?? null,
-                scoreApiUrl:        $config['SCORE_API_URL'] ?? null,
-                userAgent:          $ua,
-                debugLog:           isset($config['DEBUG']) ? (bool) $config['DEBUG'] : false,
-                allowEmailPhone:    $config['ALLOW_EMAIL_PHONE'] ?? false,
-            );
-
-            $this->getLogger()->logDebug('Config loaded from ENV variables: ' . json_encode($this->config, \JSON_THROW_ON_ERROR));
+        if ($dbConfig === null) {
+            return null;
         }
 
-        if (empty($this->config->enrichmentApiUrl)) {
-            $this->getLogger()->logWarning('The enrichment API URL is missing in the configuration. This URL is required for the app\'s enrichment features to function properly.');
+        $version = $this->loadAppVersion();
+        $useragent = $config['APP_USER_AGENT'] ?? null;
+        $useragent = ($version && $useragent) ? $useragent . '/' . strval($version) : $useragent;
+
+        $this->config = new Config(
+            databaseConfig:     $dbConfig,
+            enrichmentApiUrl:   $config['ENRICHMENT_API'] ?? null,
+            userAgent:          $useragent,
+            debugLog:           $this->toBool($config['DEBUG'] ?? null),
+            allowEmailPhone:    $this->toBool($config['ALLOW_EMAIL_PHONE'] ?? null),
+            leakyBucketRps:     $this->toInt($config['LEAKY_BUCKET_RPS'] ?? null, 5),
+            leakyBucketWindow:  $this->toInt($config['LEAKY_BUCKET_WINDOW'] ?? null, 5),
+        );
+
+        if (!$silent) {
+            $this->getLogger()->logDebug('Config loaded from ENV variables: ' . json_encode($this->config, \JSON_THROW_ON_ERROR));
+
+            if (empty($this->config->enrichmentApiUrl)) {
+                $this->getLogger()->logWarning('The enrichment API URL is missing in the configuration. This URL is required for the app\'s enrichment features to function properly.');
+            }
         }
 
         return $this->config;
@@ -289,5 +330,15 @@ class DI {
         } else {
             return new DataEnrichmentPhpClient($config->enrichmentApiUrl, $config->userAgent);
         }
+    }
+
+    private function toBool(string|int|bool|null $value): bool {
+        return is_string($value) ? filter_var($value, FILTER_VALIDATE_BOOLEAN) : boolval($value);
+    }
+
+    public static function toInt(mixed $value, ?int $default = null): ?int {
+        $validated = filter_var($value, FILTER_VALIDATE_INT);
+
+        return $validated !== false ? $validated : (is_float($value) || is_bool($value) ? intval($value) : $default);
     }
 }

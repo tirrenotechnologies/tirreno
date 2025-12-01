@@ -23,15 +23,14 @@
                 <tbody>
                     <loop from="{{ @I }}=0" to="{{ @I }} < {{ count(@RULES) }}" step="{{ @I }}++">
                         <SET VALUE="{{ @RULES[@I].value ?? 0}}" />
-                        <SET BROKEN="{{ !@RULES[@I].validated || @RULES[@I].missing }}" />
                         <SET PROPORTION="{{ @RULES[@I].proportion !== null ? (@RULES[@I].proportion < 1.0 && @RULES[@I].proportion > 0.0 ? '<1%' : strval(intval(@RULES[@I].proportion)).'%') : '&minus;' }}"/>
                         <SET PROPORTION_UPD="{{ @RULES[@I].proportion_updated_at !== null ? 'Last updated: '.(new DateTime(@RULES[@I].proportion_updated_at))->format('d/m/Y') : '&minus;' }}"/>
                         <tr data-rule-uid="{{ @RULES[@I].uid }}">
                             <td align="right">
-                                <a href="/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ @BROKEN ? 'broken' : \Utils\RulesClasses::getRuleClass($VALUE) }}">{{@RULES[@I].uid}}</h3></a>
+                                <a href="{{ @BASE }}/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ \Utils\RulesClasses::getRuleClass(@VALUE, @RULES[@I].broken) }}">{{@RULES[@I].uid}}</h3></a>
                             </td>
                             <td>
-                                <check if="{{ !@BROKEN }}">
+                                <check if="{{ !@RULES[@I].broken }}">
                                     <true>
                                         {{@RULES[@I].type}}
                                     </true>
@@ -41,19 +40,19 @@
                                 </check>
                             </td>
                             <td>
-                                <p {{@BROKEN ? 'class="inactive-rulename"' : ''}}>{{@RULES[@I].name}}</p>
+                                <p {{@RULES[@I].broken ? 'class="inactive-rulename"' : ''}}>{{@RULES[@I].name}}</p>
                                 <p class="addlight">{{@RULES[@I].descr}}</p>
                             </td>
 
                             <td align="center">
-                                <check if="{{ !@BROKEN }}">
+                                <check if="{{ !@RULES[@I].broken }}">
                                     <true>
                                         <span class="tooltip" title="{{ @PROPORTION_UPD }}">{{ @PROPORTION }}</span>
                                     </true>
                                 </check>
                             </td>
                             <td>
-                                <check if="{{ !@BROKEN }}">
+                                <check if="{{ !@RULES[@I].broken }}">
                                     <true>
                                         <div class="selector">
                                         <select class="input rulescore" name="{{@RULES[@I].uid}}" data-initial-value="{{ @VALUE }}">
@@ -68,7 +67,7 @@
                                 </check>
                             </td>
                             <td>
-                                <check if="{{ !@BROKEN }}">
+                                <check if="{{ !@RULES[@I].broken }}">
                                     <true>
                                         <button class="button dark-loader" data-rule-uid="{{ @RULES[@I].uid }}">
                                             <span class="icon ruleIcon">

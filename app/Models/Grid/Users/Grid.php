@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Grid\Users;
 
@@ -60,6 +62,12 @@ class Grid extends \Models\Grid\Base\Grid {
         return $this->getGrid($this->idsModel->getUsersIdsByResourceId(), $params);
     }
 
+    public function getUsersByFieldId(int $fieldId): array {
+        $params = [':field_id' => $fieldId];
+
+        return $this->getGrid($this->idsModel->getUsersIdsByFieldId(), $params);
+    }
+
     public function getAllUsers(): array {
         return $this->getGrid();
     }
@@ -67,6 +75,6 @@ class Grid extends \Models\Grid\Base\Grid {
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['time', 'lastseen', 'latest_decision', 'created', 'score_updated_at'];
 
-        $this->translateTimeZones($result, $fields);
+        \Utils\TimeZones::translateTimeZones($result, $fields);
     }
 }

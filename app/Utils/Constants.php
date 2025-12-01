@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Utils;
 
@@ -43,7 +45,7 @@ class Constants {
     public const RULE_MAXIMUM_NUMBER_OF_500_CODES       = 4;
     public const RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS  = 3;
     public const RULE_LOGIN_ATTEMPTS_WINDOW             = 8;
-    public const RULE_NEW_DEVICE_MAX_AGE_IN_MINUTES     = 60 * 3;
+    public const RULE_NEW_DEVICE_MAX_AGE_IN_SECONDS     = 60 * 60 * 3;
     public const RULE_REGULAR_OS_NAMES                  = ['Windows', 'Android', 'Mac', 'iOS'];
     public const RULE_REGULAR_BROWSER_NAMES             = [
         'Chrome'            => 90,
@@ -71,7 +73,32 @@ class Constants {
         'unknown',
     ];
 
+    public const USER_DETAILS_DAY_LIMITS = [
+        'failed_login_cnt'      => 1,
+        'password_reset_cnt'    => 1,
+        'auth_error_cnt'        => 1,
+        'off_hours_login_cnt'   => 1,
+        'avg_event_cnt'         => 20,
+        'login_cnt'             => 3,
+        'session_cnt'           => 5,
+    ];
+
+    public const USER_DETAILS_WEEK_LIMITS = [
+        'failed_login_cnt'      => 1,
+        'password_reset_cnt'    => 1,
+        'auth_error_cnt'        => 1,
+        'off_hours_login_cnt'   => 1,
+        'avg_event_cnt'         => 20,
+        'login_cnt'             => 10,
+        'session_cnt'           => 25,
+    ];
+
     public const LOGBOOK_LIMIT  = 1000;
+
+    public const SECONDS_IN_WEEK    = 60 * 60 * 24 * 7;
+    public const SECONDS_IN_DAY     = 60 * 60 * 24;
+    public const SECONDS_IN_HOUR    = 60 * 60;
+    public const SECONDS_IN_MINUTE  = 60;
 
     public const NIGHT_RANGE_SECONDS_START  = 0;        // midnight
     public const NIGHT_RANGE_SECONDS_END    = 18000;    // 5 AM
@@ -96,8 +123,10 @@ class Constants {
 
     public const EVENT_REQUEST_TYPE_HEAD    = 3;
 
+    public const REVIEW_QUEUE_TILE_LIMIT    = 999;
+
     public const ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS = 7;
-    public const ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_MINUTES  = 60 * 2;
+    public const ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_SEC      = 60 * 30;
     public const ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC           = 60 * 3;
     public const ACCOUNT_OPERATION_QUEUE_BATCH_SIZE                 = 2500;
     public const NEW_EVENTS_BATCH_SIZE                              = 15000;
@@ -212,26 +241,28 @@ class Constants {
     ];
 
     public const CHART_MODEL_MAP = [
-        'resources'     => \Models\Chart\Resources::class,
-        'resource'      => \Models\Chart\Resource::class,
-        'users'         => \Models\Chart\Users::class,
-        'user'          => \Models\Chart\User::class,
-        'isps'          => \Models\Chart\Isps::class,
-        'isp'           => \Models\Chart\Isp::class,
-        'ips'           => \Models\Chart\Ips::class,
-        'ip'            => \Models\Chart\Ip::class,
-        'domains'       => \Models\Chart\Domains::class,
-        'domain'        => \Models\Chart\Domain::class,
-        'bots'          => \Models\Chart\Bots::class,
-        'bot'           => \Models\Chart\Bot::class,
-        'events'        => \Models\Chart\Events::class,
-        'emails'        => \Models\Chart\Emails::class,
-        'phones'        => \Models\Chart\Phones::class,
-        'review-queue'  => \Models\Chart\ReviewQueue::class,
-        'country'       => \Models\Chart\Country::class,
-        'blacklist'     => \Models\Chart\Blacklist::class,
-        'logbook'       => \Models\Chart\Logbook::class,
-        'stats'         => \Models\Chart\SessionStat::class,
+        'resources'         => \Models\Chart\Resources::class,
+        'resource'          => \Models\Chart\Resource::class,
+        'users'             => \Models\Chart\Users::class,
+        'user'              => \Models\Chart\User::class,
+        'isps'              => \Models\Chart\Isps::class,
+        'isp'               => \Models\Chart\Isp::class,
+        'ips'               => \Models\Chart\Ips::class,
+        'ip'                => \Models\Chart\Ip::class,
+        'domains'           => \Models\Chart\Domains::class,
+        'domain'            => \Models\Chart\Domain::class,
+        'bots'              => \Models\Chart\Bots::class,
+        'bot'               => \Models\Chart\Bot::class,
+        'events'            => \Models\Chart\Events::class,
+        'emails'            => \Models\Chart\Emails::class,
+        'phones'            => \Models\Chart\Phones::class,
+        'review-queue'      => \Models\Chart\ReviewQueue::class,
+        'country'           => \Models\Chart\Country::class,
+        'blacklist'         => \Models\Chart\Blacklist::class,
+        'logbook'           => \Models\Chart\Logbook::class,
+        'stats'             => \Models\Chart\SessionStat::class,
+        'fields'            => \Models\Chart\FieldAuditTrails::class,
+        'field'             => \Models\Chart\FieldAuditTrail::class,
     ];
 
     public const LINE_CHARTS = [
@@ -246,7 +277,8 @@ class Constants {
         'isps',
         'domains',
         'blacklist',
-        'logbook'
+        'logbook',
+        'fields',
     ];
 
     public const CHART_RESOLUTION = [
@@ -277,6 +309,7 @@ class Constants {
         'domain'    => \Models\Domain::class,
         'device'    => \Models\Device::class,
         'country'   => \Models\Country::class,
+        'field'     => \Models\FieldAudit::class,
     ];
 
     public const ENRICHING_ATTRIBUTES = [
@@ -312,6 +345,8 @@ class Constants {
         'AdminBlacklist',
         'AdminManualCheck',
         'AdminEvents',
+        'AdminFieldAudits',
+        'AdminFieldAudit',
     ];
 
     public const IP_TYPES = [
@@ -352,6 +387,7 @@ class Constants {
     public const FAILED_LOGBOOK_EVENT_TYPES = [
         'critical_validation_error',
         'critical_error',
+        'rate_limit_exceeded',
     ];
 
     public const ISSUED_LOGBOOK_EVENT_TYPES = [
@@ -362,9 +398,38 @@ class Constants {
         'success',
     ];
 
+    public const LOGBOOK_ERROR_TYPE_SUCCESS = 0;
+    public const LOGBOOK_ERROR_TYPE_VALIDATION_ERROR = 1;
+    public const LOGBOOK_ERROR_TYPE_CRITICAL_VALIDATION_ERROR = 2;
+    public const LOGBOOK_ERROR_TYPE_CRITICAL_ERROR = 3;
+    public const LOGBOOK_ERROR_TYPE_RATE_LIMIT_EXCEEDED = 4;
+
     public const ENTITY_TYPES = [
         'IP',
         'Email',
         'Phone',
     ];
+
+    public const RISK_SCORE_QUEUE_ACTION_TYPE   = 'calculate_risk_score';
+    public const BLACKLIST_QUEUE_ACTION_TYPE    = 'blacklist';
+    public const DELETE_USER_QUEUE_ACTION_TYPE  = 'delete';
+    public const ENRICHMENT_QUEUE_ACTION_TYPE   = 'enrichment';
+
+    public const WAITING_QUEUE_STATUS_TYPE      = 'waiting';
+    public const EXECUTING_QUEUE_STATUS_TYPE    = 'executing';
+    public const COMPLETED_QUEUE_STATUS_TYPE    = 'completed';
+    public const FAILED_QUEUE_STATUS_TYPE       = 'failed';
+
+    public const DAILY_NOTIFICATION_REMINDER    = 'daily';
+    public const WEEKLY_NOTIFICATION_REMINDER   = 'weekly';
+    public const NO_NOTIFICATION_REMINDER       = 'off';
+
+    public const NOTIFICATION_REMINDER_TYPES = [
+        self::DAILY_NOTIFICATION_REMINDER,
+        self::WEEKLY_NOTIFICATION_REMINDER,
+        self::NO_NOTIFICATION_REMINDER,
+    ];
+
+    public const SINGLE_RESPONSE_TYPE           = 'single';
+    public const COLLECTION_RESPONSE_TYPE       = 'collection';
 }

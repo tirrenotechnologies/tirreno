@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\UserDetails;
 
@@ -28,8 +30,8 @@ class Behaviour extends \Models\BaseSql {
             ':failed_login'     => \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID'),
             ':success_login'    => \Utils\Constants::get('ACCOUNT_LOGIN_EVENT_TYPE_ID'),
             ':password_reset'   => \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID'),
-            ':seconds_day'      => 60 * 60 * 24,
-            ':night_time_end'   => 60 * 60 * 5,
+            ':seconds_day'      => \Utils\Constants::get('SECONDS_IN_DAY'),
+            ':night_time_end'   => \Utils\Constants::get('SECONDS_IN_HOUR') * 5,
         ];
 
         $query = (
@@ -69,7 +71,7 @@ class Behaviour extends \Models\BaseSql {
 
             $query = (
                 'SELECT
-                    percentile_disc(0.5) WITHIN GROUP (ORDER BY event_session.total_visit)  AS median_event_cnt
+                    COALESCE(AVG(event_session.total_visit), 0)::int    AS avg_event_cnt
                 FROM
                     event_session
 
@@ -82,7 +84,7 @@ class Behaviour extends \Models\BaseSql {
 
             $results = $this->execQuery($query, $params);
 
-            $result['median_event_cnt'] = $results[0]['median_event_cnt'] ?? 0;
+            $result['avg_event_cnt'] = $results[0]['avg_event_cnt'] ?? 0;
         }
 
         return $result;
@@ -98,8 +100,8 @@ class Behaviour extends \Models\BaseSql {
             ':failed_login'     => \Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID'),
             ':success_login'    => \Utils\Constants::get('ACCOUNT_LOGIN_EVENT_TYPE_ID'),
             ':password_reset'   => \Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID'),
-            ':seconds_day'      => 60 * 60 * 24,
-            ':night_time_end'   => 60 * 60 * 5,
+            ':seconds_day'      => \Utils\Constants::get('SECONDS_IN_DAY'),
+            ':night_time_end'   => \Utils\Constants::get('SECONDS_IN_HOUR') * 5,
         ];
 
         $query = (
@@ -130,15 +132,14 @@ class Behaviour extends \Models\BaseSql {
                 ORDER BY ts
             )
             SELECT
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY failed_login_cnt)       AS failed_login_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY password_reset_cnt)     AS password_reset_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY auth_error_cnt)         AS auth_error_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY login_cnt)              AS login_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY off_hours_login_cnt)    AS off_hours_login_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY device_cnt)             AS device_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY ip_cnt)                 AS ip_cnt,
-                percentile_disc(0.5) WITHIN GROUP (ORDER BY session_cnt)            AS session_cnt
-
+                AVG(failed_login_cnt)::int       AS failed_login_cnt,
+                AVG(password_reset_cnt)::int     AS password_reset_cnt,
+                AVG(auth_error_cnt)::int         AS auth_error_cnt,
+                AVG(login_cnt)::int              AS login_cnt,
+                AVG(off_hours_login_cnt)::int    AS off_hours_login_cnt,
+                AVG(device_cnt)::int             AS device_cnt,
+                AVG(ip_cnt)::int                 AS ip_cnt,
+                AVG(session_cnt)::int            AS session_cnt
 
             FROM daily'
         );
@@ -160,7 +161,7 @@ class Behaviour extends \Models\BaseSql {
                 'WITH daily AS (
                     SELECT
                         EXTRACT(EPOCH FROM date_trunc(\'day\', event_session.lastseen + :offset))::bigint   AS ts,
-                        percentile_disc(0.5) WITHIN GROUP (ORDER BY event_session.total_visit)              AS median_event_cnt
+                        COALESCE(AVG(event_session.total_visit), 0)::int                                    AS avg_event_cnt
                     FROM
                         event_session
 
@@ -174,13 +175,13 @@ class Behaviour extends \Models\BaseSql {
                     ORDER BY ts
                 )
                 SELECT
-                    percentile_disc(0.5) WITHIN GROUP (ORDER BY median_event_cnt)  AS median_event_cnt
+                    AVG(avg_event_cnt)::int  AS avg_event_cnt
                 FROM daily'
             );
 
             $results = $this->execQuery($query, $params);
 
-            $result['median_event_cnt'] = $results[0]['median_event_cnt'] ?? 0;
+            $result['avg_event_cnt'] = $results[0]['avg_event_cnt'] ?? 0;
         }
 
         return $result;

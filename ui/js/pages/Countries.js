@@ -8,7 +8,7 @@ import {CountriesGrid} from '../parts/grid/Countries.js?v=2';
 export class CountriesPage extends BasePage {
 
     constructor() {
-        super();
+        super('countries');
 
         this.initUi();
     }
@@ -22,8 +22,10 @@ export class CountriesPage extends BasePage {
             return {dateRange};
         };
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:        '/admin/loadCountries',
+            url:        `${window.app_base}/admin/loadCountries`,
             tileId:     'totalCountries',
             tableId:    'countries-table',
 
@@ -34,12 +36,7 @@ export class CountriesPage extends BasePage {
                 columns: ['total_visit', 'total_account', 'total_ip'],
             },
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            }
+            getParams: this.getParamsSection,
         };
 
         const mapParams = {

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,14 +13,16 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ReviewQueue;
 
-class Page extends \Controllers\Pages\Base {
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminReviewQueue';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminReviewQueue_search_placeholder');
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
         $rulesController = new \Controllers\Admin\Rules\Data();
 
         $pageParams = [

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,13 +13,15 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 return [
-    'AdminEvents_page_title' => 'Events',
-    'AdminEvents_breadcrumb_title' => 'Events',
+    'AdminEvents_page_title' => 'Activities',
+    'AdminEvents_breadcrumb_title' => 'Activities',
     'AdminEvents_search_placeholder' => 'User ID, Timestamp, IP, HTTP Code',
     'AdminEvents_event_type_search_placeholder' => '+ Add another event type',
     'AdminEvents_device_type_search_placeholder' => '+ Add another device type',
 
-    'AdminEvents_table_title' => 'Events',
+    'AdminEvents_table_title' => 'Activities',
     'AdminEvents_table_title_tooltip' => 'This page lists events recorded during a selected period of time. To see extended event details, click on a table row. The chart shows the number of events recorded each day.',
 ];

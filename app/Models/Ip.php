@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,20 +13,16 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models;
 
 class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizationInterface, \Interfaces\FraudFlagUpdaterInterface {
     protected $DB_TABLE_NAME = 'event_ip';
 
-    public function getIpById(int $ipId): ?string {
-        $info = $this->getFullIpInfoById($ipId);
-
-        return $info['ip'] ?? null;
-    }
-
-    public function getIdByValue(string $ip, int $apiKey): ?int {
+    public function getIdByValue(string $ipAddress, int $apiKey): ?int {
         $params = [
-            ':ip_value' => $ip,
+            ':ip_value' => $ipAddress,
             ':api_key' => $apiKey,
         ];
 
@@ -36,8 +32,8 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             FROM
                 event_ip
             WHERE
-                event_ip.key = :api_key
-                AND event_ip.ip = :ip_value'
+                event_ip.ip = :ip_value AND
+                event_ip.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -45,9 +41,10 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
         return $results[0]['id'] ?? null;
     }
 
-    public function getFullIpInfoById(int $ipId): array {
+    public function getFullIpInfoById(int $ipId, int $apiKey): array {
         $params = [
-            ':ipid' => $ipId,
+            ':ipid'     => $ipId,
+            ':api_key'  => $apiKey,
         ];
 
         $query = (
@@ -86,7 +83,8 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
             ON (event_ip.country = countries.id)
 
             WHERE
-                event_ip.id = :ipid'
+                event_ip.id = :ipid AND
+                event_ip.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -108,8 +106,8 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 event_ip
 
             WHERE
-                event_ip.key = :api_key
-                AND event_ip.id = :ip_id'
+                event_ip.id = :ip_id AND
+                event_ip.key = :api_key'
         );
 
         $results = $this->execQuery($query, $params);
@@ -132,8 +130,8 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 SET fraud_detected = :fraud
 
             WHERE
-                key = :api_key
-                AND id IN ({$placeHolders})"
+                id IN ({$placeHolders}) AND
+                key = :api_key"
         );
 
         $this->execQuery($query, $params);
@@ -154,8 +152,8 @@ class Ip extends \Models\BaseSql implements \Interfaces\ApiKeyAccessAuthorizatio
                 event_ip
 
             WHERE
+                event_ip.id = :id AND
                 event_ip.key = :api_key
-                AND event_ip.id = :id
 
             LIMIT 1"
         );

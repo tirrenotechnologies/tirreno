@@ -38,7 +38,7 @@ export class DashboardTile {
         fireEvent('dateFilterChangedCaught');
 
         $.ajax({
-            url: `/admin/loadDashboardStat?token=${token}`,
+            url: `${window.app_base}/admin/loadDashboardStat?token=${token}`,
             type: 'get',
             scope: me,
             data: params,

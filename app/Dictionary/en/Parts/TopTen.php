@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 return [
     'Top10_ip' => 'IP',
     'Top10_ips' => 'IPs',
     'Top10_user' => 'User',
     'Top10_users' => 'Users',
-    'Top10_events' => 'Events',
+    'Top10_events' => 'Activities',
     'Top10_country' => 'Country',
     'Top10_resource' => 'Resource',
     'Top10_attempts' => 'Attempts',

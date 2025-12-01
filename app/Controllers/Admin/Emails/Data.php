@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,28 +13,26 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Emails;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
         $model = new \Models\Grid\Emails\Grid($apiKey);
 
-        $userId = $this->f3->get('REQUEST.userId');
+        $map = [
+            'userId' => 'getEmailsByUserId',
+        ];
 
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getEmailsByUserId($userId);
-        }
+        $result = $this->idMapIterate($map, $model);
 
         return $result;
     }
 
-    public function getEmailDetails(int $apiKey): array {
-        $params = $this->f3->get('GET');
-        $id = $params['id'];
-        $model = new \Models\Email();
-
-        $details = $model->getEmailDetails($id, $apiKey);
+    public function getEmailDetails(int $id, int $apiKey): array {
+        $details = (new \Models\Email())->getEmailDetails($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
         $tsColumns = ['email_created', 'email_lastseen', 'domain_lastseen', 'domain_created'];

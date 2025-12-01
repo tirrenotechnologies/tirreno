@@ -6,7 +6,7 @@ import {
     renderClickableAsn,
 } from '../DataRenderers.js?v=2';
 
-const URL   = '/admin/loadIpDetails';
+const URL   = `${window.app_base}/admin/loadIpDetails`;
 const ELEMS = ['country', 'asn', 'blocklist', 'blacklist', 'dc', 'vpn', 'tor', 'ar'];
 
 export class IpTiles extends BaseTiles {

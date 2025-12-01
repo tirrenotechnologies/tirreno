@@ -17,8 +17,10 @@ export class DomainsPage extends BasePage {
         const datesFilter  = new DatesFilter();
         const searchFilter = new SearchFilter();
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:        '/admin/loadDomains',
+            url:        `${window.app_base}/admin/loadDomains`,
             tileId:     'totalDomains',
             tableId:    'domains-table',
 
@@ -29,12 +31,7 @@ export class DomainsPage extends BasePage {
                 columns: ['total_account'],
             },
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            }
+            getParams: this.getParamsSection,
         };
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

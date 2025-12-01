@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -17,69 +17,33 @@ declare(strict_types=1);
 
 namespace Crons;
 
-class NotificationsHandler extends AbstractCron {
-    private const NOTIFICATION_WINDOW_HOUR_START = 9;
-    private const NOTIFICATION_WINDOW_HOUR_END = 17;
+class NotificationsHandler extends Base {
+    public function process(): void {
+        $model = new \Models\NotificationPreferences();
 
-    private \Models\NotificationPreferences $notificationPreferencesModel;
+        $operators = $model->operatorsToNotify();
 
-    public function __construct() {
-        parent::__construct();
+        $cnt = 0;
+        $failed = 0;
 
-        $this->notificationPreferencesModel = new \Models\NotificationPreferences();
-    }
-
-    public function prepareNotifications(): void {
-        $timezonesInWindow = $this->getTimeZonesInWindow(self::NOTIFICATION_WINDOW_HOUR_START, self::NOTIFICATION_WINDOW_HOUR_END);
-
-        $operatorsToNotify = $this->notificationPreferencesModel->listOperatorsEligableForUnreviewedItemsReminder($timezonesInWindow);
-
-        foreach ($operatorsToNotify as $operator) {
-            try {
-                $this->sendUnreviewedItemsReminderEmail($operator['firstname'] ?? '', $operator['email'], $operator['review_queue_cnt']);
-            } catch (\Throwable $e) {
-                $this->log(sprintf('Notification handler error %s.', $e->getMessage()));
+        foreach ($operators as $operator) {
+            if (\Utils\Cron::checkTimezone($operator['timezone'] ?? '')) {
+                try {
+                    $name   = $operator['firstname'] ?? '';
+                    $email  = $operator['email'] ?? '';
+                    $review = $operator['review_queue_cnt'] ?? 0;
+                    if (!\Utils\Cron::sendUnreviewedItemsReminderEmail($name, $email, $review)) {
+                        $this->addLog(sprintf('Username `%s` is not email; review count is %s', $email, $review));
+                    }
+                    $model->updateUnreviewedReminder($operator['id']);
+                    $cnt++;
+                } catch (\Throwable $e) {
+                    $this->addLog(sprintf('Notification handler error %s.', $e->getMessage()));
+                    $failed++;
+                }
             }
         }
 
-        $count = \count($operatorsToNotify);
-
-        if ($count > 0) {
-            $this->notificationPreferencesModel->updateLastUnreviewedItemsReminder(\array_column($operatorsToNotify, 'id'));
-        }
-
-        $this->log(sprintf('Sent %s unreviewed items reminder notifications.', $count));
-    }
-
-    /**
-     * @return string[] Time zones currently in the notification window
-     */
-    private function getTimeZonesInWindow(int $startHour, int $endHour): array {
-        $timezones = \DateTimeZone::listIdentifiers();
-
-        return \array_filter($timezones, function ($timezone) use ($startHour, $endHour) {
-            $date = new \DateTime('now', new \DateTimeZone($timezone));
-            $hour = (int) $date->format('H');
-
-            return $hour >= $startHour && $hour < $endHour;
-        });
-    }
-
-    private function sendUnreviewedItemsReminderEmail(string $recipientFirstName, string $recipientEmail, int $reviewCount): void {
-        $audit = \Audit::instance();
-        if (!$audit->email($recipientEmail, true)) {
-            $this->log(sprintf('Username `%s` is not email; review count is %s', $recipientEmail, $reviewCount));
-
-            return;
-        }
-
-        $subject = $this->f3->get('UnreviewedItemsReminder_email_subject');
-        $subject = sprintf($subject, $reviewCount);
-
-        $message = $this->f3->get('UnreviewedItemsReminder_email_body');
-        $url = \Utils\Variables::getSiteWithProtocol();
-        $message = sprintf($message, $recipientFirstName, $recipientEmail, $reviewCount, $url);
-
-        \Utils\Mailer::send($recipientFirstName, $recipientEmail, $subject, $message);
+        $this->addLog(sprintf('Sent %s unreviewed items reminder notifications, failed %s.', $cnt, $failed));
     }
 }

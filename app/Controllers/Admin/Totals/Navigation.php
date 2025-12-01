@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,21 +13,24 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Totals;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
+
+        $this->controller = new Data();
+        $this->page = null;
+    }
 
     public function getTimeFrameTotal(): array {
-        $dataController = new Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $params = $this->f3->get('GET');
-        $ids = $params['ids'];
-        $type = $params['type'];
-        $startDate = $params['startDate'];
-        $endDate = $params['endDate'];
+        $ids        = \Utils\Conversion::getArrayRequestParam('ids');
+        $type       = \Utils\Conversion::getStringRequestParam('type');
+        $startDate  = \Utils\Conversion::getStringRequestParam('startDate');
+        $endDate    = \Utils\Conversion::getStringRequestParam('endDate');
 
-        return $dataController->getTimeFrameTotal($ids, $type, $startDate, $endDate, $apiKey);
+        return $this->controller->getTimeFrameTotal($ids, $type, $startDate, $endDate, $this->apiKey);
     }
 }

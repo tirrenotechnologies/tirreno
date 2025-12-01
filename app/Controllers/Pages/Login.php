@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Controllers\Pages;
 
@@ -29,50 +31,45 @@ class Login extends Base {
             'ALLOW_FORGOT_PASSWORD' => \Utils\Variables::getForgotPasswordAllowed(),
         ];
 
-        if ($this->isPostRequest()) {
-            $params = $this->f3->get('POST');
-            $errorCode = $this->validate($params);
+        if (!$this->isPostRequest()) {
+            return parent::applyPageParams($pageParams);
+        }
 
-            if (!$errorCode) {
-                $operatorsModel = new \Models\Operator();
-                $operatorsModel->getActivatedByEmail($params['email']);
+        $params = $this->extractRequestParams(['token', 'email', 'password']);
+        $errorCode = \Utils\Validators::validateLogin($params);
 
-                if ($operatorsModel->loaded() && $operatorsModel->verifyPassword($params['password'])) {
-                    $controller = new \Controllers\Admin\ReviewQueue\Navigation();
-                    $controller->getNumberOfNotReviewedUsers(true, true);    // use cache, overall count
+        $pageParams['VALUES'] = $params;
+        $pageParams['ERROR_CODE'] = $errorCode;
 
-                    $this->f3->set('SESSION.active_user_id', $operatorsModel->id);
-                    $extra = $this->f3->get('EXTRA_LOGIN');
-                    if ($extra && is_callable($extra)) {
-                        $params = $extra();
-                    }
-                    $this->f3->reroute('/');
-                } else {
-                    $errorCode = \Utils\ErrorCodes::EMAIL_OR_PASSWORD_IS_NOT_CORRECT;
-                }
-            }
+        if ($errorCode) {
+            return parent::applyPageParams($pageParams);
+        }
 
-            $pageParams['VALUES'] = $params;
-            $pageParams['ERROR_CODE'] = $errorCode;
+        \Utils\Updates::syncUpdates();
+
+        $email      = \Utils\Conversion::getStringRequestParam('email');
+        $password   = \Utils\Conversion::getStringRequestParam('password');
+
+        $operatorsModel = new \Models\Operator();
+        $operatorsModel->getActivatedByEmail($email);
+
+        if ($operatorsModel->loaded() && $operatorsModel->verifyPassword($password)) {
+            $this->f3->set('SESSION.active_user_id', $operatorsModel->id);
+
+            // blacklist first because it uses review_queue_updated_at for cache check
+            $controller = new \Controllers\Admin\Blacklist\Navigation();
+            $controller->setBlacklistUsersCount(true);      // use cache
+
+            $controller = new \Controllers\Admin\ReviewQueue\Navigation();
+            $controller->setNotReviewedCount(true);         // use cache
+
+            $pageParams['VALUES'] = \Utils\Routes::callExtra('LOGIN', $params) ?? $params;
+            $this->f3->reroute('/');
+        } else {
+            $pageParams['VALUES'] = \Utils\Routes::callExtra('LOGIN_FAIL', $params) ?? $params;
+            $pageParams['ERROR_CODE'] = \Utils\ErrorCodes::EMAIL_OR_PASSWORD_IS_NOT_CORRECT;
         }
 
         return parent::applyPageParams($pageParams);
-    }
-
-    private function validate(array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        if (!$params['email']) {
-            return \Utils\ErrorCodes::EMAIL_DOES_NOT_EXIST;
-        }
-
-        if (!$params['password']) {
-            return \Utils\ErrorCodes::PASSWORD_DOES_NOT_EXIST;
-        }
-
-        return false;
     }
 }

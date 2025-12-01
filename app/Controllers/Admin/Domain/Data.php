@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,41 +13,36 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Domain;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return match ($params['cmd']) {
-            'reenrichment' => $this->enrichEntity($params),
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'reenrichment' => $this->enrichEntity(),
             default => []
         };
     }
 
-    public function enrichEntity(array $params): array {
+    public function enrichEntity(): array {
         $dataController = new \Controllers\Admin\Enrichment\Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
-        $type = $params['type'];
-        $search = $params['search'] ?? null;
-        $entityId = isset($params['entityId']) ? (int) $params['entityId'] : null;
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $enrichmentKey = \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
+
+        $type       = \Utils\Conversion::getStringRequestParam('type');
+        $search     = \Utils\Conversion::getStringRequestParam('search', true);
+        $entityId   = \Utils\Conversion::getIntRequestParam('entityId', true);
 
         return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
-    public function checkIfOperatorHasAccess(int $domainId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Domain();
-
-        return $model->checkAccess($domainId, $apiKey);
+    public function checkIfOperatorHasAccess(int $domainId, int $apiKey): bool {
+        return (new \Models\Domain())->checkAccess($domainId, $apiKey);
     }
 
-    public function getDomainDetails(int $domainId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        $model = new \Models\Domain();
-        $result = $model->getFullDomainInfoById($domainId, $apiKey);
+    public function getDomainDetails(int $domainId, int $apiKey): array {
+        $result = (new \Models\Domain())->getFullDomainInfoById($domainId, $apiKey);
 
         $tsColumns = ['lastseen'];
         \Utils\TimeZones::localizeTimestampsForActiveOperator($tsColumns, $result);
@@ -55,10 +50,7 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function isEnrichable(): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('domain', $apiKey);
+    public function isEnrichable(int $apiKey): bool {
+        return (new \Models\ApiKeys())->attributeIsEnrichable('domain', $apiKey);
     }
 }

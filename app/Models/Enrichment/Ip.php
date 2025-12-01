@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Enrichment;
 
@@ -86,7 +88,7 @@ class Ip extends \Models\Enrichment\Base {
     public function updateEntityInDb(int $entityId, int $apiKey): void {
         $ipModel = new \Models\Ip();
 
-        $previousIpData = $ipModel->getFullIpInfoById($entityId);
+        $previousIpData = $ipModel->getFullIpInfoById($entityId, $apiKey);
         $previousIspId = count($previousIpData) ? $previousIpData['ispid'] : null;
         $previousCountryId = count($previousIpData) ? $previousIpData['country_id'] : 0;
         // get current isp id

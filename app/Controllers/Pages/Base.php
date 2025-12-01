@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Pages;
 
 abstract class Base {
-    use \Traits\Debug;
-    use \Traits\ApiKeys;
-
     protected $f3;
     protected $page;
 
@@ -31,6 +30,8 @@ abstract class Base {
         }
 
         $this->f3->CSRF = $this->f3->get('SESSION.csrf');
+
+        \Utils\Routes::callExtra('PAGE_BASE');
     }
 
     public function isPostRequest(): bool {
@@ -60,6 +61,9 @@ abstract class Base {
     }
 
     public function applyPageParams(array $params): array {
+        $time = gmdate('Y-m-d H:i:s');
+        \Utils\TimeZones::localizeForActiveOperator($time);
+
         $errorCode = $params['ERROR_CODE'] ?? null;
         $successCode = $params['SUCCESS_CODE'] ?? null;
 
@@ -68,13 +72,10 @@ abstract class Base {
             $params['PAGE_TITLE'] = $pageTitle;
         }
 
-        if ($this->f3->get('EXTRA_CSS')) {
-            $params['EXTRA_CSS'] = $this->f3->get('EXTRA_CSS');
-        }
-
         $breadCrumbTitle = $this->getBreadcrumbTitle();
         $params['BREADCRUMB_TITLE'] = $breadCrumbTitle;
         $params['CURRENT_PATH'] = $this->f3->PATH;
+        $params['CURRENT_PATTERN'] = $this->f3->PATTERN;
 
         if ($errorCode) {
             $errorI18nCode = sprintf('error_%s', $errorCode);
@@ -89,25 +90,27 @@ abstract class Base {
         }
 
         if (array_key_exists('ERROR_MESSAGE', $params)) {
-            $time = gmdate('Y-m-d H:i:s');
-            \Utils\TimeZones::localizeForActiveOperator($time);
             $params['ERROR_MESSAGE_TIMESTAMP'] = $time;
         }
 
         if (array_key_exists('SUCCESS_MESSAGE', $params)) {
-            $time = gmdate('Y-m-d H:i:s');
-            \Utils\TimeZones::localizeForActiveOperator($time);
             $params['SUCCESS_MESSAGE_TIMESTAMP'] = $time;
         }
 
-        $currentOperator = $this->f3->get('CURRENT_USER');
+        $currentOperator = \Utils\Routes::getCurrentRequestOperator();
         if ($currentOperator) {
             $cnt = $currentOperator->review_queue_cnt > 999 ? 999 : ($currentOperator->review_queue_cnt ?? 0);
             $params['NUMBER_OF_NOT_REVIEWED_USERS'] = $cnt;
 
+            $cnt = $currentOperator->blacklist_users_cnt ?? 0;
+            $params['NUMBER_OF_BLACKLIST_USERS'] = \Utils\Conversion::formatKiloValue($cnt);
+
             $offset = \Utils\TimeZones::getCurrentOperatorOffset();
             $now = time() + $offset;
-            $day = (int) ceil(($now - mktime(0, 0, 0, 1, 1, gmdate('Y'))) / (60 * 60 * 24));
+            $day = \Utils\Constants::get('SECONDS_IN_DAY');
+            $firstJan = mktime(0, 0, 0, 1, 1, intval(gmdate('Y')));
+
+            $day = \Utils\Conversion::intVal(ceil(($now - $firstJan) / $day), 0);
 
             $params['OFFSET']   = $offset;
             $params['DAY']      = ($day < 10 ? '00' : ($day < 100 ? '0' : '')) . strval($day);
@@ -134,17 +137,18 @@ abstract class Base {
             ];
         }
 
-        $extra = $this->f3->get('EXTRA_APPLY_PAGE_PARAMS');
-        if ($extra && is_callable($extra)) {
-            $params = $extra($params, $page);
-        }
+        $params = \Utils\Routes::callExtra('APPLY_PAGE_PARAMS', $params, $page) ?? $params;
 
         return $params;
     }
 
-    public function integerParam($param): int {
-        $validated = filter_var($param, FILTER_VALIDATE_INT);
+    protected function extractRequestParams(array $params): array {
+        $result = [];
 
-        return $validated !== false ? $validated : 0;
+        foreach ($params as $key) {
+            $result[$key] = \Base::instance()->get('REQUEST.' . $key);
+        }
+
+        return $result;
     }
 }

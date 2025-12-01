@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,15 +13,15 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Watchlist;
 
-class Page extends \Controllers\Pages\Base {
-    use \Traits\ApiKeys;
-
+class Page extends \Controllers\Admin\Base\Page {
     public $page = 'AdminWatchlist';
 
     public function getPageParams(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
 
         $dataController = new Data();
         $users = $dataController->getImportantUsers($apiKey);

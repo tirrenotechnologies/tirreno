@@ -5,7 +5,7 @@ import {EnrichAllPopUp} from '../parts/EnrichAllPopUp.js?v=2';
 export class ApiPage extends BasePage {
 
     constructor() {
-        super();
+        super('api');
 
         this.initUi();
     }
@@ -18,7 +18,7 @@ export class ApiPage extends BasePage {
         this.snippetTextareas.forEach(txt => txt.addEventListener('click', onTextAreaClick, false));
 
         const gridParams = {
-            url:        '/admin/loadUsageStats',
+            url:        `${window.app_base}/admin/loadUsageStats`,
             tableId:    'usage-stats-table',
             tileId:     'totalUsageStats',
 

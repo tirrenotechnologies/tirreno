@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,69 +13,62 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\User;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
 
-    public function showIndexPage(): void {
-        $this->redirectIfUnlogged();
-
-        $pageController = new Page();
-        $this->response = new \Views\Frontend();
-        $this->response->data = $pageController->getPageParams();
+        $this->controller = new Data();
+        $this->page = new Page();
     }
 
     public function manageUser(): array {
-        $params = $this->f3->get('POST');
-        $accountId = $params['userId'] ?? null;
+        $accountId  = \Utils\Conversion::getIntRequestParam('userId');
+        $cmd        = \Utils\Conversion::getStringRequestParam('type');
+        $hasAccess  = $this->controller->checkIfOperatorHasAccess($accountId, $this->apiKey);
 
-        $dataController = new Data();
-        $errorCode = $dataController->validate($accountId, $params);
+        if (!$hasAccess) {
+            $this->f3->error(404);
+        }
+
         $successCode = false;
 
-        if (!$errorCode) {
-            $cmd = $params['type'] ?? null;
-            $apiKey = $this->getCurrentOperatorApiKeyId();
-            switch ($cmd) {
-                case 'add':
-                    $dataController->addToWatchlist($accountId, $apiKey);
-                    $successCode = \Utils\ErrorCodes::USER_HAS_BEEN_SUCCESSFULLY_ADDED_TO_WATCH_LIST;
-                    break;
+        switch ($cmd) {
+            case 'add':
+                $this->controller->addToWatchlist($accountId, $this->apiKey);
+                $successCode = \Utils\ErrorCodes::USER_ADDED_TO_WATCHLIST;
+                break;
 
-                case 'remove':
-                    $dataController->removeFromWatchlist($accountId, $apiKey);
-                    $successCode = \Utils\ErrorCodes::USER_HAS_BEEN_SUCCESSFULLY_REMOVED_FROM_WATCH_LIST;
-                    break;
+            case 'remove':
+                $this->controller->removeFromWatchlist($accountId, $this->apiKey);
+                $successCode = \Utils\ErrorCodes::USER_REMOVED_FROM_WATCHLIST;
+                break;
 
-                case 'fraud':
-                    $dataController->addToBlacklistQueue($accountId, true, $apiKey);
-                    $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_HAS_BEEN_SET;
-                    break;
+            case 'fraud':
+                $this->controller->addToBlacklistQueue($accountId, true, false, true, $this->apiKey);   // recalculate
+                $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_SET;
+                break;
 
-                case 'legit':
-                    $dataController->addToBlacklistQueue($accountId, false, $apiKey);
-                    $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_HAS_BEEN_UNSET;
-                    break;
+            case 'legit':
+                $this->controller->addToBlacklistQueue($accountId, false, false, true, $this->apiKey);  // recalculate
+                $successCode = \Utils\ErrorCodes::USER_FRAUD_FLAG_UNSET;
+                break;
 
-                case 'reviewed':
-                    $dataController->setReviewedFlag($accountId, true, $apiKey);
-                    $successCode = \Utils\ErrorCodes::USER_REVIEWED_FLAG_HAS_BEEN_SET;
-                    break;
-            }
+            case 'reviewed':
+                $this->controller->setReviewedFlag($accountId, true, $this->apiKey);
+                $successCode = \Utils\ErrorCodes::USER_REVIEWED_FLAG_SET;
+                break;
         }
 
         return ['success' => $successCode];
     }
 
     public function getUserScoreDetails(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $params = $this->f3->get('GET');
-        $userId = $params['userId'];
+        $userId = \Utils\Conversion::getIntRequestParam('userId');
 
-        $dataController = new Data();
-
-        return $dataController->getUserScoreDetails($userId, $apiKey);
+        return $this->controller->getUserScoreDetails($userId, $this->apiKey);
     }
 }

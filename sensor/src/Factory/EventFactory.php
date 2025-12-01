@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -41,6 +41,7 @@ use Sensor\Entity\UrlQueryEntity;
 use Sensor\Entity\UserAgentEnrichedEntity;
 use Sensor\Entity\UserAgentEntity;
 use Sensor\Entity\PayloadEntity;
+use Sensor\Entity\FieldHistoryEntity;
 use Sensor\Model\Blacklist\FraudDetected;
 use Sensor\Model\CreateEventDto;
 use Sensor\Model\DeviceDetected;
@@ -371,6 +372,8 @@ class EventFactory {
 
         $payload = ($dto->payload) ? (new PayloadEntity($accountId, $apiKeyId, $dto->payload, $lastSeen)) : null;
 
+        $fieldHistory = ($dto->fieldHistory) ? (new FieldHistoryEntity($accountId, $apiKeyId, $dto->fieldHistory, $lastSeen)) : null;
+
         return new EventEntity(
             $accountId,
             $session,
@@ -387,6 +390,7 @@ class EventFactory {
             $dto->eventTime,
             $dto->traceId,
             $payload,
+            $fieldHistory,
             $country,
         );
     }

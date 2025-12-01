@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,17 +13,21 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Search;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
+
+        $this->controller = new Data();
+        $this->page = null;
+    }
 
     public function getSearchResults(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $query = $this->f3->get('REQUEST.query');
-        $dataController = new Data();
+        $query = \Utils\Conversion::getStringRequestParam('query');
 
-        return $dataController->getSearchResults($query, $apiKey);
+        return $this->controller->getSearchResults($query, $this->apiKey);
     }
 }

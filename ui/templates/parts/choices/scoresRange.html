@@ -6,7 +6,7 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder>{{ @AdminUsers_scores_range_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @AdminUsers_scores_range_search_placeholder }}</option>
                     <repeat group="{{ @scores }}" key="{{ @key }}" value="{{ @value }}">
                         <option value="{{ @value }}">{{ @value }}|{{ min(@value + 10, 99) }}</option>
                     </repeat>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Context;
 
@@ -54,15 +56,22 @@ class Data {
         //$domainDetails    = $this->domainModel->getContext($accountIds, $apiKey);
 
         $timezoneName       = $this->keyModel->getTimezoneByKeyId($apiKey);
-        $utcTime            = new \DateTime('now', new \DateTimeZone('UTC'));
-        $timezone           = new \DateTimeZone($timezoneName);
+        $utcTime            = new \DateTime('now', \Utils\TimeZones::getUtcTimezone());
+        $timezone           = \Utils\TimeZones::getTimezone($timezoneName);
         $offsetInSeconds    = $timezone->getOffset($utcTime);
 
         // get only suspicious sessions
         $sessionDetails     = $this->sessionModel->getContext($accountIds, $apiKey, $offsetInSeconds);
 
+        $ip = [];
+        $device = [];
+        $email = [];
+        $phone = [];
+        $events = [];
+        $session = [];
+
         //Extend user details context
-        foreach ($userDetails as $userId => $user) {
+        foreach ($userDetails as $user) {
             $user['le_exists']      = ($user['le_email'] ?? null) !== null;
             $user['le_email']       = $user['le_email'] ?? '';
             $user['le_local_part']  = explode('@', $user['le_email'])[0] ?? '';
@@ -76,23 +85,23 @@ class Data {
             $events     = $eventDetails[$userId] ?? [];
             $session    = $sessionDetails[$userId] ?? [];
 
+            // get ip cidr and country from eip_ip_id, look them up at eip_cidr_count, eip_country_count
             $user['eip_ip_id']              = $ip['eip_ip_id'] ?? [];
-            $user['eip_ip']                 = $ip['eip_ip'] ?? [];
-            $user['eip_cidr']               = $ip['eip_cidr'] ?? [];
+            $user['eip_cidr_count']         = $ip['eip_cidr_count'] ?? [];
+            $user['eip_country_count']      = $ip['eip_country_count'] ?? [];
+
             $user['eip_country_id']         = $ip['eip_country_id'] ?? [];
-            $user['eip_data_center']        = $ip['eip_data_center'] ?? [];
-            $user['eip_tor']                = $ip['eip_tor'] ?? [];
-            $user['eip_vpn']                = $ip['eip_vpn'] ?? [];
-            $user['eip_relay']              = $ip['eip_relay'] ?? [];
-            $user['eip_starlink']           = $ip['eip_starlink'] ?? [];
-            $user['eip_total_visit']        = $ip['eip_total_visit'] ?? [];
-            $user['eip_blocklist']          = $ip['eip_blocklist'] ?? [];
-            $user['eip_shared']             = $ip['eip_shared'] ?? [];
+            $user['eip_data_center']        = $ip['eip_data_center'] ?? null;
+            $user['eip_tor']                = $ip['eip_tor'] ?? null;
+            $user['eip_vpn']                = $ip['eip_vpn'] ?? null;
+            $user['eip_relay']              = $ip['eip_relay'] ?? null;
+            $user['eip_starlink']           = $ip['eip_starlink'] ?? null;
+            $user['eip_blocklist']          = $ip['eip_blocklist'] ?? null;
+            $user['eip_shared']             = $ip['eip_shared'] ?? 0;
+            $user['eip_has_fraud']          = $ip['eip_has_fraud'] ?? null;
             //$user['eip_domains']          = $ip['eip_domains'] ?? [];
-            $user['eip_country_id']         = $ip['eip_country_id'] ?? [];
-            $user['eip_fraud_detected']     = $ip['eip_fraud_detected'] ?? [];
-            $user['eip_alert_list']         = $ip['eip_alert_list'] ?? [];
-            $user['eip_domains_count_len']  = $ip['eip_domains_count_len'] ?? [];
+            $user['eip_domains_count_len']  = $ip['eip_domains_count_len'] ?? 0;
+            $user['eip_unique_cidrs']       = $ip['eip_unique_cidrs'] ?? 0;
 
             $user['eup_device']             = $device['eup_device'] ?? [];
             $user['eup_device_id']          = $device['eup_device_id'] ?? [];
@@ -121,21 +130,23 @@ class Data {
             $user['event_device_created']   = $events['event_device_created'] ?? [];
             $user['event_device_lastseen']  = $events['event_device_lastseen'] ?? [];
 
-            $user['event_session_multiple_country'] = $session[0]['event_session_multiple_country'] ?? false;
-            $user['event_session_multiple_ip']      = $session[0]['event_session_multiple_ip'] ?? false;
-            $user['event_session_multiple_device']  = $session[0]['event_session_multiple_device'] ?? false;
-            $user['event_session_night_time']       = $session[0]['event_session_night_time'] ?? false;
+            $user['event_session_single_event']     = $session[0]['event_session_single_event'] ?? null;
+            $user['event_session_multiple_country'] = $session[0]['event_session_multiple_country'] ?? null;
+            $user['event_session_multiple_ip']      = $session[0]['event_session_multiple_ip'] ?? null;
+            $user['event_session_multiple_device']  = $session[0]['event_session_multiple_device'] ?? null;
+            $user['event_session_night_time']       = $session[0]['event_session_night_time'] ?? null;
 
             //Extra params for rules
-            $user = $this->extendParams($user);
+            $this->extendParams($user);
+            $this->extendEventParams($user);
 
-            $userDetails[$userId] = $this->extendEventParams($user);
+            $userDetails[$userId] = $user;
         }
 
         return $userDetails;
     }
 
-    private function extendParams(array $record): array {
+    private function extendParams(array &$record): void {
         //$record['timezone']
 
         $localPartLen   = strlen($record['le_local_part']);
@@ -184,20 +195,16 @@ class Data {
 
         $record['ee_days_since_first_breach'] = count($daysSinceBreaches) ? max($daysSinceBreaches) : -1;
 
-        $onlyNonResidentialParams = !(bool) count(array_filter(array_merge(
-            $record['eip_fraud_detected'],
-            $record['eip_blocklist'],
-            $record['eip_tor'],
-            $record['eip_starlink'],
-            $record['eip_relay'],
-            $record['eip_vpn'],
-            $record['eip_data_center'],
-        ), static function ($value): bool {
-            return $value === true;
-        }));
+        $onlyNonResidentialParams = !($record['eip_has_fraud']
+            || $record['eip_blocklist']
+            || $record['eip_tor']
+            || $record['eip_starlink']
+            || $record['eip_relay']
+            || $record['eip_vpn']
+            || $record['eip_data_center']
+        );
+
         $record['eip_only_residential'] = $onlyNonResidentialParams && !in_array(0, $record['eip_country_id']);
-        $record['eip_has_fraud']        = in_array(true, $record['eip_fraud_detected']);
-        $record['eip_unique_cidrs']     = count(array_unique($record['eip_cidr']));
         $record['lp_fraud_detected']    = $record['lp_fraud_detected'] ?? false;
         $record['le_fraud_detected']    = $record['le_fraud_detected'] ?? false;
 
@@ -217,11 +224,9 @@ class Data {
                 }
             }
         }
-
-        return $record;
     }
 
-    private function extendEventParams(array $record): array {
+    private function extendEventParams(array &$record): void {
         // Remove null values specifically
         $eventTypeFiltered                  = $this->filterStringNum($record['event_type']);
         $eventHttpCodeFiltered              = $this->filterStringNum($record['event_http_code']);
@@ -270,8 +275,6 @@ class Data {
                 }
             }
         }
-
-        return $record;
     }
 
     private function getDaysSinceDomainCreation(array $params): int {
@@ -296,16 +299,7 @@ class Data {
     }
 
     private function getDaysTillToday(?string $dt2): int {
-        $diff = -1;
-
-        if ($dt2 !== null) {
-            $dt1 = date('Y-m-d');
-            $dt1 = new \DateTime($dt1);
-            $dt2 = new \DateTime($dt2);
-            $diff = $dt1->diff($dt2)->format('%a');
-        }
-
-        return $diff;
+        return $this->getDaysDiff(date('Y-m-d'), $dt2);
     }
 
     private function getDaysDiff(?string $dt1, ?string $dt2): int {
@@ -317,7 +311,7 @@ class Data {
             $diff = $dt1->diff($dt2)->format('%a');
         }
 
-        return $diff;
+        return \Utils\Conversion::intVal($diff, 0);
     }
 
     private function getUserFullName(array $record): string {

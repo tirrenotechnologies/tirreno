@@ -15,7 +15,7 @@ export class ScoreDetails {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: '/admin/scoreDetails',
+            url: `${window.app_base}/admin/scoreDetails`,
             type: 'get',
             data: {userId: this.config.userId, token: token},
             success: onScoreDetailsLoaded,

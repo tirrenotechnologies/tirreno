@@ -20,8 +20,10 @@ export class LogbookPage extends BasePage {
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:            '/admin/loadLogbook',
+            url:            `${window.app_base}/admin/loadLogbook`,
             tileId:         'totalLogbook',
             tableId:        'logbook-table',
             panelType:      'logbook',
@@ -31,12 +33,7 @@ export class LogbookPage extends BasePage {
             singleUser:     false,
             isSortable:     true,
 
-            getParams: function() {
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            }
+            getParams:      this.getParamsSection,
         };
 
         new LogbookChart(chartParams);

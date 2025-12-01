@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,27 +13,27 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\User;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return match ($params['cmd']) {
-            'riskScore' => $this->recalculateRiskScore($params),
-            'reenrichment' => $this->enrichEntity($params),
-            'delete' => $this->deleteUser($params),
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'riskScore'     => $this->recalculateRiskScore(),
+            'reenrichment'  => $this->enrichEntity(),
+            'delete'        => $this->deleteUser(),
             default => []
         };
     }
 
-    public function recalculateRiskScore(array $params): array {
+    public function recalculateRiskScore(): array {
         $result = [];
         set_error_handler([\Utils\ErrorHandler::class, 'exceptionErrorHandler']);
 
         try {
-            $apiKey = $this->getCurrentOperatorApiKeyId();
-            $userId = (int) $params['accountid'];
+            $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+            $userId = \Utils\Conversion::getIntRequestParam('accountid');
 
             [$score, $rules] = $this->getUserScore($userId, $apiKey);
             $result = [
@@ -50,29 +50,29 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function enrichEntity(array $params): array {
+    public function enrichEntity(): array {
         $dataController = new \Controllers\Admin\Enrichment\Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
-        $type = $params['type'];
-        $search = $params['search'] ?? null;
-        $entityId = isset($params['entityId']) ? (int) $params['entityId'] : null;
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $enrichmentKey = \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
+
+        $type       = \Utils\Conversion::getStringRequestParam('type');
+        $search     = \Utils\Conversion::getStringRequestParam('search', true);
+        $entityId   = \Utils\Conversion::getIntRequestParam('entityId', true);
 
         return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
-    public function deleteUser(array $params): void {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+    public function deleteUser(): void {
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
 
         if ($apiKey) {
-            $accountId = (int) $params['accountid'];
-            $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
-            $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+            $model = new \Models\Queue();
+            $accountId = \Utils\Conversion::getIntRequestParam('accountid');
+            $code = \Utils\ErrorCodes::REST_API_USER_ALREADY_DELETING;
 
-            $code = \Utils\ErrorCodes::REST_API_USER_ALREADY_SCHEDULED_FOR_DELETION;
-            if (!$accountOpQueueModel->isInQueue($accountId, $apiKey)) {
-                $code = \Utils\ErrorCodes::REST_API_USER_SUCCESSFULLY_ADDED_FOR_DELETION;
-                $accountOpQueueModel->add($accountId, $apiKey);
+            if (!$model->isInQueue($accountId, \Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'), $apiKey)) {
+                $code = \Utils\ErrorCodes::REST_API_USER_ADDED_FOR_DELETION;
+                $model->add($accountId, \Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'), $apiKey);
             }
 
             $this->f3->set('SESSION.extra_message_code', $code);
@@ -90,14 +90,9 @@ class Data extends \Controllers\Base {
         ];
     }
 
-    public function getUserById(int $accountId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        $model = new \Models\User();
-        $user = $model->getUser($accountId, $apiKey);
-
-        $model = new \Models\Rules();
-        $rules = $model->getAll();
+    public function getUserById(int $accountId, int $apiKey): array {
+        $user = (new \Models\User())->getUser($accountId, $apiKey);
+        $rules = (new \Models\Rules())->getAll();
 
         $details = [];
         if ($user['score_details']) {
@@ -114,9 +109,7 @@ class Data extends \Controllers\Base {
             }
         }
 
-        usort($details, static function ($a, $b): int {
-            return $b['score'] <=> $a['score'];
-        });
+        usort($details, [\Utils\Sort::class, 'cmpScore']);
 
         $user['score_details'] = $details;
 
@@ -135,15 +128,12 @@ class Data extends \Controllers\Base {
         return $user;
     }
 
-    public function checkIfOperatorHasAccess(int $userId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $userModel = new \Models\User();
-
-        return $userModel->checkAccess($userId, $apiKey);
+    public function checkIfOperatorHasAccess(int $userId, int $apiKey): bool {
+        return (new \Models\User())->checkAccess($userId, $apiKey);
     }
 
     public function checkEnrichmentAvailability(): bool {
-        return $this->getCurrentOperatorEnrichmentKeyString() !== null;
+        return \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString() !== null;
     }
 
     public function addToWatchlist(int $accountId, int $apiKey): void {
@@ -156,35 +146,43 @@ class Data extends \Controllers\Base {
         $model->remove($accountId, $apiKey);
     }
 
-    public function addToBlacklistQueue(int $accountId, bool $fraud, int $apiKey): void {
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $inQueue = $accountOpQueueModel->isInQueue($accountId, $apiKey);
+    public function addToBlacklistQueue(int $accountId, bool $fraud, bool $cron, bool $cnt, int $apiKey): void {
+        $model = new \Models\Queue();
+        $inQueue = $model->isInQueue($accountId, \Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'), $apiKey);
 
         if (!$fraud) {
             $this->setFraudFlag($accountId, false, $apiKey); // Directly remove blacklisted items
 
             if ($inQueue) {
-                $accountOpQueueModel->removeFromQueue(); // Cancel queued operation
+                $model->removeFromQueue($accountId, \Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'), $apiKey); // Cancel queued operation
             }
         }
 
         if (!$inQueue && $fraud) {
-            $accountOpQueueModel->add($accountId, $apiKey);
+            $model->add($accountId, \Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'), $apiKey);
         }
 
         $model = new \Models\User();
         $model->updateFraudFlag([$accountId], $apiKey, $fraud);
+
+        if ($cnt) {
+            $controller = new \Controllers\Admin\Blacklist\Data();
+            $controller->setBlacklistUsersCount(false, $apiKey);        // do not use cache
+            $controller = new \Controllers\Admin\ReviewQueue\Data();
+            $controller->setNotReviewedCount(false, $apiKey);           // do not use cache
+        }
+
+        \Utils\Routes::callExtra('UPDATE_USER_FRAUD_STATUS', $accountId, $fraud, $cron, $apiKey);
     }
 
     public function addToCalulcateRiskScoreQueue(int $accountId): void {
-        $apiKey = $this->getCurrentOperatorApiKeyObject();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $inQueue = $accountOpQueueModel->isInQueue($accountId, $apiKey->id);
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+
+        $model = new \Models\Queue();
+        $inQueue = $model->isInQueue($accountId, \Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'), $apiKey);
 
         if (!$inQueue) {
-            $accountOpQueueModel->add($accountId, $apiKey->id);
+            $model->add($accountId, \Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'), $apiKey);
         }
     }
 
@@ -192,10 +190,7 @@ class Data extends \Controllers\Base {
      * @param array{accountId: int, key: int}[] $accounts
      */
     public function addBatchToCalulcateRiskScoreQueue(array $accounts): void {
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-
-        $accountOpQueueModel->addBatch($accounts);
+        (new \Models\Queue())->addBatch($accounts, \Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'));
     }
 
     public function setReviewedFlag(int $accountId, bool $reviewed, int $apiKey): void {
@@ -221,35 +216,20 @@ class Data extends \Controllers\Base {
         return [$total, $rules];
     }
 
-    public function validate(int $accountId, array $params): int|false {
-        $errorCode = \Utils\Access::CSRFTokenValid($params, $this->f3);
-        if ($errorCode) {
-            return $errorCode;
-        }
+    public function getScheduledForDeletion(int $userId, int $apiKey): array {
+        $model = new \Models\Queue();
 
-        $userHasAccess = $this->checkIfOperatorHasAccess($accountId);
+        [$scheduled, $status] = $model->isInQueueStatus($userId, \Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'), $apiKey);
 
-        return !$userHasAccess ? \Utils\ErrorCodes::OPERATOR_DOES_NOT_HAVE_ACCESS_TO_ACCOUNT : false;
+        return [$scheduled, ($status === \Utils\Constants::get('FAILED_QUEUE_STATUS_TYPE')) ? \Utils\ErrorCodes::USER_DELETION_FAILED : null];
     }
 
-    public function getScheduledForDeletion(int $userId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::DELETE);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
+    public function getScheduledForBlacklist(int $userId, int $apiKey): array {
+        $model = new \Models\Queue();
 
-        [$scheduled, $status] = $accountOpQueueModel->isInQueueStatus($userId, $apiKey);
+        [$scheduled, $status] = $model->isInQueueStatus($userId, \Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'), $apiKey);
 
-        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::FAILED) ? \Utils\ErrorCodes::USER_DELETION_FAILED : null];
-    }
-
-    public function getScheduledForBlacklist(int $userId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::BLACKLIST);
-        $accountOpQueueModel = new \Models\Queue\AccountOperationQueue($actionType);
-
-        [$scheduled, $status] = $accountOpQueueModel->isInQueueStatus($userId, $apiKey);
-
-        return [$scheduled, ($status === \Type\QueueAccountOperationStatusType::FAILED) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
+        return [$scheduled, ($status === \Utils\Constants::get('FAILED_QUEUE_STATUS_TYPE')) ? \Utils\ErrorCodes::USER_BLACKLISTING_FAILED : null];
     }
 
     public function setFraudFlag(int $accountId, bool $fraud, int $apiKey): array {
@@ -287,7 +267,7 @@ class Data extends \Controllers\Base {
         return array_merge($ips, $emails, $phones);
     }
 
-    public function updateUserStatus(int $accountId, array $scoreData, int $apiKey): void {
+    public function updateUserStatus(int $accountId, array $scoreData, bool $cron, int $apiKey): void {
         $scoreData['addToReview'] = false;
 
         $keyModel = new \Models\ApiKeys();
@@ -296,11 +276,17 @@ class Data extends \Controllers\Base {
         $userModel = new \Models\User();
 
         if ($scoreData['score'] <= $keyModel->blacklist_threshold) {
-            $this->addToBlacklistQueue($accountId, true, $apiKey);
+            $this->addToBlacklistQueue($accountId, true, true, false, $apiKey); // automatic blacklist anyway, do not recalculate
         } elseif ($scoreData['score'] <= $keyModel->review_queue_threshold) {
             $data = $userModel->getUser($accountId, $apiKey);
             $scoreData['addToReview'] = $data['added_to_review'] === null && $data['fraud'] === null;
+            if (!$cron && $scoreData['addToReview']) {
+                $controller = new \Controllers\Admin\ReviewQueue\Data();
+                $controller->setNotReviewedCount(false, $apiKey);           // do not use cache
+            }
         }
+
+        \Utils\Routes::callExtra('UPDATE_USER_STATUS', $accountId, $scoreData, $cron, $apiKey);
 
         $userModel->updateUserStatus($accountId, $scoreData, $apiKey);
     }

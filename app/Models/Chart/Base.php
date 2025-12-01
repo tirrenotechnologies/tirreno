@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Chart;
 
 abstract class Base extends \Models\BaseSql {
-    use \Traits\DateRange;
-
     protected function concatDataLines(array $data1, string $field1, array $data2, string $field2, array $data3 = [], ?string $field3 = null): array {
         $data0 = [];
         $iters = count($data1);
@@ -77,9 +77,7 @@ abstract class Base extends \Models\BaseSql {
         }
 
         // TODO: tmp order troubles fix
-        usort($data0, function ($a, $b) {
-            return $a['ts'] - $b['ts'];
-        });
+        usort($data0, [\Utils\Sort::class, 'cmpTimestamp']);
 
         return $data0;
     }
@@ -88,15 +86,14 @@ abstract class Base extends \Models\BaseSql {
         $cnt = count($params);
         $data = array_fill(0, $cnt, []);
 
-        $request = $this->f3->get('REQUEST');
-        $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
+        $step = \Utils\Constants::get('CHART_RESOLUTION')[\Utils\DateRange::getResolutionFromRequest()];
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        $dateRange = $this->getDatesRange($request, $offset);
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest($offset);
 
         if (!$dateRange) {
             $now = time() + $offset;
-            $week = 7 * 24 * 60 * 60;
+            $week = \Utils\Constants::get('SECONDS_IN_WEEK');
             if (count($params[0]) === 0) {
                 $dateRange = [
                     'endDate' => date('Y-m-d H:i:s', $now),
@@ -117,10 +114,10 @@ abstract class Base extends \Models\BaseSql {
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
 
-        $ox = $params[0];
+        $timestamps = $params[0];
 
         while ($endTs >= $startTs) {
-            $itemIdx = array_search($startTs, $ox);
+            $itemIdx = array_search($startTs, $timestamps);
 
             $data[0][] = $startTs;
 
@@ -135,10 +132,8 @@ abstract class Base extends \Models\BaseSql {
     }
 
     protected function execute(string $query, int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-
         // do not use offset because :start_time/:end_time compared with UTC db timestamps
-        $dateRange = $this->getDatesRange($request);
+        $dateRange = \Utils\DateRange::getDatesRangeFromRequest();
 
         // Search request does not contain daterange param
         if (!$dateRange) {
@@ -154,7 +149,7 @@ abstract class Base extends \Models\BaseSql {
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => $this->getResolution($request),
+            ':resolution'   => \Utils\DateRange::getResolutionFromRequest(),
             ':offset'       => strval($offset),     // str for postgres
         ];
 

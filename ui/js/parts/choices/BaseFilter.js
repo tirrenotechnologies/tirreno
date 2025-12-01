@@ -31,7 +31,7 @@ export class BaseFilter {
         );
     }
 
-    getValues() {
+    getValue() {
         return Array.from(document.querySelector(`${this.selectorId} select`).options)
             .filter(option => option.selected)
             .map(option => option.value);

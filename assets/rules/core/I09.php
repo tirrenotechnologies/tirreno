@@ -1,0 +1,15 @@
+<?php
+
+namespace CoreRules;
+
+class I09 extends \Assets\Rule {
+    public const NAME = 'Numerous IPs';
+    public const DESCRIPTION = 'User accesses the account with numerous IP addresses. This behaviour occurs in less than one percent of desktop users.';
+    public const ATTRIBUTES = [];
+
+    protected function defineCondition() {
+        return $this->rb->logicalAnd(
+            $this->rb['ea_total_ip']->greaterThan(9),
+        );
+    }
+}

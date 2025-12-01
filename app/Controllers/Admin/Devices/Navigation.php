@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,21 +13,23 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Devices;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
+
+        $this->controller = new Data();
+        $this->page = null;
+    }
 
     public function getList(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        return $apiKey ? (new Data())->getList($apiKey) : [];
+        return $this->apiKey ? $this->controller->getList($this->apiKey) : [];
     }
 
     public function getDeviceDetails(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        return $apiKey ? (new Data())->getDeviceDetails($apiKey) : [];
+        return $this->apiKey && $this->id ? $this->controller->getDeviceDetails($this->id, $this->apiKey) : [];
     }
 }

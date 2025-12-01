@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,14 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Updates;
 
 abstract class Base {
     public static $version = '';
 
-    abstract public static function apply($db);
+    abstract public static function apply($database);
 
     public static function isApplied($updatesModel) {
         return $updatesModel->isApplied(static::$version, 'core');

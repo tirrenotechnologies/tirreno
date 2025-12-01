@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,20 +13,17 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\ISP;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function checkIfOperatorHasAccess(int $ispId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Isp();
-
-        return $model->checkAccess($ispId, $apiKey);
+class Data extends \Controllers\Admin\Base\Data {
+    public function checkIfOperatorHasAccess(int $ispId, int $apiKey): bool {
+        return (new \Models\Isp())->checkAccess($ispId, $apiKey);
     }
 
-    public function getFullIspInfoById(int $ispId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
+    public function getFullIspInfoById(int $ispId, int $apiKey): array {
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
         $model = new \Models\Isp();
         $result = $model->getFullIspInfoById($ispId, $apiKey);
         $result['lastseen'] = \Utils\ElapsedDate::short($result['lastseen']);
@@ -34,16 +31,13 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    private function getNumberOfIpsByIspId(int $ispId): int {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Isp();
-
-        return $model->getIpCountById($ispId, $apiKey);
+    private function getNumberOfIpsByIspId(int $ispId, int $apiKey): int {
+        return (new \Models\Isp())->getIpCountById($ispId, $apiKey);
     }
 
-    public function getIspDetails(int $ispId): array {
+    public function getIspDetails(int $ispId, int $apiKey): array {
         $result = [];
-        $data = $this->getFullIspInfoById($ispId);
+        $data = $this->getFullIspInfoById($ispId, $apiKey);
 
         if (array_key_exists('asn', $data)) {
             $result = [
@@ -51,7 +45,7 @@ class Data extends \Controllers\Base {
                 'total_fraud'   => $data['total_fraud'],
                 'total_visit'   => $data['total_visit'],
                 'total_account' => $data['total_account'],
-                'total_ip'      => $this->getNumberOfIpsByIspId($ispId),
+                'total_ip'      => $this->getNumberOfIpsByIspId($ispId, $apiKey),
             ];
         }
 

@@ -19,32 +19,24 @@ export class BlacklistPage extends BasePage {
         const datesFilter       = new DatesFilter();
         const searchFilter      = new SearchFilter();
 
+        this.setBaseFilters(datesFilter, searchFilter);
+
         const gridParams = {
-            url:            '/admin/loadBlacklist',
+            url:            `${window.app_base}/admin/loadBlacklist`,
             tileId:         'totalBlacklist',
             tableId:        'blacklist-table',
 
             dateRangeGrid:  true,
 
-            getParams: function() {
-                const dateRange     = datesFilter.getValue();
-                const searchValue   = searchFilter.getValue();
-
-                return {dateRange, searchValue};
-            },
+            getParams: this.getParamsSection,
         };
 
         if (document.getElementById('entity-type-selectors')) {
             const entityTypeFilter  = new EntityTypeFilter();
 
             gridParams.choicesFilterEvents = [entityTypeFilter.getEventType()];
-            gridParams.getParams = function() {
-                const dateRange     = datesFilter.getValue();
-                const searchValue   = searchFilter.getValue();
-                const entityTypeIds = entityTypeFilter.getValues();
 
-                return {dateRange, searchValue, entityTypeIds};
-            };
+            this.filters.entityTypeIds = entityTypeFilter;
         }
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);

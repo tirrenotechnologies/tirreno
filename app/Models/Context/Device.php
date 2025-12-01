@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Context;
 
@@ -60,9 +62,9 @@ class Device extends Base {
             ON(event_device.user_agent=event_ua_parsed.id)
 
             WHERE
-                event_device.key = :api_key
-                AND event_ua_parsed.checked = true
-                AND event_device.account_id IN ({$placeHolders})"
+                event_device.account_id IN ({$placeHolders}) AND
+                event_ua_parsed.checked IS TRUE AND
+                event_device.key = :api_key"
         );
 
         return $this->execQuery($query, $params);

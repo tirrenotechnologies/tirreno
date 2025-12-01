@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,14 +13,12 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Home;
 
-class Data extends \Controllers\Base {
-    use \Traits\DateRange;
-
-    public function getChart(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-        $mode = $request['mode'];
+class Data extends \Controllers\Admin\Base\Data {
+    public function getChart(string $mode, int $apiKey): array {
         $modelMap = \Utils\Constants::get('CHART_MODEL_MAP');
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
@@ -28,11 +26,7 @@ class Data extends \Controllers\Base {
         return $model ? $model->getData($apiKey) : [[], []];
     }
 
-    public function getStat(int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
-        $dateRange = $this->getDatesRange($request);
-        $mode = $request['mode'];
-
+    public function getStat(string $mode, ?array $dateRange, int $apiKey): array {
         $model = new \Models\Dashboard();
 
         $result = [
@@ -74,10 +68,7 @@ class Data extends \Controllers\Base {
         return $result;
     }
 
-    public function getTopTen(int $apiKey): array {
-        $params = $this->f3->get('GET');
-        $dateRange = $this->getDatesRange($params);
-        $mode = $params['mode'];
+    public function getTopTen(string $mode, ?array $dateRange, int $apiKey): array {
         $modelMap = \Utils\Constants::get('TOP_TEN_MODELS_MAP');
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
@@ -85,10 +76,10 @@ class Data extends \Controllers\Base {
         $total = count($data);
 
         return [
-            'draw' => $params['draw'] ?? 1,
-            'recordsTotal' => $total,
-            'recordsFiltered' => $total,
-            'data' => $data,
+            'draw'              => $this->f3->get('REQUEST.draw') ?? 1,
+            'recordsTotal'      => $total,
+            'recordsFiltered'   => $total,
+            'data'              => $data,
         ];
     }
 }

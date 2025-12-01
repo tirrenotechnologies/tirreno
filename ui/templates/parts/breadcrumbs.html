@@ -3,29 +3,29 @@
     <ul>
         <check if="false !== strpos(@CURRENT_PATH, '/id/')">
             <true>
-                <li><a href="/id" aria-current="page">{{ @AdminUsers_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/id" aria-current="page">{{ @AdminUsers_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/country/')">
             <true>
-                <li><a href="/country" aria-current="page">{{ @AdminCountries_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/country" aria-current="page">{{ @AdminCountries_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/ip/')">
             <true>
-                <li><a href="/ip" aria-current="page">{{ @AdminIps_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/ip" aria-current="page">{{ @AdminIps_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/resource/')">
             <true>
-                <li><a href="/resource" aria-current="page">{{ @AdminResources_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/resource" aria-current="page">{{ @AdminResources_breadcrumb_title }}</a></li>
             </true>
         </check>
 
-        <li class="is-active"><a href="{{ @CURRENT_PATH }}" aria-current="page">{{ @BREADCRUMB_TITLE }}</a></li>
+        <li class="is-active"><a href="{{ @BASE }}{{ @CURRENT_PATH }}" aria-current="page">{{ @BREADCRUMB_TITLE }}</a></li>
     </ul>
 </nav>
 **}

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 return [
     'AdminApi_page_title' => 'Tracking ID',
     'AdminApi_breadcrumb_title' => 'Api',
@@ -22,12 +24,12 @@ return [
     'AdminApi_http_endpoint' => 'Tracking code',
     'AdminApi_server_language' => 'Server language',
     'AdminApi_http_endpoint_tooltip' => [
-        'title' => 'This container holds your tracking code and is used to collect and process user data.',
+        'title' => 'Examples of integrations to start collecting and process user data.',
         'items' => [
             'Choose your server language (PHP, Python, Node.js, Ruby, cURL).',
             'Replace the placeholders in the code with your specific values.',
-            'Paste the completed code on every page of your website or app that you want to track. This code should be included for logged-in users.',
-            'Data will appear in reports within approximately one minute.',
+            'Paste the completed code on every page of your product or application that you want to track.',
+            'Data will appear in dashboard within approximately one minute.',
         ],
     ],
 
@@ -58,7 +60,7 @@ return [
     'AdminApi_form_field_token_label' => 'Enrichment key',
     'AdminApi_form_field_token_placeholder' => 'TIR:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=',
     'AdminApi_current_token_tooltip' => 'Current key: ',
-    'AdminApi_form_confirmationMessage' => 'You can use a limited version of tirreno without a paid subscription or choose to enrich IP data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
+    'AdminApi_form_confirmationMessage' => 'You can use tirreno without a paid subscription or choose to enrich IP data. To learn about enrichment plans and obtain a subscription key, please visit: https://www.tirreno.com/pricing/',
 
     'AdminApi_token_management_title' => 'Enrichment subscription management',
     'AdminApi_token_management_title_tooltip' => 'Usage statistics and subscription key management',

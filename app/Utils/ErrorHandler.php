@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Utils;
 
@@ -70,9 +72,9 @@ class ErrorHandler {
             }
         }
 
-        $db = $f3->get('API_DATABASE');
-        if ($db) {
-            $errorData['sql_log'] = $db->log();
+        $database = \Utils\Database::getDb();
+        if ($database && \Utils\Routes::getCurrentRequestOperator()) {
+            $errorData['sql_log'] = $database->log();
             $logModel = new \Models\Log();
             $logModel->add($errorData);
 
@@ -88,15 +90,17 @@ class ErrorHandler {
                 return;
             }
 
-            $subject = $f3->get('error_email_subject');
+            $subject = $f3->get('error_email_subject') ?? '%s';
             $subject = sprintf($subject, $errorData['code']);
 
             $currentTime = date('d-m-Y H:i:s');
             $errorMessage = $errorData['message'];
             $errorTrace = $errorData['trace'];
 
+            $hosts = json_encode(\Utils\Variables::getHosts());
+
             $message = $f3->get('error_email_body_template');
-            $message = sprintf($message, $currentTime, $errorMessage, $errorTrace);
+            $message = sprintf($message, $currentTime, $hosts, $errorMessage, $errorTrace);
 
             \Utils\Mailer::send($toName, $toAddress, $subject, $message);
         }
@@ -120,17 +124,16 @@ class ErrorHandler {
          * @param $f3
          */
         return function (\Base $f3): void {
-            $hive = $f3->hive();
-            $isAjax = $hive['AJAX'];
+            $isAjax = $f3->get('AJAX');
 
             $errorData = self::getErrorDetails($f3);
-            self::saveErrorInformation($f3, $errorData);
 
-            if ($errorData['code'] === 403 && $isAjax) {
-                echo self::getAjaxErrorMessage($errorData);
-
-                return;
+            // clean template if anything was rendered already
+            while (ob_get_level() > 0) {
+                ob_end_clean();
             }
+
+            self::saveErrorInformation($f3, $errorData);
 
             if ($errorData['code'] === 403 && !$isAjax) {
                 $f3->reroute('/logout');
@@ -152,6 +155,9 @@ class ErrorHandler {
             $pageController = new \Controllers\Pages\Error();
 
             $errorData['message'] = 'ERROR_' . $errorData['code'];
+            if ($errorData['code'] !== 404) {
+                $errorData['extra_message'] = $f3->get('ErrorPage_extra_message');
+            }
             unset($errorData['trace']);
             $pageParams = $pageController->getPageParams($errorData);
 

@@ -35,42 +35,29 @@ const notificationTime = () => {
 const formatIntTimeUtc = (ts, useTime, offsetInSeconds = 0) => {
     const dt = new Date(ts + ((new Date()).getTimezoneOffset() * 60 + offsetInSeconds) * 1000);
 
-    let m = dt.getMonth() + 1;
-    let d = dt.getDate();
-    let y = dt.getFullYear();
-    m = padZero(m);
-    d = padZero(d);
-    y = padZero(y, 4);
+    const m = padZero(dt.getMonth() + 1);
+    const d = padZero(dt.getDate());
+    const y = padZero(dt.getFullYear(), 4);
 
     if (!useTime) {
         return `${d}/${m}/${y}`;
     }
 
-    let h = dt.getHours();
-    let i = dt.getMinutes();
-    let s = dt.getSeconds();
-    h = padZero(h);
-    i = padZero(i);
-    s = padZero(s);
+    const h = padZero(dt.getHours());
+    const i = padZero(dt.getMinutes());
+    const s = padZero(dt.getSeconds());
 
     return `${d}/${m}/${y} ${h}:${i}:${s}`;
 };
 
 const formatStringTime = (dt) => {
+    const m = padZero(dt.getMonth() + 1);
+    const d = padZero(dt.getDate());
+    const y = padZero(dt.getFullYear(), 4);
 
-    let m = dt.getMonth() + 1;
-    let d = dt.getDate();
-    let y = dt.getFullYear();
-    m = padZero(m);
-    d = padZero(d);
-    y = padZero(y, 4);
-
-    let h = dt.getHours();
-    let i = dt.getMinutes();
-    let s = dt.getSeconds();
-    h = padZero(h);
-    i = padZero(i);
-    s = padZero(s);
+    const h = padZero(dt.getHours());
+    const i = padZero(dt.getMinutes());
+    const s = padZero(dt.getSeconds());
 
     return `${y}-${m}-${d}T${h}:${i}:${s}`;
 };

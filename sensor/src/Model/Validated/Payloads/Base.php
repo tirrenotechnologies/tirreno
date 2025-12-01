@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -18,6 +18,8 @@ declare(strict_types=1);
 namespace Sensor\Model\Validated\Payloads;
 
 class Base extends \Sensor\Model\Validated\Base {
+    private const INVALIDPLACEHOLDER = 'unknown';
+
     protected array $optionalFields;
     protected array $requiredFields;
 
@@ -72,7 +74,7 @@ class Base extends \Sensor\Model\Validated\Base {
             if (isset($item[$key])) {
                 $data[$key] = $this->convert($item[$key]);
             } else {
-                $data[$key] = null;
+                $data[$key] = self::INVALIDPLACEHOLDER;
                 $this->invalid = true;
             }
         }

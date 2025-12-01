@@ -26,8 +26,16 @@ export class EventsPage extends BasePage {
 
         const chartParams = this.getChartParams(datesFilter, searchFilter);
 
+        this.filters = {
+            dateRange:      datesFilter,
+            searchValue:    searchFilter,
+            eventTypeIds:   eventTypeFilter,
+            ruleUids:       rulesFilter,
+            deviceTypes:    deviceTypeFilter,
+        };
+
         const gridParams = {
-            url:            '/admin/loadEvents',
+            url:            `${window.app_base}/admin/loadEvents`,
             tileId:         'totalEvents',
             tableId:        'user-events-table',
             panelType:      'event',
@@ -43,15 +51,7 @@ export class EventsPage extends BasePage {
                 deviceTypeFilter.getEventType(),
             ],
 
-            getParams: function() {
-                const dateRange     = datesFilter.getValue();
-                const searchValue   = searchFilter.getValue();
-                const eventTypeIds  = eventTypeFilter.getValues();
-                const ruleUids      = rulesFilter.getValues();
-                const deviceTypes   = deviceTypeFilter.getValues();
-
-                return {dateRange, searchValue, eventTypeIds, ruleUids, deviceTypes};
-            }
+            getParams: this.getParamsSection,
         };
 
         new EventPanel();

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models\Chart;
 
@@ -31,13 +33,12 @@ class SessionStat extends Base {
             ];
         }
 
-        $request = $this->f3->get('REQUEST');
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
-        $datesRange = $this->getLatestNDatesRange(14, $offset);
+        $datesRange = \Utils\DateRange::getLatestNDatesRangeFromRequest(14, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Utils\Constants::get('CHART_RESOLUTION')[$this->getResolution($request)];
+        $step = \Utils\Constants::get('CHART_RESOLUTION')[\Utils\DateRange::getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
@@ -92,18 +93,17 @@ class SessionStat extends Base {
     }
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
-        $request = $this->f3->get('REQUEST');
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = $this->getLatestNDatesRange(14);
+        $dateRange = \Utils\DateRange::getLatestNDatesRangeFromRequest(14);
         $offset = \Utils\TimeZones::getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            //':resolution'   => $this->getResolution($request),
-            ':resolution'   => 60 * 60 * 24,
-            ':id'           => $request['id'],
+            //':resolution'   => \Utils\DateRange::getResolutionFromRequest(),
+            ':resolution'   => \Utils\Constants::get('SECONDS_IN_DAY'),
+            ':id'           => \Utils\Conversion::getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];
 
@@ -115,19 +115,19 @@ class SessionStat extends Base {
             'SELECT
                 ((EXTRACT(EPOCH FROM event_session.created)::bigint + :offset::bigint) / :resolution) * :resolution as ts,
 
-                COUNT(event_session.id)                             AS event_session_cnt,
-                MAX(event_session_stat.event_count)                 AS event_count_max,
-                FLOOR(AVG(event_session_stat.event_count))::int     AS event_count_avg,
-                MAX(event_session_stat.device_count)                AS device_count_max,
-                FLOOR(AVG(event_session_stat.device_count))::int    AS device_count_avg,
-                MAX(event_session_stat.ip_count)                    AS ip_count_max,
-                FLOOR(AVG(event_session_stat.ip_count))::int        AS ip_count_avg,
-                MAX(event_session_stat.country_count)               AS country_count_max,
-                FLOOR(AVG(event_session_stat.country_count))::int   AS country_count_avg,
-                SUM(event_session_stat.new_ip_count)                AS new_ip_count_sum,
-                SUM(event_session_stat.new_device_count)            AS new_device_count_sum,
-                jsonb_agg(event_session_stat.event_types)           AS event_types,
-                jsonb_agg(event_session_stat.http_codes)            AS http_codes
+                COUNT(event_session.id)                                         AS event_session_cnt,
+                COALESCE(MAX(event_session_stat.event_count), 0)                AS event_count_max,
+                COALESCE(FLOOR(AVG(event_session_stat.event_count))::int, 0)    AS event_count_avg,
+                COALESCE(MAX(event_session_stat.device_count), 0)               AS device_count_max,
+                COALESCE(FLOOR(AVG(event_session_stat.device_count))::int, 0)   AS device_count_avg,
+                COALESCE(MAX(event_session_stat.ip_count), 0)                   AS ip_count_max,
+                COALESCE(FLOOR(AVG(event_session_stat.ip_count))::int, 0)       AS ip_count_avg,
+                COALESCE(MAX(event_session_stat.country_count), 0)              AS country_count_max,
+                COALESCE(FLOOR(AVG(event_session_stat.country_count))::int, 0)  AS country_count_avg,
+                COALESCE(SUM(event_session_stat.new_ip_count), 0)               AS new_ip_count_sum,
+                COALESCE(SUM(event_session_stat.new_device_count), 0)           AS new_device_count_sum,
+                jsonb_agg(event_session_stat.event_types)                       AS event_types,
+                jsonb_agg(event_session_stat.http_codes)                        AS http_codes
 
             FROM
                 event_session

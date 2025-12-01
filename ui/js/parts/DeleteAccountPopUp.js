@@ -1,4 +1,4 @@
-import {fireEvent} from './utils/Event.js?v=2';
+import {fireEvent, handleEscape} from './utils/Event.js?v=2';
 
 export class DeleteAccountPopUp {
 
@@ -17,21 +17,8 @@ export class DeleteAccountPopUp {
         this.closePopUpButton.addEventListener('click', onCloseButtonClick, false);
     }
 
-    //https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
     onKeydown(e) {
-        if (e.defaultPrevented) {
-            return; // Do nothing if the event was already processed
-        }
-        switch (e.key) {
-            case 'Esc': // IE/Edge specific value
-            case 'Escape':
-                this.close();
-                break;
-            default:
-                return;
-        }
-        // Cancel the default action to avoid it being handled twice
-        e.preventDefault();
+        handleEscape(e, () => this.close(), false);
     }
 
     onConfirmDeleteAccountButton(e) {

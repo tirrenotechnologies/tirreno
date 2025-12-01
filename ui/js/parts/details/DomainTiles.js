@@ -5,7 +5,7 @@ import {
     renderDate,
 } from '../DataRenderers.js?v=2';
 
-const URL   = '/admin/loadDomainDetails';
+const URL   = `${window.app_base}/admin/loadDomainDetails`;
 const ELEMS = [
     'free-email', 'tranco-rank', 'unavailable', 'disposable',
     'creation-date', 'expiration-date', 'total-account', 'fraud'];

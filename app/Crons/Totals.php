@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,24 +13,30 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Crons;
 
-class Totals extends AbstractCron {
+class Totals extends Base {
     // execute before risk score!
-    public function calculateTotals(): void {
-        $this->log('Start totals calculation.');
+    public function process(): void {
+        $this->addLog('Start totals calculation.');
+
         $start = time();
         $models = \Utils\Constants::get('REST_TOTALS_MODELS');
 
-        $actionType = new \Type\QueueAccountOperationActionType(\Type\QueueAccountOperationActionType::CALCULATE_RISK_SCORE);
-        $queueModel = new \Models\Queue\AccountOperationQueue($actionType);
-        $keys = $queueModel->getNextBatchKeysInQueue(\Utils\Variables::getAccountOperationQueueBatchSize());
+        $batchSize = \Utils\Variables::getAccountOperationQueueBatchSize();
+        $bottom = false;
 
+        $queueModel = new \Models\Queue();
+
+        // TODO check multiple batches
+        $keys = $queueModel->getNextBatchKeys(\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'), $batchSize);
         $res = [];
 
         foreach ($models as $name => $modelClass) {
             $res[$name] = ['cnt' => 0, 's' => 0];
-            $s = time();
+            $timeMark = time();
             $model = new $modelClass();
             foreach ($keys as $key) {
                 (new \Models\SessionStat())->updateStats($key);
@@ -39,13 +45,14 @@ class Totals extends AbstractCron {
                 $res[$name]['cnt'] += $cnt;
                 if (time() - $start > \Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {
                     // TODO: any reason to put the rest keys to queue?
-                    $res[$name]['s'] = time() - $s;
+                    $res[$name]['s'] = time() - $timeMark;
                     break 2;
                 }
             }
-            $res[$name]['s'] = time() - $s;
+            $res[$name]['s'] = time() - $timeMark;
         }
 
-        $this->log(sprintf('Updated %s entities for %s keys and %s models in %s seconds.', array_sum(array_column(array_values($res), 'cnt')), count($keys), count($models), time() - $start));
+
+        $this->addLog(sprintf('Updated %s entities for %s keys and %s models in %s seconds.', array_sum(array_column(array_values($res), 'cnt')), count($keys), count($models), time() - $start));
     }
 }

@@ -1,5 +1,5 @@
 <div class="card events-card" data-item-id="profile-form">
-    <form method="POST" action="/settings">
+    <form method="POST" action="{{ @BASE }}/settings">
         <input type="hidden" name="token" value="{{ @CSRF }}">
         <input type="hidden" name="cmd" value="changeTimeZone" />
 

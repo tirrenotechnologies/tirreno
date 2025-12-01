@@ -1,8 +1,10 @@
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {Button} from './Button.js?v=2';
 
-export class BlacklistGridActionButtons {
+export class BlacklistGridActionButtons extends Button {
 
     constructor(tableId) {
+        super();
         this.tableId = tableId;
         const onTableLoaded = this.onTableLoaded.bind(this);
         window.addEventListener('tableLoaded', onTableLoaded, false);
@@ -22,7 +24,7 @@ export class BlacklistGridActionButtons {
 
         const me = this;
         const target = e.target;
-        const url  = '/admin/removeBlacklisted';
+        const url  = `${window.app_base}/admin/removeBlacklisted`;
 
         const data = {
             id:    target.dataset.itemId,
@@ -74,6 +76,7 @@ export class BlacklistGridActionButtons {
         if (tableRow) {
             const dataTable = $(`#${me.tableId}`).DataTable();
             dataTable.row(tableRow).remove().draw(false);
+            me.setBlacklistMenuCount();
         }
     }
 

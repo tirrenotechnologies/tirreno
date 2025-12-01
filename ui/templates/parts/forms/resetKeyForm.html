@@ -1,4 +1,4 @@
-<form method="POST" action="{{ 'api' | alias }}">
+<form method="POST" action="{{ @BASE }}{{ 'api' | alias }}">
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="cmd" value="resetKey">
     <input type="hidden" name="keyId" value="{{ @id }}">

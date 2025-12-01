@@ -39,11 +39,11 @@ import {
 
 export class EventPanel extends BasePanel {
 
-    constructor() {
-        let eventParams = {
+    constructor(eventParams = null) {
+        eventParams = eventParams !== null ? eventParams : {
             enrichment: false,
             type: 'event',
-            url: '/admin/eventDetails',
+            url: `${window.app_base}/admin/eventDetails`,
             cardId: 'event-card',
             panelClosed: 'eventPanelClosed',
             closePanel: 'closeEventPanel',

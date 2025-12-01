@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Ips;
 
 class Grid extends \Models\Grid\Base\Grid {
-    use \Traits\Enrichment\Ips;
-
     public function __construct(int $apiKey) {
         parent::__construct();
 
@@ -38,7 +38,7 @@ class Grid extends \Models\Grid\Base\Grid {
         return $this->getGrid($this->idsModel->getIpsIdsByIspId(), $params);
     }
 
-    public function getIpsByDomainId($domainId) {
+    public function getIpsByDomainId(int $domainId): array {
         $params = [':domain_id' => $domainId];
 
         return $this->getGrid($this->idsModel->getIpsIdsByDomainId(), $params);
@@ -62,11 +62,17 @@ class Grid extends \Models\Grid\Base\Grid {
         return $this->getGrid($this->idsModel->getIpsIdsByResourceId(), $params);
     }
 
+    public function getIpsByFieldId(int $fieldId): array {
+        $params = [':field_id' => $fieldId];
+
+        return $this->getGrid($this->idsModel->getIpsIdsByFieldId(), $params);
+    }
+
     public function getAllIps() {
         return $this->getGrid();
     }
 
     protected function calculateCustomParams(array &$result): void {
-        $this->calculateIpType($result);
+        \Utils\Enrichment::calculateIpType($result);
     }
 }

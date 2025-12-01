@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,29 +13,23 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Countries;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\ApiKeys;
-    use \Traits\Navigation;
+class Navigation extends \Controllers\Admin\Base\Navigation {
+    public function __construct() {
+        parent::__construct();
 
-    public function showIndexPage(): void {
-        $this->redirectIfUnlogged();
-
-        $pageController = new Page();
-        $this->response = new \Views\Frontend();
-        $this->response->data = $pageController->getPageParams();
+        $this->controller = new Data();
+        $this->page = new Page();
     }
 
     public function getList(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        return $apiKey ? (new Data())->getList($apiKey) : [];
+        return $this->apiKey ? $this->controller->getList($this->apiKey) : [];
     }
 
     public function getMap(): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-
-        return $apiKey ? (new Data())->getMap($apiKey) : [];
+        return $this->apiKey ? $this->controller->getMap($this->apiKey) : [];
     }
 }

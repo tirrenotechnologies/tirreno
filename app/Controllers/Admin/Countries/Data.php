@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,9 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Countries;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
 
@@ -38,41 +40,15 @@ class Data extends \Controllers\Base {
 
         $model = new \Models\Map();
 
-        $ispId = $this->f3->get('REQUEST.ispId');
-        $userId = $this->f3->get('REQUEST.userId');
-        $botId = $this->f3->get('REQUEST.botId');
-        $domainId = $this->f3->get('REQUEST.domainId');
-        $resourceId = $this->f3->get('REQUEST.resourceId');
+        $map = [
+            'userId'        => 'getCountriesByUserId',
+            'ispId'         => 'getCountriesByIspId',
+            'botId'         => 'getCountriesByDeviceId',
+            'domainId'      => 'getCountriesByDomainId',
+            'resourceId'    => 'getCountriesByResourceId',
+        ];
 
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getCountriesByUserId($userId, $apiKey);
-        }
-
-        if (isset($ispId) && is_numeric($ispId)) {
-            $result = $model->getCountriesByIspId($ispId, $apiKey);
-        }
-
-        if (isset($domainId) && is_numeric($domainId)) {
-            $result = $model->getCountriesByDomainId($domainId, $apiKey);
-        }
-
-        if (isset($botId) && is_numeric($botId)) {
-            $result = $model->getCountriesByBotId($botId, $apiKey);
-        }
-
-        if (isset($resourceId) && is_numeric($resourceId)) {
-            $result = $model->getCountriesByResourceId($resourceId, $apiKey);
-        }
-
-        if (!$result) {
-            $dateFrom = $this->f3->get('REQUEST.dateFrom');
-            $dateTo = $this->f3->get('REQUEST.dateTo');
-
-            $dateFrom = ($dateFrom) ? date('Y-m-d H:i:s', strtotime($dateFrom)) : null;
-            $dateTo = ($dateTo) ? date('Y-m-d H:i:s', strtotime($dateTo)) : null;
-
-            $result = $model->getAllCountries($dateFrom, $dateTo, $apiKey);
-        }
+        $result = $this->idMapIterate($map, $model, 'getAllCountriesByDateRange', $apiKey);
 
         return $result;
     }

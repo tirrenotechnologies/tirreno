@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,11 +13,11 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Data;
 
-class Navigation extends \Controllers\Base {
-    use \Traits\Navigation;
-
+class Navigation extends \Controllers\Admin\Base\Navigation {
     private $dataController;
 
     public function beforeroute(): void {
@@ -26,7 +26,7 @@ class Navigation extends \Controllers\Base {
             $this->f3->error(403);
         }
 
-        $this->redirectIfUnlogged();
+        \Utils\Routes::redirectIfUnlogged();
 
         $this->dataController = new Data();
         $this->response = new \Views\Json();
@@ -114,6 +114,10 @@ class Navigation extends \Controllers\Base {
         $this->response->data = $this->dataController->getEventDetails();
     }
 
+    public function getFieldEventDetails(): void {
+        $this->response->data = $this->dataController->getFieldEventDetails();
+    }
+
     public function getLogbookDetails(): void {
         $this->response->data = $this->dataController->getLogbookDetails();
     }
@@ -148,6 +152,10 @@ class Navigation extends \Controllers\Base {
 
     public function getFieldAuditTrail(): void {
         $this->response->data = $this->dataController->getFieldAuditTrail();
+    }
+
+    public function getFieldAudits(): void {
+        $this->response->data = $this->dataController->getFieldAudits();
     }
 
     public function getUserScoreDetails(): void {
@@ -188,6 +196,10 @@ class Navigation extends \Controllers\Base {
 
     public function getReviewUsersQueueCount(): void {
         $this->response->data = $this->dataController->getReviewUsersQueueCount();
+    }
+
+    public function getBlacklistUsersCount(): void {
+        $this->response->data = $this->dataController->getBlacklistUsersCount();
     }
 
     public function getSearchResults(): void {

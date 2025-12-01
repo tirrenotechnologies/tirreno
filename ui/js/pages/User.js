@@ -9,10 +9,11 @@ import {BaseBarChart} from '../parts/chart/BaseBar.js?v=2';
 import {BaseSparklineChart} from '../parts/chart/BaseSparkline.js?v=2';
 import {UserTiles} from '../parts/details/UserTiles.js?v=2';
 import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
+import {FieldPanel} from '../parts/panel/FieldPanel.js?v=2';
 import {SingleReviewButton} from '../parts/SingleReviewButton.js?v=2';
 import {ScoreDetails} from '../parts/ScoreDetails.js?v=2';
 import {PhonesGrid} from '../parts/grid/Phones.js?v=2';
-import {FieldAuditTrailGrid} from '../parts/grid/payloads/FieldAuditTrail.js?v=2';
+import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=2';
 import {IspsGrid} from '../parts/grid/Isps.js?v=2';
 
 import {EmailPanel} from '../parts/panel/EmailPanel.js?v=2';
@@ -37,6 +38,9 @@ export class UserPage extends BasePage {
         eventsGridParams.sessionGroup = true;
         eventsGridParams.singleUser = true;
 
+        const fieldAuditTrailGridParams = this.getFieldAuditTrailParams();
+        fieldAuditTrailGridParams.singleUser = true;
+
         const mapParams         = this.getMapParams();
         const chartParams       = this.getBarChartParams();
         const statsChartParams  = {
@@ -52,7 +56,7 @@ export class UserPage extends BasePage {
         mapParams.tileId            = null;
 
         const emailsGridParams = {
-            url:        '/admin/loadEmails',
+            url:        `${window.app_base}/admin/loadEmails`,
             tableId:    'emails-table',
             panelType:  'email',
 
@@ -62,18 +66,9 @@ export class UserPage extends BasePage {
         };
 
         const phonesGridParams = {
-            url:        '/admin/loadPhones',
+            url:        `${window.app_base}/admin/loadPhones`,
             tableId:    'phones-table',
             panelType:  'phone',
-
-            isSortable: false,
-
-            getParams:  this.getParams,
-        };
-
-        const fieldAuditTrailGridParams = {
-            url:        '/admin/loadFieldAuditTrail',
-            tableId:    'field-audit-trail-table',
 
             isSortable: false,
 
@@ -88,6 +83,7 @@ export class UserPage extends BasePage {
 
         new SingleReviewButton(this.id);
         new EventPanel();
+        new FieldPanel();
         new DevicePanel();
         new ReenrichmentButton();
 

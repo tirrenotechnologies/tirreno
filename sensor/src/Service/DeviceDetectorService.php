@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -34,8 +34,8 @@ class DeviceDetectorService {
             return null;
         }
 
-        $dd = new DeviceDetector($userAgent);
-        $dd->parse();
+        $detector = new DeviceDetector($userAgent);
+        $detector->parse();
 
         $deviceType = null;
         $browserName = null;
@@ -44,15 +44,15 @@ class DeviceDetectorService {
         $osVersion = null;
         $modified = false;
 
-        if ($dd->isBot()) {
+        if ($detector->isBot()) {
             $deviceType = 'bot';
-            $botInfo = $dd->getBot();
+            $botInfo = $detector->getBot();
             $osName = $this->valueOrNull('name', $botInfo);
             $modified = true;
         } else {
-            $deviceTypeInt = $dd->getDevice();
-            $clientInfo = $dd->getClient();
-            $osInfo = $dd->getOs();
+            $deviceTypeInt = $detector->getDevice();
+            $clientInfo = $detector->getClient();
+            $osInfo = $detector->getOs();
 
             $deviceType = $deviceTypeInt !== null ? AbstractDeviceParser::getDeviceName($deviceTypeInt) : null;
             $browserName = $this->valueOrNull('name', $clientInfo);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,47 +13,39 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Bot;
 
-class Data extends \Controllers\Base {
-    use \Traits\ApiKeys;
-
-    public function proceedPostRequest(array $params): array {
-        return match ($params['cmd']) {
-            'reenrichment' => $this->enrichEntity($params),
+class Data extends \Controllers\Admin\Base\Data {
+    public function proceedPostRequest(): array {
+        return match (\Utils\Conversion::getStringRequestParam('cmd')) {
+            'reenrichment' => $this->enrichEntity(),
             default => []
         };
     }
 
-    public function enrichEntity(array $params): array {
+    public function enrichEntity(): array {
         $dataController = new \Controllers\Admin\Enrichment\Data();
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $enrichmentKey = $this->getCurrentOperatorEnrichmentKeyString();
-        $type = $params['type'];
-        $search = $params['search'] ?? null;
-        $entityId = isset($params['entityId']) ? (int) $params['entityId'] : null;
+        $apiKey = \Utils\ApiKeys::getCurrentOperatorApiKeyId();
+        $enrichmentKey = \Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
+
+        $type       = \Utils\Conversion::getStringRequestParam('type');
+        $search     = \Utils\Conversion::getStringRequestParam('search', true);
+        $entityId   = \Utils\Conversion::getIntRequestParam('entityId', true);
 
         return $dataController->enrichEntity($type, $search, $entityId, $apiKey, $enrichmentKey);
     }
 
-    public function checkIfOperatorHasAccess(int $botId): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Bot();
-
-        return $model->checkAccess($botId, $apiKey);
+    public function checkIfOperatorHasAccess(int $botId, int $apiKey): bool {
+        return (new \Models\Bot())->checkAccess($botId, $apiKey);
     }
 
-    public function getBotDetails(int $botId): array {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\Bot();
-
-        return $model->getFullBotInfoById($botId, $apiKey);
+    public function getBotDetails(int $botId, int $apiKey): array {
+        return (new \Models\Bot())->getFullBotInfoById($botId, $apiKey);
     }
 
-    public function isEnrichable(): bool {
-        $apiKey = $this->getCurrentOperatorApiKeyId();
-        $model = new \Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('ua', $apiKey);
+    public function isEnrichable(int $apiKey): bool {
+        return (new \Models\ApiKeys())->attributeIsEnrichable('ua', $apiKey);
     }
 }

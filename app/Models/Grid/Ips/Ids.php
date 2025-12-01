@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,6 +13,8 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Models\Grid\Ips;
 
 class Ids extends \Models\Grid\Base\Ids {
@@ -22,8 +24,8 @@ class Ids extends \Models\Grid\Base\Ids {
                 event.ip AS itemid
             FROM event
             WHERE
-                event.key = :api_key
-                AND event.account = :account_id'
+                event.key = :api_key AND
+                event.account = :account_id'
         );
     }
 
@@ -33,8 +35,8 @@ class Ids extends \Models\Grid\Base\Ids {
                 event_ip.id AS itemid
             FROM event_ip
             WHERE
-                event_ip.key = :api_key
-                AND event_ip.isp = :isp_id'
+                event_ip.key = :api_key AND
+                event_ip.isp = :isp_id'
         );
     }
 
@@ -46,8 +48,8 @@ class Ids extends \Models\Grid\Base\Ids {
             LEFT JOIN event_email
             ON (event.email = event_email.id)
             WHERE
-                event_email.key = :api_key
-                AND event_email.domain = :domain_id'
+                event_email.key = :api_key AND
+                event_email.domain = :domain_id'
         );
     }
 
@@ -83,6 +85,19 @@ class Ids extends \Models\Grid\Base\Ids {
             WHERE
                 event.url = :resource_id AND
                 event.key = :api_key'
+        );
+    }
+
+    public function getIpsIdsByFieldId(): string {
+        return (
+            'SELECT DISTINCT
+                event.ip AS itemid
+            FROM event
+            INNER JOIN event_field_audit_trail
+            ON (event.id = event_field_audit_trail.event_id)
+            WHERE
+                event_field_audit_trail.field_id = :field_id AND
+                event_field_audit_trail.key = :api_key'
         );
     }
 }

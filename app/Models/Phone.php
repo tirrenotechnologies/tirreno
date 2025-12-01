@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -12,6 +12,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.tirreno.com Tirreno(tm)
  */
+
+declare(strict_types=1);
 
 namespace Models;
 
@@ -108,8 +110,8 @@ class Phone extends \Models\BaseSql {
             FROM
                 event_phone
             WHERE
-                event_phone.key = :api_key
-                AND event_phone.phone_number = :phone_value'
+                event_phone.phone_number = :phone_value AND
+                event_phone.key = :api_key'
         );
 
         $params = [
@@ -137,8 +139,8 @@ class Phone extends \Models\BaseSql {
                 SET fraud_detected = :fraud
 
             WHERE
-                key = :api_key
-                AND id IN ({$placeHolders})"
+                id IN ({$placeHolders}) AND
+                key = :api_key"
         );
 
         $this->execQuery($query, $params);
@@ -198,8 +200,8 @@ class Phone extends \Models\BaseSql {
                 event_phone
 
             WHERE
-                event_phone.key = :api_key
-                AND event_phone.id = :id
+                event_phone.id      = :id AND
+                event_phone.key     = :api_key
 
             LIMIT 1"
         );

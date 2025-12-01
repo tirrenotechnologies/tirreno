@@ -47,7 +47,7 @@ export class BaseSparklineChart extends BaseChart {
                     label: 'Day',
                     scale: 'DAY',
                     value: '{YYYY}-{MM}-{DD}',
-                    stroke: '#8180a0',
+                    stroke: '#90a1b9',
                 },
                 {
                     label: 'This week',

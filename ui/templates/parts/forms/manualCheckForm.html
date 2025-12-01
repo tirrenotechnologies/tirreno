@@ -1,5 +1,5 @@
 <div class="card events-card" data-item-id="manual-check-form">
-    <form method="POST" action="{{ 'manualCheck' | alias }}">
+    <form method="POST" action="{{ @BASE }}{{ 'manualCheck' | alias }}">
         <input type="hidden" name="token" value="{{ @CSRF }}">
 
         <header class="card-header">

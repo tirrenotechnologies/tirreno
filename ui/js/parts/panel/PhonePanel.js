@@ -16,7 +16,7 @@ export class PhonePanel extends BasePanel {
         let eventParams = {
             enrichment: true,
             type: 'phone',
-            url: '/admin/phoneDetails',
+            url: `${window.app_base}/admin/phoneDetails`,
             cardId: 'phone-card',
             panelClosed: 'phonePanelClosed',
             closePanel: 'closePhonePanel',

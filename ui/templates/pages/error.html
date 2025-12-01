@@ -2,14 +2,18 @@
 <section class="front-block">
 
     <div class="container">
-        <code><span style="background:#8080AA;color:#2B2A3D;">&nbsp;A secret place!&nbsp;</span><br>
+        <code><span style="background:#8080AA;color:#2b2a39;">&nbsp;A secret place!&nbsp;</span><br>
             <check if="{{ isset(@ERROR_DATA) }}">
                 <true>
                     <p>* {{ @ERROR_DATA.message }}</p>
+                    <check if="{{ isset(@ERROR_DATA.extra_message) }}">
+                    <p>  {{ @ERROR_DATA.extra_message | raw }}</p>
+                    </check>
                 </true>
             </check>
         </code>
         <br>
+        <!-- Cross my heart by KilledByAPixel -->
         <div class="game"><pre id=b></pre></div><script>
         s=Array(50).fill(' '.repeat(100)).join('\n');
         b.innerText = s.slice(0,20*101+25) + '[· P R E S S   A N Y    K E Y   T O   S T A R T ·]' + s.slice(20*101+26+22,50*101);
@@ -30,9 +34,7 @@
             onkeydownOrignal(e);
         }
         }
-        </script>
-        <br>
-        <div class="level-right"><small>Cross my heart by KilledByAPixel</small></div>
+        </script>        
     </div>
 </section>
 

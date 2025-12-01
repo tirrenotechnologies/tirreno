@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,42 +13,28 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Devices;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $result = [];
         $model = new \Models\Grid\Devices\Grid($apiKey);
 
-        $ipId = $this->f3->get('REQUEST.ipId');
-        $userId = $this->f3->get('REQUEST.userId');
-        $resourceId = $this->f3->get('REQUEST.resourceId');
+        $map = [
+            'ipId'          => 'getDevicesByIpId',
+            'userId'        => 'getDevicesByUserId',
+            'resourceId'    => 'getDevicesByResourceId',
+        ];
 
-        if (isset($ipId) && is_numeric($ipId)) {
-            $result = $model->getDevicesByIpId($ipId);
-        }
-
-        if (isset($userId) && is_numeric($userId)) {
-            $result = $model->getDevicesByUserId($userId);
-        }
-
-        if (isset($resourceId) && is_numeric($resourceId)) {
-            $result = $model->getDevicesByResourceId($resourceId);
-        }
-
-        if (!$result) {
-            $result = $model->getAllDevices();
-        }
+        $result = $this->idMapIterate($map, $model, 'getAllDevices');
 
         return $result;
     }
 
-    public function getDeviceDetails(int $apiKey): array {
-        $params = $this->f3->get('GET');
-        $id = $params['id'];
-        $model = new \Models\Device();
-
-        $details = $model->getFullDeviceInfoById($id, $apiKey);
+    public function getDeviceDetails(int $id, int $apiKey): array {
+        $details = (new \Models\Device())->getFullDeviceInfoById($id, $apiKey);
         $details['enrichable'] = $this->isEnrichable($apiKey);
 
         $tsColumns = ['created'];
@@ -58,8 +44,6 @@ class Data extends \Controllers\Base {
     }
 
     private function isEnrichable(int $apiKey): bool {
-        $model = new \Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('ua', $apiKey);
+        return (new \Models\ApiKeys())->attributeIsEnrichable('ua', $apiKey);
     }
 }

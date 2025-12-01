@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Tirreno ~ Open source user analytics
+ * tirreno ~ open security analytics
  * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -13,12 +13,20 @@
  * @link          https://www.tirreno.com Tirreno(tm)
  */
 
+declare(strict_types=1);
+
 namespace Controllers\Admin\Resources;
 
-class Data extends \Controllers\Base {
+class Data extends \Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
+        $result = [];
         $model = new \Models\Grid\Resources\Grid($apiKey);
-        $result = $model->getAllResources();
+
+        $map = [
+            'userId' => 'getResourcesByUserId',
+        ];
+
+        $result = $this->idMapIterate($map, $model, 'getAllResources');
 
         $ids = array_column($result['data'], 'id');
         if ($ids) {
