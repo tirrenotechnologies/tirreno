@@ -72,7 +72,7 @@ Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (*admin/
 
 1. [Download](https://www.tirreno.com/download.php) the latest version of tirreno (ZIP file).
 2. Extract the tirreno-master.zip file to the location where you want it installed on your web server.
-3. Navigate to `http://your-domain.example/install/index.php` in a browser to launch the installation process.
+3. Navigate to `http://your-domain.example/install/index.php` (`http://localhost:8585/install/` for Docker) in a browser to launch the installation process.
 4. After the successful installation, delete the `install/` directory and its contents.
 5. Navigate to `http://your-domain.example/signup/` in a browser to create administrator account.
 6. For cron jobs setup insert the following schedule (every 10 minutes) expression with `crontab -e` command or by editing `/var/spool/cron/your-web-server` file:
@@ -86,7 +86,7 @@ Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (*admin/
 To run tirreno within docker container you may use image published on [dockerhub](https://hub.docker.com/r/tirreno/tirreno).
 
 ```bash
-docker pull tirreno/tirreno:latest
+curl -sL tirreno.com/t.yml | docker compose -f - up -d
 ```
 
 ## Using Heroku (optional)
