@@ -49,6 +49,10 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
         if ($this->operator) {
             \Tirreno\Utils\Updates::syncUpdates();
 
+            if (!$this->apiKey) {
+                $this->f3->reroute('/logout');
+            }
+
             $messages = \Tirreno\Utils\SystemMessages::get($this->apiKey);
 
             $this->f3->set('SYSTEM_MESSAGES', $messages);
