@@ -7,7 +7,7 @@ class B11 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'The account has been created today.';
     public const ATTRIBUTES = [];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ea_days_since_account_creation']->notEqualTo(-1),
             $this->rb['ea_days_since_account_creation']->lessThan(1),

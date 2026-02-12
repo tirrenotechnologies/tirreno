@@ -48,6 +48,12 @@ DirectoryIndex index.php index.html index.htm
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule (^|/)ui/js/.+\.(map|css|js)$ - [L,QSA]
 
+  # Allow rule for file search in controller
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule (^|/)ui/js/.+\.(map|css|js)$ index.php [L,QSA]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule (^|/)ui/css/[^/]+\.css$ index.php [L,QSA]
+
   # Allow rule for sensor
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class ForgotPassword extends Base {
-    public $page = 'ForgotPassword';
+    public ?string $page = 'ForgotPassword';
 
     public function getPageParams(): array {
         if (!\Tirreno\Utils\Variables::getForgotPasswordAllowed()) {
@@ -35,16 +35,16 @@ class ForgotPassword extends Base {
 
             if (!$errorCode) {
                 $email = \Tirreno\Utils\Conversion::getStringRequestParam('email');
-                $operatorModel = new \Tirreno\Models\Operator();
-                $operatorModel->getActivatedByEmail($email);
+                $model = new \Tirreno\Models\Operator();
+                $operatorId = $model->getActivatedByEmail($email);
 
-                if ($operatorModel->loaded()) {
+                if ($operatorId) {
                     // Create forgot password record.
                     $forgotPasswordModel = new \Tirreno\Models\ForgotPassword();
-                    $forgotPasswordModel->add($operatorModel->id);
+                    $renewKey = $forgotPasswordModel->insertRecord($operatorId);
 
                     // Send forgot password email.
-                    $this->sendPasswordRenewEmail($operatorModel, $forgotPasswordModel);
+                    $this->sendPasswordRenewEmail($operatorId, $renewKey);
                 }
 
                 // Random sleep between 0.5 and 1 second to prevent timing attacks.
@@ -61,12 +61,13 @@ class ForgotPassword extends Base {
         return parent::applyPageParams($pageParams);
     }
 
-    private function sendPasswordRenewEmail(\Tirreno\Models\Operator $operatorModel, \Tirreno\Models\ForgotPassword $forgotPasswordModel): void {
+    private function sendPasswordRenewEmail(int $operatorId, string $renewKey): void {
         $url = \Tirreno\Utils\Variables::getHostWithProtocolAndBase();
 
-        $toName = $operatorModel->firstname;
-        $toAddress = $operatorModel->email;
-        $renewKey = $forgotPasswordModel->renew_key;
+        $operator = \Tirreno\Entities\Operator::getById($operatorId);
+
+        $toName = $operator->firstname;
+        $toAddress = $operator->email;
 
         $subject = $this->f3->get('ForgotPassowrd_renew_password_subject');
         $message = $this->f3->get('ForgotPassowrd_renew_password_body');

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\ReviewQueue;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminReviewQueue';
+    public ?string $page = 'AdminReviewQueue';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminReviewQueue_search_placeholder');

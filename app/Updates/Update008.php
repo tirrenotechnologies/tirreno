@@ -15,21 +15,19 @@
 
 declare(strict_types=1);
 
-namespace Tirreno\Utils\Assets\Lists;
+namespace Tirreno\Updates;
 
-class Constants extends Base {
-    protected static string $extensionFile = 'constants.php';
-    protected static string $path = '/assets/dashboard/';
+class Update008 extends Base {
+    public static string $version = 'v0.9.12';
 
-    protected static array $list = [
-        'user_details_total_limits' => [
-            'ips'           => 7,
-            'isps'          => 5,
-            'countries'     => 3,
-            'user_agents'   => 4,
-            'edits'         => 1,
-            'events'        => 100,
-            'sessions'      => 20,
-        ],
-    ];
+    public static function apply(\DB\SQL $database): void {
+        $queries = [
+            'ALTER TABLE ONLY dshb_operators_rules ADD CONSTRAINT dshb_operators_rules_key_rule_uid_key UNIQUE (key, rule_uid)',
+            'DROP TABLE dshb_operators_change_email',
+        ];
+
+        foreach ($queries as $sql) {
+            $database->exec($sql);
+        }
+    }
 }

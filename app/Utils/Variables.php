@@ -62,9 +62,9 @@ class Variables {
     }
 
     public static function getLogbookLimit(): int {
-        $value = getenv('LOGBOOK_LIMIT') ?: self::getF3()->get('LOGBOOK_LIMIT') ?: \Tirreno\Utils\Constants::get('LOGBOOK_LIMIT');
+        $value = getenv('LOGBOOK_LIMIT') ?: self::getF3()->get('LOGBOOK_LIMIT') ?: \Tirreno\Utils\Constants::get()->LOGBOOK_LIMIT;
 
-        return \Tirreno\Utils\Conversion::intValCheckEmpty($value, \Tirreno\Utils\Constants::get('LOGBOOK_LIMIT'));
+        return \Tirreno\Utils\Conversion::intValCheckEmpty($value, \Tirreno\Utils\Constants::get()->LOGBOOK_LIMIT);
     }
 
     public static function getForgotPasswordAllowed(): bool {
@@ -101,15 +101,15 @@ class Variables {
     }
 
     public static function getAccountOperationQueueBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'), \Tirreno\Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'));
+        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_BATCH_SIZE);
     }
 
     public static function getNewEventsBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('NEW_EVENTS_BATCH_SIZE'), \Tirreno\Utils\Constants::get('NEW_EVENTS_BATCH_SIZE'));
+        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('NEW_EVENTS_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->NEW_EVENTS_BATCH_SIZE);
     }
 
     public static function getRuleUsersBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('RULE_USERS_BATCH_SIZE'), \Tirreno\Utils\Constants::get('RULE_USERS_BATCH_SIZE'));
+        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('RULE_USERS_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->RULE_USERS_BATCH_SIZE);
     }
 
     public static function getAvailableTimezones(): array {

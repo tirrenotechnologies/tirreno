@@ -7,7 +7,7 @@ class I03 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'User may have exhibited unwanted activity before at other web services.';
     public const ATTRIBUTES = ['ip'];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['eip_blocklist']->equalTo(true),
         );

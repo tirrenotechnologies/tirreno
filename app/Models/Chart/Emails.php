@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Emails extends Base {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);

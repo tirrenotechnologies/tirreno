@@ -9,8 +9,6 @@ import {ResourcesGrid} from '../parts/grid/Resources.js?v=2';
 export class ResourcesPage extends BasePage {
     constructor() {
         super('resources');
-
-        this.initUi();
     }
 
     initUi() {

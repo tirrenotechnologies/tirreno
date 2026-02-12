@@ -1,6 +1,6 @@
 import {BaseChart}  from './BaseChart.js?v=2';
-import {COLOR_MAP} from '../utils/Constants.js?v=2';
 import {formatIntTimeUtc} from '../utils/Date.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 import {renderChartTooltipPart} from '../DataRenderers.js?v=2';
 
 export class BaseBarChart extends BaseChart {
@@ -23,8 +23,8 @@ export class BaseBarChart extends BaseChart {
             label:      label,
             width:      -1,
             drawStyle:  1,
-            fill: 	    COLOR_MAP[color].main,
-            stroke:     COLOR_MAP[color].main,
+            fill: 	    Constants.COLOR_MAP[color].main,
+            stroke:     Constants.COLOR_MAP[color].main,
             paths:      uPlot.paths.bars({size: [0.6, 100]}),
             points:     {show: false},
         };

@@ -68,12 +68,10 @@ final class RoutesTest extends TestCase {
     }
 
     public static function currentRequestOperatorProvider(): array {
+        // TODO: add Operator obj
         return [
             'null' => [
                 'currentUser' => null,
-            ],
-            'false' => [
-                'currentUser' => false,
             ],
         ];
     }

@@ -22,9 +22,9 @@ class X03 extends \Tirreno\Assets\Rule {
     * The rule fires when the user's ID starts with the digit '1',
     * as determined by the 'extra_one_digit_userid' context flag.
     *
-    * @return \Ruler\Proposition The rule condition to evaluate
+    * @return \Ruler\Operator\LogicalOperator The rule condition to evaluate
     */
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['extra_one_digit_userid']->equalTo(true),
         );

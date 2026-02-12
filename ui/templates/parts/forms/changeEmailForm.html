@@ -10,11 +10,6 @@
 
         <div class="card-content">
             <div class="content">
-                <check if="{{ @waitingForConfirmation }}">
-                    <div class="warning-text">
-                        {{ sprintf(@AdminSettings_changeEmail_approval_pending, @waitingForConfirmation) }}
-                    </div>
-                </check>
                 <div class="field">
                     <label class="label">{{ @AdminSettings_changeEmail_form_field_email_label }}</label>
                     <div class="control">

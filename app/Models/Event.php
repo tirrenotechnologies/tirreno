@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Event extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getLastEvent(int $apiKey): array {
         $params = [

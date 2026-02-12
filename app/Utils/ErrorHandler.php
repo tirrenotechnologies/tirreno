@@ -49,7 +49,7 @@ class ErrorHandler {
         $errorMessage = join(', ', ['ERROR_' . $errorCode, $f3->get('ERROR.text')]);
 
         return [
-            'ip' => $f3->IP,
+            'ip' => $f3->get('IP'),
             'code' => $errorCode,
             'message' => $errorMessage,
             'trace' => join('<br>', $errorTraceArray),
@@ -76,7 +76,7 @@ class ErrorHandler {
         if ($database && \Tirreno\Utils\Routes::getCurrentRequestOperator()) {
             $errorData['sql_log'] = $database->log();
             $logModel = new \Tirreno\Models\Log();
-            $logModel->add($errorData);
+            $logModel->insertRecord($errorData);
 
             \Tirreno\Utils\Logger::log('SQL', $errorData['sql_log']);
         }
@@ -155,9 +155,11 @@ class ErrorHandler {
             $pageController = new \Tirreno\Controllers\Pages\Error();
 
             $errorData['message'] = 'ERROR_' . $errorData['code'];
+            $errorData['raw'] = false;
 
             if ($errorData['code'] !== 404) {
                 $errorData['extra_message'] = $f3->get('ErrorPage_extra_message');
+                $errorData['raw'] = true;
             }
 
             if ($errorData['code'] === 400) {
@@ -195,7 +197,5 @@ class ErrorHandler {
             return false;
         }
         throw new \ErrorException($message, 0, $severity, $file, $line);
-
-        return true;
     }
 }

@@ -9,7 +9,7 @@ class A06 extends \Tirreno\Assets\Rule {
 
     protected function prepareParams(array $params): array {
         $pwdChangeInNewCountry = false;
-        $pwdChange = \Tirreno\Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
+        $pwdChange = \Tirreno\Utils\Constants::get()->ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID;
 
         if (count(array_unique($params['eip_country_id'])) > 1) {
             foreach ($params['event_type'] as $idx => $event) {
@@ -27,7 +27,7 @@ class A06 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['event_password_change_in_new_country']->equalTo(true),
         );

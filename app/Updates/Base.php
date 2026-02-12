@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 abstract class Base {
-    public static $version = '';
+    public static string $version = '';
 
-    abstract public static function apply($database): void;
+    abstract public static function apply(\DB\SQL $database): void;
 
     public static function isApplied(\Tirreno\Models\Updates $updatesModel): bool {
         return $updatesModel->isApplied(static::$version, 'core');

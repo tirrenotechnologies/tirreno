@@ -26,6 +26,7 @@ class Updates {
         \Tirreno\Updates\Update005::class,
         \Tirreno\Updates\Update006::class,
         \Tirreno\Updates\Update007::class,
+        \Tirreno\Updates\Update008::class,
     ];
 
     public static function syncUpdates(): void {

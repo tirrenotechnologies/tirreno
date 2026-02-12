@@ -1,10 +1,6 @@
-Release song: https://youtu.be/PWMCbEzRF1E
+Release song: https://youtu.be/9zQX2XqAE8c&t=52s
 
-tirreno is thrilled to announce v0.9.11.
+tirreno is announcing v0.9.12.
 
-This release celebrates 1,000 stars since tirreno was open-sourced.
-It contains improved extendable context for easier risk rule creation,
-an improved installation workflow, and preset rules for account takeover,
-credential stuffing, content spam, account registration,
-fraud prevention, insider threat, bot detection, dormant accounts,
-multi-accounting, promo abuse, API protection, high-risk regions, and more.
+This release introduces optimized class for frontend constants overrides,
+improves outgoing HTTP requests and installation process.

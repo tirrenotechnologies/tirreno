@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Views;
 
 class Xml extends Base {
-    public function render(): string|false|null {
+    public function render(): array {
         header('Content-Type: text/xml');
 
         return $this->data;

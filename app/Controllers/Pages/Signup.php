@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class Signup extends Base {
-    public $page = 'Signup';
+    public ?string $page = 'Signup';
 
     public function getPageParams(): array {
         $model = new \Tirreno\Models\Operator();
@@ -29,12 +29,13 @@ class Signup extends Base {
         $pageParams = [
             'HTML_FILE'     => 'signup.html',
             'TIMEZONES'     => \Tirreno\Utils\Timezones::timezonesList(),
+            'RULES_PRESETS' => \Tirreno\Utils\Constants::get()->RULES_PRESETS,
         ];
 
         if ($this->isPostRequest()) {
             \Tirreno\Utils\Updates::syncUpdates();
 
-            $params = $this->extractRequestParams(['token', 'email', 'password', 'timezone']);
+            $params = $this->extractRequestParams(['token', 'email', 'password', 'timezone', 'rules-preset']);
             $errorCode = \Tirreno\Utils\Validators::validateSignup($params);
 
             $pageParams['ERROR_CODE'] = $errorCode;
@@ -42,13 +43,12 @@ class Signup extends Base {
             if ($errorCode) {
                 $pageParams['VALUES'] = $params;
             } else {
-                $operatorModel = $this->addUser($params);
+                $operatorId = $this->addUser($params);
 
-                $operatorId = $operatorModel->id;
                 $apiKey = $this->addDefaultApiKey($operatorId);
-                (new \Tirreno\Controllers\Admin\Rules\Data())->applyRulesPresetById('base', $apiKey);
+                (new \Tirreno\Controllers\Admin\Rules\Data())->applyRulesPresetById($params['rules-preset'], $apiKey);
 
-                //$this->sendActivationEmail($operatorModel);
+                //$this->sendActivationEmail($operatorId);
                 $pageParams['SUCCESS_CODE'] = \Tirreno\Utils\ErrorCodes::ACCOUNT_CREATED;
             }
         }
@@ -57,31 +57,25 @@ class Signup extends Base {
     }
 
     private function addDefaultApiKey(int $operatorId): int {
-        $data = [
-            'quote' => $this->f3->get('DEFAULT_API_KEY_QUOTE'),
-            'operator_id' => $operatorId,
-            'skip_enriching_attributes' => json_encode(array_keys(\Tirreno\Utils\Constants::get('ENRICHING_ATTRIBUTES'))),
-            'skip_blacklist_sync' => true,
-        ];
-
+        $skipEnrichingAttr = json_encode(array_keys(\Tirreno\Utils\Constants::get()->ENRICHING_ATTRIBUTES));
         $model = new \Tirreno\Models\ApiKeys();
 
-        return $model->add($data);
+        return $model->insertRecord($skipEnrichingAttr, true, $operatorId);
     }
 
-    protected function addUser(array $data): \Tirreno\Models\Operator {
+    protected function addUser(array $data): int {
         $model = new \Tirreno\Models\Operator();
-        $model->add($data);
 
-        return $model;
+        return $model->insertRecord($data['password'], $data['email'], $data['timezone']);
     }
 
-    private function sendActivationEmail(\Tirreno\Models\Operator $operatorModel): void {
+    /*private function sendActivationEmail(int $operatorId): void {
+        $operator = \Tirreno\Entities\Operator::getById($operatorId);
         $url = \Tirreno\Utils\Variables::getHostWithProtocolAndBase();
 
-        $toName = $operatorModel->firstname;
-        $toAddress = $operatorModel->email;
-        $activationKey = $operatorModel->activation_key;
+        $toName = $operator->firstname;
+        $toAddress = $operator->email;
+        $activationKey = $operator->activationKey;
 
         $subject = $this->f3->get('Signup_activation_email_subject');
         $message = $this->f3->get('Signup_activation_email_body');
@@ -90,5 +84,5 @@ class Signup extends Base {
         $message = sprintf($message, $activationUrl);
 
         \Tirreno\Utils\Mailer::send($toName, $toAddress, $subject, $message);
-    }
+    }*/
 }

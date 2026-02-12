@@ -8,8 +8,6 @@ import {FieldAuditsGrid} from '../parts/grid/FieldAudits.js?v=2';
 export class FieldAuditsPage extends BasePage {
     constructor() {
         super('fields');
-
-        this.initUi();
     }
 
     initUi() {

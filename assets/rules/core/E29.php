@@ -7,7 +7,7 @@ class E29 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'The earliest data breach associated with the email appeared more than 3 years ago. Can be used as sign of aged email.';
     public const ATTRIBUTES = ['email'];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ee_days_since_first_breach']->greaterThan(365 * 3),
         );

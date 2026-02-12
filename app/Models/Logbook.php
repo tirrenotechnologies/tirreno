@@ -18,14 +18,14 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Logbook extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_logbook';
+    protected ?string $DB_TABLE_NAME = 'event_logbook';
 
     public function getLastSucceededEvent(int $apiKey): array {
         $params = [
             ':api_key'          => $apiKey,
             ':endpoint'         => '/sensor/',
-            ':success'          => \Tirreno\Utils\Constants::LOGBOOK_ERROR_TYPE_SUCCESS,
-            ':validation_error' => \Tirreno\Utils\Constants::LOGBOOK_ERROR_TYPE_VALIDATION_ERROR,
+            ':success'          => \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_SUCCESS,
+            ':validation_error' => \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_VALIDATION_ERROR,
         ];
 
         $query = (

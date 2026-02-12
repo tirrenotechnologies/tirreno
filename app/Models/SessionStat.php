@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class SessionStat extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_session_stat';
+    protected ?string $DB_TABLE_NAME = 'event_session_stat';
 
     public function updateTotalsByAccountIds(array $ids, int $apiKey): ?int {
         if (!count($ids)) {

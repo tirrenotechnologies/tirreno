@@ -33,7 +33,7 @@ class Cron extends \Prefab {
     ];
     public const PATTERN = '/^(\*|\d+)(?:-(\d+))?(?:\/(\d+))?$/';
 
-    protected $f3;
+    protected \Base $f3;
     protected array $jobs = [];
     protected array $forceRun = [];
     protected bool $runForcedOnly = false;

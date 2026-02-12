@@ -11,8 +11,6 @@ import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
 export class CountryPage extends BasePage {
     constructor() {
         super('country', true);
-
-        this.initUi();
     }
 
     initUi() {

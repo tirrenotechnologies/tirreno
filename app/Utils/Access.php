@@ -42,18 +42,16 @@ class Access {
 
     public static function checkApiKeyAccess(int $keyId, int $operatorId): bool {
         $model = new \Tirreno\Models\ApiKeys();
-        $model->getByKeyAndOperatorId($keyId, $operatorId);
+        $keyExists = $model->existsByKeyAndOperatorId($keyId, $operatorId);
 
-        if (!$model->loaded()) {
-            $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
-
-            if (!$coOwnerModel->loaded()) {
-                return false;
-            }
+        if ($keyExists) {
+            return true;
         }
 
-        return true;
+        $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
+        $key = $coOwnerModel->getCoOwnershipKeyId($operatorId);
+
+        return boolval($key);
     }
 
     public static function checkCurrentOperatorApiKeyAccess(int $keyId): bool {
@@ -67,24 +65,33 @@ class Access {
     }
 
     public static function getCurrentOperatorApiKeyId(): ?int {
-        $operatorId = self::getCurrentOperatorId();
+        return \Tirreno\Utils\Routes::getCurrentRequestApiKey()?->id;
+    }
 
-        if (!$operatorId) {
-            return null;
-        }
+    public static function hashPassword(string $password): string {
+        $pepper = \Tirreno\Utils\Variables::getPepper();
+        $pepperedPassword = hash_hmac('sha256', $password, $pepper);
 
-        $model = new \Tirreno\Models\ApiKeys();
-        $key = $model->getKey($operatorId);
+        return password_hash($pepperedPassword, PASSWORD_DEFAULT);
+    }
 
-        if (!$key) { // Check if operator is co-owner of another API key when it has no own API key.
-            $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
+    public static function verifyPassword(string $unverified, string $password): bool {
+        $pepper = \Tirreno\Utils\Variables::getPepper();
+        $pepperedPassword = hash_hmac('sha256', $unverified, $pepper);
 
-            if ($coOwnerModel->loaded()) {
-                $key = $model->getKeyById($coOwnerModel->api);
-            }
-        }
+        return password_verify($pepperedPassword, $password);
+    }
 
-        return $key ? $key->id : null;
+    public static function saltHash(string $string): string {
+        $iterations = 1000;
+        $salt = \Base::instance()->get('SALT');
+
+        return hash_pbkdf2('sha256', $string, $salt, $iterations, 32);
+    }
+
+    public static function pseudoRandString(int $length = 32): string {
+        $bytes = random_bytes(intdiv($length, 2));
+
+        return bin2hex($bytes);
     }
 }

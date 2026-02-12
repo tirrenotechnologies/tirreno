@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\IPs;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminIps';
+    public ?string $page = 'AdminIps';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminIps_search_placeholder');
@@ -31,7 +31,7 @@ class Page extends \Tirreno\Controllers\Admin\Base\Page {
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/ips.html',
             'JS'                    => 'admin_ips.js',
-            'IP_TYPES'              => \Tirreno\Utils\Constants::get('IP_TYPES'),
+            'IP_TYPES'              => \Tirreno\Utils\Constants::get()->IP_TYPES,
         ];
 
         return parent::applyPageParams($pageParams);

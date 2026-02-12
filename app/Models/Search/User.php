@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Search;
 
 class User extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     public function searchByUserId(string $query, int $apiKey): array {
         $params = [

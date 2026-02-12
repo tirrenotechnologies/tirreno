@@ -10,11 +10,12 @@ import {ReviewQueueChart} from '../parts/chart/ReviewQueue.js?v=2';
 export class ReviewQueuePage extends BasePage {
     constructor() {
         super('review-queue');
-        this.tableId = 'review-queue-table';
         this.initUi();
     }
 
     initUi() {
+        this.tableId = 'review-queue-table';
+
         const datesFilter   = new DatesFilter();
         const searchFilter  = new SearchFilter();
         const rulesFilter   = new RulesFilter();

@@ -31,7 +31,7 @@ class SystemMessages {
         if (!array_filter($messages)) {
             $messages[] = self::getInactiveCronMessage($lastLogbook, $apiKey);
         }
-        $messages[] = self::getCustomErrorMessage($apiKey);
+        $messages[] = self::getCustomErrorMessage();
         $msg = [];
 
         $iters = count($messages);
@@ -73,7 +73,7 @@ class SystemMessages {
     private static function getNoEventsMessage(array $lastLogbook): ?array {
         $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
         $takeFromCache = self::canTakeLastEventTimeFromCache($currentOperator);
-        $lastEventTime = $currentOperator->last_event_time;
+        $lastEventTime = $currentOperator->lastEventTime;
 
         $interval   = \Base::instance()->get('NO_EVENTS_TIME');
         $inInterval = \Tirreno\Utils\DateRange::inIntervalTillNow($lastEventTime, $interval);
@@ -85,13 +85,8 @@ class SystemMessages {
 
             $lastEventTime = $lastLogbook['lastseen'];
 
-            $data = [
-                'id' => $currentOperator->id,
-                'last_event_time' => $lastEventTime,
-            ];
-
             $model = new \Tirreno\Models\Operator();
-            $model->updateLastEventTime($data);
+            $model->updateLastEventTime($lastEventTime, $currentOperator->id);
 
             $inInterval = \Tirreno\Utils\DateRange::inIntervalTillNow($lastEventTime, $interval);
         }
@@ -104,10 +99,9 @@ class SystemMessages {
     }
 
     private static function getOveruseMessage(int $apiKey): ?array {
-        $model = new \Tirreno\Models\ApiKeys();
-        $model->getKeyById($apiKey);
+        $key = \Tirreno\Entities\ApiKey::getById($apiKey);
 
-        if ($model->last_call_reached === false) {
+        if ($key->lastCallReached === false) {
             return ['id' => \Tirreno\Utils\ErrorCodes::ENRICHMENT_API_KEY_OVERUSE];
         }
 
@@ -125,23 +119,24 @@ class SystemMessages {
     }
 
     //TODO: think about custom function which receives three params: date1, date2 and diff.
-    private static function canTakeLastEventTimeFromCache(\Tirreno\Models\Operator $currentOperator): bool {
+    private static function canTakeLastEventTimeFromCache(\Tirreno\Entities\Operator $operator): bool {
         $interval = \Base::instance()->get('LAST_EVENT_CACHE_TIME');
 
-        return !!\Tirreno\Utils\DateRange::inIntervalTillNow($currentOperator->last_event_time, $interval);
+        return !!\Tirreno\Utils\DateRange::inIntervalTillNow($operator->lastEventTime, $interval);
     }
 
+    // TODO: get message by api key?
     private static function getCustomErrorMessage(): ?array {
         $message = null;
         $model = new \Tirreno\Models\Message();
 
-        $data = $model->getMessage();
+        $data = $model->getLastMessage();
 
         if ($data) {
             $message = [
                 'id'            => \Tirreno\Utils\ErrorCodes::CUSTOM_ERROR_FROM_DSHB_MESSAGES,
-                'text'          => $data->text,
-                'created_at'    => $data->created_at,
+                'text'          => $data['text'],
+                'created_at'    => $data['created_at'],
             ];
         }
 

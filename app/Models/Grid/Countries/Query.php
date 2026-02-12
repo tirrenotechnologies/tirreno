@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Countries;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = null;
-    protected $dateRangeField = 'event_country.lastseen';
+    protected ?string $defaultOrder = null;
+    protected string $dateRangeField = 'event_country.lastseen';
 
-    protected $allowedColumns = ['full_country', 'country', 'total_account', 'total_visit', 'total_ip', 'id'];
+    protected array $allowedColumns = ['full_country', 'country', 'total_account', 'total_visit', 'total_ip', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -82,10 +82,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Add dates into request
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = '';
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * Not covered (unstable without refactor):
  * - Updates::syncUpdates():
- *   - instantiates \App\Models\Updates($f3) and calls checkDb(...) (DB required)
+ *   - instantiates \Tirreno\Models\Updates($f3) and calls checkDb(...) (DB required)
  *   - may instantiate controller and call updateRules(...) (side effects)
  *   - Routes::callExtra('UPDATES') is unreachable in unit test because DB-dependent code executes before it
  *

@@ -1,4 +1,5 @@
 import {padZero} from './utils/Date.js?v=2';
+import {Constants} from './utils/Constants.js?v=2';
 import {
     //truncateWithHellip,
     formatKiloValue,
@@ -7,60 +8,22 @@ import {
     openJson,
 } from './utils/String.js?v=2';
 
-import {
-    MAX_STRING_LONG_NETNAME_IN_TABLE,
-    MAX_STRING_SHORT_NETNAME_IN_TABLE,
-    MAX_STRING_LENGTH_IN_TABLE,
-    MAX_STRING_USER_SHORT_LENGTH_IN_TABLE,
-    MAX_STRING_USER_MEDIUM_LENGTH_IN_TABLE,
-    MAX_STRING_USER_LONG_LENGTH_IN_TABLE,
-    MAX_STRING_USER_LONG_LENGTH_IN_TILE,
-    MAX_STRING_LENGTH_IN_TABLE_ON_DASHBOARD,
-    MAX_STRING_LENGTH_FOR_EMAIL,
-    MAX_STRING_LENGTH_FOR_PHONE,
-    MAX_STRING_LENGTH_FULL_COUNTRY,
-    MAX_STRING_LENGTH_FOR_TILE,
-    MAX_STRING_USERID_LENGTH_IN_TABLE,
-    MAX_STRING_USER_NAME_IN_TABLE,
-    MAX_STRING_DEVICE_OS_LENGTH,
-    MAX_STRING_LENGTH_URL,
-    MAX_STRING_LENGTH_ENDPOINT,
-    MAX_TOOLTIP_URL_LENGTH,
-    MAX_TOOLTIP_LENGTH,
-
-    USER_LOW_TRUST_SCORE_INF,
-    USER_LOW_TRUST_SCORE_SUP,
-    USER_MEDIUM_TRUST_SCORE_INF,
-    USER_MEDIUM_TRUST_SCORE_SUP,
-    USER_HIGH_TRUST_SCORE_INF,
-
-    ASN_OVERRIDE,
-    COUNTRIES_EXCEPTIONS,
-    NORMAL_DEVICES,
-    PHONE_LANDLINE,
-    NO_RULES_MSG,
-    UNDEFINED_RULES_MSG,
-    MIDLINE_HELLIP,
-    HELLIP,
-    HYPHEN,
-} from './utils/Constants.js?v=2';
-
 const isDashboardPage = () => !!document.getElementById('most-active-users');
 
 const getNumberOfSymbols = (length = 'default') => {
     if (length === 'tile') {
-        return MAX_STRING_USER_LONG_LENGTH_IN_TILE;
+        return Constants.MAX_STRING_USER_LONG_LENGTH_IN_TILE;
     } else if (isDashboardPage()) {
-        return MAX_STRING_LENGTH_IN_TABLE_ON_DASHBOARD;
+        return Constants.MAX_STRING_LENGTH_IN_TABLE_ON_DASHBOARD;
     } else {
         if (length === 'long') {
-            return MAX_STRING_USER_LONG_LENGTH_IN_TABLE;
+            return Constants.MAX_STRING_USER_LONG_LENGTH_IN_TABLE;
         } else if (length === 'short') {
-            return MAX_STRING_USER_SHORT_LENGTH_IN_TABLE;
+            return Constants.MAX_STRING_USER_SHORT_LENGTH_IN_TABLE;
         } else if (length === 'medium') {
-            return MAX_STRING_USER_MEDIUM_LENGTH_IN_TABLE;
+            return Constants.MAX_STRING_USER_MEDIUM_LENGTH_IN_TABLE;
         } else {
-            return MAX_STRING_LENGTH_IN_TABLE;
+            return Constants.MAX_STRING_LENGTH_IN_TABLE;
         }
     }
 };
@@ -85,15 +48,15 @@ const tooltipWrap = (tooltip, value, wrap = true, wordBreak = false) => {
     return result;
 };
 
-const truncateWithHellip = (value, n, wordBreak = false, length = MAX_TOOLTIP_LENGTH) => {
+const truncateWithHellip = (value, n, wordBreak = false, length = Constants.MAX_TOOLTIP_LENGTH) => {
     let tooltip = value;
 
     if (value && value.length > (n + 2)) {
-        value = value.slice(0, n) + HELLIP;
+        value = value.slice(0, n) + Constants.HELLIP;
     }
 
     if (tooltip && tooltip.length > length) {
-        tooltip = tooltip.slice(0, length) + HELLIP;
+        tooltip = tooltip.slice(0, length) + Constants.HELLIP;
     }
 
     return tooltipWrap(tooltip, renderDefaultIfEmpty(value), true, wordBreak);
@@ -404,10 +367,10 @@ const renderChoicesSelectorChoice = (classNames, data, itemSelectText, innerHtml
 };
 
 const splitLabel = (label) => {
-    const node = document.createElement('div');
-    node.innerHTML = label;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(label, 'text/html');
 
-    return node.textContent.split('|');
+    return doc.body.textContent.split('|');
 };
 
 const renderRuleSelectorItem = (classNames, data) => {
@@ -500,7 +463,7 @@ const renderDeviceTypeSelectorItem = (classNames, data) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
 
-    const deviceIsNormal = NORMAL_DEVICES.includes(value);
+    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
     img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
@@ -518,7 +481,7 @@ const renderDeviceTypeSelectorChoice = (classNames, data, itemSelectText) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
 
-    const deviceIsNormal = NORMAL_DEVICES.includes(value);
+    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
     img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
@@ -643,7 +606,9 @@ const renderTotalFrame = (base, val) => {
     const frag = document.createDocumentFragment();
 
     if (parseInt(base, 10) > parseInt(val, 10)) {
-        const rest = (base !== null && base !== undefined && base > 0 && base >= val) ? (base - val) : MIDLINE_HELLIP;
+        const rest = (base !== null && base !== undefined && base > 0 && base >= val)
+            ? (base - val)
+            : Constants.MIDLINE_HELLIP;
         const span = document.createElement('span');
         span.className = 'addlight';
         span.textContent = val + '/';
@@ -684,7 +649,7 @@ const renderBoolean = (data) => {
         node.className = 'highlight';
         node.textContent = 'Yes';
     } else {
-        node.textContent = HYPHEN;
+        node.textContent = Constants.HYPHEN;
     }
 
     return node;
@@ -707,15 +672,15 @@ const renderUserScore = record => {
         score = (record.fraud) ? 'X' : 'OK';
         cls = (record.fraud) ? 'low' : 'high';
     } else {
-        if (score >= USER_HIGH_TRUST_SCORE_INF) {
+        if (score >= Constants.USER_HIGH_TRUST_SCORE_INF) {
             cls = 'high';
         }
 
-        if (score >= USER_MEDIUM_TRUST_SCORE_INF && score < USER_MEDIUM_TRUST_SCORE_SUP) {
+        if (score >= Constants.USER_MEDIUM_TRUST_SCORE_INF && score < Constants.USER_MEDIUM_TRUST_SCORE_SUP) {
             cls = 'medium';
         }
 
-        if (score >= USER_LOW_TRUST_SCORE_INF && score < USER_LOW_TRUST_SCORE_SUP) {
+        if (score >= Constants.USER_LOW_TRUST_SCORE_INF && score < Constants.USER_LOW_TRUST_SCORE_SUP) {
             cls = 'low';
         }
     }
@@ -734,7 +699,7 @@ const renderUserId = (value) => {
     let span = null;
 
     if (value) {
-        span = truncateWithHellip(value, MAX_STRING_USERID_LENGTH_IN_TABLE);
+        span = truncateWithHellip(value, Constants.MAX_STRING_USERID_LENGTH_IN_TABLE);
     }
 
     return renderDefaultIfEmptySpan(span);
@@ -849,7 +814,7 @@ const renderUserFirstname = record => {
 
     if (name) {
         name = name.replace(/\b\w+/g, capitalizeValue);
-        span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
+        span = truncateWithHellip(name, Constants.MAX_STRING_USER_NAME_IN_TABLE);
     }
 
     return renderDefaultIfEmptySpan(span);
@@ -861,7 +826,7 @@ const renderUserLastname = record => {
 
     if (name) {
         name = name.replace(/\b\w+/g, capitalizeValue);
-        span = truncateWithHellip(name, MAX_STRING_USER_NAME_IN_TABLE);
+        span = truncateWithHellip(name, Constants.MAX_STRING_USER_NAME_IN_TABLE);
     }
 
     return renderDefaultIfEmptySpan(span);
@@ -972,9 +937,9 @@ const renderScoreDetails = record => {
     if (!record.score_calculated) {
         const span = document.createElement('span');
         span.className = 'no-rules-tile';
-        span.textContent = UNDEFINED_RULES_MSG.value;
+        span.textContent = Constants.UNDEFINED_RULES_MSG.value;
 
-        return tooltipWrap(UNDEFINED_RULES_MSG.tooltip, span, true);
+        return tooltipWrap(Constants.UNDEFINED_RULES_MSG.tooltip, span, true);
     }
 
     const frag = document.createDocumentFragment();
@@ -1062,9 +1027,9 @@ const renderScoreDetails = record => {
         } else {
             const span = document.createElement('span');
             span.className = 'no-rules-tile';
-            span.textContent = NO_RULES_MSG.value;
+            span.textContent = Constants.NO_RULES_MSG.value;
 
-            result.appendChild(tooltipWrap(NO_RULES_MSG.tooltip, span, false));
+            result.appendChild(tooltipWrap(Constants.NO_RULES_MSG.tooltip, span, false));
         }
     }
 
@@ -1072,12 +1037,12 @@ const renderScoreDetails = record => {
 };
 
 //Email
-const renderEmail = (record, length = MAX_STRING_LENGTH_FOR_EMAIL) => {
+const renderEmail = (record, length = Constants.MAX_STRING_LENGTH_FOR_EMAIL) => {
     let span = null;
     const email = record.email;
 
     if (email) {
-        const n = (length === MAX_STRING_LENGTH_FOR_EMAIL) ? length : getNumberOfSymbols(length);
+        const n = (length === Constants.MAX_STRING_LENGTH_FOR_EMAIL) ? length : getNumberOfSymbols(length);
 
         span = truncateWithHellip(email, n);
     }
@@ -1125,10 +1090,10 @@ const renderPhone = (record) => {
     const phone = record.phonenumber;
 
     if (phone) {
-        const code = !COUNTRIES_EXCEPTIONS.includes(record.country_iso) ? record.country_iso : 'lh';
+        const code = !Constants.COUNTRIES_EXCEPTIONS.includes(record.country_iso) ? record.country_iso : 'lh';
         const tooltip = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
 
-        const n       = MAX_STRING_LENGTH_FOR_PHONE;
+        const n       = Constants.MAX_STRING_LENGTH_FOR_PHONE;
         const number  = truncateWithHellip(phone, n);
 
         const frag = document.createDocumentFragment();
@@ -1143,7 +1108,7 @@ const renderPhone = (record) => {
         result = wrapWithCountryDiv(frag);
     } else {
         const div = document.createElement('div');
-        div.textContent = HYPHEN;
+        div.textContent = Constants.HYPHEN;
 
         result = div;
     }
@@ -1159,7 +1124,7 @@ const renderClickablePhone = record => {
 };
 
 const renderFullCountry = value => {
-    return renderDefaultIfEmptySpan(truncateWithHellip(value, MAX_STRING_LENGTH_FULL_COUNTRY));
+    return renderDefaultIfEmptySpan(truncateWithHellip(value, Constants.MAX_STRING_LENGTH_FULL_COUNTRY));
 };
 
 const renderPhoneCarrierName = (record, length = 'medium') => {
@@ -1181,7 +1146,7 @@ const renderPhoneType = record => {
 
     if (type) {
         let src = 'smartphone.svg';
-        if (PHONE_LANDLINE.includes(type)) src = 'landline.svg';
+        if (Constants.PHONE_LANDLINE.includes(type)) src = 'landline.svg';
         if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
 
         const tooltip = type.toLowerCase().replace(/_/g, ' ');
@@ -1228,7 +1193,7 @@ const renderUsersList = (data) => {
 
 //Resource
 const renderResource = (value, tooltip) => {
-    const n = isDashboardPage() ? getNumberOfSymbols() : MAX_STRING_LENGTH_URL;
+    const n = isDashboardPage() ? getNumberOfSymbols() : Constants.MAX_STRING_LENGTH_URL;
     value = value ? value : '/';
 
     const el = truncateWithHellip(value, n, true);
@@ -1255,8 +1220,8 @@ const renderResourceWithQueryAndEventType = record => {
     }
 
     let tooltip = url;
-    if (url && url.length > MAX_TOOLTIP_URL_LENGTH) {
-        tooltip = url.slice(0, MAX_TOOLTIP_URL_LENGTH) + HELLIP;
+    if (url && url.length > Constants.MAX_TOOLTIP_URL_LENGTH) {
+        tooltip = url.slice(0, Constants.MAX_TOOLTIP_URL_LENGTH) + Constants.HELLIP;
     }
 
     const frag = document.createDocumentFragment();
@@ -1315,7 +1280,7 @@ const renderClickableIp = record => {
 
 const renderIpAndFlag = (ip, record) => {
     const countryCode = record.country_iso;
-    const code = !COUNTRIES_EXCEPTIONS.includes(countryCode) ? countryCode.toLowerCase() : 'lh';
+    const code = !Constants.COUNTRIES_EXCEPTIONS.includes(countryCode) ? countryCode.toLowerCase() : 'lh';
     const iso = (countryCode !== null && countryCode !== undefined) ? countryCode : '';
 
     const net = record.isp_name;
@@ -1343,7 +1308,7 @@ const renderIpWithCountry = record => {
     const n = getNumberOfSymbols();
 
     if (ip && ip.length > n) {
-        ip = ip.slice(0, n) + HELLIP;
+        ip = ip.slice(0, n) + Constants.HELLIP;
     }
 
     const el = document.createTextNode(ip);
@@ -1356,7 +1321,7 @@ const renderClickableIpWithCountry = record => {
     const n = getNumberOfSymbols();
 
     if (ip && ip.length > n) {
-        ip = ip.slice(0, n) + HELLIP;
+        ip = ip.slice(0, n) + Constants.HELLIP;
     }
 
     const el = document.createTextNode(ip);
@@ -1399,7 +1364,9 @@ const renderNetName = (record, length = 'default') => {
         name = name.replace(/\b\w+/g, capitalizeValue);
 
         //TODO: move to constants
-        const len = length === 'long' ? MAX_STRING_LONG_NETNAME_IN_TABLE : MAX_STRING_SHORT_NETNAME_IN_TABLE;
+        const len = length === 'long'
+            ? Constants.MAX_STRING_LONG_NETNAME_IN_TABLE
+            : Constants.MAX_STRING_SHORT_NETNAME_IN_TABLE;
         span = truncateWithHellip(name, len);
     }
 
@@ -1414,7 +1381,7 @@ const renderCidr = record => {
 };
 
 const renderAsn = record => {
-    const asn = (ASN_OVERRIDE[record.asn] !== undefined) ? ASN_OVERRIDE[record.asn] : record.asn;
+    const asn = (Constants.ASN_OVERRIDE[record.asn] !== undefined) ? Constants.ASN_OVERRIDE[record.asn] : record.asn;
     const span = document.createElement('span');
     span.textContent = renderDefaultIfEmpty(asn);
 
@@ -1430,7 +1397,7 @@ const renderClickableAsn = record => {
 
 //Country
 const renderCountry = (code, value, tooltip) => {
-    code = !COUNTRIES_EXCEPTIONS.includes(code) ? code : 'lh';
+    code = !Constants.COUNTRIES_EXCEPTIONS.includes(code) ? code : 'lh';
     value = (value !== null && value !== undefined) ? value : '';
 
     const frag = document.createDocumentFragment();
@@ -1481,7 +1448,7 @@ const renderClickableCountryTruncated = record => {
     const fullValue = record.full_country;
     let value   = record.full_country;
     value = (value !== null && value !== undefined) ? value : '';
-    value = value.length <= MAX_STRING_LENGTH_FOR_TILE ? value : record.country_iso;
+    value = value.length <= Constants.MAX_STRING_LENGTH_FOR_TILE ? value : record.country_iso;
 
     const span = tooltipWrap(fullValue, value, true);
 
@@ -1504,11 +1471,11 @@ const renderAuditParent = record => {
     let value = record.parent_name;
 
     if (value && value.length > (n + 2)) {
-        value = value.slice(0, n) + HELLIP;
+        value = value.slice(0, n) + Constants.HELLIP;
     }
 
-    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
-        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    if (tooltip && tooltip.length > Constants.MAX_TOOLTIP_LENGTH) {
+        tooltip = tooltip.slice(0, Constants.MAX_TOOLTIP_LENGTH) + Constants.HELLIP;
     }
 
     return tooltipWrap(renderDefaultIfEmpty(tooltip), renderDefaultIfEmpty(value), true);
@@ -1521,11 +1488,11 @@ const renderAuditField = record => {
     let value = record.field_name;
 
     if (value && value.length > (n + 2)) {
-        value = value.slice(0, n) + HELLIP;
+        value = value.slice(0, n) + Constants.HELLIP;
     }
 
-    if (tooltip && tooltip.length > MAX_TOOLTIP_LENGTH) {
-        tooltip = tooltip.slice(0, MAX_TOOLTIP_LENGTH) + HELLIP;
+    if (tooltip && tooltip.length > Constants.MAX_TOOLTIP_LENGTH) {
+        tooltip = tooltip.slice(0, Constants.MAX_TOOLTIP_LENGTH) + Constants.HELLIP;
     }
 
     return tooltipWrap(renderDefaultIfEmpty(tooltip), renderDefaultIfEmpty(value), true);
@@ -1582,7 +1549,7 @@ const renderClickableUserAgentId = record => {
 };
 
 const renderDevice = record => {
-    const deviceIsNormal = NORMAL_DEVICES.includes(record.device_name);
+    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(record.device_name);
 
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = deviceIsNormal ? record.device_name : 'unknown';
@@ -1607,13 +1574,13 @@ const renderDevice = record => {
 
 const renderDeviceWithOs = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
-    const deviceTypeImg = NORMAL_DEVICES.includes(record.device_name) ? record.device_name : 'unknown';
+    const deviceTypeImg = Constants.NORMAL_DEVICES.includes(record.device_name) ? record.device_name : 'unknown';
 
     let os = record.os_name ? record.os_name : 'N/A';
     os += record.os_version ? ' ' + record.os_version : '';
 
-    if (os && os.length > MAX_STRING_DEVICE_OS_LENGTH) {
-        os = os.slice(0, MAX_STRING_DEVICE_OS_LENGTH) + HELLIP;
+    if (os && os.length > Constants.MAX_STRING_DEVICE_OS_LENGTH) {
+        os = os.slice(0, Constants.MAX_STRING_DEVICE_OS_LENGTH) + Constants.HELLIP;
     }
 
     const frag = document.createDocumentFragment();
@@ -1663,7 +1630,7 @@ const renderOs = record => {
     }
 
     if (os) {
-        os = truncateWithHellip(os, MAX_STRING_LENGTH_FOR_TILE);
+        os = truncateWithHellip(os, Constants.MAX_STRING_LENGTH_FOR_TILE);
     }
 
     os = renderDefaultIfEmptySpan(os);
@@ -1689,7 +1656,7 @@ const renderBrowser = record => {
         browser = browser.split('.');
         browser = browser[0].trim();
 
-        browser = truncateWithHellip(browser, MAX_STRING_LENGTH_FOR_TILE);
+        browser = truncateWithHellip(browser, Constants.MAX_STRING_LENGTH_FOR_TILE);
     }
 
     return renderDefaultIfEmptySpan(browser);
@@ -1742,7 +1709,7 @@ const renderUserAgent = record => {
 
 const renderDefaultIfEmptyElement = (value) => {
     const span = document.createElement('span');
-    span.textContent = (value) ? value : HYPHEN;
+    span.textContent = (value) ? value : Constants.HYPHEN;
 
     return span;
 };
@@ -1752,7 +1719,7 @@ const renderDefaultIfEmpty = (value) => {
         return value;
     }
 
-    return HYPHEN;
+    return Constants.HYPHEN;
 };
 
 const renderDefaultIfEmptySpan = (span) => {
@@ -1808,7 +1775,7 @@ const renderBlacklistType = record => {
 const renderSensorErrorColumn = record => {
     const obj = openJson(record.error_text);
     const s = (obj !== null) ? obj.join('; ') : null;
-    return truncateWithHellip(s, MAX_STRING_LONG_NETNAME_IN_TABLE);
+    return truncateWithHellip(s, Constants.MAX_STRING_LONG_NETNAME_IN_TABLE);
 };
 
 const renderSensorError = record => {
@@ -1826,7 +1793,7 @@ const renderTimeMsLogbook = (record) => {
 };
 
 const renderEndpoint = record => {
-    return truncateWithHellip(record.endpoint, MAX_STRING_LENGTH_ENDPOINT, true);
+    return truncateWithHellip(record.endpoint, Constants.MAX_STRING_LENGTH_ENDPOINT, true);
 };
 
 const renderJsonTextarea = value => {
@@ -1868,7 +1835,7 @@ const renderMailto = record => {
 
 const currentPlanRender = (data, type, record, _meta) => {
     const value = record.sub_plan_api_calls;
-    const text = (value !== null && value !== undefined) ? value + ' API calls' : MIDLINE_HELLIP;
+    const text = (value !== null && value !== undefined) ? value + ' API calls' : Constants.MIDLINE_HELLIP;
 
     const span = document.createElement('span');
     span.textContent = text;
@@ -1878,7 +1845,7 @@ const currentPlanRender = (data, type, record, _meta) => {
 
 const currentStatusRender = (data, type, record, meta) => {
     const value = record.sub_status;
-    const text = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
+    const text = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
 
     const span = document.createElement('span');
     span.textContent = text;
@@ -1888,9 +1855,9 @@ const currentStatusRender = (data, type, record, meta) => {
 
 const currentUsageRender = (data, type, record, meta) => {
     let value = record.sub_calls_used;
-    const used = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
+    const used = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
     value = record.sub_calls_limit;
-    const limit = (value !== null && value !== undefined) ? value : MIDLINE_HELLIP;
+    const limit = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
 
     const span = document.createElement('span');
     span.textContent = used + '/' + limit;
@@ -1900,7 +1867,9 @@ const currentUsageRender = (data, type, record, meta) => {
 
 const currentBillingEndRender = (data, type, record, meta) => {
     const value = record.sub_next_billed;
-    const text = (value !== null && value !== undefined) ? renderDateString(value.replace('T', ' ')) : MIDLINE_HELLIP;
+    const text = (value !== null && value !== undefined)
+        ? renderDateString(value.replace('T', ' '))
+        : Constants.MIDLINE_HELLIP;
 
     const span = document.createElement('span');
     span.textContent = text;
@@ -1960,7 +1929,9 @@ const renderRulePlayResult = (users, count, section, uid) => {
     section = section === 1000 ? '1k' : section;
 
     const result = document.createDocumentFragment();
-    const txt = (count === 1) ? `One user from last ${section} matching ${uid} rule: ` : `${count} users from last ${section} matching ${uid} rule: `;
+    const txt = (count === 1)
+        ? `One user from last ${section} matching ${uid} rule: `
+        : `${count} users from last ${section} matching ${uid} rule: `;
     result.appendChild(document.createTextNode(txt));
 
     const list = document.createDocumentFragment();

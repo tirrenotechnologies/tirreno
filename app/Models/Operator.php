@@ -18,194 +18,342 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Operator extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_operators';
+    protected ?string $DB_TABLE_NAME = 'dshb_operators';
 
-    public function add(array $data): void {
-        $password = $data['password'] ?? null;
+    public function insertRecord(?string $password, string $email, string $timezone): int {
+        $params = [
+            ':password' => $password ? \Tirreno\Utils\Access::hashPassword($password) : $password,
+            ':email'    => $email,
+            ':timezone' => $timezone,
+            ':active'   => 1,
+        ];
 
-        if ($password) {
-            $this->password = self::hashPassword($password);
-        }
+        $query = (
+            'INSERT INTO dshb_operators (
+                password, email, timezone, is_active
+            ) VALUES (
+                :password, :email, :timezone, :active
+            ) RETURNING id'
+        );
 
-        $this->email = $data['email'];
-        $this->timezone = $data['timezone'];
-        $this->is_active = 1;
-        $this->save();
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['id'];
     }
 
     public function updatePassword(string $password, int $operatorId): void {
-        $this->getOperatorById($operatorId);
+        $params = [
+            ':password'     => \Tirreno\Utils\Access::hashPassword($password),
+            ':operator_id'  => $operatorId,
+        ];
 
-        if ($this->loaded()) {
-            $this->password = self::hashPassword($password, PASSWORD_DEFAULT);
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                password = :password
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
 
-            $this->save();
-        }
+        $this->execQuery($query, $params);
     }
 
-    public function updateEmail(array $data): void {
-        $operatorId = $data['id'];
-        $this->getOperatorById($operatorId);
+    public function updateEmail(string $email, int $operatorId): void {
+        $params = [
+            ':email'        => $email,
+            ':operator_id'  => $operatorId,
+        ];
 
-        if ($this->loaded()) {
-            $this->email = $data['email'];
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                email = :email
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
 
-            $this->save();
-        }
+        $this->execQuery($query, $params);
     }
 
     public function updateTimezone(string $timezone, int $operatorId): void {
-        $this->getOperatorById($operatorId);
+        $params = [
+            ':timezone'     => $timezone,
+            ':operator_id'  => $operatorId,
+        ];
 
-        if ($this->loaded()) {
-            $this->timezone = $timezone;
-
-            $this->save();
-        }
-    }
-
-    public function updateNotificationPreferences(string $reminder): void {
-        if ($this->loaded()) {
-            $this->unreviewed_items_reminder_freq = $reminder;
-
-            $this->save();
-        }
-    }
-
-    public function updateReviewedQueueCnt(array $data): void {
-        $operatorId = $data['id'];
-        $this->getOperatorById($operatorId);
-
-        if ($this->loaded()) {
-            $this->review_queue_cnt = $data['review_queue_cnt'];
-            $this->review_queue_updated_at = gmdate('Y-m-d H:i:s');
-
-            $this->save();
-        }
-    }
-
-    public function updateBlacklistUsersCnt(array $data): void {
-        $operatorId = $data['id'];
-        $this->getOperatorById($operatorId);
-
-        if ($this->loaded()) {
-            $this->blacklist_users_cnt = $data['blacklist_users_cnt'];
-
-            $this->save();
-        }
-    }
-
-    public function updateLastEventTime(array $data): void {
-        $operatorId = $data['id'];
-        $this->getOperatorById($operatorId);
-
-        if ($this->loaded()) {
-            $this->last_event_time = $data['last_event_time'];
-
-            $this->save();
-        }
-    }
-
-    public function closeAccount(): void {
-        if ($this->loaded()) {
-            $this->is_closed = 1;
-
-            $this->save();
-        }
-    }
-
-    public function deleteAccount(): void {
-        if ($this->loaded()) {
-            $this->erase();
-        }
-    }
-
-    public function removeData(): void {
-        if ($this->loaded()) {
-            $params = [
-                ':operator_id' => $this->id,
-            ];
-
-            # firstly delete all nested data to not break the cascade
-            $queries = [
-                'DELETE FROM event
-                WHERE event.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-                'DELETE FROM event_account
-                WHERE event_account.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-                'DELETE FROM event_ip
-                WHERE event_ip.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-                'DELETE FROM event_device
-                WHERE event_device.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-                'DELETE FROM event_email
-                WHERE event_email.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
-            ];
-
-            try {
-                $this->db->begin();
-                $this->db->exec($queries, array_fill(0, 5, $params));
-
-                $query = 'DELETE FROM dshb_api WHERE creator = :operator_id';
-                $this->db->exec($query, $params);
-
-                $this->db->commit();
-            } catch (\Exception $e) {
-                $this->db->rollback();
-                error_log($e->getMessage());
-                throw $e;
-            }
-        }
-    }
-
-    public function activateByOperator(int $operatorId): void {
-        $this->getOperatorById($operatorId);
-
-        if ($this->loaded()) {
-            $this->is_active = 1;
-            $this->save();
-        }
-    }
-
-    public function getByEmail(string $email): self|null|false {
-        return $this->load(
-            ['"email"=?', $email],
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                timezone = :timezone
+            WHERE
+                dshb_operators.id = :operator_id'
         );
+
+        $this->execQuery($query, $params);
     }
 
-    public function getActivatedByEmail(string $email): int {
-        $isActive = 1;
-        $isClosed = 0;
+    public function updateNotificationPreferences(string $reminder, int $operatorId): void {
+        $params = [
+            ':reminder'     => $reminder,
+            ':operator_id'  => $operatorId,
+        ];
 
-        $filters = ['LOWER(email)=LOWER(?) AND "is_active"=? AND "is_closed"=?', $email, $isActive, $isClosed];
-        $this->load($filters);
-
-        return $this->loaded();
-    }
-
-    public function getOperatorById(int $id): self|null|false {
-        return $this->load(
-            ['"id"=? AND "is_closed"=?', $id, 0],
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                unreviewed_items_reminder_freq = :reminder
+            WHERE
+                dshb_operators.id = :operator_id'
         );
+
+        $this->execQuery($query, $params);
     }
 
-    public function verifyPassword(string $password): bool {
-        if (!$this->loaded() || !$this->password) {
+    public function updateReviewedQueueCnt(int $cnt, int $operatorId): void {
+        $params = [
+            ':cnt'          => $cnt,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                review_queue_cnt = :cnt,
+                review_queue_updated_at = NOW()
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function updateBlacklistUsersCnt(int $cnt, int $operatorId): void {
+        $params = [
+            ':cnt'          => $cnt,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                blacklist_users_cnt = :cnt
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function updateLastEventTime(string $timestamp, int $operatorId): void {
+        $params = [
+            ':timestamp'    => $timestamp,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                last_event_time = :timestamp
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function closeAccount(int $operatorId): void {
+        $params = [
+            ':closed'       => 1,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                is_closed = :closed
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function deleteAccount(int $operatorId): void {
+        $params = [
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'DELETE FROM dshb_operators
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function removeData(int $operatorId): void {
+        $params = [
+            ':operator_id' => $operatorId,
+        ];
+
+        # firstly delete all nested data to not break the cascade
+        $queries = [
+            'DELETE FROM event
+            WHERE event.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+            'DELETE FROM event_account
+            WHERE event_account.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+            'DELETE FROM event_ip
+            WHERE event_ip.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+            'DELETE FROM event_device
+            WHERE event_device.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+            'DELETE FROM event_email
+            WHERE event_email.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
+        ];
+
+        try {
+            $this->db->begin();
+            $this->db->exec($queries, array_fill(0, 5, $params));
+
+            $query = 'DELETE FROM dshb_api WHERE creator = :operator_id';
+            $this->db->exec($query, $params);
+
+            $this->db->commit();
+        } catch (\Exception $e) {
+            $this->db->rollback();
+            error_log($e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function activateByOperatorId(int $operatorId): void {
+        $params = [
+            ':active'       => 1,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'UPDATE dshb_operators
+            SET
+                is_active = :active
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function getByEmail(string $email): array {
+        $params = [
+            ':email'  => $email,
+        ];
+
+        $query = (
+            'SELECT
+                id
+            FROM
+                dshb_operators
+            WHERE
+                LOWER(dshb_operators.email) = LOWER(:email)'
+        );
+
+        return $this->execQuery($query, $params);
+    }
+
+    public function getActivatedByEmail(string $email): ?int {
+        $params = [
+            ':email'    => $email,
+            ':active'   => 1,
+            ':closed'   => 0,
+        ];
+
+        $query = (
+            'SELECT
+                id
+            FROM
+                dshb_operators
+            WHERE
+                LOWER(dshb_operators.email) = LOWER(:email) AND
+                dshb_operators.is_active = :active AND
+                dshb_operators.is_closed = :closed'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['id'] ?? null;
+    }
+
+    public function getOperatorById(int $operatorId): array {
+        $params = [
+            ':closed'       => 0,
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'SELECT
+                id,
+                email,
+                password,
+                firstname,
+                lastname,
+                activation_key,
+                timezone,
+                review_queue_cnt,
+                review_queue_updated_at,
+                unreviewed_items_reminder_freq,
+                last_event_time,
+                blacklist_users_cnt
+            FROM
+                dshb_operators
+            WHERE
+                dshb_operators.id = :operator_id AND
+                dshb_operators.is_closed = :closed'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0] ?? [];
+    }
+
+    public function verifyPassword(string $password, int $operatorId): bool {
+        $params = [
+            ':operator_id'  => $operatorId,
+        ];
+
+        $query = (
+            'SELECT
+                password
+            FROM
+                dshb_operators
+            WHERE
+                dshb_operators.id = :operator_id'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        $operatorPassword = $results[0]['password'] ?? null;
+
+        if (!$results || !$operatorPassword) {
             return false;
         }
 
-        $pepper = \Tirreno\Utils\Variables::getPepper();
-        $pepperedPassword = hash_hmac('sha256', $password, $pepper);
-
-        return password_verify($pepperedPassword, $this->password);
+        return \Tirreno\Utils\Access::verifyPassword($password, $operatorPassword);
     }
 
     public function getAll(): array {
-        return $this->find(null, ['order' => 'email ASC']);
-    }
+        $query = (
+            'SELECT
+                id,
+                email,
+                firstname,
+                lastname,
+                last_event_time,
+                review_queue_cnt
+            FROM
+                dshb_operators
+            ORDER BY email ASC'
+        );
 
-    public static function hashPassword(string $password): string {
-        $pepper = \Tirreno\Utils\Variables::getPepper();
-        $pepperedPassword = hash_hmac('sha256', $password, $pepper);
-
-        return password_hash($pepperedPassword, PASSWORD_DEFAULT);
+        return $this->execQuery($query, null);
     }
 }

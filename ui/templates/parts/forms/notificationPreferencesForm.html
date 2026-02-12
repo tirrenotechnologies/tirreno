@@ -16,7 +16,7 @@
                     <div class="control">
                         <div class="selector">
                             <select class="input" name="review-reminder-frequency" id="review-reminder-frequency">
-                                <repeat group="{{ \Tirreno\Utils\Constants::get('NOTIFICATION_REMINDER_TYPES') }}" value="{{ @key }}">
+                                <repeat group="{{ \Tirreno\Utils\Constants::get()->NOTIFICATION_REMINDER_TYPES }}" value="{{ @key }}">
                                     <set active="{{ @frequency === @key }}" />
                                     <option value="{{ @key }}" {{ @active ? 'selected' : '' }}>{{
                                         @AdminSettings_notificationPreferences_reviewReminderFrequency_options[@key] }}

@@ -14,8 +14,6 @@ import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
 export class DomainPage extends BasePage {
     constructor() {
         super('domain', true);
-
-        this.initUi();
     }
 
     initUi() {

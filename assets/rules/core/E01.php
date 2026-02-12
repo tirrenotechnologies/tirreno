@@ -7,7 +7,7 @@ class E01 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'Invalid email format. Should be \'username@domain.com\'.';
     public const ATTRIBUTES = [];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['le_is_invalid']->equalTo(true),
         );

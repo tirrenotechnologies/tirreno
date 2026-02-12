@@ -39,7 +39,6 @@ abstract class Data extends \Tirreno\Controllers\Base {
         return $result;
     }
 
-
     protected function extractRequestParams(array $params): array {
         $result = [];
 

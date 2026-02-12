@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update007 extends Base {
-    public static $version = 'v0.9.11';
+    public static string $version = 'v0.9.11';
 
-    public static function apply($database): void {
+    public static function apply(\DB\SQL $database): void {
         $sql = 'ALTER TABLE dshb_operators ALTER COLUMN review_queue_cnt TYPE integer';
 
         $database->exec($sql);

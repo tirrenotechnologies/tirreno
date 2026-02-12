@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\FieldAudit;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminFieldAudit';
+    public ?string $page = 'AdminFieldAudit';
 
     public function getPageParams(): array {
         $dataController = new Data();

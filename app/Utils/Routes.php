@@ -22,7 +22,7 @@ class Routes {
         return \Base::instance();
     }
 
-    public static function getCurrentRequestOperator(): \Tirreno\Models\Operator|false|null {
+    public static function getCurrentRequestOperator(): ?\Tirreno\Entities\Operator {
         return self::getF3()->get('CURRENT_USER');
     }
 
@@ -30,11 +30,28 @@ class Routes {
         self::getF3()->set('CURRENT_USER', self::getCurrentSessionOperator());
     }
 
-    public static function getCurrentSessionOperator(): \Tirreno\Models\Operator|false|null {
-        $model = new \Tirreno\Models\Operator();
+    public static function getCurrentSessionOperator(): ?\Tirreno\Entities\Operator {
         $loggedInOperatorId = \Tirreno\Utils\Conversion::intValCheckEmpty(self::getF3()->get('SESSION.active_user_id'));
 
-        return $loggedInOperatorId ? $model->getOperatorById($loggedInOperatorId) : null;
+        return $loggedInOperatorId ? \Tirreno\Entities\Operator::getById($loggedInOperatorId) : null;
+    }
+
+    public static function getCurrentRequestApiKey(): ?\Tirreno\Entities\ApiKey {
+        return self::getF3()->get('CURRENT_KEY');
+    }
+
+    public static function setCurrentRequestApiKey(): void {
+        self::getF3()->set('CURRENT_KEY', self::getCurrentSessionApiKey());
+    }
+
+    public static function getCurrentSessionApiKey(): ?\Tirreno\Entities\ApiKey {
+        $keyId = self::getF3()->get('TEST_API_KEY_ID');
+
+        if (!$keyId) {
+            $keyId = \Tirreno\Utils\Conversion::intValCheckEmpty(self::getF3()->get('SESSION.active_key_id'));
+        }
+
+        return $keyId ? \Tirreno\Entities\ApiKey::getById($keyId) : null;
     }
 
     public static function redirectIfUnlogged(string $targetPage = '/'): void {

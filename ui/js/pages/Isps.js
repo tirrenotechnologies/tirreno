@@ -8,8 +8,6 @@ import {IspsGrid} from '../parts/grid/Isps.js?v=2';
 export class IspsPage extends BasePage {
     constructor() {
         super('isps');
-
-        this.initUi();
     }
 
     initUi() {

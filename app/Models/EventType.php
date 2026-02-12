@@ -3,7 +3,7 @@
 namespace Tirreno\Models;
 
 class EventType extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_type';
+    protected ?string $DB_TABLE_NAME = 'event_type';
 
     public function getAll(): array {
         $query = 'SELECT id, value, name FROM event_type';

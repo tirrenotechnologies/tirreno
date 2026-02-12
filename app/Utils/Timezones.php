@@ -24,7 +24,7 @@ class Timezones {
 
     private static function translateTimezone(array &$row, array $attributes = ['time', 'lastseen'], bool $useMilliseconds = false): void {
         foreach ($attributes as $attribute) {
-            if (isset($row[$attribute]) && $row[$attribute] !== null) {
+            if (isset($row[$attribute])) {
                 self::localizeForActiveOperator($row[$attribute], $useMilliseconds);
             }
         }
@@ -98,7 +98,7 @@ class Timezones {
         }
     }
 
-    public static function getOperatorOffset(?\Tirreno\Models\Operator $operator): int {
+    public static function getOperatorOffset(?\Tirreno\Entities\Operator $operator): int {
         $operatorTimezone = self::getTimezone($operator?->timezone);
         $utcTime = new \DateTime('now', self::getUtcTimezone());
 
@@ -123,7 +123,7 @@ class Timezones {
 
     public static function getLastNDaysRange(int $days = 1, int $offset = 0): array {
         $now = time();
-        $daySeconds = \Tirreno\Utils\Constants::get('SECONDS_IN_DAY');
+        $daySeconds = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
 
         $date = new \DateTime();
         $date->setTimestamp($now - ($daySeconds * $days) - (($now + $offset) % $daySeconds));
@@ -144,7 +144,7 @@ class Timezones {
         $date->setTimestamp($now + $offset);
         $date->setTime(0, 0, 0);
         $dow = \Tirreno\Utils\Conversion::intValCheckEmpty($date->format('N'), 1);
-        $day = \Tirreno\Utils\Constants::get('SECONDS_IN_DAY');
+        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
 
         $weekStart = $date->getTimestamp() - $offset - ($dow - 1) * $day;
 
@@ -178,8 +178,8 @@ class Timezones {
 
         $date->setTime(0, 0, 0);
 
-        $week = \Tirreno\Utils\Constants::get('SECONDS_IN_WEEK');
-        $day = \Tirreno\Utils\Constants::get('SECONDS_IN_DAY');
+        $week = \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK;
+        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
 
         return [
             'endDate'   => date(self::FORMAT, $date->getTimestamp() - $offset - $week + $day),
@@ -195,7 +195,7 @@ class Timezones {
         $date->setTimestamp($now + $offset);
         $date->setTime(0, 0, 0);
         $dow = \Tirreno\Utils\Conversion::intValCheckEmpty($date->format('N'), 0);
-        $day = \Tirreno\Utils\Constants::get('SECONDS_IN_DAY');
+        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
 
         return [
             'endDate'   => date(self::FORMAT, $now),

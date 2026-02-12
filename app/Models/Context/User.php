@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 class User extends Base {
-    protected $uniqueValues = false;
+    protected ?bool $uniqueValues = false;
 
     public function getContext(array $accountIds, int $apiKey): array {
         $results = $this->getDetails($accountIds, $apiKey);

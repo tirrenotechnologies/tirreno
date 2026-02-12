@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers;
 
 class Navigation extends Base {
-    public $response;
+    public \Tirreno\Views\Base $response;
 
     public function beforeroute(): void {
         // CSRF assignment in base page
@@ -32,10 +32,6 @@ class Navigation extends Base {
      * and do something else with it.
      */
     public function afterroute(): void {
-        if (!$this->response) {
-            trigger_error('No View has been set.');
-        }
-
         echo $this->response->render();
     }
 
@@ -75,11 +71,6 @@ class Navigation extends Base {
         \Tirreno\Utils\Routes::redirectIfUnlogged();
 
         $pageController = new \Tirreno\Controllers\Pages\Logout();
-        $this->response->data = $pageController->getPageParams();
-    }
-
-    public function visitChangeEmailPage(): void {
-        $pageController = new \Tirreno\Controllers\Pages\ChangeEmail();
         $this->response->data = $pageController->getPageParams();
     }
 }

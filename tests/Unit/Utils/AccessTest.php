@@ -217,6 +217,34 @@ final class AccessTest extends TestCase {
         ];
     }
 
+    public function testGetHashUsesSaltAndIsDeterministic(): void {
+        $salt = 'test-salt';
+        $this->f3->set('SALT', $salt);
+
+        $input = 'hello';
+
+        $iterations = 1000;
+        $length = 32;
+
+        $expected = hash_pbkdf2('sha256', $input, $salt, $iterations, $length);
+        $actual = Access::saltHash($input);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testGetPseudoRandomStringIsHexAndHasExpectedLength(): void {
+        $length = 32;
+        $actual = Access::pseudoRandString($length);
+
+        $expectedLength = 32;
+        $actualLength = strlen($actual);
+        $this->assertSame($expectedLength, $actualLength);
+
+        $expectedIsHex = 1;
+        $actualIsHex = preg_match('/^[0-9a-f]+$/', $actual);
+        $this->assertSame($expectedIsHex, $actualIsHex);
+    }
+
     private function setF3(string $key, mixed $value): void {
         $this->f3->set($key, $value);
     }

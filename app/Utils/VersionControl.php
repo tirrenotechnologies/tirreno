@@ -20,7 +20,7 @@ namespace Tirreno\Utils;
 class VersionControl {
     public const VERSION_MAJOR = 0;
     public const VERSION_MINOR = 9;
-    public const VERSION_REVISION = 11;
+    public const VERSION_REVISION = 12;
 
     public static function versionString(): string {
         return sprintf('%d.%d.%d', self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_REVISION);

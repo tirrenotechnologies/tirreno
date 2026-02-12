@@ -91,8 +91,6 @@ class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
                 return false;
             }
             throw new \ErrorException($message, 0, $severity, $file, $line);
-
-            return true;
         });
 
         $result = null;
@@ -114,7 +112,7 @@ class DataEnrichmentPhpClient implements DataEnrichmentClientInterface {
 
         return [
             'content'   => $result !== false ? $result : null,
-            'headers'   => isset($http_response_header) ? $http_response_header : [],
+            'headers'   => $http_response_header,
         ];
     }
 }

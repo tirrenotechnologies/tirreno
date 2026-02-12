@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Emails;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_email.lastseen DESC';
-    protected $dateRangeField = 'event_email.lastseen';
+    protected ?string $defaultOrder = 'event_email.lastseen DESC';
+    protected string $dateRangeField = 'event_email.lastseen';
 
-    protected $allowedColumns = ['email', 'reputation', 'free_email_provider', 'data_breach',
+    protected array $allowedColumns = ['email', 'reputation', 'free_email_provider', 'data_breach',
         'data_breaches', 'disposable_domains', 'blockemails', 'fraud_detected'];
 
     public function getData(): array {
@@ -83,10 +83,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_email.id', $queryParams);
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND
                 (

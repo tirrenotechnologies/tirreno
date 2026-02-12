@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Api;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminApi';
+    public ?string $page = 'AdminApi';
 
     public function getPageParams(): array {
         $dataController = new Data();

@@ -18,41 +18,87 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class ForgotPassword extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_operators_forgot_password';
+    protected ?string $DB_TABLE_NAME = 'dshb_operators_forgot_password';
 
-    public function add(int $operatorId): void {
-        $record = $this->getUnusedKeyByOperatorId($operatorId);
+    public function insertRecord(int $operatorId): string {
+        $params = [
+            ':operator_id'  => $operatorId,
+            ':status'       => 'unused',
+            ':invalidated'  => 'invalidated',
+        ];
 
-        if ($record) {
-            $this->status = 'invalidated';
-            $this->save();
-        }
-
-        $this->reset();
-        $this->renew_key = $this->getPseudoRandomString(32);
-        $this->operator_id = $operatorId;
-        $this->status = 'unused';
-
-        $this->save();
-    }
-
-    private function getUnusedKeyByOperatorId(int $operatorId): self|null|false {
-        return $this->load(
-            ['"operator_id"=? AND "status"=?', $operatorId, 'unused'],
+        $query = (
+            'UPDATE dshb_operators_forgot_password
+            SET
+                status = :invalidated
+            WHERE
+                dshb_operators_forgot_password.operator_id = :operator_id AND
+                dshb_operators_forgot_password.status = :status'
         );
-    }
 
-    public function getUnusedByRenewKey(string $key): self|null|false {
-        return $this->load(
-            ['"renew_key"=? AND "status"=?', $key, 'unused'],
+        $this->execQuery($query, $params);
+
+        $renewKey = \Tirreno\Utils\Access::pseudoRandString(32);
+
+        $params = [
+            ':operator_id'  => $operatorId,
+            ':renew_key'    => $renewKey,
+            ':status'       => 'unused',
+        ];
+
+        $query = (
+            'INSERT INTO dshb_operators_forgot_password (
+                renew_key, status, operator_id
+            ) VALUES (
+                :renew_key, :status, :operator_id
+            )'
         );
+
+        $this->execQuery($query, $params);
+
+        return $renewKey;
     }
 
-    public function deactivate(): void {
-        if ($this->loaded()) {
-            $this->status = 'used';
+    public function getUnusedByRenewKey(string $renewKey): ?string {
+        $params = [
+            ':renew_key'    => $renewKey,
+            ':status'       => 'unused',
+        ];
 
-            $this->save();
-        }
+        $query = (
+            'SELECT
+                created_at
+            FROM
+                dshb_operators_forgot_password
+            WHERE
+                dshb_operators_forgot_password.renew_key = :renew_key AND
+                dshb_operators_forgot_password.status = :status'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['created_at'] ?? null;
+    }
+
+    public function useByRenewKey(string $renewKey): ?int {
+        $params = [
+            ':renew_key'    => $renewKey,
+            ':status'       => 'unused',
+            ':used'         => 'used',
+        ];
+
+        $query = (
+            'UPDATE dshb_operators_forgot_password
+            SET
+                status = :used
+            WHERE
+                dshb_operators_forgot_password.renew_key = :renew_key AND
+                dshb_operators_forgot_password.status = :status
+            RETURNING operator_id'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['operator_id'] ?? null;
     }
 }

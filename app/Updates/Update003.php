@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update003 extends Base {
-    public static $version = 'v0.9.7';
+    public static string $version = 'v0.9.7';
 
-    public static function apply($database): void {
-        $data = [':type' => \Tirreno\Utils\Constants::get('PAGE_ERROR_EVENT_TYPE_ID')];
+    public static function apply(\DB\SQL $database): void {
+        $data = [':type' => \Tirreno\Utils\Constants::get()->PAGE_ERROR_EVENT_TYPE_ID];
 
         $queries = [
             'ALTER TABLE event_logbook DROP COLUMN raw_time',

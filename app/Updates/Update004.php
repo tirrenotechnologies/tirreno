@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update004 extends Base {
-    public static $version = 'v0.9.8';
+    public static string $version = 'v0.9.8';
 
-    public static function apply($database): void {
-        $data = [':type' => \Tirreno\Utils\Constants::get('FIELD_EDIT_EVENT_TYPE_ID')];
+    public static function apply(\DB\SQL $database): void {
+        $data = [':type' => \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID];
 
         $queries = [
             ('CREATE SEQUENCE event_field_audit_trail_id_seq

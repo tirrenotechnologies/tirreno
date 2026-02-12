@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Phone extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_phone';
+    protected ?string $DB_TABLE_NAME = 'event_phone';
 
     public function getPhoneDetails(int $id, int $apiKey): array {
         $params = [

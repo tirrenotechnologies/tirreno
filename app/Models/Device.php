@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Device extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_device';
+    protected ?string $DB_TABLE_NAME = 'event_device';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $query = (

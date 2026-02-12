@@ -18,12 +18,12 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Api;
 
 class Data extends \Tirreno\Controllers\Admin\Base\Data {
-    protected $ENRICHED_ATTRIBUTES = [];
+    protected array $ENRICHED_ATTRIBUTES = [];
 
     public function __construct() {
         parent::__construct();
 
-        $this->ENRICHED_ATTRIBUTES = array_keys(\Tirreno\Utils\Constants::get('ENRICHING_ATTRIBUTES'));
+        $this->ENRICHED_ATTRIBUTES = array_keys(\Tirreno\Utils\Constants::get()->ENRICHING_ATTRIBUTES);
     }
 
     public function proceedPostRequest(): array {
@@ -42,11 +42,11 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         $isOwner = true;
         if (!$apiKeys) {
             $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
+            $key = $coOwnerModel->getCoOwnershipKeyId($operatorId);
 
-            if ($coOwnerModel->loaded()) {
+            if ($key) {
                 $isOwner = false;
-                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
+                $apiKeys[] = $model->getKeyById($key);
             }
         }
 
@@ -58,8 +58,8 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
 
         foreach ($apiKeys as $key) {
             $subscriptionStats = [];
-            if ($key->token !== null) {
-                [$code, $response, $error] = $this->getSubscriptionStats($key->token);
+            if ($key['token'] !== null) {
+                [$code, $response, $error] = $this->getSubscriptionStats($key['token']);
                 $subscriptionStats = strlen($error) > 0 || $code > 201 ? [] : $response;
             }
 
@@ -68,9 +68,9 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             $used = $remaining !== null && $total !== null ? $total - $remaining : null;
 
             $resultKeys[] = [
-                'id'                        => $key->id,
-                'key'                       => $key->key,
-                'apiToken'                  => $key->token ?? null,
+                'id'                        => $key['id'],
+                'key'                       => $key['key'],
+                'apiToken'                  => $key['token'] ?? null,
                 'sub_status'                => $subscriptionStats['status'] ?? null,
                 'sub_calls_left'            => $remaining,
                 'sub_calls_used'            => $used,
@@ -93,14 +93,14 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
 
         foreach ($apiKeys as $key) {
             $resultKeys[] = [
-                'id'                        => $key->id,
-                'key'                       => $key->key,
-                'created_at'                => $key->created_at,
-                'skip_enriching_attributes' => $key->skip_enriching_attributes,
-                'enrichedAttributes'        => $this->getEnrichedAttributes($key),
-                'retention_policy'          => $key->retention_policy,
-                'skip_blacklist_sync'       => $key->skip_blacklist_sync,
-                'apiToken'                  => $key->token ?? null,
+                'id'                        => $key['id'],
+                'key'                       => $key['key'],
+                'created_at'                => $key['created_at'],
+                'skip_enriching_attributes' => $key['skip_enriching_attributes'],
+                'enrichedAttributes'        => $this->getEnrichedAttributes($key['skip_enriching_attributes']),
+                'retention_policy'          => $key['retention_policy'],
+                'skip_blacklist_sync'       => $key['skip_blacklist_sync'],
+                'apiToken'                  => $key['token'],
             ];
         }
 
@@ -109,20 +109,19 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
 
     private function getSubscriptionStats(string $token): array {
         $response = \Tirreno\Utils\Network::sendApiRequest(null, '/usage-stats', 'GET', $token);
-        $code = $response['code'];
-        $result = $response['data'];
+        $code = $response->code();
+        $result = $response->body();
 
-        $jsonResponse = is_array($result) ? $result : [];
         $statusCode = $code ?? 0;
+        $errorMessage = $response->error() ?? '';
 
-        $errorMessage = $response['error'] ?? '';
-
-        return [$statusCode, $jsonResponse, $errorMessage];
+        return [$statusCode, $result, $errorMessage];
     }
 
     public function resetApiKey(): array {
         $pageParams = [];
         $params = $this->extractRequestParams(['token', 'keyId']);
+        // TODO: valid only for owners?
         $errorCode = \Tirreno\Utils\Validators::validateResetApiKey($params);
 
         if ($errorCode) {
@@ -130,9 +129,11 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         } else {
             $keyId = \Tirreno\Utils\Conversion::getIntRequestParam('keyId');
 
+            $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
+            $operatorId = $currentOperator->id;
+
             $model = new \Tirreno\Models\ApiKeys();
-            $model->getKeyById($keyId);
-            $model->resetKey($keyId, $model->creator);
+            $model->resetKey($keyId, $operatorId);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_reset_success_message');
         }
@@ -154,7 +155,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             $model = new \Tirreno\Models\Users();
             $accountsToEnrich = $model->notCheckedUsers($apiKey);
 
-            (new \Tirreno\Models\Queue())->addBatchIds($accountsToEnrich, \Tirreno\Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'), $apiKey);
+            (new \Tirreno\Models\Queue())->addBatchIds($accountsToEnrich, \Tirreno\Utils\Constants::get()->ENRICHMENT_QUEUE_ACTION_TYPE, $apiKey);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_manual_enrichment_success_message');
         }
@@ -162,9 +163,9 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         return $pageParams;
     }
 
-    public function getEnrichedAttributes(\Tirreno\Models\ApiKeys $key): array {
+    private function getEnrichedAttributes(string $attributes): array {
         $enrichedAttributes = [];
-        $skipAttributes = json_decode($key->skip_enriching_attributes);
+        $skipAttributes = json_decode($attributes);
         foreach ($this->ENRICHED_ATTRIBUTES as $attribute) {
             $enrichedAttributes[$attribute] = !in_array($attribute, $skipAttributes);
         }
@@ -195,15 +196,15 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
                     $pageParams['ERROR_CODE'] = \Tirreno\Utils\ErrorCodes::SUBSCRIPTION_KEY_INVALID_UPDATE;
                     return $pageParams;
                 }
-                $model->updateInternalToken($apiToken);
+                $model->updateInternalToken($apiToken, $keyId);
             }
 
-            $enrichedAttributes = \Tirreno\Utils\Conversion::getArrayRequestParam('enrichedAttributes');
+            $enrichedAttributes = \Tirreno\Utils\Conversion::getDictionaryRequestParam('enrichedAttributes');
             $skipEnrichingAttr = array_diff($this->ENRICHED_ATTRIBUTES, array_keys($enrichedAttributes));
-            $model->updateSkipEnrichingAttributes($skipEnrichingAttr);
+            $model->updateSkipEnrichingAttributes($skipEnrichingAttr, $keyId);
 
             $skipBlacklistSync = !\Tirreno\Utils\Conversion::getStringRequestParam('exchangeBlacklist');
-            $model->updateSkipBlacklistSynchronisation($skipBlacklistSync);
+            $model->updateSkipBlacklistSynchronisation($skipBlacklistSync, $keyId);
 
             $pageParams['SUCCESS_MESSAGE'] = $this->f3->get('AdminApi_data_enrichment_success_message');
         }
@@ -223,6 +224,6 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         $model = new \Tirreno\Models\Queue();
 
         // do not use isInQueue() to prevent true on failed state
-        return $model->actionIsInQueueProcessing(\Tirreno\Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'), $apiKey);
+        return $model->actionIsInQueueProcessing(\Tirreno\Utils\Constants::get()->ENRICHMENT_QUEUE_ACTION_TYPE, $apiKey);
     }
 }

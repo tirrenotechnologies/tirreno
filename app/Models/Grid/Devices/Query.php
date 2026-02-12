@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Devices;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_device.created DESC';
-    protected $dateRangeField = 'event_device.lastseen';
+    protected ?string $defaultOrder = 'event_device.created DESC';
+    protected string $dateRangeField = 'event_device.lastseen';
 
-    protected $allowedColumns = ['created', 'device', 'os_name', 'browser_name', 'lang', 'modified', 'id'];
+    protected array $allowedColumns = ['created', 'device', 'os_name', 'browser_name', 'lang', 'modified', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();

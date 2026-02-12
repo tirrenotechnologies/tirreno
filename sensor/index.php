@@ -96,22 +96,22 @@ try {
 
     if (!$rateLimit) {
         $logbookManager->logIncorrectRequest(
-            $request?->body ?? [],
+            $request->body ?? [],
             $e::class . ': ' . $e->getMessage(),
-            $request?->traceId ?? null,
+            $request->traceId ?? null,
         );
     }
 
     // Log profiler data and queries before exit
     $profiler->finish('total');
-    $logger->logProfilerData($profiler->getData());
+    //$logger->logProfilerData($profiler->getData());
 
     http_response_code(!$rateLimit ? 500 : 429);
     exit;
 }
 
 $profiler->finish('total');
-$logger->logProfilerData($profiler->getData());
+//$logger->logProfilerData($profiler->getData());
 // getapikey
 $logbookManager->logRequest($requestStartTime, $response);
 
@@ -124,7 +124,7 @@ if ($response instanceof RegularResponse) {
 $logger->logUserError($response->httpCode, (string) $response);
 // getapikey
 $logbookManager->logIncorrectRequest(
-    $request?->body ?? [],
+    $request->body,
     (string) $response,
-    $request?->traceId ?? null,
+    $request->traceId ?? null,
 );

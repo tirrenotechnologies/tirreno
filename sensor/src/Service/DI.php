@@ -119,12 +119,10 @@ class DI {
                 $accountRepository,
                 new SessionRepository($pdo),
                 new IpAddressRepository($ispRepository, $pdo),
-                $ispRepository,
                 new UrlRepository(new UrlQueryRepository($pdo), $pdo),
                 new DeviceRepository($userAgentRepository, $pdo),
                 new RefererRepository($pdo),
                 $emailRepository,
-                $domainRepository,
                 $phoneRepository,
                 new EventCountryRepository($pdo),
                 new FieldAuditTrailRepository($pdo),
@@ -140,7 +138,7 @@ class DI {
     }
 
     public function getLogger(): Logger {
-        return $this->logger ??= new Logger($this->getConfig(true)?->debugLog || false);
+        return $this->logger ??= new Logger(boolval($this->getConfig(true)?->debugLog));
     }
 
     public function getProfiler(): Profiler {
@@ -155,9 +153,9 @@ class DI {
             new LogbookRepository($pdo),
             new ApiKeyRepository($pdo),
             new EventIncorrectRepository($pdo),
-            $this->config?->allowEmailPhone ?? false,
-            $this->config?->leakyBuckerRps ?? 5,
-            $this->config?->leakyBucketWindow ?? 5,
+            $this->config->allowEmailPhone ?? false,
+            $this->config->leakyBucketRps ?? 5,
+            $this->config->leakyBucketWindow ?? 5,
         );
     }
 
@@ -217,27 +215,29 @@ class DI {
      */
     private function parseDatabaseConfig(array $config): ?DatabaseConfig {
         if (isset($config['DATABASE_URL'])) {
-            $dbParts = parse_url($config['DATABASE_URL']);
+            $parts = parse_url($config['DATABASE_URL']);
 
-            if (
-                $dbParts === false || !isset(
-                    $dbParts['scheme'],
-                    $dbParts['user'],
-                    $dbParts['pass'],
-                    $dbParts['host'],
-                    $dbParts['port'],
-                    $dbParts['path']
-                )
-            ) {
+            if (!$parts) {
+                throw new \Exception('Invalid DB URL.');
+            }
+
+            $schm = $parts['scheme'] ?? '';
+            $host = $parts['host'] ?? '';
+            $port = $parts['port'] ?? 5432;
+            $user = $parts['user'] ?? '';
+            $pass = $parts['pass'] ?? '';
+            $path = $parts['path'] ?? '';
+
+            if (!$schm || !$host || !$port || !$user || !$pass || !$path) {
                 throw new \Exception('Invalid DB URL.');
             }
 
             return new DatabaseConfig(
-                dbHost: $dbParts['host'],
-                dbPort: is_numeric($dbParts['port']) ? intval($dbParts['port']) : 0,
-                dbUser: $dbParts['user'],
-                dbPassword: $dbParts['pass'],
-                dbDatabaseName: ltrim($dbParts['path'], '/'),
+                dbHost: $host,
+                dbPort: $this->toInt($port, 0),
+                dbUser: $user,
+                dbPassword: $pass,
+                dbDatabaseName: ltrim($path, '/'),
             );
         }
 

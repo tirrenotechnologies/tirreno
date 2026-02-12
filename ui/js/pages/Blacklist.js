@@ -10,11 +10,11 @@ import {BlacklistGrid} from '../parts/grid/Blacklist.js?v=2';
 export class BlacklistPage extends BasePage {
     constructor() {
         super('blacklist');
-        this.tableId = 'blacklist-table';
-        this.initUi();
     }
 
     initUi() {
+        this.tableId = 'blacklist-table';
+
         const datesFilter       = new DatesFilter();
         const searchFilter      = new SearchFilter();
 

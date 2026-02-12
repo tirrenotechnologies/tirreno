@@ -5,8 +5,6 @@ import {EnrichAllPopUp} from '../parts/popup/EnrichAllPopUp.js?v=2';
 export class ApiPage extends BasePage {
     constructor() {
         super('api');
-
-        this.initUi();
     }
 
     initUi() {

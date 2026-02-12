@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Queue extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'queue_account_operation';
+    protected ?string $DB_TABLE_NAME = 'queue_account_operation';
 
     public function add(int $accountId, string $action, int $key): void {
         $params = [
@@ -57,25 +57,25 @@ class Queue extends \Tirreno\Models\BaseSql {
     }
 
     public function setWaiting(array $ids): void {
-        $this->setStatus(\Tirreno\Utils\Constants::get('WAITING_QUEUE_STATUS_TYPE'), $ids);
+        $this->setStatus(\Tirreno\Utils\Constants::get()->WAITING_QUEUE_STATUS_TYPE, $ids);
     }
 
     public function setFailed(array $ids): void {
-        $this->setStatus(\Tirreno\Utils\Constants::get('FAILED_QUEUE_STATUS_TYPE'), $ids);
+        $this->setStatus(\Tirreno\Utils\Constants::get()->FAILED_QUEUE_STATUS_TYPE, $ids);
     }
 
     public function setCompleted(array $ids): void {
-        $this->setStatus(\Tirreno\Utils\Constants::get('COMPLETED_QUEUE_STATUS_TYPE'), $ids);
+        $this->setStatus(\Tirreno\Utils\Constants::get()->COMPLETED_QUEUE_STATUS_TYPE, $ids);
     }
 
     public function setExecuting(array $ids): void {
-        $this->setStatus(\Tirreno\Utils\Constants::get('EXECUTING_QUEUE_STATUS_TYPE'), $ids);
+        $this->setStatus(\Tirreno\Utils\Constants::get()->EXECUTING_QUEUE_STATUS_TYPE, $ids);
     }
 
     public function isInQueueStatus(int $accountId, string $action, int $key): array {
         $params = [
             ':account'  => $accountId,
-            ':status'   => \Tirreno\Utils\Constants::get('COMPLETED_QUEUE_STATUS_TYPE'),
+            ':status'   => \Tirreno\Utils\Constants::get()->COMPLETED_QUEUE_STATUS_TYPE,
             ':key'      => $key,
             ':action'   => $action,
         ];
@@ -105,8 +105,8 @@ class Queue extends \Tirreno\Models\BaseSql {
 
     public function actionIsInQueueProcessing(string $action, int $key): bool {
         $params = [
-            ':failed'       => \Tirreno\Utils\Constants::get('FAILED_QUEUE_STATUS_TYPE'),
-            ':completed'    => \Tirreno\Utils\Constants::get('COMPLETED_QUEUE_STATUS_TYPE'),
+            ':failed'       => \Tirreno\Utils\Constants::get()->FAILED_QUEUE_STATUS_TYPE,
+            ':completed'    => \Tirreno\Utils\Constants::get()->COMPLETED_QUEUE_STATUS_TYPE,
             ':key'          => $key,
             ':action'       => $action,
         ];
@@ -153,7 +153,7 @@ class Queue extends \Tirreno\Models\BaseSql {
 
         $params = [
             ':action'   => $action,
-            ':waiting'  => \Tirreno\Utils\Constants::get('WAITING_QUEUE_STATUS_TYPE'),
+            ':waiting'  => \Tirreno\Utils\Constants::get()->WAITING_QUEUE_STATUS_TYPE,
         ];
 
         $arrayPlaceholders = [];
@@ -247,7 +247,7 @@ class Queue extends \Tirreno\Models\BaseSql {
     public function clearQueue(string $action, string $before): int {
         $params = [
             ':before' => $before,
-            ':status' => \Tirreno\Utils\Constants::get('COMPLETED_QUEUE_STATUS_TYPE'),
+            ':status' => \Tirreno\Utils\Constants::get()->COMPLETED_QUEUE_STATUS_TYPE,
             ':action' => $action,
         ];
 
@@ -272,8 +272,8 @@ class Queue extends \Tirreno\Models\BaseSql {
     public function setFailedForStuckAction(string $action): void {
         $params = [
             ':action'   => $action,
-            ':status'   => \Tirreno\Utils\Constants::get('FAILED_QUEUE_STATUS_TYPE'),
-            ':stuck'    => \Tirreno\Utils\Constants::get('EXECUTING_QUEUE_STATUS_TYPE'),
+            ':status'   => \Tirreno\Utils\Constants::get()->FAILED_QUEUE_STATUS_TYPE,
+            ':stuck'    => \Tirreno\Utils\Constants::get()->EXECUTING_QUEUE_STATUS_TYPE,
         ];
 
         $query = (
@@ -293,7 +293,7 @@ class Queue extends \Tirreno\Models\BaseSql {
     public function checkExecuting(string $action): array {
         $params = [
             ':action'   => $action,
-            ':status'   => \Tirreno\Utils\Constants::get('EXECUTING_QUEUE_STATUS_TYPE'),
+            ':status'   => \Tirreno\Utils\Constants::get()->EXECUTING_QUEUE_STATUS_TYPE,
         ];
 
         $query = (
@@ -316,7 +316,7 @@ class Queue extends \Tirreno\Models\BaseSql {
         $params = [
             ':batch'    => $size,
             ':action'   => $action,
-            ':status'   => \Tirreno\Utils\Constants::get('WAITING_QUEUE_STATUS_TYPE'),
+            ':status'   => \Tirreno\Utils\Constants::get()->WAITING_QUEUE_STATUS_TYPE,
         ];
 
         $query = ('
@@ -342,7 +342,7 @@ class Queue extends \Tirreno\Models\BaseSql {
         $params = [
             ':batch'    => $size,
             ':action'   => $action,
-            ':status'   => \Tirreno\Utils\Constants::get('WAITING_QUEUE_STATUS_TYPE'),
+            ':status'   => \Tirreno\Utils\Constants::get()->WAITING_QUEUE_STATUS_TYPE,
         ];
 
         $query = ('

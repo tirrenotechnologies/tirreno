@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class PasswordRecovering extends Base {
-    public $page = 'PasswordRecovering';
+    public ?string $page = 'PasswordRecovering';
 
     public function getPageParams(): array {
         $pageParams = [
@@ -37,16 +37,13 @@ class PasswordRecovering extends Base {
 
             if (!$errorCode) {
                 $forgotPasswordModel = new \Tirreno\Models\ForgotPassword();
-                $forgotPasswordModel->getUnusedByRenewKey($this->f3->get('PARAMS.renewKey'));
-                $operatorId = $forgotPasswordModel->operator_id;
-
-                $forgotPasswordModel->deactivate();
+                $operatorId = $forgotPasswordModel->useByRenewKey($this->f3->get('PARAMS.renewKey'));
 
                 $password = \Tirreno\Utils\Conversion::getStringRequestParam('new-password');
 
-                $operatorModel = new \Tirreno\Models\Operator();
-                $operatorModel->updatePassword($password, $operatorId);
-                $operatorModel->activateByOperator($operatorId);
+                $model = new \Tirreno\Models\Operator();
+                $model->updatePassword($password, $operatorId);
+                $model->activateByOperatorId($operatorId);
 
                 $pageParams['SUCCESS_CODE'] = \Tirreno\Utils\ErrorCodes::ACCOUNT_ACTIVATED;
             }

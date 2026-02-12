@@ -6,9 +6,7 @@ import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
 import {formatKiloValue} from '../utils/String.js?v=2';
 import {TotalTile} from '../TotalTile.js?v=2';
 import {renderTotalFrame} from '../DataRenderers.js?v=2';
-import {
-    MIDLINE_HELLIP,
-} from '../utils/Constants.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 
 export class BaseGrid {
     constructor(gridParams) {
@@ -310,7 +308,7 @@ export class BaseGrid {
 
     onBeforeLoad(e, settings, data) {
         this.startLoader();
-        this.updateTableTitle(MIDLINE_HELLIP);
+        this.updateTableTitle(Constants.MIDLINE_HELLIP);
 
         fireEvent('dateFilterChangedCaught');
 
@@ -431,7 +429,7 @@ export class BaseGrid {
         const col_name = meta.settings.aoColumns[meta.col].name;
         if (this.config.calculateTotals && this.config.totals.columns.includes(col_name)) {
             span.className = 'loading-table-total';
-            span.textContent = MIDLINE_HELLIP;
+            span.textContent = Constants.MIDLINE_HELLIP;
         } else {
             span.textContent = data;
         }

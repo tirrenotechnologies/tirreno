@@ -33,7 +33,7 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
     public function init(array $data): void {
         $this->ip = $data['value'];
 
-        if (!\Tirreno\Utils\Conversion::filterIp($this->ip) || $data['error'] !== \Tirreno\Utils\Constants::get('ENRICHMENT_IP_IS_BOGON')) {
+        if (!\Tirreno\Utils\Conversion::filterIp($this->ip) || $data['error'] !== \Tirreno\Utils\Constants::get()->ENRICHMENT_IP_IS_BOGON) {
             throw new \Exception('Validation failed');
         }
     }
@@ -82,7 +82,7 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
         $this->isp = $newIspId;
 
         $countryModel = new \Tirreno\Models\Country();
-        $newCountryId = $countryModel->getCountryIdByIso($this->country);
+        $newCountryId = $this->country;
 
         $countryRecord = $countryModel->getCountryById($newCountryId, $apiKey);
         if (!count($countryRecord)) {

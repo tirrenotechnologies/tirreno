@@ -10,8 +10,6 @@ import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=2';
 export class FieldAuditPage extends BasePage {
     constructor() {
         super('field', true);
-
-        this.initUi();
     }
 
     initUi() {

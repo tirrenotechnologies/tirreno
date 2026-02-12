@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\UserAgents;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'ed.lastseen DESC';
-    protected $dateRangeField = 'ed.lastseen';
+    protected ?string $defaultOrder = 'ed.lastseen DESC';
+    protected string $dateRangeField = 'ed.lastseen';
 
-    protected $allowedColumns = ['id', 'device', 'os_name', 'modified'];
+    protected array $allowedColumns = ['id', 'device', 'os_name', 'modified'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -97,9 +97,9 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions = (
                 ' AND
                 (

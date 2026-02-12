@@ -23,7 +23,7 @@ class Totals extends Base {
         $this->addLog('Start totals calculation.');
 
         $start = time();
-        $models = \Tirreno\Utils\Constants::get('REST_TOTALS_MODELS');
+        $models = \Tirreno\Utils\Constants::get()->REST_TOTALS_MODELS;
 
         $batchSize = \Tirreno\Utils\Variables::getAccountOperationQueueBatchSize();
         $bottom = false;
@@ -31,7 +31,7 @@ class Totals extends Base {
         $queueModel = new \Tirreno\Models\Queue();
 
         // TODO check multiple batches
-        $keys = $queueModel->getNextBatchKeys(\Tirreno\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'), $batchSize);
+        $keys = $queueModel->getNextBatchKeys(\Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE, $batchSize);
         $res = [];
 
         foreach ($models as $name => $modelClass) {
@@ -43,7 +43,7 @@ class Totals extends Base {
 
                 $cnt = $model->updateAllTotals($key);
                 $res[$name]['cnt'] += $cnt;
-                if (time() - $start > \Tirreno\Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC')) {
+                if (time() - $start > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC) {
                     // TODO: any reason to put the rest keys to queue?
                     $res[$name]['s'] = time() - $timeMark;
                     break 2;

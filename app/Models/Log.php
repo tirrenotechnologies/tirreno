@@ -18,14 +18,17 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Log extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_logs';
+    protected ?string $DB_TABLE_NAME = 'dshb_logs';
 
-    public function add(array $data): void {
-        $this->text = json_encode($data);
-        $this->save();
-    }
+    public function insertRecord(array $data): void {
+        $params = [
+            ':text' => json_encode($data),
+        ];
 
-    public function getAll(): array {
-        return $this->find();
+        $query = (
+            'INSERT INTO dshb_logs (text) VALUES (:text)'
+        );
+
+        $this->execQuery($query, $params);
     }
 }

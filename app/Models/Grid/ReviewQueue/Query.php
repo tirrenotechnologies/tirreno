@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\ReviewQueue;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = null;
-    protected $dateRangeField = 'event_account.added_to_review';
+    protected ?string $defaultOrder = null;
+    protected string $dateRangeField = 'event_account.added_to_review';
 
-    protected $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created', 'added_to_review'];
+    protected array $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created', 'added_to_review'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -96,9 +96,9 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND
                 (

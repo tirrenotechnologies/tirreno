@@ -9,8 +9,6 @@ import {EventsGrid} from '../parts/grid/Events.js?v=2';
 export class WatchlistPage extends BasePage {
     constructor() {
         super('watchlist');
-
-        this.initUi();
     }
 
     initUi() {

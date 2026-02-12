@@ -44,16 +44,16 @@ abstract class BaseQueue extends Base {
         $prefix = '';
 
         switch ($action) {
-            case \Tirreno\Utils\Constants::get('DELETE_USER_QUEUE_ACTION_TYPE'):
+            case \Tirreno\Utils\Constants::get()->DELETE_USER_QUEUE_ACTION_TYPE:
                 $prefix = 'Deletion';
                 break;
-            case \Tirreno\Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'):
+            case \Tirreno\Utils\Constants::get()->BLACKLIST_QUEUE_ACTION_TYPE:
                 $prefix = 'Blacklist';
                 break;
-            case \Tirreno\Utils\Constants::get('ENRICHMENT_QUEUE_ACTION_TYPE'):
+            case \Tirreno\Utils\Constants::get()->ENRICHMENT_QUEUE_ACTION_TYPE:
                 $prefix = 'Enrichment';
                 break;
-            case \Tirreno\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'):
+            case \Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE:
                 $prefix = 'Risk score';
                 break;
         }
@@ -106,13 +106,13 @@ abstract class BaseQueue extends Base {
                 }
 
                 // exit if took too long
-                $batchTimeout = (time() - $start) > \Tirreno\Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC');
+                $batchTimeout = (time() - $start) > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
                 if ($batchTimeout) {
                     break;
                 }
             }
             // exit if took too long
-            $bottom = (time() - $start) > \Tirreno\Utils\Constants::get('ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC');
+            $bottom = (time() - $start) > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
         }
 
         $model->setCompleted($success);

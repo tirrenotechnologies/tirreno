@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Rules;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminRules';
+    public ?string $page = 'AdminRules';
 
     public function getPageParams(): array {
         $dataController = new Data();
@@ -42,7 +42,7 @@ class Page extends \Tirreno\Controllers\Admin\Base\Page {
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/rules.html',
             'JS'                    => 'admin_rules.js',
-            'RULES_PRESETS'         => \Tirreno\Utils\Constants::get('RULES_PRESETS'),
+            'RULES_PRESETS'         => \Tirreno\Utils\Constants::get()->RULES_PRESETS,
             'RULE_VALUES'           => $ruleValues,
             'RULES'                 => $rules,
             'SEARCH_PLACEHOLDER'    => $searchPlacholder,

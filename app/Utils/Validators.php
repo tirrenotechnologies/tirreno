@@ -23,58 +23,65 @@ class Validators {
     }
 
     // helpers
-    private static function getSafeString(string $key, array $params): ?string {
+    protected static function getSafeString(string $key, array $params): ?string {
         return isset($params[$key]) && is_string($params[$key]) && $params[$key] ? $params[$key] : null;
     }
 
-    private static function getSafeInt(string $key, array $params): ?int {
+    protected static function getSafeInt(string $key, array $params): ?int {
         return isset($params[$key]) ? \Tirreno\Utils\Conversion::intVal($params[$key]) : null;
     }
 
-    private static function checkInterval(string $key, array $params, int $start, int $end): bool {
+    protected static function checkInterval(string $key, array $params, int $start, int $end): bool {
         $value = self::getSafeInt($key, $params);
 
         return $value !== null && $value >= $start && $value <= $end;
     }
 
+    protected static function isAddress(string $key, array $params): bool {
+        $value = self::getSafeString($key, $params);
+        $audit = \Audit::instance();
+
+        return $audit->url($value) || $audit->ipv4($value) || $audit->ipv6($value);
+    }
+
     // basic validators
-    private static function validateCsrf(array $params): int|false {
+    protected static function validateCsrf(array $params): int|false {
         return \Tirreno\Utils\Access::CSRFTokenValid($params, self::getF3()) ?: false;
     }
 
-    private static function validateEmailPresence(array $params): int|false {
+    protected static function validateEmailPresence(array $params): int|false {
         return !self::getSafeString('email', $params)
             ? \Tirreno\Utils\ErrorCodes::EMAIL_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validatePasswordPresence(array $params): int|false {
+    protected static function validatePasswordPresence(array $params): int|false {
         return !self::getSafeString('password', $params)
             ? \Tirreno\Utils\ErrorCodes::PASSWORD_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validateTimezone(array $params): int|false {
+    protected static function validateTimezone(array $params): int|false {
         return !self::getSafeString('timezone', $params)
             || !array_key_exists($params['timezone'], \Tirreno\Utils\Variables::getAvailableTimezones())
             ? \Tirreno\Utils\ErrorCodes::TIME_ZONE_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validateEmailCorrect(array $params): int|false {
+    protected static function validateEmailCorrect(array $params): int|false {
         return !self::getSafeString('email', $params)
             || !\Audit::instance()->email($params['email'], true)
             ? \Tirreno\Utils\ErrorCodes::EMAIL_IS_NOT_CORRECT
             : false;
     }
 
-    private static function validateApiKeyPresence(array $params): int|false {
+    protected static function validateApiKeyPresence(array $params): int|false {
         return !self::getSafeInt('keyId', $params)
             ? \Tirreno\Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST
             : false;
     }
 
-    private static function validateApiKeyOwning(array $params): int|false {
+    protected static function validateApiKeyOwning(array $params): int|false {
         $keyId = self::getSafeInt('keyId', $params);
 
         return !$keyId
@@ -83,7 +90,7 @@ class Validators {
             : false;
     }
 
-    private static function validateEmailNew(array $params): int|false {
+    protected static function validateEmailNew(array $params): int|false {
         return !self::getSafeString('email', $params)
             || (new \Tirreno\Models\Operator())->getByEmail($params['email'])
             ? \Tirreno\Utils\ErrorCodes::EMAIL_ALREADY_EXIST
@@ -91,40 +98,40 @@ class Validators {
         /*if ($operatorsModel->loaded()) {*/
     }
 
-    private static function validateNewPasswordPresence(array $params): int|false {
+    protected static function validateNewPasswordPresence(array $params): int|false {
         return !self::getSafeString('new-password', $params)
             ? \Tirreno\Utils\ErrorCodes::NEW_PASSWORD_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validatePasswordLength(array $params): int|false {
+    protected static function validatePasswordLength(array $params): int|false {
         return !self::getSafeString('password', $params)
             || strlen($params['password']) < self::getF3()->get('MIN_PASSWORD_LENGTH')
             ? \Tirreno\Utils\ErrorCodes::PASSWORD_IS_TOO_SHORT
             : false;
     }
 
-    private static function validateNewPasswordLength(array $params): int|false {
+    protected static function validateNewPasswordLength(array $params): int|false {
         return !self::getSafeString('new-password', $params)
             || strlen($params['new-password']) < self::getF3()->get('MIN_PASSWORD_LENGTH')
             ? \Tirreno\Utils\ErrorCodes::PASSWORD_IS_TOO_SHORT
             : false;
     }
 
-    private static function validateCurrentPasswordPresence(array $params): int|false {
+    protected static function validateCurrentPasswordPresence(array $params): int|false {
         return !self::getSafeString('current-password', $params)
             ? \Tirreno\Utils\ErrorCodes::CURRENT_PASSWORD_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validateEmailChanged(array $params): int|false {
+    protected static function validateEmailChanged(array $params): int|false {
         return !self::getSafeString('email', $params)
-            || strtolower($params['email']) === strtolower(\Tirreno\Utils\Routes::getCurrentRequestOperator()?->email ?? '')
+            || strtolower($params['email']) === strtolower(\Tirreno\Utils\Routes::getCurrentRequestOperator()->email ?? '')
             ? \Tirreno\Utils\ErrorCodes::EMAIL_IS_NOT_NEW
             : false;
     }
 
-    private static function validateEnrichedAttributes(array $params, array $attributes): int|false {
+    protected static function validateEnrichedAttributes(array $params, array $attributes): int|false {
         return !isset($params['enrichedAttributes'])
             || !is_array($params['enrichedAttributes'])
             || array_diff(array_keys($params['enrichedAttributes']), $attributes)
@@ -132,11 +139,11 @@ class Validators {
             : false;
     }
 
-    private static function validateReminderFreq($params): int|false {
+    protected static function validateReminderFreq(array $params): int|false {
         return !isset($params['review-reminder-frequency'])
             || !$params['review-reminder-frequency']
             || (!is_int($params['review-reminder-frequency']) && !is_string($params['review-reminder-frequency']))
-            || !in_array($params['review-reminder-frequency'], \Tirreno\Utils\Constants::get('NOTIFICATION_REMINDER_TYPES'))
+            || !in_array($params['review-reminder-frequency'], \Tirreno\Utils\Constants::get()->NOTIFICATION_REMINDER_TYPES)
             ? \Tirreno\Utils\ErrorCodes::INVALID_REMINDER_FREQUENCY
             : false;
     }
@@ -162,26 +169,19 @@ class Validators {
             : false;
     }
 
-    private static function validateEmailRenewKeyPresence(?array $params): int|false {
-        return $params === null
-            || !self::getSafeString('renewKey', $params)
-            ? \Tirreno\Utils\ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST
-            : false;
-    }
-
     private static function validateOperatorIdPresence(array $params): int|false {
         return !self::getSafeInt('operatorId', $params)
             ? \Tirreno\Utils\ErrorCodes::API_KEY_ID_DOESNT_EXIST
             : false;
     }
 
-    private static function validateRetention($params): int|false {
+    private static function validateRetention(array $params): int|false {
         return !self::checkInterval('retention-policy', $params, 0, 12)
             ? \Tirreno\Utils\ErrorCodes::RETENTION_POLICY_DOES_NOT_EXIST
             : false;
     }
 
-    private static function validateBlacklistThreshold($params): int|false {
+    private static function validateBlacklistThreshold(array $params): int|false {
         return (isset($params['blacklist-threshold'])
             && $params['blacklist-threshold'] !== ''
             && !self::checkInterval('blacklist-threshold', $params, 0, 98))
@@ -189,7 +189,7 @@ class Validators {
             : false;
     }
 
-    private static function validateReviewQueueThreshold($params): int|false {
+    private static function validateReviewQueueThreshold(array $params): int|false {
         return !self::checkInterval('review-queue-threshold', $params, 0, 99)
             ? \Tirreno\Utils\ErrorCodes::INVALID_REVIEW_QUEUE_THRESHOLD
             : false;
@@ -207,7 +207,7 @@ class Validators {
     }
 
     private static function validateRulesPresetId(array $params): int|false {
-        return !array_key_exists($params['rules-preset'], \Tirreno\Utils\Constants::get('RULES_PRESETS'))
+        return !array_key_exists($params['rules-preset'], \Tirreno\Utils\Constants::get()->RULES_PRESETS)
             ? \Tirreno\Utils\ErrorCodes::INVALID_RULES_PRESET_ID
             : false;
     }
@@ -243,8 +243,7 @@ class Validators {
         }
 
         $model = new \Tirreno\Models\Operator();
-        $model->getOperatorById($operatorId);
-        if (!$model->verifyPassword($params['current-password'])) {
+        if (!$model->verifyPassword($params['current-password'], $operatorId)) {
             return \Tirreno\Utils\ErrorCodes::CURRENT_PASSWORD_IS_NOT_CORRECT;
         }
 
@@ -260,9 +259,9 @@ class Validators {
         }
 
         $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-        $coOwnerModel->getCoOwnership($operatorId);
+        $key = $coOwnerModel->getCoOwnershipKeyId($operatorId);
 
-        if (!$coOwnerModel->loaded() || $coOwnerModel->api !== $keyId) {
+        if (!$key || $key !== $keyId) {
             return \Tirreno\Utils\ErrorCodes::OPERATOR_IS_NOT_A_CO_OWNER;
         }
         return false;
@@ -386,7 +385,8 @@ class Validators {
             ?: self::validateEmailCorrect($params)
             ?: self::validateEmailNew($params)
             ?: self::validatePasswordLength($params)
-            ?: self::validateTimezone($params);
+            ?: self::validateTimezone($params)
+            ?: self::validateRulesPresetId($params);
     }
 
     public static function validatePasswordRecoveringPost(array $params): int|false {
@@ -410,40 +410,17 @@ class Validators {
         }
 
         $forgotPasswordModel = new \Tirreno\Models\ForgotPassword();
-        $forgotPasswordModel->getUnusedByRenewKey($params['renewKey']);
-        if (!$forgotPasswordModel->loaded()) {
+        $createdAt = $forgotPasswordModel->getUnusedByRenewKey($params['renewKey']);
+        if (!$createdAt) {
             return \Tirreno\Utils\ErrorCodes::RENEW_KEY_IS_NOT_CORRECT;
         }
 
         $currentTime = time();
-        $linkTime = strtotime($forgotPasswordModel->created_at);
+        $linkTime = strtotime($createdAt);
         $lifeTime = self::getF3()->get('RENEW_PASSWORD_LINK_TIME');
 
         if ($currentTime > $linkTime + $lifeTime) {
             return \Tirreno\Utils\ErrorCodes::RENEW_KEY_WAS_EXPIRED;
-        }
-
-        return false;
-    }
-
-    public static function validateChangeEmailPage(?array $params): int|false {
-        $errorCode = self::validateEmailRenewKeyPresence($params);
-        if ($errorCode) {
-            return $errorCode;
-        }
-
-        $changeEmailModel = new \Tirreno\Models\ChangeEmail();
-        $changeEmailModel->getByRenewKey($params['renewKey']);
-        if (!$changeEmailModel->loaded()) {
-            return \Tirreno\Utils\ErrorCodes::CHANGE_EMAIL_KEY_IS_NOT_CORRECT;
-        }
-
-        $currentTime = time();
-        $linkTime = strtotime($changeEmailModel->created_at);
-        $lifeTime = self::getF3()->get('RENEW_PASSWORD_LINK_TIME');
-
-        if ($currentTime > $linkTime + $lifeTime) {
-            return \Tirreno\Utils\ErrorCodes::CHANGE_EMAIL_KEY_WAS_EXPIRED;
         }
 
         return false;

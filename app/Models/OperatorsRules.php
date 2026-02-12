@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class OperatorsRules extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_operators_rules';
+    protected ?string $DB_TABLE_NAME = 'dshb_operators_rules';
 
     public function getAllValidRulesByOperator(int $apiKey): array {
         $params = [
@@ -126,37 +126,40 @@ class OperatorsRules extends \Tirreno\Models\BaseSql {
     }
 
     public function updateRule(string $ruleUid, int $score, int $apiKey): void {
-        $found = $this->load(
-            ['"key"=? AND "rule_uid"=?', $apiKey, $ruleUid],
+        $params = [
+            ':score'    => $score,
+            ':uid'      => $ruleUid,
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = (
+            'INSERT INTO dshb_operators_rules (
+                key, rule_uid, value
+            ) VALUES (
+                :api_key, :uid, :score
+            ) ON CONFLICT (key, rule_uid) DO UPDATE SET
+                value = EXCLUDED.value'
         );
 
-        if (!$found) {
-            $this->key = $apiKey;
-            $this->rule_uid = $ruleUid;
-            $this->proportion = null;
-        }
-
-        $this->value = $score;
-        // do not change proportion
-
-        $this->save();
+        $this->execQuery($query, $params);
     }
 
     public function updateRuleProportion(string $ruleUid, float $proportion, int $apiKey): void {
-        $found = $this->load(
-            ['"key"=? AND "rule_uid"=?', $apiKey, $ruleUid],
+        $params = [
+            ':proportion'   => $proportion,
+            ':uid'          => $ruleUid,
+            ':api_key'      => $apiKey,
+        ];
+
+        $query = (
+            'INSERT INTO dshb_operators_rules (
+                key, rule_uid, proportion, proportion_updated_at, value
+            ) VALUES (
+                :api_key, :uid, :proportion, NOW(), 0
+            ) ON CONFLICT (key, rule_uid) DO UPDATE SET
+                proportion = EXCLUDED.proportion, proportion_updated_at = NOW()'
         );
 
-        // set value if record is new
-        if (!$found) {
-            $this->key = $apiKey;
-            $this->rule_uid = $ruleUid;
-            $this->value = 0;
-        }
-
-        $this->proportion = $proportion;
-        $this->proportion_updated_at = date('Y-m-d H:i:s');
-
-        $this->save();
+        $this->execQuery($query, $params);
     }
 }

@@ -5,8 +5,6 @@ import {ManualCheckItems} from '../parts/ManualCheckItems.js?v=2';
 export class ManualCheckPage extends BasePage {
     constructor() {
         super('manual-check');
-
-        this.initUi();
     }
 
     initUi() {

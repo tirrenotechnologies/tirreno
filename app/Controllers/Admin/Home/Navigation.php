@@ -54,4 +54,8 @@ class Navigation extends \Tirreno\Controllers\Admin\Base\Navigation {
     public function getCurrentTime(): array {
         return $this->operator ? $this->controller->getCurrentTime($this->operator) : [];
     }
+
+    public function getConstants(): array {
+        return $this->controller->getConstants();
+    }
 }

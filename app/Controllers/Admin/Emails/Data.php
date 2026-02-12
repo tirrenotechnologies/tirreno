@@ -42,8 +42,6 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     }
 
     private function isEnrichable(int $apiKey): bool {
-        $model = new \Tirreno\Models\ApiKeys();
-
-        return $model->attributeIsEnrichable('email', $apiKey);
+        return (new \Tirreno\Models\ApiKeys())->attributeIsEnrichable('email', $apiKey);
     }
 }

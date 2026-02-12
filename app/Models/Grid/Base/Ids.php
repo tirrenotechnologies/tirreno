@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Base;
 
 class Ids extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
-    private $apiKey = null;
+    private ?int $apiKey = null;
 
     public function __construct(int $apiKey) {
         parent::__construct();

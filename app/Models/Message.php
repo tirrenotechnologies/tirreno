@@ -18,24 +18,37 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Message extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_message';
+    protected ?string $DB_TABLE_NAME = 'dshb_message';
 
     public function addMessage(string $msg): int {
-        $this->text = $msg;
-
-        $this->save();
-
-        return \Tirreno\Utils\Conversion::intVal($this->id, 0);
-    }
-
-    public function getMessage(): self|null|false {
-        $filters = [];
-        $options = [
-            'order' => 'id DESC',
-            'offset' => 0,
-            'limit' => 1,
+        $params = [
+            ':text' => $msg,
         ];
 
-        return $this->load($filters, $options);
+        $query = (
+            'INSERT INTO dshb_message (text) VALUES (:text) RETURNING id'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['id'];
+    }
+
+    public function getLastMessage(): array {
+        $query = (
+            'SELECT
+                id,
+                text,
+                title,
+                created_at
+            FROM
+                dshb_message
+            ORDER BY id DESC
+            LIMIT 1'
+        );
+
+        $results = $this->execQuery($query, null);
+
+        return $results[0] ?? [];
     }
 }

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Base;
 
 abstract class Page extends \Tirreno\Controllers\Pages\Base {
-    public $page = null;
+    public ?string $page = null;
 
     abstract public function getPageParams(): array;
 }

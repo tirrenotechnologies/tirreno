@@ -23,7 +23,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
 
         $this->apiKey = $apiKey;
         $this->idsModel = new Ids($apiKey);
-        $this->query = new Query($apiKey);
+        $this->queryModel = new Query($apiKey);
     }
 
     public function getResourcesByUserId(int $userId): array {
@@ -47,7 +47,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
     }
 
     private function extendWithSuspiciousUrl(array $result): array {
-        if (is_array($result) && count($result)) {
+        if (count($result)) {
             $suspiciousUrlList = \Tirreno\Utils\Assets\Lists\Url::getList();
             foreach ($result as &$record) {
                 $record['suspicious'] = $this->isUrlSuspicious($suspiciousUrlList, $record['url']);

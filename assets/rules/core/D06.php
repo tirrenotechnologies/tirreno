@@ -7,7 +7,7 @@ class D06 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'User accesses the account using multiple devices. Account may be used by different people.';
     public const ATTRIBUTES = [];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ea_total_device']->greaterThan(4),
         );

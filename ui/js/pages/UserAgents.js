@@ -8,8 +8,6 @@ import {UserAgentsGrid} from '../parts/grid/UserAgents.js?v=2';
 export class UserAgentsPage extends BasePage {
     constructor() {
         super('userAgents');
-
-        this.initUi();
     }
 
     initUi() {

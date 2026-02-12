@@ -16,8 +16,6 @@ import {DevicePanel} from '../parts/panel/DevicePanel.js?v=2';
 export class ResourcePage extends BasePage {
     constructor() {
         super('resource', true);
-
-        this.initUi();
     }
 
     initUi() {

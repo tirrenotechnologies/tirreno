@@ -61,7 +61,7 @@ class BatchedNewEvents extends Base {
 
             \Tirreno\Utils\Routes::callExtra('BATCHING_NEW_EVENTS', $cursor, $next);
 
-            (new \Tirreno\Models\Queue())->addBatch($accounts, \Tirreno\Utils\Constants::get('RISK_SCORE_QUEUE_ACTION_TYPE'));
+            (new \Tirreno\Models\Queue())->addBatch($accounts, \Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE);
 
             $model->updateCursor($next);
 

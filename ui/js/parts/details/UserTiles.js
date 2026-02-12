@@ -1,4 +1,5 @@
 import {BaseTiles} from './BaseTiles.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 import {
     renderDateWithTimestampTooltip,
     renderBoolean,
@@ -48,7 +49,7 @@ export class UserTiles extends BaseTiles {
         }
 
         const record = data.totalDetails;
-        const limits = record.limits
+        const limits = Constants.USER_DETAILS_TOTAL_LIMITS;
         this.removeLoaderBackground(tile);
 
         const map = [
@@ -93,7 +94,9 @@ export class UserTiles extends BaseTiles {
         ];
 
         for (const [id, el] of map) {
-            tile.querySelector(id).replaceChildren(renderTotalFrameCmp(week[el], record[el], useHyphenOld, useHyphenNew));
+            tile.querySelector(id).replaceChildren(renderTotalFrameCmp(
+                week[el], record[el], useHyphenOld, useHyphenNew
+            ));
         }
     }
 

@@ -19,31 +19,24 @@ namespace Sensor\Service\Debug;
 
 use Sensor\Service\Logger;
 
-class PdoStatementProxy {
+class PdoStatementProxy extends \PDOStatement {
     /** @var array<string,mixed> */
-    private array $values;
+    private array $values = [];
+    private ?Logger $logger = null;
 
-    public function __construct(
-        private \PDOStatement $statement,
-        private Logger $logger,
-    ) {
+    protected function __construct(?Logger $logger) {
+        $this->logger = $logger;
     }
 
-    public function bindValue(
-        string $param,
-        mixed $value,
-        int $type = \PDO::PARAM_STR,
-    ): void {
-        $this->statement->bindValue($param, $value, $type);
-        $this->values[$param] = $value;
+    public function bindValue(string|int $param, mixed $value, int $type = \PDO::PARAM_STR): bool {
+        $this->values[strval($param)] = $value;
+
+        return parent::bindValue($param, $value, $type);
     }
 
-    public function execute(): void {
-        $this->logger->logQuery($this->statement->queryString, $this->values);
-        $this->statement->execute();
-    }
+    public function execute(?array $params = null): bool {
+        $this->logger?->logQuery($this->queryString, $this->values);
 
-    public function __call(string $name, array $args): mixed {
-        return $this->statement->$name(...$args);
+        return parent::execute($params);
     }
 }

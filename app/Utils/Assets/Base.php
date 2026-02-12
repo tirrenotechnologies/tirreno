@@ -32,7 +32,7 @@ abstract class Base {
 
     abstract protected static function getNamespace(): string;
 
-    protected static function validateClass(string $filename, string $classname): string {
+    protected static function validateClass(string $filename, string $classname): object {
         if (!file_exists($filename)) {
             throw new \LogicException("File {$filename} doesn't exist.");
         }
@@ -54,6 +54,6 @@ abstract class Base {
             throw new \LogicException("Class {$classname} is defined in {$reflectionFileName}, not in {$filename}");
         }
 
-        return $classname;
+        return $reflection;
     }
 }

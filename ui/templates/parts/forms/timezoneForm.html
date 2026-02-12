@@ -13,7 +13,7 @@
                 <div class="field">
                     <label class="label">{{ @AdminTimezone_form_field_timezone_label }}</label>
                     <div class="control">
-                        <set TIMEZONE="{{ @PROFILE ? @PROFILE.timezone: 'UTC' }}" />
+                        <set TIMEZONE="{{ @PROFILE ? @PROFILE->timezone: 'UTC' }}" />
                         <set TIMEZONE="{{ isset(@TIME_ZONE_VALUES) ? @TIME_ZONE_VALUES.timezone : @TIMEZONE }}" />
                         <include href="templates/parts/timezoneSelector.html" />
                     </div>

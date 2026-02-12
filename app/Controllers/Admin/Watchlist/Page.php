@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Watchlist;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminWatchlist';
+    public ?string $page = 'AdminWatchlist';
 
     public function getPageParams(): array {
         $apiKey = \Tirreno\Utils\ApiKeys::getCurrentOperatorApiKeyId();

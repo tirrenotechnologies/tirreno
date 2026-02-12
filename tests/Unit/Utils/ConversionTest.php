@@ -157,7 +157,8 @@ final class ConversionTest extends TestCase {
         $this->assertSame(7, Conversion::getIntRequestParam('a'));
         $this->assertSame('', Conversion::getStringRequestParam('b', false));
         $this->assertNull(Conversion::getStringRequestParam('b', true));
-        $this->assertSame(['x' => 1], Conversion::getArrayRequestParam('c'));
+        $this->assertSame(['x' => 1], Conversion::getDictionaryRequestParam('c'));
+        $this->assertSame([0 => 1], Conversion::getArrayRequestParam('c'));
 
         $this->assertSame(5, Conversion::getIntUrlParam('id'));
 
@@ -175,6 +176,15 @@ final class ConversionTest extends TestCase {
         $this->f3->set('REQUEST.arr', 'not-an-array');
         $this->assertSame([], Conversion::getArrayRequestParam('arr', false));
         $this->assertNull(Conversion::getArrayRequestParam('arr', true));
+    }
+
+    public function testGetDictionaryRequestParamDefaults(): void {
+        $this->assertSame([], Conversion::getDictionaryRequestParam('missing', false));
+        $this->assertNull(Conversion::getDictionaryRequestParam('missing', true));
+
+        $this->f3->set('REQUEST.arr', 'not-an-array');
+        $this->assertSame([], Conversion::getDictionaryRequestParam('arr', false));
+        $this->assertNull(Conversion::getDictionaryRequestParam('arr', true));
     }
 
    /**

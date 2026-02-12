@@ -7,7 +7,7 @@ class B24 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'The user made a request without a referer.';
     public const ATTRIBUTES = [];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['event_empty_referer']->equalTo(true),
         );

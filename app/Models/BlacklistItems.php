@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class BlacklistItems extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getIpsRelatedToAccountWithinOperator(int $accountId, int $apiKey): array {
         $params = [

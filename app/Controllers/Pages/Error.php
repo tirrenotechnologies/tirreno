@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class Error extends Base {
-    public function getPageParams($errorData): array {
+    public function getPageParams(array $errorData): array {
         $pageTitle = $this->getInternalPageTitleWithPostfix(strval($errorData['code']));
 
         return [

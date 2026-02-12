@@ -62,11 +62,7 @@ export class EnrichAllPopUp extends BasePopUp {
         for (const key in data) {
             span = this.card.querySelector(`#details_${key}`);
             if (span) {
-                if (data[key] instanceof Node) {
-                    span.replaceChildren(data[key]);
-                } else {
-                    span.innerHTML = data[key];
-                }
+                span.replaceChildren(data[key]);
             }
         }
     }

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\UserDetails;
 
 class Ip extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_ip';
+    protected ?string $DB_TABLE_NAME = 'event_ip';
 
     public function getDetails(int $userId, int $apiKey): array {
         $details = $this->getIpsDetails($userId, $apiKey);

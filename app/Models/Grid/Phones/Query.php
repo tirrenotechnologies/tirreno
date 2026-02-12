@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Phones;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_phone.lastseen DESC';
-    protected $dateRangeField = 'event_phone.lastseen';
+    protected ?string $defaultOrder = 'event_phone.lastseen DESC';
+    protected string $dateRangeField = 'event_phone.lastseen';
 
-    protected $allowedColumns = ['phonenumber', 'invalid', 'full_country', 'carrier_name', 'type', 'shared', 'fraud_detected'];
+    protected array $allowedColumns = ['phonenumber', 'invalid', 'full_country', 'carrier_name', 'type', 'shared', 'fraud_detected'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -81,10 +81,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_phone.id', $queryParams);
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND
                 (

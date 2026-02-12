@@ -18,14 +18,52 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class ApiKeyCoOwner extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_api_co_owners';
+    protected ?string $DB_TABLE_NAME = 'dshb_api_co_owners';
 
-    public function getCoOwnership(int $operatorId): self|null|false {
-        $filters = [
-            'operator=?', $operatorId,
+    public function getCoOwnershipKeyId(int $operatorId): ?int {
+        $params = [
+            ':operator_id'  => $operatorId,
         ];
 
-        return $this->load($filters);
+        $query = (
+            'SELECT
+                api AS key
+            FROM
+                dshb_api_co_owners
+            WHERE
+                dshb_api_co_owners.operator = :operator_id'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['key'] ?? null;
+    }
+
+    public function insertRecord(int $operatorId, int $apiKey): void {
+        $params = [
+            ':operator_id'  => $operatorId,
+            ':api_key'      => $apiKey,
+        ];
+
+        $query = (
+            'INSERT INTO dshb_api_co_owners (operator, api)
+            VALUES (:operator_id, :api_key)'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
+    public function deleteCoOwnership(int $operatorId): void {
+        $params = [
+            ':operator_id' => $operatorId,
+        ];
+
+        $query = (
+            'DELETE FROM dshb_api_co_owners
+            WHERE operator = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
     public function getSharedApiKeyOperators(int $operatorId): array {
@@ -52,18 +90,5 @@ class ApiKeyCoOwner extends \Tirreno\Models\BaseSql {
         );
 
         return $this->execQuery($query, $params);
-    }
-
-    public function create(int $operator, int $api): void {
-        $this->operator = $operator;
-        $this->api = $api;
-
-        $this->save();
-    }
-
-    public function deleteCoOwnership(): void {
-        if ($this->loaded()) {
-            $this->erase();
-        }
     }
 }

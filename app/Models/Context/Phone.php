@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 class Phone extends Base {
-    protected $uniqueValues = true;
+    protected ?bool $uniqueValues = true;
 
     protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);

@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Data;
 
 class Navigation extends \Tirreno\Controllers\Admin\Base\Navigation {
-    private $dataController;
+    private \Tirreno\Controllers\Admin\Data\Data $dataController;
 
     public function beforeroute(): void {
         $errorCode = $this->validateCsrfToken();
@@ -134,9 +134,9 @@ class Navigation extends \Tirreno\Controllers\Admin\Base\Navigation {
         $this->response->data = $this->dataController->getUserDetails();
     }
 
-    public function getUserEnrichmentDetails(): void {
+    /*public function getUserEnrichmentDetails(): void {
         $this->response->data = $this->dataController->getUserEnrichmentDetails();
-    }
+    }*/
 
     public function getNotCheckedEntitiesCount(): void {
         $this->response->data = $this->dataController->getNotCheckedEntitiesCount();
@@ -216,5 +216,9 @@ class Navigation extends \Tirreno\Controllers\Admin\Base\Navigation {
 
     public function getCurrentTime(): void {
         $this->response->data = $this->dataController->getCurrentTime();
+    }
+
+    public function getConstants(): void {
+        $this->response->data = $this->dataController->getConstants();
     }
 }

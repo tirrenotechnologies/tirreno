@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\ApiKeyAccountAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     public function checkAccess(int $userId, int $apiKey): bool {
         $params = [
@@ -68,7 +68,7 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
         return count($results) > 0;
     }
 
-    public function getUser(int $userId, int $apiKey): array {
+    public function getUserById(int $userId, int $apiKey): array {
         $params = [
             ':user_id' => $userId,
             ':api_key' => $apiKey,
@@ -172,7 +172,8 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
             $model->updateTotalsByEntityIds($entities['domain_ids'], $apiKey, true);
 
             $model = new \Tirreno\Models\Phone();
-            $model->updateTotalsByValues($entities['phone_numbers'], $apiKey, true);
+            // it is always a force update
+            $model->updateTotalsByValues($entities['phone_numbers'], $apiKey);
 
             $this->db->commit();
         } catch (\Exception $e) {
@@ -214,14 +215,6 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
         }
 
         return $result;
-    }
-
-    public function getAccountIdByUserId(string $userId, int $apiKey): self|null|false {
-        $filters = [
-            'key=? AND userid=?', $apiKey, $userId,
-        ];
-
-        return $this->load($filters);
     }
 
     public function getApplicableRulesByAccountId(int $id, int $apiKey, bool $all = false): array {
@@ -266,24 +259,29 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
         return $results;
     }
 
-    public function updateUserStatus(int $accountId, array $data, int $apiKey): void {
-        $this->load(
-            ['id=? AND key=?', $accountId, $apiKey],
+    public function updateUserStatus(int $score, string $details, bool $onReview, int $accountId, int $apiKey): void {
+        $params = [
+            ':account_id'   => $accountId,
+            ':api_key'      => $apiKey,
+            ':score'        => $score,
+            ':details'      => $details,
+            ':on_review'    => $onReview ? 1 : 0,
+        ];
+
+        $query = (
+            'UPDATE event_account
+            SET
+                score = :score,
+                score_details = :details,
+                score_updated_at = NOW(),
+                score_recalculate = FALSE,
+                added_to_review = CASE WHEN :on_review = 1 THEN NOW() ELSE event_account.added_to_review END
+            WHERE
+                 event_account.id = :account_id AND
+                 event_account.key = :api_key'
         );
 
-        if ($this->loaded()) {
-            $timestamp = (new \DateTime('now', \Tirreno\Utils\Timezones::getUtcTimezone()))->format(\Tirreno\Utils\Timezones::FORMAT);
-            $this->score = $data['score'];
-            $this->score_details = $data['details'];
-            $this->score_updated_at = $timestamp;
-            $this->score_recalculate = false;
-
-            if ($data['addToReview']) {
-                $this->added_to_review = $timestamp;
-            }
-
-            $this->save();
-        }
+        $this->execQuery($query, $params);
     }
 
     public function updateFraudFlag(array $accountIds, int $apiKey, bool $fraud): void {
@@ -310,18 +308,22 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
     }
 
     public function updateReviewedFlag(int $accountId, int $apiKey, bool $reviewed): void {
-        $this->load(
-            ['id=? AND key=?', $accountId, $apiKey],
+        $params = [
+            ':account_id'   => $accountId,
+            ':api_key'      => $apiKey,
+            ':reviewed'     => $reviewed,
+        ];
+
+        $query = (
+            'UPDATE event_account
+            SET
+                reviewed = :reviewed
+            WHERE
+                 event_account.id = :account_id AND
+                 event_account.key = :api_key'
         );
 
-        if ($this->loaded()) {
-            //Workaround. Emulate nullable default value
-            $this->fraud = null;
-
-            $this->reviewed = $reviewed;
-
-            $this->save();
-        }
+        $this->execQuery($query, $params);
     }
 
     public function updateTotalsByAccountIds(array $ids, int $apiKey): int {

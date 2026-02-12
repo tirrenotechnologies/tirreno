@@ -24,14 +24,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class VersionControlTest extends TestCase {
     public function testVersionString(): void {
-        $expected = '0.9.11';
+        $expected = '0.9.12';
         $actual = VersionControl::versionString();
 
         $this->assertSame($expected, $actual);
     }
 
     public function testFullVersionString(): void {
-        $expected = 'v0.9.11';
+        $expected = 'v0.9.12';
         $actual = VersionControl::fullVersionString();
 
         $this->assertSame($expected, $actual);

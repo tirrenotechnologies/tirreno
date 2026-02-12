@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Crons;
 
 abstract class Base {
-    protected $log = [];
+    protected array $log = [];
 
     abstract public function process(): void;
 

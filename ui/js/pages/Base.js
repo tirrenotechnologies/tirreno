@@ -1,5 +1,6 @@
 import {SearchLine} from '../parts/SearchLine.js?v=2';
 import {Tooltip} from '../parts/Tooltip.js?v=2';
+import {Constants} from '../parts/utils/Constants.js?v=2';
 
 export class BasePage {
     constructor(name, single = false) {
@@ -27,10 +28,15 @@ export class BasePage {
                 };
             }
         }
+
+        const initUi = this.initUi.bind(this);
+        window.addEventListener('constantsLoaded', initUi, false);
     }
 
     initCommonUi() {
         new SearchLine();
+
+        Constants.init();
 
         document.addEventListener('keyup', e => {
             if (e.key !== '/' || e.ctrlKey || e.metaKey) return;

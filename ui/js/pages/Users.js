@@ -10,8 +10,6 @@ import {UsersChart} from '../parts/chart/Users.js?v=2';
 export class UsersPage extends BasePage {
     constructor() {
         super('users');
-
-        this.initUi();
     }
 
     initUi() {

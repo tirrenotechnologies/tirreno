@@ -1,0 +1,10 @@
+<div class="selector">
+    <select class="input" name="rules-preset" id="rules-preset">
+        <option value="none" disabled selected hidden>{{ @AdminApplyRulesPresets_form_disabled_option }}</option>
+        <optgroup label="Preset">
+            <repeat group="{{ @RULES_PRESETS }}" key="{{ @PRESET_ID }}" value="{{ @PRESET }}">
+                <option value="{{ @PRESET_ID }}">{{ @PRESET.description }}</option>
+            </repeat>
+        </optgroup>
+    </select>
+</div>

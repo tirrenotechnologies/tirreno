@@ -68,25 +68,25 @@ Check out the live demo at [play.tirreno.com](https://play.tirreno.com) (*admin/
   * **Application**: 128 MB RAM (1 GB recommended)
   * **Storage**: Approximately 3 GB PostgreSQL storage per 1 million events
 
-## Quickstart install
+## Docker-based installation
 
-1. [Download](https://www.tirreno.com/download.php) the latest version of tirreno (ZIP file).
-2. Extract the tirreno-master.zip file to the location where you want it installed on your web server.
-3. Navigate to `http://your-domain.example/install/index.php` (`http://localhost:8585/install/` for Docker) in a browser to launch the installation process.
-4. After the successful installation, delete the `install/` directory and its contents.
-5. Navigate to `http://your-domain.example/signup/` in a browser to create administrator account.
-6. For cron jobs setup insert the following schedule (every 10 minutes) expression with `crontab -e` command or by editing `/var/spool/cron/your-web-server` file:
-
-```
-*/10 * * * * /usr/bin/php /absolute/path/to/tirreno/index.php /cron
-```
-
-## Docker-based installation (optional)
-
-To run tirreno within docker container you may use image published on [dockerhub](https://hub.docker.com/r/tirreno/tirreno).
+To run tirreno within a Docker container you may use command below:
 
 ```bash
 curl -sL tirreno.com/t.yml | docker compose -f - up -d
+```
+Continue with step 4 of [Quickstart](#quickstart-install).
+
+## Quickstart install
+1. [Download](https://www.tirreno.com/download.php) the latest version of tirreno (ZIP file).
+2. Extract the tirreno-master.zip file to the location where you want it installed on your web server.
+3. Navigate to `http://localhost:8585/install/index.php` in a browser to launch the installation process.
+4. After the successful installation, delete the `install/` directory and its contents.
+5. Navigate to `http://localhost:8585/signup/` in a browser to create an administrator account.
+6. For cron job setup, insert the following schedule (every 10 minutes) expression with the `crontab -e` command or by editing the `/var/spool/cron/your-web-server` file:
+
+```
+*/10 * * * * /usr/bin/php /absolute/path/to/tirreno/index.php /cron
 ```
 
 ## Using Heroku (optional)

@@ -228,12 +228,12 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             $reviewQueueThreshold   = \Tirreno\Utils\Conversion::getIntRequestParam('review-queue-threshold');
 
             $model = new \Tirreno\Models\ApiKeys();
-            $model->getKeyById($keyId);
+            $key = $model->getKeyById($keyId);
 
-            $recalculateReviewQueueCnt = $model->review_queue_threshold !== $reviewQueueThreshold;
+            $recalculateReviewQueueCnt = $key['review_queue_threshold'] !== $reviewQueueThreshold;
 
-            $model->updateBlacklistThreshold($blacklistThreshold);
-            $model->updateReviewQueueThreshold($reviewQueueThreshold);
+            $model->updateBlacklistThreshold($blacklistThreshold, $keyId);
+            $model->updateReviewQueueThreshold($reviewQueueThreshold, $keyId);
 
             if ($recalculateReviewQueueCnt) {
                 $controller = new \Tirreno\Controllers\Admin\ReviewQueue\Data();
@@ -268,7 +268,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     public function applyRulesPresetById(string $presetId, int $apiKey): void {
         $model = new \Tirreno\Models\OperatorsRules();
 
-        $rules = \Tirreno\Utils\Constants::get('RULES_PRESETS');
+        $rules = \Tirreno\Utils\Constants::get()->RULES_PRESETS;
         if (!array_key_exists($presetId, $rules)) {
             return;
         }
@@ -411,19 +411,16 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             $details[] = ['uid' => $uid, 'score' => $operatorRules[$uid]['value']];
         }
 
-        $data = [
-            'score'     => $this->normalizeScore($details),
-            'details'   => json_encode($details),
-        ];
-
         // preparedModels true on cron call
         $cron = $preparedModels;
-        $this->userController->updateUserStatus($accountId, $data, $cron, $apiKey);
+        $score = $this->normalizeScore($details);
+
+        $this->userController->updateUserStatus($score, json_encode($details), $cron, $accountId, $apiKey);
     }
 
     public function buildEvaluationModels(?string $uid = null): void {
         $this->totalModels = [];
-        foreach (\Tirreno\Utils\Constants::get('RULES_TOTALS_MODELS') as $className) {
+        foreach (\Tirreno\Utils\Constants::get()->RULES_TOTALS_MODELS as $className) {
             $this->totalModels[] = new $className();
         }
 

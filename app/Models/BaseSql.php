@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 abstract class BaseSql extends \DB\SQL\Mapper {
-    protected $f3 = null;
-    protected $DB_TABLE_TTL = 0;
-    protected $DB_TABLE_NAME = null;
-    protected $DB_TABLE_FIELDS = null;
+    protected ?\Base $f3 = null;
+    protected int $DB_TABLE_TTL = 0;
+    protected ?string $DB_TABLE_NAME = null;
+    protected ?array $DB_TABLE_FIELDS = null;
 
     public function __construct() {
         $this->f3 = \Base::instance();
@@ -32,21 +32,8 @@ abstract class BaseSql extends \DB\SQL\Mapper {
         }
     }
 
-    private function getDatabaseConnection(): ?\DB\SQL {
+    protected function getDatabaseConnection(): ?\DB\SQL {
         return \Tirreno\Utils\Database::getDb();
-    }
-
-    public function getHash(string $string): string {
-        $iterations = 1000;
-        $salt = $this->f3->get('SALT');
-
-        return hash_pbkdf2('sha256', $string, $salt, $iterations, 32);
-    }
-
-    public function getPseudoRandomString(int $length = 32): string {
-        $bytes = openssl_random_pseudo_bytes($length / 2);
-
-        return bin2hex($bytes);
     }
 
     public function printLog(): void {

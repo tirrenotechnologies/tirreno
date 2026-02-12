@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update002 extends Base {
-    public static $version = 'v0.9.6';
+    public static string $version = 'v0.9.6';
 
-    private static $rulesMap = [
+    private static array $rulesMap = [
         29  => 'E20',
         24  => 'B19',
         19  => 'B04',
@@ -129,7 +129,7 @@ class Update002 extends Base {
         110 => 'B24',
     ];
 
-    public static function apply($database): void {
+    public static function apply(\DB\SQL $database): void {
         $queries = [
             'INSERT INTO dshb_rules (id) VALUES (109), (110)',
             'CREATE INDEX event_account_lastseen_key_idx ON event_account USING btree (lastseen, key)',
@@ -243,16 +243,13 @@ class Update002 extends Base {
         $out = [];
 
         foreach ($rules['imported'] as $uid => $cls) {
-            try {
-                $out[$uid] = [
-                    'uid'           => $uid,
-                    'name'          => $cls::NAME,
-                    'descr'         => $cls::DESCRIPTION,
-                    'attributes'    => $cls::ATTRIBUTES,
-                ];
-            } catch (\Throwable $e) {
-                error_log('Fail on const call: ' . $e->getMessage());
-            }
+            // unreachable constant causes fatal error, not catchable
+            $out[$uid] = [
+                'uid'           => $uid,
+                'name'          => $cls::NAME,
+                'descr'         => $cls::DESCRIPTION,
+                'attributes'    => $cls::ATTRIBUTES,
+            ];
         }
 
         return $out;

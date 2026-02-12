@@ -57,7 +57,7 @@ class UserAgentRepository {
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':key', $userAgent->apiKeyId);
             $stmt->execute();
-            /** @var array{id: int} $result */
+            /** @var array{id: int}|false $result */
             $result = $stmt->fetch();
 
             if ($result !== false) {

@@ -1,8 +1,5 @@
 import {BaseChart}  from './BaseChart.js?v=2';
-import {
-    COLOR_MAP,
-    X_AXIS_SERIFS,
-} from '../utils/Constants.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 
 export class BaseLineChart extends BaseChart {
     getSeries() {
@@ -19,10 +16,10 @@ export class BaseLineChart extends BaseChart {
             value:  (u, v) => Number(v.toFixed(0)).toLocaleString(),
             points: {
                 space: 0,
-                fill: COLOR_MAP[color].main,
+                fill: Constants.COLOR_MAP[color].main,
             },
-            stroke: COLOR_MAP[color].main,
-            fill:   COLOR_MAP[color].light,
+            stroke: Constants.COLOR_MAP[color].main,
+            fill:   Constants.COLOR_MAP[color].light,
         };
     }
 
@@ -31,7 +28,7 @@ export class BaseLineChart extends BaseChart {
 
         axes.x.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
             let rangeDays   = (scaleMax - scaleMin) / 86400;
-            if (rangeDays > X_AXIS_SERIFS) rangeDays = X_AXIS_SERIFS;
+            if (rangeDays > Constants.X_AXIS_SERIFS) rangeDays = Constants.X_AXIS_SERIFS;
             const pxPerDay = plotDim / rangeDays;
 
             return pxPerDay;

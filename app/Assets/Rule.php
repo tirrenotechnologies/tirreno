@@ -18,20 +18,21 @@ declare(strict_types=1);
 namespace Tirreno\Assets;
 
 abstract class Rule {
-    protected $rb;
-    protected $context;
-    protected $params;
-    protected $condition;
+    protected \Ruler\RuleBuilder $rb;
+    protected \Ruler\Context $context;
+    protected array $params;
+    protected \Ruler\Operator\LogicalOperator $condition;
 
-    public $uid;
+    public string $uid;
 
     public function __construct(?\Ruler\RuleBuilder $rb = null, array $params = []) {
-        $this->uid = end(explode('\\', get_class($this)));
+        $parts = explode('\\', get_class($this));
+        $this->uid = end($parts);
         $this->rb = $rb ? $rb : (new \Ruler\RuleBuilder());
         $this->params = $params;
     }
 
-    abstract protected function defineCondition();
+    abstract protected function defineCondition(): \Ruler\Operator\LogicalOperator;
 
     protected function prepareParams(array $params): array {
         return $params;

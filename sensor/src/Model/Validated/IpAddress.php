@@ -54,10 +54,15 @@ class IpAddress extends Base {
         $size = filter_var($this->value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : 16;
         $ipAddr = inet_pton($this->value);
 
+        if ($ipAddr === false) {
+            return false;
+        }
+
         foreach (self::LOCALHOST_NETS as $cidr) {
             [$net, $maskBits] = explode('/', $cidr);
             $net = inet_pton($net);
-            if (!$net) {
+            $maskBits = self::toInt($maskBits);
+            if ($net === false || $maskBits === null) {
                 continue;
             }
 
@@ -76,5 +81,11 @@ class IpAddress extends Base {
         }
 
         return false;
+    }
+
+    public static function toInt(mixed $value, ?int $default = null): ?int {
+        $validated = filter_var($value, FILTER_VALIDATE_INT);
+
+        return $validated !== false ? $validated : (is_float($value) || is_bool($value) ? intval($value) : $default);
     }
 }

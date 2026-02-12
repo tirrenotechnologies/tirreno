@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Country;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminCountry';
+    public ?string $page = 'AdminCountry';
 
     public function getPageParams(): array {
         $dataController = new Data();

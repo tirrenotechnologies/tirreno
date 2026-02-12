@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 class Device extends Base {
-    protected $uniqueValues = false;
+    protected ?bool $uniqueValues = false;
 
     protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);

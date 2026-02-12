@@ -20,16 +20,7 @@ namespace Sensor\Service\Debug;
 use Sensor\Service\Logger;
 
 class PdoProxy extends \PDO {
-    private ?Logger $logger = null;
-
     public function setLogger(Logger $logger): void {
-        $this->logger = $logger;
-    }
-
-    #[\ReturnTypeWillChange]
-    public function prepare(string $query, array $options = []): PdoStatementProxy {
-        $statement = parent::prepare($query, $options);
-
-        return new PdoStatementProxy($statement, $this->logger);
+        $this->setAttribute(\PDO::ATTR_STATEMENT_CLASS, [PdoStatementProxy::class, [$logger]]);
     }
 }

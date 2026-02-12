@@ -25,7 +25,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     }
 
     public function removeFromWatchlist(int $accountId, int $apiKey): void {
-        $watchListModel = new \Tirreno\Models\Watchlist();
-        $watchListModel->remove($accountId, $apiKey);
+        $model = new \Tirreno\Models\Watchlist();
+        $model->remove($accountId, $apiKey);
     }
 }

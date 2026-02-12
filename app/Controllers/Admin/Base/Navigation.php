@@ -18,13 +18,13 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Base;
 
 abstract class Navigation extends \Tirreno\Controllers\Base {
-    protected $response;
+    protected \Tirreno\Views\Base $response;
 
-    protected $page = null;
-    protected $controller = null;
-    protected $operator = null;
-    protected $apiKey = null;
-    protected $id = null;
+    protected ?object $page = null;
+    protected ?object $controller = null;
+    protected ?\Tirreno\Entities\Operator $operator = null;
+    protected ?int $apiKey = null;
+    protected ?int $id = null;
 
     public function __construct() {
         parent::__construct();
@@ -35,7 +35,7 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
     }
 
     public function showIndexPage(): void {
-        if (!isset($this->page) || !$this->page) {
+        if (!$this->page) {
             return;
         }
 
@@ -44,7 +44,6 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
         $this->response = new \Tirreno\Views\Frontend();
         $this->response->data = $this->page->getPageParams();
     }
-
 
     public function beforeroute(): void {
         if ($this->operator) {
@@ -64,7 +63,7 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
         }
     }
 
-    private function shouldRedirectToApiKeys($message): bool {
+    private function shouldRedirectToApiKeys(array $message): bool {
         $route = $this->f3->get('PARAMS.0');
         $allowedPages = [
             '/api',
@@ -80,7 +79,7 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
     }
 
     public function isPostRequest(): bool {
-        return $this->f3->VERB === 'POST';
+        return $this->f3->get('VERB') === 'POST';
     }
 
     /**
@@ -90,10 +89,6 @@ abstract class Navigation extends \Tirreno\Controllers\Base {
      * and do something else with it.
      */
     public function afterroute(): void {
-        if (!$this->response) {
-            trigger_error('No View has been set.');
-        }
-
         $shouldPrintSqlToLog = $this->f3->get('PRINT_SQL_LOG_AFTER_EACH_SCRIPT_CALL');
 
         if ($shouldPrintSqlToLog) {

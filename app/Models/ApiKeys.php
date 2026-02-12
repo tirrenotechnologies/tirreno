@@ -18,35 +18,59 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class ApiKeys extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_api';
+    protected ?string $DB_TABLE_NAME = 'dshb_api';
 
-    public function add(array $data): int {
-        $quote = $data['quote'];
-        $operatorId = $data['operator_id'];
+    public function insertRecord(string $skipEnrichingAttr, bool $skipBlacklistSync, int $operatorId): int {
+        $quote = $this->f3->get('DEFAULT_API_KEY_QUOTE');
         $uuid = sprintf('%s%s%s', $operatorId, $quote, time());
 
-        $this->quote = $quote;
-        $this->creator = $operatorId;
-        $this->key = $this->getHash($uuid);
+        $params = [
+            ':quote'                => $this->f3->get('DEFAULT_API_KEY_QUOTE'),
+            ':operator_id'          => $operatorId,
+            ':skip_enriching_attr'  => $skipEnrichingAttr,
+            ':skip_blacklist_sync'  => $skipBlacklistSync,
+            ':key'                  => \Tirreno\Utils\Access::saltHash($uuid),
+        ];
 
-        if (array_key_exists('skip_enriching_attributes', $data)) {
-            $this->skip_enriching_attributes = $data['skip_enriching_attributes'];
-        }
-        if (array_key_exists('skip_blacklist_sync', $data)) {
-            $this->skip_blacklist_sync = $data['skip_blacklist_sync'];
-        }
+        $query = (
+            'INSERT INTO dshb_api (
+                quote, creator, key, skip_enriching_attributes, skip_blacklist_sync
+            ) VALUES (
+                :quote, :operator_id, :key, :skip_enriching_attr, :skip_blacklist_sync
+            ) RETURNING id'
+        );
 
-        $this->save();
+        $results = $this->execQuery($query, $params);
 
-        return \Tirreno\Utils\Conversion::intVal($this->id, 0);
+        return $results[0]['id'];
     }
 
     public function getKeys(int $operatorId): array {
-        $filters = [
-            'creator=?', $operatorId,
+        $params = [
+            ':operator_id'  => $operatorId,
         ];
 
-        return $this->find($filters);
+        $query = (
+            'SELECT
+                id,
+                key,
+                token,
+                creator,
+                created_at,
+                retention_policy,
+                last_call_reached,
+                skip_blacklist_sync,
+                review_queue_threshold,
+                skip_enriching_attributes,
+                blacklist_threshold
+            FROM
+                dshb_api
+            WHERE
+                dshb_api.creator = :operator_id
+            ORDER BY id ASC'
+        );
+
+        return $this->execQuery($query, $params);
     }
 
     public function getKey(int $operatorId): ?ApiKeys {
@@ -56,38 +80,89 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
     }
 
     public function resetKey(int $keyId, int $operatorId): void {
-        $this->getByKeyAndOperatorId($keyId, $operatorId);
+        $uuid = sprintf('%s%s%s', $keyId, $operatorId, time());
 
-        if ($this->loaded()) {
-            $uuid = sprintf('%s%s%s', $keyId, $operatorId, time());
-
-            $this->key = $this->getHash($uuid);
-            $this->save();
-        }
-    }
-
-    public function getByKeyAndOperatorId(int $keyId, int $operatorId): self|null|false {
-        $filters = [
-            'id=? AND creator=?', $keyId, $operatorId,
+        $params = [
+            ':operator_id'  => $operatorId,
+            ':key_id'       => $keyId,
+            ':key'          => \Tirreno\Utils\Access::saltHash($uuid),
         ];
 
-        return $this->load($filters);
+        $query = (
+            'UPDATE dshb_api
+            SET
+                key = :key
+            WHERE
+                dshb_api.id = :key_id AND
+                dshb_api.creator = :operator_id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function getKeyIdByHash(string $hash): self|null|false {
-        $filters = [
-            'key=?', $hash,
+    public function existsByKeyAndOperatorId(int $keyId, int $operatorId): bool {
+        $params = [
+            ':operator_id'  => $operatorId,
+            ':key_id'       => $keyId,
         ];
 
-        return $this->load($filters);
+        $query = (
+            'SELECT 1
+            FROM
+                dshb_api
+            WHERE
+                dshb_api.creator = :operator_id AND
+                dshb_api.id = :key_id'
+        );
+
+        return boolval(count($this->execQuery($query, $params)));
     }
 
-    public function getKeyById(int $keyId): self|null|false {
-        $filters = [
-            'id=?', $keyId,
+    public function getKeyIdByHash(string $hash): ?int {
+        $params = [
+            ':key'  => $hash,
         ];
 
-        return $this->load($filters);
+        $query = (
+            'SELECT
+                id
+            FROM
+                dshb_api
+            WHERE
+                dshb_api.key = :key'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0]['id'] ?? null;
+    }
+
+    public function getKeyById(int $keyId): ?array {
+        $params = [
+            ':id'   => $keyId,
+        ];
+
+        $query = (
+            'SELECT
+                id,
+                key,
+                token,
+                creator,
+                created_at,
+                retention_policy,
+                last_call_reached,
+                skip_blacklist_sync,
+                review_queue_threshold,
+                skip_enriching_attributes,
+                blacklist_threshold
+            FROM
+                dshb_api
+            WHERE dshb_api.id = :id'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0] ?? null;
     }
 
     public function getTimezoneByKeyId(int $keyId): string {
@@ -149,7 +224,7 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
 
     public function enrichableAttributes(int $keyId): array {
         $skipAttributes = $this->getSkipEnrichingAttributes($keyId);
-        $attributes = \Tirreno\Utils\Constants::get('ENRICHING_ATTRIBUTES');
+        $attributes = \Tirreno\Utils\Constants::get()->ENRICHING_ATTRIBUTES;
         $attributes = array_diff_key($attributes, array_flip($skipAttributes));
 
         return $attributes;
@@ -164,46 +239,105 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
         return $this->execQuery($query, null);
     }
 
-    public function updateSkipEnrichingAttributes(array $attributes): void {
-        if ($this->loaded()) {
-            $attributes = array_values($attributes);
-            $this->skip_enriching_attributes = json_encode($attributes);
-            $this->save();
-        }
+    public function updateSkipEnrichingAttributes(array $attributes, int $keyId): void {
+        $params = [
+            ':value'    => json_encode(array_values($attributes)),
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                skip_enriching_attributes = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function updateSkipBlacklistSynchronisation(bool $skip): void {
-        if ($this->loaded()) {
-            $this->skip_blacklist_sync = $skip;
-            $this->save();
-        }
+    public function updateSkipBlacklistSynchronisation(bool $skip, int $keyId): void {
+        $params = [
+            ':value'    => $skip,
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                skip_blacklist_sync = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function updateRetentionPolicy(int $policyInWeeks): void {
-        if ($this->loaded()) {
-            $this->retention_policy = $policyInWeeks;
-            $this->save();
-        }
+    public function updateRetentionPolicy(int $policyInWeeks, int $keyId): void {
+        $params = [
+            ':value'    => $policyInWeeks,
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                retention_policy = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function updateBlacklistThreshold(int $value): void {
-        if ($this->loaded()) {
-            $this->blacklist_threshold = $value;
-            $this->save();
-        }
+    public function updateBlacklistThreshold(int $value, int $keyId): void {
+        $params = [
+            ':value'    => $value,
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                blacklist_threshold = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function updateReviewQueueThreshold(int $value): void {
-        if ($this->loaded()) {
-            $this->review_queue_threshold = $value;
-            $this->save();
-        }
+    public function updateReviewQueueThreshold(int $value, int $keyId): void {
+        $params = [
+            ':value'    => $value,
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                review_queue_threshold = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 
-    public function updateInternalToken(string $apiToken): void {
-        if ($this->loaded()) {
-            $this->token = $apiToken;
-            $this->save();
-        }
+    public function updateInternalToken(string $apiToken, int $keyId): void {
+        $params = [
+            ':value'    => $apiToken,
+            ':id'       => $keyId,
+        ];
+
+        $query = (
+            'UPDATE dshb_api
+            SET
+                token = :value
+            WHERE
+                dshb_api.id = :id'
+        );
+
+        $this->execQuery($query, $params);
     }
 }

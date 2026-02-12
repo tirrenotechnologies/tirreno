@@ -93,7 +93,7 @@ class Data extends \Tirreno\Controllers\Base {
         foreach ($userDetails as $user) {
             $user['le_exists']      = ($user['le_email'] ?? null) !== null;
             $user['le_email']       = $user['le_email'] ?? '';
-            $user['le_local_part']  = explode('@', $user['le_email'])[0] ?? '';
+            $user['le_local_part']  = explode('@', $user['le_email'])[0];
             $user['le_domain_part'] = explode('@', $user['le_email'])[1] ?? '';
 
             $userId     = $user['ea_id'];
@@ -191,8 +191,8 @@ class Data extends \Tirreno\Controllers\Base {
         $record['le_email_has_vowels']              = preg_match('/[aeoui]/i', $record['le_local_part']) > 0;
         $record['le_email_has_consonants']          = preg_match('/[bcdfghjklmnpqrstvwxyz]/i', $record['le_local_part']) > 0;
 
-        $record['le_with_long_local_part_length']   = $localPartLen > \Tirreno\Utils\Constants::get('RULE_EMAIL_MAXIMUM_LOCAL_PART_LENGTH');
-        $record['le_with_long_domain_length']       = $domainPartLen > \Tirreno\Utils\Constants::get('RULE_EMAIL_MAXIMUM_DOMAIN_LENGTH');
+        $record['le_with_long_local_part_length']   = $localPartLen > \Tirreno\Utils\Constants::get()->RULE_EMAIL_MAXIMUM_LOCAL_PART_LENGTH;
+        $record['le_with_long_domain_length']       = $domainPartLen > \Tirreno\Utils\Constants::get()->RULE_EMAIL_MAXIMUM_DOMAIN_LENGTH;
         $record['le_email_in_blockemails']          = $record['le_blockemails'] ?? false;
         $record['le_is_invalid']                    = $record['le_exists'] && !\Tirreno\Utils\Conversion::filterEmail($record['le_email']);
 
@@ -230,8 +230,8 @@ class Data extends \Tirreno\Controllers\Base {
         $record['lp_fraud_detected']    = $record['lp_fraud_detected'] ?? false;
         $record['le_fraud_detected']    = $record['le_fraud_detected'] ?? false;
 
-        $record['eup_has_rare_browser'] = (bool) count(array_diff($record['eup_browser_name'], array_keys(\Tirreno\Utils\Constants::get('RULE_REGULAR_BROWSER_NAMES'))));
-        $record['eup_has_rare_os']      = (bool) count(array_diff($record['eup_os_name'], \Tirreno\Utils\Constants::get('RULE_REGULAR_OS_NAMES')));
+        $record['eup_has_rare_browser'] = (bool) count(array_diff($record['eup_browser_name'], array_keys(\Tirreno\Utils\Constants::get()->RULE_REGULAR_BROWSER_NAMES)));
+        $record['eup_has_rare_os']      = (bool) count(array_diff($record['eup_os_name'], \Tirreno\Utils\Constants::get()->RULE_REGULAR_OS_NAMES));
         $record['eup_device_count']     = count($record['eup_device']);
 
         $record['eup_vulnerable_ua']    = false;
@@ -255,15 +255,15 @@ class Data extends \Tirreno\Controllers\Base {
 
         $eventTypeCount                     = array_count_values($eventTypeFiltered);
 
-        //$accountLoginFailId = \Tirreno\Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
-        $accountEmailChangeId               = \Tirreno\Utils\Constants::get('ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID');
-        $accountPwdChangeId                 = \Tirreno\Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
+        //$accountLoginFailId = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
+        $accountEmailChangeId               = \Tirreno\Utils\Constants::get()->ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID;
+        $accountPwdChangeId                 = \Tirreno\Utils\Constants::get()->ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID;
 
         //$record['event_failed_login_attempts'] = $eventTypeCount[$accountLoginFailId] ?? 0;
         $record['event_email_changed']      = array_key_exists($accountEmailChangeId, $eventTypeCount);
         $record['event_password_changed']   = array_key_exists($accountPwdChangeId, $eventTypeCount);
 
-        $record['event_http_method_head']   = in_array(\Tirreno\Utils\Constants::get('EVENT_REQUEST_TYPE_HEAD'), $record['event_http_method']);
+        $record['event_http_method_head']   = in_array(\Tirreno\Utils\Constants::get()->EVENT_REQUEST_TYPE_HEAD, $record['event_http_method']);
 
         $record['event_empty_referer']      = in_array(true, $record['event_empty_referer'], true);
 

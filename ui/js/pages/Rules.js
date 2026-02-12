@@ -13,8 +13,6 @@ import {
 export class RulesPage extends BasePage {
     constructor() {
         super('rules');
-
-        this.initUi();
     }
 
     initUi() {

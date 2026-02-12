@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Events;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminEvents';
+    public ?string $page = 'AdminEvents';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminEvents_search_placeholder');

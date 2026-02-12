@@ -18,22 +18,22 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
-    protected $alertTypesParams;
-    protected $editTypesParams;
-    protected $normalTypesParams;
+    protected array $alertTypesParams;
+    protected array $editTypesParams;
+    protected array $normalTypesParams;
 
-    protected $alertFlatIds;
-    protected $editFlatIds;
-    protected $normalFlatIds;
+    protected string $alertFlatIds;
+    protected string $editFlatIds;
+    protected string $normalFlatIds;
 
     public function __construct() {
         parent::__construct();
 
-        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('ALERT_EVENT_TYPES'), 'alert');
-        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('EDITING_EVENT_TYPES'), 'edit');
-        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('NORMAL_EVENT_TYPES'), 'normal');
+        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ALERT_EVENT_TYPES, 'alert');
+        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->EDITING_EVENT_TYPES, 'edit');
+        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_EVENT_TYPES, 'normal');
     }
 
     abstract public function getCounts(int $apiKey): array;
@@ -54,7 +54,7 @@ abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
         $datesRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(180, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Tirreno\Utils\Constants::get('CHART_RESOLUTION')[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);

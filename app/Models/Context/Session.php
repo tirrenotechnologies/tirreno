@@ -18,14 +18,47 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 class Session extends Base {
-    protected $uniqueValues = false;
+    protected ?bool $uniqueValues = false;
+
+    public function getContext(array $accountIds, int $apiKey, int $timezoneOffset = 0): array {
+        $unique = $this->uniqueValues;
+        $records = $this->getDetails($accountIds, $apiKey, $timezoneOffset);
+
+        $keys = array_keys($records[0] ?? []);
+        if (!$keys || !in_array('id', $keys)) {
+            return [];
+        }
+
+        $groupped = [];
+
+        $userId = 0;
+
+        foreach ($records as $record) {
+            $userId = $record['id'];
+
+            if (!isset($groupped[$userId])) {
+                $groupped[$userId] = [];
+                foreach ($keys as $key) {
+                    $groupped[$userId][$key] = [];
+                }
+            }
+
+            foreach ($keys as $key) {
+                if (!$unique || !in_array($record[$key], $groupped[$userId][$key])) {
+                    $groupped[$userId][$key][] = $record[$key];
+                }
+            }
+        }
+
+        return $groupped;
+    }
 
     // one record per account
     protected function getDetails(array $accountIds, int $apiKey, int $timezoneOffset = 0): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
-        $params[':night_start'] = gmdate('H:i:s', \Tirreno\Utils\Constants::get('NIGHT_RANGE_SECONDS_START') - $timezoneOffset);
-        $params[':night_end'] = gmdate('H:i:s', \Tirreno\Utils\Constants::get('NIGHT_RANGE_SECONDS_END') - $timezoneOffset);
+        $params[':night_start'] = gmdate('H:i:s', \Tirreno\Utils\Constants::get()->NIGHT_RANGE_SECONDS_START - $timezoneOffset);
+        $params[':night_end'] = gmdate('H:i:s', \Tirreno\Utils\Constants::get()->NIGHT_RANGE_SECONDS_END - $timezoneOffset);
 
         // boolean logic for defining time ranges overlap
         $query = (

@@ -1,10 +1,6 @@
 import {Loader} from '../Loader.js?v=2';
 import {BaseChart}  from './BaseChart.js?v=2';
-import {
-    COLOR_LIGHT_GREEN,
-    COLOR_GREEN,
-    X_AXIS_SERIFS,
-} from '../utils/Constants.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 
 export class BaseSparklineChart extends BaseChart {
     constructor(chartParams) {
@@ -51,8 +47,8 @@ export class BaseSparklineChart extends BaseChart {
                 },
                 {
                     label: 'This week',
-                    stroke: COLOR_GREEN,
-                    fill: COLOR_LIGHT_GREEN,
+                    stroke: Constants.COLOR_GREEN,
+                    fill: Constants.COLOR_LIGHT_GREEN,
                     points: {show: false}
                 },
                 {

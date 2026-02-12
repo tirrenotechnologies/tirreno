@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Map extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'countries';
+    protected ?string $DB_TABLE_NAME = 'countries';
 
     public function getAllCountries(?string $dateFrom, ?string $dateTo, int $apiKey): array {
         $params = [

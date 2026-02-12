@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Session extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_session';
+    protected ?string $DB_TABLE_NAME = 'event_session';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $query = (

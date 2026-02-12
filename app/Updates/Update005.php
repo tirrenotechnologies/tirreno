@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update005 extends Base {
-    public static $version = 'v0.9.9';
+    public static string $version = 'v0.9.9';
 
-    public static function apply($database): void {
+    public static function apply(\DB\SQL $database): void {
         $queries = [
             'CREATE INDEX event_ua_parsed_device_idx ON event_ua_parsed USING btree (device)',
             'ALTER TABLE event_device DROP CONSTRAINT event_device_account_id_key_user_agent_key',

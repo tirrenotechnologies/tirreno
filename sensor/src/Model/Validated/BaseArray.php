@@ -49,7 +49,7 @@ class BaseArray extends \Sensor\Model\Validated\Base {
                 if ($payload && is_array($payload)) {
                     $item = $this->preserveItem($payload);
 
-                    if ($item && count($item)) {
+                    if ($item) {
                         $data[] = $item;
                     } else {
                         $this->invalid = true;

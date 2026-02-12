@@ -52,13 +52,13 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     }
 
     public function getAllDeviceTypes(): array {
-        return \Tirreno\Utils\Constants::get('DEVICE_TYPES');
+        return \Tirreno\Utils\Constants::get()->DEVICE_TYPES;
     }
 
     public function extendPayload(array $data, int $apiKey): array {
         if (isset($data['event_type_id']) && isset($data['id'])) {
-            $payloadTypes = [\Tirreno\Utils\Constants::get('PAGE_SEARCH_EVENT_TYPE_ID'), \Tirreno\Utils\Constants::get('ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID')];
-            if ($data['event_type_id'] === \Tirreno\Utils\Constants::get('FIELD_EDIT_EVENT_TYPE_ID')) {
+            $payloadTypes = [\Tirreno\Utils\Constants::get()->PAGE_SEARCH_EVENT_TYPE_ID, \Tirreno\Utils\Constants::get()->ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID];
+            if ($data['event_type_id'] === \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID) {
                 $model = new \Tirreno\Models\FieldAuditTrail();
                 $data['event_payload'] = json_encode($model->getByEventId($data['id'], $apiKey));
             } elseif (in_array($data['event_type_id'], $payloadTypes)) {

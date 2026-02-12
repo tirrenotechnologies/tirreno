@@ -9,7 +9,7 @@ class A02 extends \Tirreno\Assets\Rule {
 
     protected function prepareParams(array $params): array {
         $suspiciousLoginFailed = false;
-        $loginFail = \Tirreno\Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
+        $loginFail = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
 
         foreach ($params['event_type'] as $idx => $event) {
             if ($event === $loginFail && \Tirreno\Utils\Rules::eventDeviceIsNew($params, $idx)) {
@@ -23,7 +23,7 @@ class A02 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['event_failed_login_on_new_device']->equalTo(true),
         );

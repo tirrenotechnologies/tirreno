@@ -18,9 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Views;
 
 class Json extends Base {
-    public function render(): string|false|null {
-        parent::render();
-
+    public function render(): string {
         header('Content-Type: application/json');
 
         return json_encode($this->data);

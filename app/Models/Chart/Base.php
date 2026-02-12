@@ -86,14 +86,14 @@ abstract class Base extends \Tirreno\Models\BaseSql {
         $cnt = count($params);
         $data = array_fill(0, $cnt, []);
 
-        $step = \Tirreno\Utils\Constants::get('CHART_RESOLUTION')[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
         $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
         $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest($offset);
 
         if (!$dateRange) {
             $now = time() + $offset;
-            $week = \Tirreno\Utils\Constants::get('SECONDS_IN_WEEK');
+            $week = \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK;
             if (count($params[0]) === 0) {
                 $dateRange = [
                     'endDate' => date('Y-m-d H:i:s', $now),

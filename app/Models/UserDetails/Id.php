@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\UserDetails;
 
 class Id extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $params = [

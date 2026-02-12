@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class ReviewQueue extends Base {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
         $field1 = 'ts_new_users_whitelisted';
@@ -59,7 +59,7 @@ class ReviewQueue extends Base {
             ORDER BY ts'
         );
 
-        return $this->execute($query, $apiKey, false);
+        return $this->execute($query, $apiKey);
     }
 
     private function getSecondLine(int $apiKey): array {
@@ -80,7 +80,7 @@ class ReviewQueue extends Base {
             ORDER BY ts'
         );
 
-        return $this->execute($query, $apiKey, false);
+        return $this->execute($query, $apiKey);
     }
 
     private function getThirdLine(int $apiKey): array {
@@ -101,6 +101,6 @@ class ReviewQueue extends Base {
             ORDER BY ts'
         );
 
-        return $this->execute($query, $apiKey, false);
+        return $this->execute($query, $apiKey);
     }
 }

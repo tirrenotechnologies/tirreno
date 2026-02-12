@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Email extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\FraudFlagUpdaterInterface {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getEmailDetails(int $id, int $apiKey): array {
         $params = [

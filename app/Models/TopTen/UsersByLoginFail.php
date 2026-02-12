@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\TopTen;
 
 class UsersByLoginFail extends Base {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
@@ -27,7 +27,7 @@ class UsersByLoginFail extends Base {
         $queryConditions[] = 'event.type = :event_type';
         $queryConditions = join(' AND ', $queryConditions);
 
-        $params[':event_type'] = \Tirreno\Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID');
+        $params[':event_type'] = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
 
         $query = (
             "SELECT

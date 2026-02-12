@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Users extends Base {
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
@@ -46,12 +46,12 @@ class Users extends Base {
             ':start_time'   => $dateRange['startDate'],
             ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
             ':offset'       => strval($offset),
-            ':high_inf'     => \Tirreno\Utils\Constants::get('USER_HIGH_SCORE_INF'),
-            //':high_sup'     => \Tirreno\Utils\Constants::get('USER_HIGH_SCORE_SUP'),
-            ':med_inf'      => \Tirreno\Utils\Constants::get('USER_MEDIUM_SCORE_INF'),
-            ':med_sup'      => \Tirreno\Utils\Constants::get('USER_MEDIUM_SCORE_SUP'),
-            ':low_inf'      => \Tirreno\Utils\Constants::get('USER_LOW_SCORE_INF'),
-            ':low_sup'      => \Tirreno\Utils\Constants::get('USER_LOW_SCORE_SUP'),
+            ':high_inf'     => \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_INF,
+            //':high_sup'     => \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_SUP,
+            ':med_inf'      => \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_INF,
+            ':med_sup'      => \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_SUP,
+            ':low_inf'      => \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_INF,
+            ':low_sup'      => \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_SUP,
         ];
 
         $query = (

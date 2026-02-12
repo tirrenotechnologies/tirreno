@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update006 extends Base {
-    public static $version = 'v0.9.10';
+    public static string $version = 'v0.9.10';
 
-    public static function apply($database): void {
+    public static function apply(\DB\SQL $database): void {
         $queries = [
             ('CREATE SEQUENCE event_field_audit_id_seq
                 AS BIGINT
@@ -133,7 +133,7 @@ class Update006 extends Base {
             $database->exec($sql);
         }
 
-        $params = [':field_edit' => \Tirreno\Utils\Constants::FIELD_EDIT_EVENT_TYPE_ID];
+        $params = [':field_edit' => \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID];
         $sql = (
             'UPDATE event_url
             SET

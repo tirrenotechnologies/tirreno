@@ -21,6 +21,7 @@ class Base extends \Sensor\Model\Validated\Base {
     private const INVALIDPLACEHOLDER = 'unknown';
 
     protected array $optionalFields;
+    // not empty
     protected array $requiredFields;
 
     protected bool $set;
@@ -29,7 +30,8 @@ class Base extends \Sensor\Model\Validated\Base {
     public array|string|null $value;
 
     public function __construct(mixed $value) {
-        parent::__construct(json_encode($value), 'payload');
+        $baseValue = json_encode($value) ?: '';
+        parent::__construct($baseValue, 'payload');
 
         if (!is_array($value)) {
             $this->invalid = true;
@@ -49,7 +51,7 @@ class Base extends \Sensor\Model\Validated\Base {
                 if ($payload && is_array($payload)) {
                     $item = $this->preserveItem($payload);
 
-                    if ($item && count($item)) {
+                    if ($item) {
                         $data[] = $item;
                     } else {
                         $this->invalid = true;
@@ -64,7 +66,7 @@ class Base extends \Sensor\Model\Validated\Base {
             $this->invalid = true;
         }
 
-        $this->value = count($data) ? ($this->dump ? json_encode($data) : $data) : null;
+        $this->value = count($data) ? ($this->dump ? (json_encode($data) ?: '') : $data) : null;
     }
 
     private function preserveItem(array $item): ?array {
@@ -88,7 +90,7 @@ class Base extends \Sensor\Model\Validated\Base {
 
     private function convert(mixed $val): ?string {
         if (is_array($val)) {
-            return json_encode($val);
+            return json_encode($val) ?: null;
         }
 
         if (is_int($val) || is_float($val) || is_string($val) || is_bool($val)) {

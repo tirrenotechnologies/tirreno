@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class SessionStat extends Base {
-    protected $DB_TABLE_NAME = 'event_session';
+    protected ?string $DB_TABLE_NAME = 'event_session';
 
     public function getData(int $apiKey): array {
         $itemsByDate = [];
@@ -38,7 +38,7 @@ class SessionStat extends Base {
         $datesRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(14, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Tirreno\Utils\Constants::get('CHART_RESOLUTION')[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
@@ -102,7 +102,7 @@ class SessionStat extends Base {
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
             //':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
-            ':resolution'   => \Tirreno\Utils\Constants::get('SECONDS_IN_DAY'),
+            ':resolution'   => \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY,
             ':id'           => \Tirreno\Utils\Conversion::getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];

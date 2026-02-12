@@ -11,8 +11,6 @@ import {IspTiles} from '../parts/details/IspTiles.js?v=2';
 export class IspPage extends BasePage {
     constructor() {
         super('isp', true);
-
-        this.initUi();
     }
 
     initUi() {

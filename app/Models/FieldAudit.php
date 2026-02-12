@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class FieldAudit extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_field_audit';
+    protected ?string $DB_TABLE_NAME = 'event_field_audit';
 
     public function getFieldById(int $fieldId, int $apiKey): array {
         $params = [

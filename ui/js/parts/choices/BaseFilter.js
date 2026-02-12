@@ -16,10 +16,10 @@ export class BaseFilter {
             callbackOnCreateTemplates: function(strToEl) {
                 const {classNames, itemSelectText} = this.config;
                 return {
-                    item: function({classNames}, data) {
+                    item: function(_classNames, data) {
                         return strToEl(renderItem(classNames, data));
                     },
-                    choice: function({classNames}, data) {
+                    choice: function(_classNames, data) {
                         return strToEl(renderChoice(classNames, data, itemSelectText));
                     },
                 };

@@ -46,9 +46,6 @@ class Request {
         'fieldHistory',
     ];
 
-    /**
-     * @param array<string,string> $body
-     */
     public function __construct(
         public array $body,
         #[\SensitiveParameter]

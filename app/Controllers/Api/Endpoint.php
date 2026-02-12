@@ -20,7 +20,7 @@ namespace Tirreno\Controllers\Api;
 abstract class Endpoint {
     public const API_KEY = 'Api-Key';
 
-    protected $f3;
+    protected \Base $f3;
 
     protected \Tirreno\Views\Json $response;
     protected string $responseType;
@@ -30,8 +30,8 @@ abstract class Endpoint {
     protected \DateTime $startTime;
 
     private string $apiKeyString;
-    protected \Tirreno\Models\ApiKeys $apiKey;
-    protected \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface $authorizationModel;
+    protected int $apiKeyId;
+    //protected \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface $authorizationModel;
 
     protected array $body = [];
 
@@ -45,7 +45,7 @@ abstract class Endpoint {
         \Tirreno\Utils\Database::initConnect(false);
 
         $this->response = new \Tirreno\Views\Json();
-        $this->responseType = \Tirreno\Utils\Constants::get('SINGLE_RESPONSE_TYPE');
+        $this->responseType = \Tirreno\Utils\Constants::get()->SINGLE_RESPONSE_TYPE;
     }
 
     public function beforeRoute(): void {
@@ -91,10 +91,10 @@ abstract class Endpoint {
 
     protected function authenticate(): void {
         $model = new \Tirreno\Models\ApiKeys();
-        $apiKey = $model->getKeyIdByHash($this->apiKeyString);
+        $apiKeyId = $model->getKeyIdByHash($this->apiKeyString);
 
-        if ($apiKey) {
-            $this->apiKey = $apiKey;
+        if ($apiKeyId) {
+            $this->apiKeyId = $apiKeyId;
 
             return;
         }
@@ -102,20 +102,19 @@ abstract class Endpoint {
         $this->setError(401, \Tirreno\Utils\ErrorCodes::REST_API_KEY_IS_NOT_CORRECT);
     }
 
-    protected function authorize(string $subjectId): void {
-        if (!isset($this->apiKey) || isset($this->error)) {
+    /*protected function authorize(string $subjectId): void {
+        if (!isset($this->apiKeyId) || isset($this->error)) {
             exit;
         }
 
-        $apiKeyId = $this->apiKey->id;
-        $hasAccess = $this->authorizationModel->checkAccessByExternalId($subjectId, $apiKeyId);
+        $hasAccess = $this->authorizationModel->checkAccessByExternalId($subjectId, $this->apiKeyId);
 
         if ($hasAccess) {
             return;
         }
 
         $this->setError(403, \Tirreno\Utils\ErrorCodes::REST_API_NOT_AUTHORIZED);
-    }
+    }*/
 
     protected function getBodyProp(string $key, string $paramType = 'string'): string|int|array|null {
         $value = $this->body[$key] ?? null;
@@ -131,13 +130,13 @@ abstract class Endpoint {
         $model = new \Tirreno\Models\Logbook();
         $model->add(
             $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
-            $this->f3->PATH,
+            $this->f3->get('PATH'),
             null,
-            !isset($this->error) ? \Tirreno\Utils\Constants::get('LOGBOOK_ERROR_TYPE_SUCCESS') : \Tirreno\Utils\Constants::get('LOGBOOK_ERROR_TYPE_CRITICAL_ERROR'),
+            !isset($this->error) ? \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_SUCCESS : \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_CRITICAL_ERROR,
             !isset($this->error) ? null : json_encode(['Undefined error']),
             json_encode($this->body),
             $this->formatStartTime(),
-            $this->apiKey->id,
+            $this->apiKeyId,
         );
     }
 

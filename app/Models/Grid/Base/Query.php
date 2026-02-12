@@ -18,17 +18,17 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Base;
 
 class Query {
-    protected $f3 = null;
-    protected $apiKey = null;
-    protected $ids = null;
-    protected $idsParams = [];
-    protected $itemKey = null;
-    protected $itemId = null;
+    protected ?\Base $f3 = null;
+    protected ?int $apiKey = null;
+    protected ?string $ids = null;
+    protected ?array $idsParams = [];
+    protected ?string $itemKey = null;
+    protected ?int $itemId = null;
 
-    protected $defaultOrder = null;
-    protected $dateRangeField = 'event_country.lastseen';
+    protected ?string $defaultOrder = null;
+    protected string $dateRangeField = 'event_country.lastseen';
 
-    protected $allowedColumns = [];
+    protected array $allowedColumns = [];
 
     public function __construct(int $apiKey) {
         $this->f3 = \Base::instance();
@@ -103,7 +103,7 @@ class Query {
         return [':api_key' => $this->apiKey];
     }
 
-    public function injectIdQuery(string $field, &$params): string {
+    public function injectIdQuery(string $field, array &$params): string {
         $idsQuery = $this->ids;
         if ($idsQuery === null || $idsQuery === '') {
             return '';

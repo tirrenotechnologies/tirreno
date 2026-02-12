@@ -13,7 +13,7 @@ class P02 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['lp_country_code_in_eip_country_id']->equalTo(false),
         );

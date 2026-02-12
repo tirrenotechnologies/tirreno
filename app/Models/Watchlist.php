@@ -18,35 +18,62 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Watchlist extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     public function add(int $accountId, int $apiKey): void {
-        $this->getById($accountId, $apiKey);
+        $params = [
+            ':account_id'   => $accountId,
+            ':api_key'      => $apiKey,
+        ];
 
-        if ($this->loaded()) {
-            $this->is_important = 1;
-            $this->save();
-        }
+        $query = (
+            'UPDATE event_account
+            SET
+                is_important = 1
+            WHERE
+                event_account.id = :account_id AND
+                event_account.key = :api_key'
+        );
+
+        $this->execQuery($query, $params);
     }
 
     public function remove(int $accountId, int $apiKey): void {
-        $this->getById($accountId, $apiKey);
+        $params = [
+            ':account_id'   => $accountId,
+            ':api_key'      => $apiKey,
+        ];
 
-        if ($this->loaded()) {
-            $this->is_important = 0;
-            $this->save();
-        }
-    }
-
-    private function getById(int $accountId, int $apiKey): void {
-        $this->load(
-            ['id=? AND key=?', $accountId, $apiKey],
+        $query = (
+            'UPDATE event_account
+            SET
+                is_important = 0
+            WHERE
+                event_account.id = :account_id AND
+                event_account.key = :api_key'
         );
+
+        $this->execQuery($query, $params);
     }
 
     public function getUsersByKey(int $apiKey): array {
-        return $this->find(
-            ['key=? AND is_important=?', $apiKey, 1],
+        $params = [
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = (
+            'SELECT
+                id,
+                userid,
+                created,
+                lastseen
+            FROM
+                event_account
+            WHERE
+                event_account.is_important = 1 AND
+                event_account.key = :api_key'
         );
+
+        return $this->execQuery($query, $params);
     }
 }

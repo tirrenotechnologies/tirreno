@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Events extends Base {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
@@ -40,9 +40,9 @@ class Events extends Base {
             ];
         }
         $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
-        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('ALERT_EVENT_TYPES'), 'alert');
-        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('EDITING_EVENT_TYPES'), 'edit');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('NORMAL_EVENT_TYPES'), 'normal');
+        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ALERT_EVENT_TYPES, 'alert');
+        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->EDITING_EVENT_TYPES, 'edit');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_EVENT_TYPES, 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],

@@ -18,12 +18,13 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Watchlist extends Base {
-    private $userIds = [];
-    protected $DB_TABLE_NAME = 'event';
+    private array $userIds = [];
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
-        $params = $this->getRequestParams($apiKey);
-        $params[':users_ids'] = $this->userIds;
+        $params = [
+            ':users_ids' => $this->userIds,
+        ];
 
         $query = (
             "SELECT

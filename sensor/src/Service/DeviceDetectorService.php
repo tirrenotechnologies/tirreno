@@ -73,7 +73,7 @@ class DeviceDetectorService {
         );
     }
 
-    private function valueOrNull(string $key, array|bool|int|null $array): ?string {
+    private function valueOrNull(string $key, mixed $array): ?string {
         if (!is_array($array) || !array_key_exists($key, $array)) {
             return null;
         }

@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Ips;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_ip.lastseen DESC';
-    protected $dateRangeField = 'event_ip.lastseen';
+    protected ?string $defaultOrder = 'event_ip.lastseen DESC';
+    protected string $dateRangeField = 'event_ip.lastseen';
 
-    protected $allowedColumns = ['ip', 'full_country', 'asn', 'netname', 'ip_type', 'total_visit', 'total_account', 'lastseen', 'id'];
+    protected array $allowedColumns = ['ip', 'full_country', 'asn', 'netname', 'ip_type', 'total_visit', 'total_account', 'lastseen', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -104,10 +104,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_ip.id', $queryParams);
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (

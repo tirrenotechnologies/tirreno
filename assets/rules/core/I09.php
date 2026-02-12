@@ -7,7 +7,7 @@ class I09 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'User accesses the account with numerous IP addresses. This behaviour occurs in less than one percent of desktop users.';
     public const ATTRIBUTES = [];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ea_total_ip']->greaterThan(9),
         );

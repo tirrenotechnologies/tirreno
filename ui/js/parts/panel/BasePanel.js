@@ -154,11 +154,7 @@ export class BasePanel {
                     prev.classList.remove('is-hidden');
                 }
 
-                if (data[key] instanceof Node) {
-                    span.replaceChildren(data[key]);
-                } else {
-                    span.innerHTML = data[key];
-                }
+                span.replaceChildren(data[key]);
             }
         }
     }

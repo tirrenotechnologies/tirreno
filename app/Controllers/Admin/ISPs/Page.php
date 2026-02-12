@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\ISPs;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminIsps';
+    public ?string $page = 'AdminIsps';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminIsps_search_placeholder');

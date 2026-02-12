@@ -26,7 +26,7 @@ class Enrichment {
 
             $type = null;
 
-            if ($record['fraud_detected'] && !$type) {
+            if ($record['fraud_detected']) {
                 $type = 'Blacklisted';
             }
             if ($record['blocklist'] && !$type) {
@@ -76,7 +76,7 @@ class Enrichment {
             $record = $records[$i];
             $reputation = 'none';
 
-            if ($record['data_breach'] !== null && $record['data_breach'] !== null) {
+            if ($record['data_breach'] !== null) {
                 $reputationLevel = \Tirreno\Utils\Conversion::intVal($record['data_breach'], 0) + \Tirreno\Utils\Conversion::intVal(!$record['blockemails'], 0);
                 $reputation = match ($reputationLevel) {
                     2       => 'high',

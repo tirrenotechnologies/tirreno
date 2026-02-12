@@ -39,10 +39,6 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         $dateRange      = \Tirreno\Utils\Timezones::getWeekAgoDayRange($offset);
         $weekDetails    = $model->getDayDetails($userId, $dateRange, $apiKey);
 
-        $limits = \Tirreno\Utils\Assets\Lists\Constants::getList();
-
-        $totalDetails['limits'] = $limits['user_details_total_limits'] ?? [];
-
         return [
             'userDetails'   => $userDetails,
             'ipDetails'     => $ipDetails,

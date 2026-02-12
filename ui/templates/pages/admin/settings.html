@@ -21,7 +21,7 @@
                     </repeat>
                 </check>
 
-                <set FREQUENCY="{{ isset(@VALUES)?@VALUES.unreviewed_items_reminder_freq:@PROFILE.unreviewed_items_reminder_freq }}" />
+                <set FREQUENCY="{{ isset(@VALUES)?@VALUES.unreviewed_items_reminder_freq:@PROFILE->reminderFreq }}" />
                 <include href="templates/parts/forms/notificationPreferencesForm.html" with="frequency={{ @FREQUENCY }}" />
 
                 <check if="{{ @IS_OWNER }}">
@@ -30,9 +30,9 @@
 
                 <include href="templates/parts/forms/changePasswordForm.html" />
 
-                <set EMAIL="{{ @PROFILE ? @PROFILE.email : '' }}" />
+                <set EMAIL="{{ @PROFILE ? @PROFILE->email : '' }}" />
                 <set EMAIL="{{ isset(@EMAIL_VALUES) ? @EMAIL_VALUES.email : @EMAIL }}" />
-                <include href="templates/parts/forms/changeEmailForm.html" with="email={{ @EMAIL }},waitingForConfirmation={{ @PENDING_CONFIRMATION_EMAIL }}" />
+                <include href="templates/parts/forms/changeEmailForm.html" with="email={{ @EMAIL }}" />
 
                 <include href="templates/parts/forms/closeAccountForm.html" />
             </div>

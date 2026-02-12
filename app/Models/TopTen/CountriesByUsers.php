@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\TopTen;
 
 class CountriesByUsers extends Base {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);

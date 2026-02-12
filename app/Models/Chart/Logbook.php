@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Logbook extends Base {
-    protected $DB_TABLE_NAME = 'event_logbook';
+    protected ?string $DB_TABLE_NAME = 'event_logbook';
 
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
@@ -54,9 +54,9 @@ class Logbook extends Base {
             ':comb_offset'  => strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset() - $serverOffset),
         ];
 
-        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('FAILED_LOGBOOK_EVENT_TYPES'), 'failed');
-        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('ISSUED_LOGBOOK_EVENT_TYPES'), 'issued');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get('NORMAL_LOGBOOK_EVENT_TYPES'), 'normal');
+        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->FAILED_LOGBOOK_EVENT_TYPES, 'failed');
+        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ISSUED_LOGBOOK_EVENT_TYPES, 'issued');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_LOGBOOK_EVENT_TYPES, 'normal');
 
         $params = array_merge($params, $failedTypesParams);
         $params = array_merge($params, $issuedTypesParams);

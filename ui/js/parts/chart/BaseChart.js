@@ -5,11 +5,7 @@ import {formatKiloValue} from '../utils/String.js?v=2';
 import {formatIntTimeUtc} from '../utils/Date.js?v=2';
 import {fireEvent} from '../utils/Event.js?v=2';
 import {renderChartTooltipPart} from '../DataRenderers.js?v=2';
-import {
-    MAX_HOURS_CHART,
-    MIN_HOURS_CHART,
-    X_AXIS_SERIFS,
-} from '../utils/Constants.js?v=2';
+import {Constants} from '../utils/Constants.js?v=2';
 
 export class BaseChart {
     constructor(chartParams) {
@@ -86,9 +82,9 @@ export class BaseChart {
         if (data['dateFrom']) {
             const diff = new Date(data['dateTo']) - new Date(data['dateFrom']);
             const hours = diff/(60 * 60 * 1000);
-            if (hours <= MAX_HOURS_CHART && hours > MIN_HOURS_CHART) {
+            if (hours <= Constants.MAX_HOURS_CHART && hours > Constants.MIN_HOURS_CHART) {
                 data['resolution'] = 'hour';
-            } else if (hours <= MIN_HOURS_CHART) {
+            } else if (hours <= Constants.MIN_HOURS_CHART) {
                 data['resolution'] = 'minute';
             }
         }
@@ -222,7 +218,7 @@ export class BaseChart {
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeHours   = (scaleMax - scaleMin) / 3600;
-                if (rangeHours > X_AXIS_SERIFS) rangeHours = X_AXIS_SERIFS;
+                if (rangeHours > Constants.X_AXIS_SERIFS) rangeHours = Constants.X_AXIS_SERIFS;
                 const pxPerHour = plotDim / rangeHours;
 
                 return pxPerHour;
@@ -235,7 +231,7 @@ export class BaseChart {
             ];
             xAxis.space = function(self, axisIdx, scaleMin, scaleMax, plotDim) {
                 let rangeMinutes   = (scaleMax - scaleMin) / 60;
-                if (rangeMinutes > X_AXIS_SERIFS) rangeMinutes = X_AXIS_SERIFS;
+                if (rangeMinutes > Constants.X_AXIS_SERIFS) rangeMinutes = Constants.X_AXIS_SERIFS;
                 const pxPerMinute = plotDim / rangeMinutes;
 
                 return pxPerMinute;

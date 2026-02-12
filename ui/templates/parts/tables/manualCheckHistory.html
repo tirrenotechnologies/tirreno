@@ -9,7 +9,7 @@
                 <tbody>
                     <repeat group="{{ @HISTORY }}" key="{{ @key }}" value="{{ @value }}">
                         <tr>
-                            <td>{{ @AdminManualCheck_form_types[@value->type] }}</td>
+                            <td>{{ @AdminManualCheck_form_types[@value['type']] }}</td>
                             <td>
                                 <include href="templates/parts/forms/manualCheckShortForm.html" />
                             </td>

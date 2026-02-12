@@ -18,9 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Updates;
 
 class Update001 extends Base {
-    public static $version = 'v0.9.5';
+    public static string $version = 'v0.9.5';
 
-    public static function apply($database): void {
+    public static function apply(\DB\SQL $database): void {
         $queries = [
             'ALTER TABLE dshb_api ADD COLUMN blacklist_threshold INTEGER DEFAULT -1',
             'ALTER TABLE dshb_api ADD COLUMN review_queue_threshold INTEGER DEFAULT 33',

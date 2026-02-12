@@ -51,10 +51,6 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
                 break;
         }
 
-        if ($model === null) {
-            return $processErrorMessage;
-        }
-
         $totals = $model->getTimeFrameTotal($ids, $startDate, $endDate, $apiKey);
 
         return [

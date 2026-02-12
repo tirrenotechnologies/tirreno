@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Events;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event.time DESC, event.id DESC';
-    protected $dateRangeField = 'event.time';
+    protected ?string $defaultOrder = 'event.time DESC, event.id DESC';
+    protected string $dateRangeField = 'event.time';
 
-    protected $allowedColumns = ['userid', 'time', 'type', 'ip', 'ip_type', 'device', 'session_id', 'time', 'id'];
+    protected array $allowedColumns = ['userid', 'time', 'type', 'ip', 'ip_type', 'device', 'session_id', 'time', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -220,7 +220,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Apply itemId into request
         $this->applyRelatedToIdSearchConitions($query);
 
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = '';
 
         // WARN only for field_id filter
@@ -232,10 +232,11 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
                 ON (event_field_audit_trail.event_id = event.id)
             ');
 
-            $query = preg_replace($pattern, $replacement, $query, 1);
+            $modified = preg_replace($pattern, $replacement, $query, 1);
+            $query = $modified ?? $query;
         }
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             if (\Tirreno\Utils\Conversion::filterIp($search['value'])) {
                 $searchConditions .= (
                     ' AND
@@ -345,7 +346,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
             if ($deviceType === 'other') {
                 $placeholders = [];
 
-                foreach (\Tirreno\Utils\Constants::get('DEVICE_TYPES') as $device) {
+                foreach (\Tirreno\Utils\Constants::get()->DEVICE_TYPES as $device) {
                     if ($device !== 'unknown' && $device !== 'other') {
                         $param = ':device_exclude_' . $device;
                         $placeholders[] = $param;

@@ -18,12 +18,12 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 class Event extends Base {
-    protected $uniqueValues = false;
+    protected ?bool $uniqueValues = false;
 
     protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
-        $params[':context_limit'] = \Tirreno\Utils\Constants::get('RULE_EVENT_CONTEXT_LIMIT');
+        $params[':context_limit'] = \Tirreno\Utils\Constants::get()->RULE_EVENT_CONTEXT_LIMIT;
 
         $query = (
             "WITH ranked_events AS (

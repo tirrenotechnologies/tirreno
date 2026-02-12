@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers;
 
 abstract class Base {
-    protected $f3;
+    protected \Base $f3;
 
     public function __construct() {
         $this->f3 = \Base::instance();
@@ -30,6 +30,7 @@ abstract class Base {
 
         //Determine current user
         \Tirreno\Utils\Routes::setCurrentRequestOperator();
+        \Tirreno\Utils\Routes::setCurrentRequestApiKey();
 
         //Set CSRF token
         //$rnd = mt_rand();

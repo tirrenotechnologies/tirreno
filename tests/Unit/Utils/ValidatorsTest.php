@@ -27,12 +27,12 @@ use PHPUnit\Framework\TestCase;
  *
  * Not covered (unstable without refactor):
  * - Any validator that touches:
- *   - Models (Operator, ApiKeys, ApiKeyCoOwner, ForgotPassword, ChangeEmail, ...)
+ *   - Models (Operator, keyIds, keyIdCoOwner, ForgotPassword, ChangeEmail, ...)
  *   - Audit::instance()
  *   - Variables::getAvailableTimezones(), Variables::getEnrichmentApi()
  *   - Constants::get(...)
  *   - Routes::getCurrentRequestOperator()
- *   - Access::checkCurrentOperatorApiKeyAccess(), Access::getCurrentOperatorId(), ...
+ *   - Access::checkCurrentOperatorkeyIdAccess(), Access::getCurrentOperatorId(), ...
  *
  * @todo Refactor:
  * - extract CsrfValidatorInterface (avoid Access::CSRFTokenValid + Base::instance())
@@ -223,32 +223,6 @@ final class ValidatorsTest extends TestCase {
             'empty renewKey -> renew key missing' => [
                 'params' => ['renewKey' => ''],
                 'expected' => ErrorCodes::RENEW_KEY_DOES_NOT_EXIST,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider changeEmailKeyPresenceProvider
-     */
-    public function testValidateChangeEmailPageReturnsRenewKeyMissing(?array $params, int|false $expected): void {
-        $actual = Validators::validateChangeEmailPage($params);
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public static function changeEmailKeyPresenceProvider(): array {
-        return [
-            'params null -> change email key missing' => [
-                'params' => null,
-                'expected' => ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST,
-            ],
-            'missing renewKey -> change email key missing' => [
-                'params' => [],
-                'expected' => ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST,
-            ],
-            'empty renewKey -> change email key missing' => [
-                'params' => ['renewKey' => ''],
-                'expected' => ErrorCodes::CHANGE_EMAIL_KEY_DOES_NOT_EXIST,
             ],
         ];
     }

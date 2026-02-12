@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Domains;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_domain.id DESC';
-    protected $dateRangeField = 'event_domain.lastseen';
+    protected ?string $defaultOrder = 'event_domain.id DESC';
+    protected string $dateRangeField = 'event_domain.lastseen';
 
-    protected $allowedColumns = ['domain', 'free_email_provider', 'tranco_rank',
+    protected array $allowedColumns = ['domain', 'free_email_provider', 'tranco_rank',
         'disabled', 'disposable_domains', 'creation_date', 'total_account', 'fraud', 'id'];
 
     public function getData(): array {
@@ -89,10 +89,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_domain.id', $queryParams);
 
-        if (isset($search) && $search['value'] !== null) {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND (
                     LOWER(event_domain.domain)             LIKE LOWER(:search_value) OR

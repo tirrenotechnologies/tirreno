@@ -170,11 +170,11 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         return $controller->getUserDetails();
     }
 
-    public function getUserEnrichmentDetails(): array {
+    /*public function getUserEnrichmentDetails(): array {
         $controller = new \Tirreno\Controllers\Admin\UserDetails\Navigation();
 
         return $controller->getUserEnrichmentDetails();
-    }
+    }*/
 
     public function getNotCheckedEntitiesCount(): array {
         $controller = new \Tirreno\Controllers\Admin\Enrichment\Navigation();
@@ -294,5 +294,11 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         $controller = new \Tirreno\Controllers\Admin\Home\Navigation();
 
         return $controller->getCurrentTime();
+    }
+
+    public function getConstants(): array {
+        $controller = new \Tirreno\Controllers\Admin\Home\Navigation();
+
+        return $controller->getConstants();
     }
 }

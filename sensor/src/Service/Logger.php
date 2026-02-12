@@ -18,17 +18,21 @@ declare(strict_types=1);
 namespace Sensor\Service;
 
 class Logger {
-    /** @var array{sql: string, params: array<string, string>}[] */
-    private array $queries = [];
+    /** array{sql: string, params: array<string, string>}[] */
+    //private array $queries = [];
 
     public function __construct(
         private bool $printDebug,
     ) {
     }
 
-    private function fflush(string $msg, string $flow) {
+    private function fflush(string $msg, string $flow): void {
         $msg .= PHP_EOL;
         $out = fopen('php://' . $flow, 'w');
+        if ($out === false) {
+            return;
+        }
+
         fputs($out, $msg);
         fclose($out);
     }
@@ -47,10 +51,9 @@ class Logger {
     }
 
     /**
-     * @param array<string, float|null> $data
+     * array<string, float|null> $data
      */
-    public function logProfilerData(array $data): void {
-        return;
+    /*public function logProfilerData(array $data): void {
         $this->fflush('Profiler: ' . json_encode($data), 'stdout');
         $cnt = count($this->queries);
         if ($cnt > 0) {
@@ -62,7 +65,7 @@ class Logger {
             }
             $this->fflush($msg, 'stdout');
         }
-    }
+    }*/
 
     public function logDebug(string $info): void {
         if ($this->printDebug) {
@@ -75,8 +78,8 @@ class Logger {
      */
     public function logQuery(string $query, array $params): void {
         /** @var string $query */
-        $query = preg_replace('/\s+/', ' ', $query);
-        $this->queries[] = ['sql' => $query, 'params' => $params];
+        //$query = preg_replace('/\s+/', ' ', $query);
+        //$this->queries[] = ['sql' => $query, 'params' => $params];
     }
 
     private function getDebugInfo(\Throwable $err): string {

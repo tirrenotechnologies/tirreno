@@ -17,11 +17,10 @@ final class PreparedEqualsRule extends Rule {
         parent::__construct($ruleBuilder, $params);
     }
 
-    protected function defineCondition() {
-        // Uses Ruler DSL variable accessor: $this->rb['prepared'].
-        // Equality is expected to be provided as equalTo(), consistent with other DSL methods. :contentReference[oaicite:1]{index=1}
-        $condition = $this->rb['prepared']->equalTo($this->expectedPrepared);
-        return $condition;
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
+        return $this->rb->logicalAnd(
+            $this->rb['prepared']->equalTo($this->expectedPrepared),
+        );
     }
 
     protected function prepareParams(array $params): array {

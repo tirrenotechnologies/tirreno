@@ -19,10 +19,11 @@ namespace Tirreno\Crons;
 
 class BlacklistQueueHandler extends BaseQueue {
     public function process(): void {
-        parent::baseProcess(\Tirreno\Utils\Constants::get('BLACKLIST_QUEUE_ACTION_TYPE'));
+        parent::baseProcess(\Tirreno\Utils\Constants::get()->BLACKLIST_QUEUE_ACTION_TYPE);
     }
 
     protected function processItem(array $item): void {
+        $f3 = \Base::instance();
         $fraud = true;
 
         $dataController = new \Tirreno\Controllers\Admin\User\Data();
@@ -33,21 +34,20 @@ class BlacklistQueueHandler extends BaseQueue {
         );
 
         $model = new \Tirreno\Models\User();
-        $username = $model->getUser($item['event_account'], $item['key'])['userid'] ?? '';
+        $username = $model->getUserById($item['event_account'], $item['key'])['userid'] ?? '';
 
         $msg = \Tirreno\Utils\SystemMessages::syslogLine(10, 5, 'BlacklistQueue', 'blacklisted userid=' . $username);
-        \Base::instance()->write(\Base::instance()->LOGS . 'blacklist.log', $msg . PHP_EOL, true);
+        $f3->write($f3->get('LOGS') . 'blacklist.log', $msg . PHP_EOL, true);
 
-        $model = new \Tirreno\Models\ApiKeys();
-        $model->getKeyById($item['key']);
+        $key = \Tirreno\Entities\ApiKey::getById($item['key']);
 
-        if (!$model->skip_blacklist_sync && $model->token) {
+        if (!$key->skipBlacklistSync && $key->token) {
             $user = new \Tirreno\Models\User();
-            $userEmail = $user->getUser($item['event_account'], $item['key'])['email'] ?? null;
+            $userEmail = $user->getUserById($item['event_account'], $item['key'])['email'] ?? null;
 
             if ($userEmail !== null) {
                 $hashes = \Tirreno\Utils\Cron::getHashes($items, $userEmail);
-                $errorMessage = \Tirreno\Utils\Cron::sendBlacklistReportPostRequest($hashes, $model->token);
+                $errorMessage = \Tirreno\Utils\Cron::sendBlacklistReportPostRequest($hashes, $key->token);
                 if (strlen($errorMessage) > 0) {
                     // TODO: log error into database?
                     $this->addLog('Enrichment API cURL ' . $errorMessage);

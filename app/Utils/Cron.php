@@ -40,7 +40,7 @@ class Cron {
 
         $response = \Tirreno\Utils\Network::sendApiRequest($postFields, '/global_alert_report', 'POST', $enrichmentKey);
 
-        return $response['error'] ?? '';
+        return $response->error() ?? '';
     }
 
     public static function checkTimezone(string $timezone): bool {

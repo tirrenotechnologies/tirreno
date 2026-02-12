@@ -15,18 +15,10 @@
 
 declare(strict_types=1);
 
-namespace Tirreno\Models;
+namespace Tirreno\Interfaces;
 
-class ManualCheckHistoryQuery extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_manual_check_history';
+interface HttpTransportInterface {
+    public function isAvailable(): bool;
 
-    public function add(array $search): void {
-        $this->reset();
-
-        $this->operator = $search['operator'];
-        $this->type = $search['type'];
-        $this->search_query = $search['search'];
-
-        $this->save();
-    }
+    public function request(\Tirreno\Entities\HttpRequest $request): \Tirreno\Entities\HttpResponse;
 }

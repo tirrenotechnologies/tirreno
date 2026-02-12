@@ -34,7 +34,7 @@ class AccountRepository {
         $stmt->bindValue(':key', $account->apiKeyId);
         $stmt->execute();
 
-        /** @var array{id: int, session_id: int} $result */
+        /** @var array{id: int, session_id: int}|false $result */
         $result = $stmt->fetch();
 
         return $result !== false ? new InsertAccountDto($result['id'], null, null, $result['session_id']) : null;

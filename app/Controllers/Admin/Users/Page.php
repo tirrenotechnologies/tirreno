@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Users;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminUsers';
+    public ?string $page = 'AdminUsers';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminUsers_search_placeholder');

@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Blacklist;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'created DESC, type ASC, value ASC';
-    protected $dateRangeField = 'blacklist.created';
+    protected ?string $defaultOrder = 'created DESC, type ASC, value ASC';
+    protected string $dateRangeField = 'blacklist.created';
 
-    protected $allowedColumns = ['score', 'created', 'type', 'value'];
+    protected array $allowedColumns = ['score', 'created', 'type', 'value'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -197,9 +197,9 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 " AND (
                     LOWER(blacklist.accounttitle)           LIKE LOWER(:search_value) OR
@@ -230,7 +230,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
 
             foreach ($entityTypeIds as $key => $entityTypeId) {
                 $clauses[] = 'extra.type = :entity_type_' . $key;
-                $queryParams[':entity_type_' . $key] = strtolower(\Tirreno\Utils\Constants::get('ENTITY_TYPES')[$entityTypeId]);
+                $queryParams[':entity_type_' . $key] = strtolower(\Tirreno\Utils\Constants::get()->ENTITY_TYPES[$entityTypeId]);
             }
 
             $searchCondition = ' AND (' . implode(' OR ', $clauses) . ')';

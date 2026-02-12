@@ -7,7 +7,7 @@ class E11 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'Disposable email addresses are temporary email addresses that users can create and use for a short period. They might use create fake accounts.';
     public const ATTRIBUTES = ['email'];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ld_is_disposable']->equalTo(true),
         );

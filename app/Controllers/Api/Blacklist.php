@@ -22,7 +22,7 @@ class Blacklist extends Endpoint {
         $value = $this->getBodyProp('value', 'string');
 
         $model = new \Tirreno\Models\BlacklistItems();
-        $itemFound = $model->searchBlacklistedItem($value, $this->apiKey->id);
+        $itemFound = $model->searchBlacklistedItem($value, $this->apiKeyId);
 
         $this->data = [
             'value'         => $value,

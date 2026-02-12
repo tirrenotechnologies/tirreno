@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\UserAgent;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminUserAgent';
+    public ?string $page = 'AdminUserAgent';
 
     public function getPageParams(): array {
         $dataController = new Data();

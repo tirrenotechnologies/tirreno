@@ -88,7 +88,7 @@ class LogbookManager {
     }
 
     public function checkRps(): void {
-        if (isset($this->apiKeyDto) && $this->apiKeyDto?->id) {
+        if (isset($this->apiKeyDto) && $this->apiKeyDto->id) {
             if (!$this->logbookRepository->checkRps($this->leakyBucketRps, $this->leakyBucketWindow, $this->apiKeyDto->id)) {
                 throw new RateLimitException('Rate limit', 429);
             }

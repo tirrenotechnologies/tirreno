@@ -35,8 +35,7 @@ return [
     'AdminSettings_changeEmail_form_field_email_label' => 'Email address',
     'AdminSettings_changeEmail_form_field_email_placeholder' => 'New email address',
     'AdminSettings_changeEmail_form_button_save' => 'Change email',
-    'AdminSettings_changeEmail_success_message' => 'We have emailed you instructions on how to complete your email address change.',
-    'AdminSettings_changeEmail_approval_pending' => 'Confirm your new email address (%s) in order to complete your email address change.',
+    'AdminSettings_changeEmail_success_message' => 'Your email has been successfully changed.',
 
     'AdminSettings_form_closeAccount_title' => 'Delete account',
     'AdminSettings_form_closeAccount_confirmationMessage' => 'If you wish to permanently delete this account and all its associated data, including but not limited to users, IP addresses and events, click the button below.',

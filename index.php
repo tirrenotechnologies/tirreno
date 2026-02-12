@@ -93,7 +93,10 @@ if (\Tirreno\Utils\Variables::getDB()) {
     $f3->set('LOCALES', 'app/Dictionary/');
     $f3->set('LANGUAGE', 'en');
 
+    $constants = \Tirreno\Utils\Constants::get();
     $cron = \Tirreno\Controllers\Cron::instance();
+
+    $f3->set('CONSTANTS', $constants);
 }
 
 $f3->run();

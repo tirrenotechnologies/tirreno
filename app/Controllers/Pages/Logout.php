@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class Logout extends Base {
-    public $page = 'Logout';
+    public ?string $page = 'Logout';
 
     public function getPageParams(): array {
         $pageParams = [

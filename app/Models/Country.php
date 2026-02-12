@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Country extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_country';
+    protected ?string $DB_TABLE_NAME = 'event_country';
 
     public function getCountryById(int $countryId, int $apiKey): array {
         $params = [

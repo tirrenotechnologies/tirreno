@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\FraudFlagUpdaterInterface {
-    protected $DB_TABLE_NAME = 'event_ip';
+    protected ?string $DB_TABLE_NAME = 'event_ip';
 
     public function getIdByValue(string $ipAddress, int $apiKey): ?int {
         $params = [

@@ -13,7 +13,7 @@ class D02 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['eup_has_linux_system']->equalTo(true),
         );

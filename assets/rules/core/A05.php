@@ -9,7 +9,7 @@ class A05 extends \Tirreno\Assets\Rule {
 
     protected function prepareParams(array $params): array {
         $passwordChangeOnNewDevice = false;
-        $passwordChange = \Tirreno\Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID');
+        $passwordChange = \Tirreno\Utils\Constants::get()->ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID;
 
         if ($params['eup_device_count'] > 1) {
             foreach (array_keys($params['event_device']) as $idx) {
@@ -25,7 +25,7 @@ class A05 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['event_password_change_on_new_device']->equalTo(true),
         );

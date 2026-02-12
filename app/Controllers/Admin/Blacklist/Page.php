@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Blacklist;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminBlacklist';
+    public ?string $page = 'AdminBlacklist';
 
     public function getPageParams(): array {
         $searchPlacholder = $this->f3->get('AdminBlacklist_search_placeholder');
@@ -31,7 +31,7 @@ class Page extends \Tirreno\Controllers\Admin\Base\Page {
             'LOAD_AUTOCOMPLETE'     => true,
             'HTML_FILE'             => 'admin/blacklist.html',
             'JS'                    => 'admin_blacklist.js',
-            'ENTITY_TYPES'          => \Tirreno\Utils\Constants::get('ENTITY_TYPES'),
+            'ENTITY_TYPES'          => \Tirreno\Utils\Constants::get()->ENTITY_TYPES,
         ];
 
         return parent::applyPageParams($pageParams);

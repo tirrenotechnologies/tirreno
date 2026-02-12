@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 class Login extends Base {
-    public $page = 'Login';
+    public ?string $page = 'Login';
 
     public function getPageParams(): array {
         if (!\Tirreno\Utils\Variables::completedConfig()) {
@@ -50,11 +50,13 @@ class Login extends Base {
         $email      = \Tirreno\Utils\Conversion::getStringRequestParam('email');
         $password   = \Tirreno\Utils\Conversion::getStringRequestParam('password');
 
-        $operatorsModel = new \Tirreno\Models\Operator();
-        $operatorsModel->getActivatedByEmail($email);
+        $model = new \Tirreno\Models\Operator();
+        $operatorId = $model->getActivatedByEmail($email);
 
-        if ($operatorsModel->loaded() && $operatorsModel->verifyPassword($password)) {
-            $this->f3->set('SESSION.active_user_id', $operatorsModel->id);
+        if ($operatorId && $model->verifyPassword($password, $operatorId)) {
+            $this->f3->set('SESSION.active_user_id', $operatorId);
+
+            $this->f3->set('SESSION.active_key_id', \Tirreno\Utils\ApiKeys::getFirstKeyByOperatorId($operatorId));
 
             // blacklist first because it uses review_queue_updated_at for cache check
             $controller = new \Tirreno\Controllers\Admin\Blacklist\Navigation();

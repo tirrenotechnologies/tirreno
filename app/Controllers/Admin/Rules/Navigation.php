@@ -45,7 +45,7 @@ class Navigation extends \Tirreno\Controllers\Admin\Base\Navigation {
         $this->controller->saveRuleProportion($ruleUid, $proportion, $this->apiKey);
 
         return [
-            'users'                 => array_slice($users, 0, \Tirreno\Utils\Constants::get('RULE_CHECK_USERS_PASSED_TO_CLIENT')),
+            'users'                 => array_slice($users, 0, \Tirreno\Utils\Constants::get()->RULE_CHECK_USERS_PASSED_TO_CLIENT),
             'count'                 => count($users),
             'section'               => $allUsersCnt,
             'proportion'            => $proportion,

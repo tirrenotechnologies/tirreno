@@ -18,11 +18,11 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Base;
 
 class Grid extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
-    protected $idsModel = null;
-    protected $apiKey = null;
-    protected $query = null;
+    protected ?object $idsModel = null;
+    protected ?object $queryModel = null;
+    protected ?int $apiKey = null;
 
     protected function getGrid(?string $ids = null, array $idsParams = []): array {
         $this->setIds($ids, $idsParams);
@@ -43,11 +43,11 @@ class Grid extends \Tirreno\Models\BaseSql {
     }
 
     public function setIds(?string $ids, array $idsParams): void {
-        $this->query->setIds($ids, $idsParams);
+        $this->queryModel->setIds($ids, $idsParams);
     }
 
     protected function getData(): array {
-        [$query, $params] = $this->query->getData();
+        [$query, $params] = $this->queryModel->getData();
 
         $results = $this->execQuery($query, $params);
 
@@ -58,7 +58,7 @@ class Grid extends \Tirreno\Models\BaseSql {
     }
 
     protected function getTotal(): int {
-        [$query, $params] = $this->query->getTotal();
+        [$query, $params] = $this->queryModel->getTotal();
 
         $results = $this->execQuery($query, $params);
 

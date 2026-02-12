@@ -19,7 +19,7 @@ namespace Tirreno\Controllers\Admin\Home;
 
 class Data extends \Tirreno\Controllers\Admin\Base\Data {
     public function getChart(string $mode, int $apiKey): array {
-        $modelMap = \Tirreno\Utils\Constants::get('CHART_MODEL_MAP');
+        $modelMap = \Tirreno\Utils\Constants::get()->CHART_MODEL_MAP;
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
 
@@ -69,7 +69,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     }
 
     public function getTopTen(string $mode, ?array $dateRange, int $apiKey): array {
-        $modelMap = \Tirreno\Utils\Constants::get('TOP_TEN_MODELS_MAP');
+        $modelMap = \Tirreno\Utils\Constants::get()->TOP_TEN_MODELS_MAP;
 
         $model = array_key_exists($mode, $modelMap) ? new $modelMap[$mode]() : null;
         $data = $model ? $model->getList($apiKey, $dateRange) : [];
@@ -83,10 +83,10 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         ];
     }
 
-    public function getCurrentTime(\Tirreno\Models\Operator $operator): array {
+    public function getCurrentTime(\Tirreno\Entities\Operator $operator): array {
         $offset = \Tirreno\Utils\Timezones::getOperatorOffset($operator);
         $now = time() + $offset;
-        $day = \Tirreno\Utils\Constants::get('SECONDS_IN_DAY');
+        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
         $firstJan = mktime(0, 0, 0, 1, 1, intval(gmdate('Y')));
 
         $day = \Tirreno\Utils\Conversion::intVal(ceil(($now - $firstJan) / $day), 0);
@@ -97,5 +97,11 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             'clock_time_his'    => date('H:i:s', $now),
             'clock_timezone'    => 'UTC' . (($offset < 0) ? '-' . date('H:i', -$offset) : '+' . date('H:i', $offset)),
         ];
+    }
+
+    public function getConstants(): array {
+        $constants = \Tirreno\Utils\Assets\ConstantsClass::getConstantsObj();
+
+        return $constants ? $constants::listConstants() : [];
     }
 }

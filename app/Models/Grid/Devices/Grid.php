@@ -23,7 +23,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
 
         $this->apiKey = $apiKey;
         $this->idsModel = new Ids($apiKey);
-        $this->query = new Query($apiKey);
+        $this->queryModel = new Query($apiKey);
     }
 
     public function getDevicesByIpId(int $ipId): array {

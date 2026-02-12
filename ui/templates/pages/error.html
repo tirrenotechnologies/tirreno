@@ -7,7 +7,14 @@
                 <true>
                     <p>* {{ @ERROR_DATA.message }}</p>
                     <check if="{{ isset(@ERROR_DATA.extra_message) }}">
-                    <p>  {{ @ERROR_DATA.extra_message | raw }}</p>
+                        <check if="{{ isset(@ERROR_DATA.raw) && @ERROR_DATA.raw }}">
+                            <true>
+                                <p>  {{ @ERROR_DATA.extra_message | raw }}</p>
+                            </true>
+                            <false>
+                                <p>  {{ @ERROR_DATA.extra_message }}</p>
+                            </false>
+                        </check>
                     </check>
                 </true>
             </check>

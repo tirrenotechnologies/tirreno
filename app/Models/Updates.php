@@ -18,36 +18,35 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Updates extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_updates';
+    protected ?string $DB_TABLE_NAME = 'dshb_updates';
 
-    protected $db;
-
-    public function __construct($f3) {
+    public function __construct(\Base $f3) {
         $this->f3 = $f3;
 
         \Tirreno\Utils\Database::initConnect(false);
-        $this->db = \Tirreno\Utils\Database::getDb();
+        $database = $this->getDatabaseConnection();
 
-        \DB\SQL\Mapper::__construct($this->db, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
+        \DB\SQL\Mapper::__construct($database, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
 
         $this->createIfNotExists();
     }
 
     public function checkDb(string $service, array $updatesList): bool {
         $applied = false;
+        $database = $this->getDatabaseConnection();
         try {
             foreach ($updatesList as $migration) {
                 if (!$migration::isApplied($this)) {
-                    $this->db->begin();
+                    $database->begin();
                     $this->addStub($migration::$version, $service);
-                    $migration::apply($this->db);
+                    $migration::apply($database);
                     $this->addCompleted($migration::$version, $service);
-                    $this->db->commit();
+                    $database->commit();
                     $applied = true;
                 }
             }
         } catch (\Exception $e) {
-            $this->db->rollback();
+            $database->rollback();
             error_log($e->getMessage());
             throw $e;
         }

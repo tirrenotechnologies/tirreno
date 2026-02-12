@@ -7,7 +7,7 @@ class E02 extends \Tirreno\Assets\Rule {
     public const DESCRIPTION = 'Email belongs to recently created domain name and it doesn\'t appear in data breaches. Increased risk due to lack of authenticity.';
     public const ATTRIBUTES = ['email', 'domain'];
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['ld_days_since_domain_creation']->notEqualTo(-1),
             $this->rb['ld_days_since_domain_creation']->lessThan(30),

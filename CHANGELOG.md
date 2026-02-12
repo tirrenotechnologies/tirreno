@@ -1,5 +1,13 @@
 # tirreno changelog
 
+## tirreno v0.9.12
+
+* flexible assets class for UI constants in `/assets/dashboard/Constants.php`
+* rules presets selector on signup
+* improves dsn url parser in install
+* getDictionaryRequestParam() for Utils\Conversion
+* singleton for server constants
+
 ## tirreno v0.9.11
 
 * github workflow

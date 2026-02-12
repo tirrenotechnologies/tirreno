@@ -12,8 +12,6 @@ import {EventsGrid} from '../parts/grid/Events.js?v=2';
 export class EventsPage extends BasePage {
     constructor() {
         super('events');
-
-        this.initUi();
     }
 
     initUi() {

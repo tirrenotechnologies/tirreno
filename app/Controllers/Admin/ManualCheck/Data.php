@@ -51,13 +51,8 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             return $pageParams;
         }
 
-        $save = [
-            'operator'  => \Tirreno\Utils\Routes::getCurrentRequestOperator()->id,
-            'type'      => $type,
-            'search'    => $search,
-        ];
-
-        $this->saveSearch($save);
+        $operatorId = \Tirreno\Utils\Routes::getCurrentRequestOperator()->id;
+        $this->saveSearch($search, $type, $operatorId);
 
         // TODO: return alert_list back in next release
         if (array_key_exists('alert_list', $result[$type])) {
@@ -78,14 +73,14 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         return $pageParams;
     }
 
-    private function saveSearch(array $params): void {
-        $history = new \Tirreno\Models\ManualCheckHistoryQuery();
-        $history->add($params);
+    private function saveSearch(string $query, string $type, int $operatorId): void {
+        $history = new \Tirreno\Models\ManualCheckHistory();
+        $history->insertRecord($query, $type, $operatorId);
     }
 
     public function getSearchHistory(int $operatorId): ?array {
         $model = new \Tirreno\Models\ManualCheckHistory();
 
-        return $model->getRecentByOperator($operatorId);
+        return $model->getLastByOperatorId($operatorId);
     }
 }

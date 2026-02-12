@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\UserDetails;
 
 class Behaviour extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
+    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getDayDetails(int $userId, array $dateRange, int $apiKey): array {
         $params = [
@@ -27,11 +27,11 @@ class Behaviour extends \Tirreno\Models\BaseSql {
             ':start_ts'         => $dateRange['startDate'],
             ':end_ts'           => $dateRange['endDate'],
             ':offset'           => $dateRange['offset'],
-            ':failed_login'     => \Tirreno\Utils\Constants::get('ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID'),
-            ':success_login'    => \Tirreno\Utils\Constants::get('ACCOUNT_LOGIN_EVENT_TYPE_ID'),
-            ':password_reset'   => \Tirreno\Utils\Constants::get('ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID'),
-            ':seconds_day'      => \Tirreno\Utils\Constants::get('SECONDS_IN_DAY'),
-            ':night_time_end'   => \Tirreno\Utils\Constants::get('SECONDS_IN_HOUR') * 5,
+            ':failed_login'     => \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID,
+            ':success_login'    => \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_EVENT_TYPE_ID,
+            ':password_reset'   => \Tirreno\Utils\Constants::get()->ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID,
+            ':seconds_day'      => \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY,
+            ':night_time_end'   => \Tirreno\Utils\Constants::get()->SECONDS_IN_HOUR * 5,
         ];
 
         $query = (

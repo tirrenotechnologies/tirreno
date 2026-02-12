@@ -27,12 +27,10 @@ class EventRepository {
         private AccountRepository $accountRepository,
         private SessionRepository $sessionRepository,
         private IpAddressRepository $ipAddressRepository,
-        private IspRepository $ispRepository,
         private UrlRepository $urlRepository,
         private DeviceRepository $deviceRepository,
         private RefererRepository $refererRepository,
         private EmailRepository $emailRepository,
-        private DomainRepository $domainRepository,
         private PhoneRepository $phoneRepository,
         private EventCountryRepository $eventCountryRepository,
         private FieldAuditTrailRepository $fieldAuditTrailRepository,
@@ -101,8 +99,8 @@ class EventRepository {
         if ($lastEmailId !== $emailDto?->emailId || $lastPhoneId !== $phoneId) {
             $this->accountRepository->updateLastEmailAndPhone(
                 $event->accountId,
-                $emailDto?->emailId ?? $lastEmailId, // Don't reset last email ID to null
-                $phoneId ?? $lastPhoneId,            // Don't reset last phone ID to null
+                $emailDto ? $emailDto->emailId : $lastEmailId,  // Don't reset last email ID to null
+                $phoneId ?? $lastPhoneId,                       // Don't reset last phone ID to null
             );
         }
 

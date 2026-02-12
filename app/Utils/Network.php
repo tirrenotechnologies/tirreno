@@ -18,34 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Network {
-    public static function safeFileGetContents(string $path, ?array $options): array {
-        set_error_handler([\Tirreno\Utils\ErrorHandler::class, 'exceptionErrorHandler']);
-
-        $result = null;
-
-        try {
-            $context = null;
-            if ($options) {
-                $context = stream_context_create($options);
-            }
-
-            $result = file_get_contents($path, false, $context);
-        } catch (\Throwable $e) {
-            return [
-                'content'   => null,
-                'headers'   => [],
-            ];
-        }
-
-        restore_error_handler();
-
-        return [
-            'content'   => $result !== false ? $result : null,
-            'headers'   => isset($http_response_header) ? $http_response_header : [],
-        ];
-    }
-
-    public static function sendApiRequest(?array $data, string $path, string $method, ?string $enrichmentKey): array {
+    public static function sendApiRequest(?array $data, string $path, string $method, ?string $enrichmentKey): \Tirreno\Entities\HttpResponse {
         $version = \Tirreno\Utils\VersionControl::versionString();
         $userAgent = \Base::instance()->get('APP_USER_AGENT');
         $userAgent = ($version && $userAgent) ? $userAgent . '/' . $version : $userAgent;
@@ -57,104 +30,27 @@ class Network {
         ];
 
         if ($enrichmentKey !== null) {
-            //$enrichmentKey = \Tirreno\Utils\ApiKeys::getCurrentOperatorEnrichmentKeyString();
             $headers[] = 'Authorization: Bearer ' . $enrichmentKey;
         }
+
+        $body = null;
+        if ($data !== null) {
+            $body = json_encode($data);
+            if ($body === false) {
+                return \Tirreno\Entities\HttpResponse::failure(null, 'json_encode_failed', []);
+            }
+        }
+
+        $headers = \Tirreno\Utils\Http\HeaderUtils::ensureHeader($headers, 'Content-Type', 'application/json');
 
         if ($data !== null) {
             $headers[] = 'Content-Type: application/json';
             $data = json_encode($data);
         }
 
-        $resp = self::proceedRequest($data, $url, $headers, $method);
+        $request = new \Tirreno\Entities\HttpRequest($url, $method, $headers, $data);
+        $client = \Tirreno\Utils\Http\HttpClient::default();
 
-        return $resp;
-    }
-
-    public static function proceedRequest(?string $data, string $url, array $headers, string $method, bool $ssl = true): array {
-        $code = null;
-        $response = null;
-        $error = null;
-
-        if (function_exists('curl_init')) {
-            // curl
-            $ch = curl_init($url);
-            if ($ch === false) {
-                return [null, null];
-            }
-
-            curl_setopt_array($ch, [
-                CURLOPT_POST            => true,
-                CURLOPT_HTTPHEADER      => $headers,
-                CURLOPT_RETURNTRANSFER  => true,
-                CURLOPT_CONNECTTIMEOUT  => 30,
-                CURLOPT_TIMEOUT         => 30,
-            ]);
-
-            if (!$ssl) {
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            }
-
-            if ($data !== null) {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-            }
-
-            if ($method === 'POST') {
-                curl_setopt($ch, CURLOPT_POST, true);
-            } else {
-                curl_setopt($ch, CURLOPT_HTTPGET, true);
-            }
-
-            $response = curl_exec($ch);
-            $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-            if (curl_errno($ch)) {
-                $error = curl_error($ch);
-                $response = null;
-            }
-
-            curl_close($ch);
-        } else {
-            // stream
-            $options = [
-                'http' => [
-                    'method'    => $method,
-                    'header'    => implode("\r\n", $headers),
-                    'timeout'   => 30,
-                ],
-            ];
-
-            if (!$ssl) {
-                $options['ssl'] = [
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true,
-                ];
-            }
-
-            if ($data !== null) {
-                $options['http']['content'] = $data;
-            }
-
-            $result = self::safeFileGetContents($url, $options);
-
-            $response = $result['content'];
-            $responseHeaders = $result['headers'];
-
-            $code = null;
-
-            if (isset($responseHeaders[0])) {
-                preg_match('{HTTP/\d\.\d\s+(\d+)}', $responseHeaders[0], $match);
-                $code = \Tirreno\Utils\Conversion::intValCheckEmpty($match[1], 0);
-            }
-        }
-
-        $resp = [
-            'code'  => $code,
-            'data'  => $response !== null ? json_decode($response, true) : [],
-            'error' => $error,
-        ];
-
-        return $resp;
+        return $client->request($request);
     }
 }

@@ -9,8 +9,6 @@ import {LogbookChart} from '../parts/chart/Logbook.js?v=2';
 export class LogbookPage extends BasePage {
     constructor() {
         super('logbook');
-
-        this.initUi();
     }
 
     initUi() {

@@ -8,8 +8,6 @@ import {DomainsGrid} from '../parts/grid/Domains.js?v=2';
 export class DomainsPage extends BasePage {
     constructor() {
         super('domains');
-
-        this.initUi();
     }
 
     initUi() {

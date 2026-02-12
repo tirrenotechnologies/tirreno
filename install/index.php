@@ -41,19 +41,79 @@ $style = (
 $script = "<script>
 window.addEventListener('DOMContentLoaded', function() {
     function parseUrl() {
-        let url = null;
-        try {
-            url = new URL(dbUrlField.value);
-        } catch (e) {
+        let input = dbUrlField.value.trim();
+
+        if (!input) {
+            return;
         }
 
-        if (url) {
-            dbUserField.value = url.username;
-            dbPassField.value = url.password;
-            dbHostField.value = url.hostname;
-            dbPortField.value = url.port;
-            dbNameField.value = url.pathname.replace(/^\/|\/$/g, '');
+        let scheme = null;
+        let username = null;
+        let password = null;
+        let hostname = null;
+        let port = null;
+        let dbname = null;
+
+        let parts = input.split('@');
+
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+            return;
         }
+
+        let part1 = parts[0];   // scheme + user + password     postgres://user:pass
+        let part2 = parts[1];   // host + port + dbname         localhost:5432/mydb?sslmode=require
+
+        parts = part1.split('://');
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+            return;
+        }
+
+        scheme = parts[0];      // postgres | postgresql
+        let part11 = parts[1];  // user:pass
+
+        parts = part11.split(':');
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+            return;
+        }
+
+        username = parts[0];
+        password = parts[1];
+
+        parts = part2.split('?');
+        part2 = parts[0];       // localhost:5432/mydb
+        if (!part2) {
+            return;
+        }
+
+        parts = part2.split('/');
+        if (parts.length !== 2 || !parts[0] || !parts[1]) {
+            return;
+        }
+
+        let part21 = parts[0];  // localhost:5432 || [::ffff:192.168.1.1]:3306
+        dbname = parts[1];
+
+        if (part21[0] === '[') {
+            parts = part21.split(']:');
+            if (parts.length !== 2 || !parts[0] || !parts[1]) {
+                return;
+            }
+            hostname = parts[0] + ']';
+            port = parts[1];
+        } else {
+            parts = part21.split(':');
+            if (parts.length !== 2 || !parts[0] || !parts[1]) {
+                return;
+            }
+            hostname = parts[0];
+            port = parts[1];
+        }
+
+        dbUserField.value = decodeURIComponent(username);
+        dbPassField.value = decodeURIComponent(password);
+        dbHostField.value = decodeURIComponent(hostname);
+        dbPortField.value = decodeURIComponent(port);
+        dbNameField.value = decodeURIComponent(dbname);
     }
 
     function submit(e) {
@@ -111,7 +171,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const dbHostField = document.getElementById('db-host');
     const dbPortField = document.getElementById('db-port');
     const dbNameField = document.getElementById('db-name');
-
+    const adminEmailField = document.getElementById('admin-email');
 
     const fieldIdMap = {
         'db-url': dbUrlField,
@@ -123,14 +183,14 @@ window.addEventListener('DOMContentLoaded', function() {
     };
 
     const fieldNameMap = {
-        'db_url': dbUrlField,
-        'db_user': dbUserField,
-        'db_pass': dbPassField,
-        'db_host': dbHostField,
-        'db_port': dbPortField,
-        'db_name': dbNameField,
+        'db_url':       dbUrlField,
+        'db_user':      dbUserField,
+        'db_pass':      dbPassField,
+        'db_host':      dbHostField,
+        'db_port':      dbPortField,
+        'db_name':      dbNameField,
+        'admin_email':  adminEmailField,
     };
-
 
     // parse db url on db_url input change
     // parse db url if db_url was substituted and js doesnt contain sessionstorage
@@ -209,21 +269,21 @@ $formBody = (
 
 $formBody .= $script;
 
-function resultHtmlStart() {
+function resultHtmlStart(): string {
     global $installerHead, $logo;
     return $installerHead . '<body><pre>' . $logo;
 }
 
-function resultHtmlEnd() {
+function resultHtmlEnd(): string {
     return '</pre></body></html>';
 }
 
-function formHtml() {
+function formHtml(): string {
     global $installerHead, $formBody;
     return $installerHead . $formBody . '</html>';
 }
 
-function finishOk() {
+function finishOk(): string {
     $uri = $_SERVER['REQUEST_URI'] ?? '/';
     $pos = strrpos($uri, '/install');
     $path = $pos === false ? rtrim($uri, '/') : substr($uri, 0, $pos);
@@ -237,7 +297,7 @@ function finishOk() {
     return $out;
 }
 
-function finishError() {
+function finishError(): string {
     global $backButton;
 
     $out = "\n====================== Something went wrong ======================";
@@ -292,7 +352,7 @@ $steps = [
     ],
 ];
 
-function proceed() {
+function proceed(): void {
     $out = '';
     if (configAlreadyExists()) {
         $out .= resultHtmlStart();
@@ -409,7 +469,7 @@ function substituteFormWithEnv(): void {
     }
 }
 
-function versionCheck(int $step, array &$steps) {
+function versionCheck(int $step, array &$steps): void {
     $versionStatus = checkLatestVersion();
     $steps[$step]['tasks'][0]['status'] = $versionStatus;
 
@@ -424,7 +484,7 @@ function versionCheck(int $step, array &$steps) {
     }
 }
 
-function compatibilityCheck(int $step, array &$steps) {
+function compatibilityCheck(int $step, array &$steps): void {
     $versionSuits = version_compare(PHP_VERSION, MIN_PHP_VERSION) >= 0 && version_compare(PHP_VERSION, MAX_PHP_VERSION) < 0;
     $steps[$step]['tasks'][0]['status'] = $versionSuits;
     if (!$versionSuits) {
@@ -476,7 +536,7 @@ function compatibilityCheck(int $step, array &$steps) {
     $steps[$step]['tasks'][6]['status'] = $memLim >= MIN_MEMORY_LIM;
 }
 
-function dbConfig(int $step, array &$values, array &$steps) {
+function dbConfig(int $step, array &$values, array &$steps): void {
     $steps[$step]['tasks'][0]['status'] = is_file('./install.sql');
 
     $steps[$step]['tasks'][1]['status'] = $values['db_name'] !== '';
@@ -489,7 +549,7 @@ function dbConfig(int $step, array &$values, array &$steps) {
 function saveConfig(int $step, array $values, array &$steps): ?array {
     $configData = null;
     try {
-        $currentHttpHost = strtolower(filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL));
+        $currentHttpHost = strtolower(filter_var($_SERVER['HTTP_HOST'], FILTER_SANITIZE_URL) ?: '');
         $hosts = [$currentHttpHost];
 
         $forceHttps = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on')
@@ -526,7 +586,6 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
             $steps[$step]['tasks'][0]['status'] = true;
             $site = getenv('SITE');
             if ($site !== false) {
-                $site = is_string($site) ? $site : json_encode($site);
                 $site = htmlspecialchars($site, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
                 $steps[$step]['tasks'][0]['warn'] = true;
                 $steps[$step]['tasks'][0]['error'] = 'Environment variable SITE detected: ' . $site;
@@ -542,7 +601,7 @@ function saveConfig(int $step, array $values, array &$steps): ?array {
     return $configData;
 }
 
-function dbSaveConfig(int $step, array $values, array &$steps) {
+function dbSaveConfig(int $step, array $values, array &$steps): void {
     $connection = initDbConnection($values);
     if (!$connection[0]) {
         $steps[$step]['tasks'][0]['status'] = false;
@@ -682,8 +741,6 @@ function safeFileGetContents(string $path, ?array $options): array {
             return false;
         }
         throw new \ErrorException($message, 0, $severity, $file, $line);
-
-        return true;
     });
 
     $result = null;
@@ -705,7 +762,7 @@ function safeFileGetContents(string $path, ?array $options): array {
 
     return [
         'content'   => $result !== false ? $result : null,
-        'headers'   => isset($http_response_header) ? $http_response_header : [],
+        'headers'   => $GLOBALS['http_response_header'] ?? [],
     ];
 }
 
@@ -717,7 +774,11 @@ function performRequest(string $url, string $useragent): array {
     if (function_exists('curl_init')) {
         $ch = curl_init($url);
         if ($ch === false) {
-            return null;
+            return [
+                'code'  => $code,
+                'data'  => [],
+                'error' => $error,
+            ];
         }
 
         curl_setopt_array($ch, [
@@ -779,7 +840,7 @@ function checkLatestVersion(): ?bool {
     $version = \Tirreno\Utils\VersionControl::versionString();
 
     $useragent = 'tirreno-install';
-    $useragent = ($version && $useragent) ? $useragent . '/' . $version : $useragent;
+    $useragent = $version ? $useragent . '/' . $version : $useragent;
     $useragent = 'User-Agent: ' . $useragent;
 
     $path = __DIR__ . '/../config/config.ini';

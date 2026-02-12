@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Logbook;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_logbook.error_type DESC, event_logbook.id DESC';
-    protected $dateRangeField = 'event_logbook.started';
+    protected ?string $defaultOrder = 'event_logbook.error_type DESC, event_logbook.id DESC';
+    protected string $dateRangeField = 'event_logbook.started';
 
-    protected $allowedColumns = ['ip', 'started', 'endpoint', 'error_type', 'error_text', 'created'];
+    protected array $allowedColumns = ['ip', 'started', 'endpoint', 'error_type', 'error_text', 'created'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -84,10 +84,10 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Add dates into request
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
         $searchConditions = '';
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $extra = '';
             if (\Tirreno\Utils\Conversion::filterIp($search['value'])) {
                 $extra = ' event_logbook.ip = :search_ip_value OR ';

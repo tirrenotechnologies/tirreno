@@ -48,6 +48,12 @@ class Conversion {
     public static function getArrayRequestParam(string $key, bool $nullable = false): ?array {
         $value = \Base::instance()->get('REQUEST.' . $key);
 
+        return is_array($value) ? array_values($value) : ($nullable ? null : []);
+    }
+
+    public static function getDictionaryRequestParam(string $key, bool $nullable = false): ?array {
+        $value = \Base::instance()->get('REQUEST.' . $key);
+
         return is_array($value) ? $value : ($nullable ? null : []);
     }
 

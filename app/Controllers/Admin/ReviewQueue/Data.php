@@ -21,41 +21,33 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
     public function getList(int $apiKey): array {
         $model = new \Tirreno\Models\Grid\ReviewQueue\Grid($apiKey);
 
-        return $model->getAll() ?? [];
+        return $model->getAll();
     }
 
     public function setNotReviewedCount(bool $cache, int $apiKey): array {
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
+        $operator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
 
-        if (!$currentOperator) {
-            $model = new \Tirreno\Models\ApiKeys();
-            $model = $model->getKeyById($apiKey);
-            $creator = $model->creator;
-            $model = new \Tirreno\Models\Operator();
-            $currentOperator = $model->getOperatorById($creator);
+        if (!$operator) {
+            $key = \Tirreno\Entities\ApiKey::getById($apiKey);
+            $operator = \Tirreno\Entities\Operator::getById($key->creator);
         }
 
-        $takeFromCache = $this->canTakeNumberOfNotReviewedUsersFromCache($currentOperator);
+        $takeFromCache = $this->canTakeNumberOfNotReviewedUsersFromCache($operator);
 
-        $total = $currentOperator->review_queue_cnt;
+        $total = $operator->reviewQueueCnt;
         if (!$cache || !$takeFromCache) {
             $total = (new \Tirreno\Models\ReviewQueue())->getCount($apiKey);
 
-            $data = [
-                'id' => $currentOperator->id,
-                'review_queue_cnt' => $total,
-            ];
-
             $model = new \Tirreno\Models\Operator();
-            $model->updateReviewedQueueCnt($data);
+            $model->updateReviewedQueueCnt($total, $operator->id);
         }
 
         return ['total' => $total];
     }
 
-    private function canTakeNumberOfNotReviewedUsersFromCache(\Tirreno\Models\Operator $currentOperator): bool {
+    private function canTakeNumberOfNotReviewedUsersFromCache(\Tirreno\Entities\Operator $operator): bool {
         $interval = \Base::instance()->get('REVIEWED_QUEUE_CNT_CACHE_TIME');
 
-        return !!\Tirreno\Utils\DateRange::inIntervalTillNow($currentOperator->review_queue_updated_at, $interval);
+        return !!\Tirreno\Utils\DateRange::inIntervalTillNow($operator->reviewQueueUpdatedAt, $interval);
     }
 }

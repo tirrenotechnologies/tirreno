@@ -53,15 +53,15 @@ class RulesClasses extends Base {
             return ['&minus;', $cls];
         }
 
-        if ($score >= \Tirreno\Utils\Constants::get('USER_LOW_SCORE_INF') && $score < \Tirreno\Utils\Constants::get('USER_LOW_SCORE_SUP')) {
+        if ($score >= \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_INF && $score < \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_SUP) {
             $cls = 'low';
         }
 
-        if ($score >= \Tirreno\Utils\Constants::get('USER_MEDIUM_SCORE_INF') && $score < \Tirreno\Utils\Constants::get('USER_MEDIUM_SCORE_SUP')) {
+        if ($score >= \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_INF && $score < \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_SUP) {
             $cls = 'medium';
         }
 
-        if ($score >= \Tirreno\Utils\Constants::get('USER_HIGH_SCORE_INF')) {
+        if ($score >= \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_INF) {
             $cls = 'high';
         }
 
@@ -156,7 +156,7 @@ class RulesClasses extends Base {
         $reflection = self::validateClass($filename, $classname);
 
         if (!$core && !str_starts_with($uid, 'X')) {
-            $parentClassName = $reflection->getParentClass()?->getName();
+            $parentClassName = $reflection->getParentClass()->getName();
             if ('\\' . $parentClassName !== self::getNamespace($core) . '\\' . $uid) {
                 throw new \LogicException("Class {$classname} in assets has invalid parent class {$parentClassName}");
             }

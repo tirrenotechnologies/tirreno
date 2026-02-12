@@ -41,12 +41,9 @@ class LogbookEntityFactory {
         } elseif ($response instanceof ValidationFailedResponse) {
             $errorType = LogbookEntity::ERROR_TYPE_CRITICAL_VALIDATION_ERROR;
             $errorText = json_encode([$response->jsonSerialize()]);
-        } elseif ($response instanceof ErrorResponse) {
-            $errorType = LogbookEntity::ERROR_TYPE_CRITICAL_ERROR;
-            $errorText = json_encode([$response->jsonSerialize()]);
         } else {
             $errorType = LogbookEntity::ERROR_TYPE_CRITICAL_ERROR;
-            $errorText = json_encode(['Undefined error']);
+            $errorText = json_encode([$response->jsonSerialize()]);
         }
 
         return new LogbookEntity(

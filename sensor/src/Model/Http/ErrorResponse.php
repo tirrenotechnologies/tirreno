@@ -28,7 +28,7 @@ class ErrorResponse {
         return $this->errorMessage;
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize(): string {
         return $this->__toString();
     }
 }

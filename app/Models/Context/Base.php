@@ -18,8 +18,8 @@ declare(strict_types=1);
 namespace Tirreno\Models\Context;
 
 abstract class Base extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event';
-    protected $uniqueValues = null;
+    protected ?string $DB_TABLE_NAME = 'event';
+    protected ?bool $uniqueValues = null;
 
     abstract protected function getDetails(array $accountIds, int $apiKey): array;
 

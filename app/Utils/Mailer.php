@@ -44,7 +44,7 @@ class Mailer {
     private static function sendByMailgun(string $toAddress, string $toName, string $subj, string $msg, bool $html): array {
         $f3 = \Base::instance();
 
-        $fromName = \Tirreno\Utils\Constants::get('MAIL_FROM_NAME');
+        $fromName = \Tirreno\Utils\Constants::get()->MAIL_FROM_NAME;
         $smtpDebug = $f3->get('SMTP_DEBUG');
         $fromAddress = \Tirreno\Utils\Variables::getMailLogin();
         $mailLogin = \Tirreno\Utils\Variables::getMailLogin();
@@ -63,7 +63,7 @@ class Mailer {
             //Server settings
             $mail->SMTPDebug = $smtpDebug;                                              //Enable verbose debug output
             $mail->isSMTP();                                                            //Send using SMTP
-            $mail->Host = \Tirreno\Utils\Constants::get('MAIL_HOST');                                  //Set the SMTP server to send through
+            $mail->Host = \Tirreno\Utils\Constants::get()->MAIL_HOST;                   //Set the SMTP server to send through
             $mail->SMTPAuth = true;                                                     //Enable SMTP authentication
             $mail->Username = $mailLogin;                                               //SMTP username
             $mail->Password = $mailPassword;                                            //SMTP password
@@ -96,7 +96,7 @@ class Mailer {
     }
 
     private static function sendByNativeMail(string $toAddress, string $toName, string $subj, string $msg): array {
-        $sendMailPath = \Tirreno\Utils\Constants::get('MAIL_SEND_BIN');
+        $sendMailPath = \Tirreno\Utils\Constants::get()->MAIL_SEND_BIN;
 
         if (!file_exists($sendMailPath) || !is_executable($sendMailPath)) {
             return [
@@ -105,7 +105,7 @@ class Mailer {
             ];
         }
 
-        $fromName = \Tirreno\Utils\Constants::get('MAIL_FROM_NAME');
+        $fromName = \Tirreno\Utils\Constants::get()->MAIL_FROM_NAME;
         $fromAddress = \Tirreno\Utils\Variables::getMailLogin();
 
         if ($fromAddress === null) {

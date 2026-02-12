@@ -9,8 +9,6 @@ import {IpsGrid} from '../parts/grid/Ips.js?v=2';
 export class IpsPage extends BasePage {
     constructor() {
         super('ips');
-
-        this.initUi();
     }
 
     initUi() {

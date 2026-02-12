@@ -18,24 +18,24 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Pages;
 
 abstract class Base {
-    protected $f3;
-    protected $page;
+    protected \Base $f3;
+    protected ?string $page;
 
     public function __construct() {
         $this->f3 = \Base::instance();
 
         if (!$this->f3->exists('SESSION.csrf')) {
             // Set anti-CSRF token.
-            $this->f3->set('SESSION.csrf', bin2hex(openssl_random_pseudo_bytes(16)));
+            $this->f3->set('SESSION.csrf', bin2hex(random_bytes(16)));
         }
 
-        $this->f3->CSRF = $this->f3->get('SESSION.csrf');
+        $this->f3->set('CSRF', $this->f3->get('SESSION.csrf'));
 
         \Tirreno\Utils\Routes::callExtra('PAGE_BASE');
     }
 
     public function isPostRequest(): bool {
-        return $this->f3->VERB === 'POST';
+        return $this->f3->get('VERB') === 'POST';
     }
 
     // TODO: reverse
@@ -46,9 +46,9 @@ abstract class Base {
     }
 
     public function getInternalPageTitleWithPostfix(string $title): string {
-        $title = $title ? $title : \Tirreno\Utils\Constants::get('UNAUTHORIZED_USERID');
+        $title = $title ? $title : \Tirreno\Utils\Constants::get()->UNAUTHORIZED_USERID;
         $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-        $title = sprintf('%s %s', $safeTitle, \Tirreno\Utils\Constants::get('PAGE_TITLE_POSTFIX'));
+        $title = sprintf('%s %s', $safeTitle, \Tirreno\Utils\Constants::get()->PAGE_TITLE_POSTFIX);
 
         return $title;
     }
@@ -74,8 +74,8 @@ abstract class Base {
 
         $breadCrumbTitle = $this->getBreadcrumbTitle();
         $params['BREADCRUMB_TITLE'] = $breadCrumbTitle;
-        $params['CURRENT_PATH'] = $this->f3->PATH;
-        $params['CURRENT_PATTERN'] = $this->f3->PATTERN;
+        $params['CURRENT_PATH'] = $this->f3->get('PATH');
+        $params['CURRENT_PATTERN'] = $this->f3->get('PATTERN');
 
         if ($errorCode) {
             $errorI18nCode = sprintf('error_%s', $errorCode);
@@ -99,10 +99,10 @@ abstract class Base {
 
         $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
         if ($currentOperator) {
-            $cnt = $currentOperator->review_queue_cnt ?? 0;
+            $cnt = $currentOperator->reviewQueueCnt ?? 0;
             $params['NUMBER_OF_NOT_REVIEWED_USERS'] = \Tirreno\Utils\Conversion::formatKiloValue($cnt);
 
-            $cnt = $currentOperator->blacklist_users_cnt ?? 0;
+            $cnt = $currentOperator->blacklistUsersCnt ?? 0;
             $params['NUMBER_OF_BLACKLIST_USERS'] = \Tirreno\Utils\Conversion::formatKiloValue($cnt);
 
             $controller = new \Tirreno\Controllers\Admin\Home\Data();

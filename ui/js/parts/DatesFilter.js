@@ -5,7 +5,7 @@ import {
     addHours,
 } from './utils/Date.js?v=2';
 import {debounce} from './utils/Functions.js?v=2';
-import {DAYS_IN_RANGE} from './utils/Constants.js?v=2';
+import {Constants} from './utils/Constants.js?v=2';
 
 export class DatesFilter {
     constructor(sequential=false) {
@@ -74,14 +74,14 @@ export class DatesFilter {
     }
 
     setDefaultDates() {
-        this.setDateRangeFromNow(DAYS_IN_RANGE * 24);
+        this.setDateRangeFromNow(Constants.DAYS_IN_RANGE * 24);
     }
 
     setDefaultLocalDates() {
         let dateTo = new Date();
         dateTo = new Date(dateTo.getTime() + (dateTo.getTimezoneOffset() * 60 + this.offset) * 1000); // now time in op tz
 
-        const dateFrom = addDays(dateTo, -DAYS_IN_RANGE); // dateFrom in op tz
+        const dateFrom = addDays(dateTo, -Constants.DAYS_IN_RANGE); // dateFrom in op tz
         dateFrom.setHours(24, 0, 0, 0);
 
         this.dateToLocalField.value   = formatStringTime(dateTo);

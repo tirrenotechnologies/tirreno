@@ -18,9 +18,6 @@ declare(strict_types=1);
 namespace Sensor\Entity;
 
 class EventEntity {
-    /**
-     * @param array<mixed, mixed>|null $payload
-     */
     public function __construct(
         public int $accountId,
         public SessionEntity $session,

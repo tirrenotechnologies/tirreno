@@ -13,7 +13,9 @@ import {
 export class DashboardPage extends BasePage {
     constructor() {
         super('dashboard');
+    }
 
+    postInit() {
         this.initUi();
     }
 

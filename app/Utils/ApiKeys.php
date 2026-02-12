@@ -19,19 +19,19 @@ namespace Tirreno\Utils;
 
 class ApiKeys {
     public static function getCurrentOperatorApiKeyId(): ?int {
-        $key = self::getCurrentOperatorApiKeyObject();
+        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
 
         return $key ? $key->id : null;
     }
 
     public static function getCurrentOperatorApiKeyString(): ?string {
-        $key = self::getCurrentOperatorApiKeyObject();
+        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
 
         return $key ? $key->key : null;
     }
 
     public static function getCurrentOperatorEnrichmentKeyString(): ?string {
-        $key = self::getCurrentOperatorApiKeyObject();
+        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
 
         return $key ? $key->token : null;
     }
@@ -43,50 +43,30 @@ class ApiKeys {
         $isOwner = true;
         if (!$apiKeys) {
             $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
+            $keyId = $coOwnerModel->getCoOwnershipKeyId($operatorId);
 
-            if ($coOwnerModel->loaded()) {
+            if ($keyId) {
                 $isOwner = false;
-                $apiKeys[] = $model->getKeyById($coOwnerModel->api);
+                $apiKeys[] = $model->getKeyById($keyId);
             }
         }
 
         return [$isOwner, $apiKeys];
     }
 
-    // returns \Tirreno\Models\ApiKeys; in test mode returns object
-    public static function getCurrentOperatorApiKeyObject(): object|null {
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
-
-        if (!$currentOperator) {
-            return null;
-        }
-
+    public static function getFirstKeyByOperatorId(int $operatorId): ?int {
         $model = new \Tirreno\Models\ApiKeys();
+        $apiKeys = $model->getKeys($operatorId);
 
-        //This key specified in the local configuration file and will not applied to the production environment
-        $testId = \Base::instance()->get('TEST_API_KEY_ID');
-        if (isset($testId) && $testId !== '') {
-            return (object) [
-                'id' => $testId,
-                'key' => $model->getKeyById($testId)->key,
-                'skip_blacklist_sync' => true,
-                'token' => $model->getKeyById($testId)->token,
-            ];
-        }
-
-        $operatorId = $currentOperator->id;
-        $key = $model->getKey($operatorId);
-
-        if (!$key) { // Check if operator is co-owner of another API key when it has no own API key.
+        if (!$apiKeys) {
             $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $coOwnerModel->getCoOwnership($operatorId);
+            $keyId = $coOwnerModel->getCoOwnershipKeyId($operatorId);
 
-            if ($coOwnerModel->loaded()) {
-                $key = $model->getKeyById($coOwnerModel->api);
+            if ($keyId) {
+                $apiKeys[] = $model->getKeyById($keyId);
             }
         }
 
-        return $key;
+        return $apiKeys[0]['id'] ?? null;
     }
 }

@@ -12,8 +12,6 @@ import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
 export class IpPage extends BasePage {
     constructor() {
         super('ip', true);
-
-        this.initUi();
     }
 
     initUi() {

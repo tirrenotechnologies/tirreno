@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\FieldAudits;
 
 class Query extends \Tirreno\Models\Grid\Base\Query {
-    protected $defaultOrder = 'event_field_audit.id DESC';
-    protected $dateRangeField = 'event_field_audit.lastseen';
+    protected ?string $defaultOrder = 'event_field_audit.id DESC';
+    protected string $dateRangeField = 'event_field_audit.lastseen';
 
-    protected $allowedColumns = ['id', 'created', 'field_id', 'field_name', 'lastseen'];
+    protected array $allowedColumns = ['id', 'created', 'field_id', 'field_name', 'lastseen'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -77,9 +77,9 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = $this->injectIdQuery('event_field_audit.id', $queryParams);
-        $search = \Tirreno\Utils\Conversion::getArrayRequestParam('search');
+        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
 
-        if (is_array($search) && isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
+        if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
                 ' AND
                 (

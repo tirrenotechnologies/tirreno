@@ -8,8 +8,6 @@ import {CountriesGrid} from '../parts/grid/Countries.js?v=2';
 export class CountriesPage extends BasePage {
     constructor() {
         super('countries');
-
-        this.initUi();
     }
 
     initUi() {

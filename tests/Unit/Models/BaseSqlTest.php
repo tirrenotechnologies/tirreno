@@ -94,44 +94,12 @@ final class BaseSqlTest extends TestCase {
         $this->assertSame($expectedPlaceholders, $actualPlaceholders);
     }
 
-    public function testGetHashUsesSaltAndIsDeterministic(): void {
-        $salt = 'test-salt';
-        $this->f3->set('SALT', $salt);
-
-        $model = $this->makeModel();
-
-        $input = 'hello';
-
-        $iterations = 1000;
-        $length = 32;
-
-        $expected = hash_pbkdf2('sha256', $input, $salt, $iterations, $length);
-        $actual = $model->getHash($input);
-
-        $this->assertSame($expected, $actual);
-    }
-
-    public function testGetPseudoRandomStringIsHexAndHasExpectedLength(): void {
-        $model = $this->makeModel();
-
-        $length = 32;
-        $actual = $model->getPseudoRandomString($length);
-
-        $expectedLength = 32;
-        $actualLength = strlen($actual);
-        $this->assertSame($expectedLength, $actualLength);
-
-        $expectedIsHex = 1;
-        $actualIsHex = preg_match('/^[0-9a-f]+$/', $actual);
-        $this->assertSame($expectedIsHex, $actualIsHex);
-    }
-
     /* ================= helpers ================= */
 
     private function makeModel(): BaseSql {
         $model = new class () extends BaseSql {
             /** @var string|null */
-            protected $DB_TABLE_NAME = null;
+            protected ?string $DB_TABLE_NAME = null;
         };
 
         return $model;

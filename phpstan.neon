@@ -1,5 +1,5 @@
 parameters:
-  level: 0
+  level: 6
   paths:
     - .
   excludePaths:
@@ -7,3 +7,6 @@ parameters:
     - .github
     - tests
     - libs
+  ignoreErrors:
+    - identifier: missingType.iterableValue
+    - '#Access to protected property .*Constants::\$[A-Z0-9_]+#'

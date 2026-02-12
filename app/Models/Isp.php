@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Isp extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected $DB_TABLE_NAME = 'event_isp';
+    protected ?string $DB_TABLE_NAME = 'event_isp';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $params = [
@@ -232,13 +232,14 @@ class Isp extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyA
         return $result;
     }
 
-    public function updateTotalsByEntityIds(array $ids, int $apiKey): void {
+    public function updateTotalsByEntityIds(array $ids, int $apiKey, bool $force = false): void {
         if (!count($ids)) {
             return;
         }
 
         [$params, $flatIds] = $this->getArrayPlaceholders($ids);
         $params[':key'] = $apiKey;
+        $extraClause = $force ? '' : ' AND event_isp.lastseen >= event_isp.updated';
 
         $query = (
             "UPDATE event_isp
@@ -265,8 +266,8 @@ class Isp extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyA
             WHERE
                 event_isp.key = :key AND
                 event_isp.id = sub_isp.id AND
-                event_isp.id IN ({$flatIds}) AND
-                event_isp.lastseen >= event_isp.updated"
+                event_isp.id IN ({$flatIds})
+                $extraClause"
         );
 
         $this->execQuery($query, $params);

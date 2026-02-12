@@ -56,7 +56,7 @@ class Database {
         return false;
     }
 
-    private static function getDbConnect(string $url): ?\DB\SQL {
+    private static function getDbConnect(string $url): \DB\SQL {
         $parts = parse_url($url);
 
         if (!is_array($parts)) {
@@ -70,7 +70,7 @@ class Database {
         $pass = $parts['pass'] ?? '';
         $path = $parts['path'] ?? '';
 
-        if (!$host || !$host || !$user || !$pass || !$path) {
+        if (!$host || !$port || !$user || !$pass || !$path) {
             throw new \InvalidArgumentException('Invalid DSN format');
         }
 

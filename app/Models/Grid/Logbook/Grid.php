@@ -23,7 +23,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
 
         $this->apiKey = $apiKey;
         $this->idsModel = new Ids($apiKey);
-        $this->query = new Query($apiKey);
+        $this->queryModel = new Query($apiKey);
     }
 
     public function getAll(): array {
@@ -37,7 +37,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
         $serverOffset = \Tirreno\Utils\Timezones::getServerOffset();
 
         foreach ($result as $idx => $row) {
-            if (!isset($row[$field]) || $row[$field] === null) {
+            if (!isset($row[$field])) {
                 continue;
             }
 

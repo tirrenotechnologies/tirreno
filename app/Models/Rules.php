@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class Rules extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_rules';
+    protected ?string $DB_TABLE_NAME = 'dshb_rules';
 
     public function getAll(): array {
         $query = (

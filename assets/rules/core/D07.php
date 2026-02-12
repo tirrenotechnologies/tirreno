@@ -26,7 +26,7 @@ class D07 extends \Tirreno\Assets\Rule {
         return $params;
     }
 
-    protected function defineCondition() {
+    protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
             $this->rb['eup_desktop_devices_with_different_os']->equalTo(true),
         );

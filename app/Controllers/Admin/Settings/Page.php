@@ -18,15 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Controllers\Admin\Settings;
 
 class Page extends \Tirreno\Controllers\Admin\Base\Page {
-    public $page = 'AdminSettings';
+    public ?string $page = 'AdminSettings';
 
     public function getPageParams(): array {
         $dataController = new Data();
-
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
-        $operatorId = $currentOperator->id;
-
-        [$isOwner, $apiKeys] = \Tirreno\Utils\ApiKeys::getOperatorApiKeys($operatorId);
 
         $pageParams = [
             'LOAD_DATATABLE'    => true,
@@ -45,6 +40,10 @@ class Page extends \Tirreno\Controllers\Admin\Base\Page {
         }
 
         // set shared_operators and api_keys params after processing POST request
+
+        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
+        $operatorId = $currentOperator->id;
+
         $coOwners = $dataController->getSharedApiKeyOperators($operatorId);
         $pageParams['SHARED_OPERATORS'] = $coOwners;
 
@@ -53,13 +52,7 @@ class Page extends \Tirreno\Controllers\Admin\Base\Page {
         $pageParams['IS_OWNER'] = $isOwner;
         $pageParams['API_KEYS'] = $apiKeys;
 
-        $operatorModel = new \Tirreno\Models\Operator();
-        $operatorModel->getOperatorById($operatorId);
-        $pageParams['PROFILE'] = $operatorModel->cast();
-
-        $changeEmailModel = new \Tirreno\Models\ChangeEmail();
-        $changeEmailModel->getUnusedKeyByOperatorId($operatorId);
-        $pageParams['PENDING_CONFIRMATION_EMAIL'] = $changeEmailModel->email ?? null;
+        $pageParams['PROFILE'] = $currentOperator;
 
         return parent::applyPageParams($pageParams);
     }

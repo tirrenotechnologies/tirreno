@@ -10,10 +10,10 @@ namespace Tirreno\Rules\Custom;
  */
 class Context extends \Tirreno\Assets\Context {
     /** @var string Database table to query for context data */
-    protected $DB_TABLE_NAME = 'event_account';
+    protected ?string $DB_TABLE_NAME = 'event_account';
 
     /** @var bool Whether to return only unique values from context queries */
-    protected $uniqueValues = false;
+    protected ?bool $uniqueValues = false;
 
     /**
      * Enriches user data with custom context flags.

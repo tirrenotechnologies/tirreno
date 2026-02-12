@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Models\Search;
 
 class Domain extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'event_domain';
+    protected ?string $DB_TABLE_NAME = 'event_domain';
 
     public function searchByDomain(string $query, int $apiKey): array {
         $params = [

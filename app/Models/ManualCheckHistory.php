@@ -18,15 +18,42 @@ declare(strict_types=1);
 namespace Tirreno\Models;
 
 class ManualCheckHistory extends \Tirreno\Models\BaseSql {
-    protected $DB_TABLE_NAME = 'dshb_manual_check_history';
+    protected ?string $DB_TABLE_NAME = 'dshb_manual_check_history';
 
-    public function getRecentByOperator(int $operatorId): array {
-        return $this->find(
-            ['operator=?', $operatorId],
-            [
-                'order' => 'created_at DESC',
-                'limit' => 15,
-            ],
+    public function getLastByOperatorId(int $operatorId, int $limit = 15): array {
+        $params = [
+            ':operator' => $operatorId,
+            ':limit'    => $limit,
+        ];
+
+        $query = (
+            'SELECT
+                id,
+                type,
+                search_query,
+                created_at
+            FROM
+                dshb_manual_check_history
+            WHERE dshb_manual_check_history.operator = :operator
+            ORDER BY created_at DESC
+            LIMIT :limit'
         );
+
+        return $this->execQuery($query, $params);
+    }
+
+    public function insertRecord(string $query, string $type, int $operatorId): void {
+        $params = [
+            ':query'    => $query,
+            ':type'     => $type,
+            ':operator' => $operatorId,
+        ];
+
+        $query = (
+            'INSERT INTO dshb_manual_check_history (search_query, type, operator)
+            VALUES (:query, :type, :operator)'
+        );
+
+        $this->execQuery($query, $params);
     }
 }

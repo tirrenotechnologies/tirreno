@@ -110,9 +110,9 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
 
         if ($type === 'ip') {
             // do not raise on bogon ip
-            if ($apiError === \Tirreno\Utils\Constants::get('ENRICHMENT_IP_IS_NOT_FOUND')) {
+            if ($apiError === \Tirreno\Utils\Constants::get()->ENRICHMENT_IP_IS_NOT_FOUND) {
                 return ['ERROR_CODE' => \Tirreno\Utils\ErrorCodes::ENRICHMENT_API_IP_NOT_FOUND];
-            } elseif ($apiError !== null && $apiError !== \Tirreno\Utils\Constants::get('ENRICHMENT_IP_IS_BOGON') || $statusCode !== 200 || $response[$type] === null) {
+            } elseif ($apiError !== null && $apiError !== \Tirreno\Utils\Constants::get()->ENRICHMENT_IP_IS_BOGON || $statusCode !== 200 || $response[$type] === null) {
                 return $processErrorMessage;
             }
         } elseif ($apiError !== null || $statusCode !== 200 || $response[$type] === null) {
@@ -153,7 +153,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             return \Tirreno\Utils\ErrorCodes::ENRICHMENT_API_UNKNOWN_ERROR;
         }
 
-        if ($statusCode === 200 && is_array($result) && is_array($result[$requestType])) {
+        if ($statusCode === 200 && is_array($result[$requestType])) {
             return false;
         }
 
@@ -161,7 +161,7 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
         if ($details) {
             if (is_array($details)) {
                 $messages = array_map(function ($detail) {
-                    if (isset($detail['msg']) && $detail['msg'] !== null && $detail['msg'] !== '') {
+                    if (isset($detail['msg']) && $detail['msg'] !== '') {
                         return $detail['msg'];
                     }
                 }, $details);
@@ -187,17 +187,14 @@ class Data extends \Tirreno\Controllers\Admin\Base\Data {
             $type => $value['value'],
         ];
         $response = \Tirreno\Utils\Network::sendApiRequest($postFields, '/query', 'POST', $enrichmentKey);
-        $code = $response['code'];
-        $result = $response['data'];
+        $code = $response->code();
+        $result = $response->body();
 
-        $jsonResponse = is_array($result) ? $result : [];
         $statusCode = $code ?? 0;
+        $errorMessage = $response->error() ?? '';
+        $errorMessages = $this->validateResponse($type, $statusCode, $result, $errorMessage);
 
-        $errorMessage = $response['error'] ?? '';
-
-        $errorMessages = $this->validateResponse($type, $statusCode, $jsonResponse, $errorMessage);
-
-        return [$statusCode, $jsonResponse, $errorMessages];
+        return [$statusCode, $result, $errorMessages];
     }
 
     public function getNotCheckedEntitiesCount(int $apiKey): array {
