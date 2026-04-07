@@ -13,7 +13,7 @@
 
 tirreno *[tir.ˈrɛ.no]* helps understand, monitor, and protect your product from threats, fraud, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypasses firewalls, SIEM, WAFs, and other defenses. tirreno detects threats where they actually happen: inside your product.
 
-tirreno is a few-dependency, "low-tech" PHP/PostgreSQL application. After a straightforward five-minute installation, you can ingest events through API calls and immediately access a real-time threat dashboard.
+tirreno is a hand-written, few-dependency, "low-tech" PHP/PostgreSQL application. After a straightforward five-minute installation, you can ingest events through API calls and immediately access a real-time threat dashboard.
 
 ## Core components
 * **SDKs & API** Integrate tirreno into any product with SDKs.
@@ -42,6 +42,9 @@ tirreno is a few-dependency, "low-tech" PHP/PostgreSQL application. After a stra
 * **SaaS and digital platforms**: Prevent cross-tenant data leakage,
   online fraud, privilege escalation, data exfiltration and business
   logic abuse.
+* **E-commerce and online marketplaces**: Detect payment fraud, account 
+  abuse, fake reviews, promotional code exploitation, inventory manipulation,
+  and protect against credential stuffing and carding attacks.
 * **Mission critical applications**: Sensitive application protection,
   even in air-gapped deployments.
 * **Industrial control systems (ICS) and command & control (C2)**: Protect,
@@ -78,7 +81,7 @@ curl -sL tirreno.com/t.yml | docker compose -f - up -d
 Continue with step 4 of [Quickstart](#quickstart-install).
 
 ## Quickstart install
-1. [Download](https://www.tirreno.com/download.php) the latest version of tirreno (ZIP file).
+1. [Download](https://www.tirreno.com/download/) the latest version of tirreno (ZIP file).
 2. Extract the tirreno-master.zip file to the location where you want it installed on your web server.
 3. Navigate to `http://localhost:8585/install/index.php` in a browser to launch the installation process.
 4. After the successful installation, delete the `install/` directory and its contents.
@@ -112,14 +115,15 @@ composer require tirreno/tirreno
 * [PHP](https://github.com/tirrenotechnologies/tirreno-php-tracker)
 * [Python](https://github.com/tirrenotechnologies/tirreno-python-tracker)
 * [NodeJS](https://github.com/tirrenotechnologies/tirreno-nodejs-tracker)
-
+* [WordPress](https://github.com/tirrenotechnologies/tirreno-wordpress-tracker)
+  
 ## Documentation
 
 See the [User guide](https://docs.tirreno.com/) for details on how to use tirreno, [Developers documentation](https://github.com/tirrenotechnologies/DEVELOPMENT.md) to customize your integration, [Admin documentation](https://github.com/tirrenotechnologies/ADMIN.md) for installation, maintenance and updates.
 
 ## About
 
-tirreno is an open-source security framework that embeds protection against threats, fraud, and abuse right into your product.
+tirreno is an [open-source security framework](https://www.tirreno.com) that embeds protection against threats, fraud, and abuse right into your product.
 
 The project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
@@ -139,9 +143,12 @@ While working on the logo, we conducted our own historical study and traced ment
 * [Live demo](https://play.tirreno.com)
 * [Admin documentation](https://github.com/tirrenotechnologies/ADMIN.md)
 * [Developers documentation](https://github.com/tirrenotechnologies/DEVELOPMENT.md)
+* [Resource center](https://www.tirreno.com/bat/)
+* [Docker Hub](https://hub.docker.com/r/tirreno/tirreno)
 * [User guide](https://docs.tirreno.com)
+* [Packagist](https://packagist.org/packages/tirreno/tirreno)
 * [Mattermost community](https://chat.tirreno.com)
-
+  
 ## Reporting a security issue
 
 If you've found a security-related issue with tirreno, please email security@tirreno.com. Submitting the issue on GitHub exposes the vulnerability to the public, making it easy to exploit. We will publicly disclose the security issue after it has been resolved.
