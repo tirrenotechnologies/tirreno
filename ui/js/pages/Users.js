@@ -36,6 +36,7 @@ export class UsersPage extends BasePage {
 
             choicesFilterEvents: [rulesFilter.getEventType(), scoresRangeFilter.getEventType()],
 
+            datesFilter: datesFilter,
             getParams: this.getParamsSection,
         };
 

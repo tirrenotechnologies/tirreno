@@ -65,6 +65,23 @@ export class BaseGrid {
             const config = me.getDataTableConfig();
             $(`#${tableId}`).DataTable(config);
 
+            const reloadBtn = document.getElementById(tableId)
+                .closest('.card')
+                .querySelector('button.reload');
+                
+            if (reloadBtn) {
+                reloadBtn.addEventListener('click', () => {
+                    if (me.config.datesFilter) {
+                        const activeLink = document.querySelector('nav.filters-form.daterange a.active');
+                        const hours = activeLink ? parseInt(activeLink.dataset.value, 10) : null;
+                        if (hours) {
+                            me.config.datesFilter.setDateRangeFromNow(hours);
+                        }
+                    }
+                    me.loadData();
+                });
+            }
+
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
 

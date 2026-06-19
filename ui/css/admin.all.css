@@ -1073,10 +1073,20 @@ svg {
     padding-left: 2.3em;
 }
 
-.card-header-title {
+.card-header{
     background: #373552;
-    box-shadow: inset 1px 1px #131220;
     padding: 0.57em 0.75em;
+    box-shadow: inset 1px 1px #131220;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-header button.reload{
+    cursor: pointer;
+    background-color: #575675;
+    border: none;
+    padding: 2px 4px;
 }
 
 .title.low {
