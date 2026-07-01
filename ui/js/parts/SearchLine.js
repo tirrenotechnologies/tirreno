@@ -3,8 +3,6 @@ import {Tooltip} from './Tooltip.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {padZero} from './utils/Date.js?v=2';
 
-// --- Search suggestion helpers ---
-
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -53,8 +51,6 @@ function formatSearchResult(suggestion, currentValue) {
         }
     }
 }
-
-// --- SearchLine class ---
 
 export class SearchLine {
     constructor() {
