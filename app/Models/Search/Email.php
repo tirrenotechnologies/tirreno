@@ -28,13 +28,17 @@ class Email extends \Tirreno\Models\BaseSql {
 
         $query = (
             "SELECT
-                event_email.account_id AS id,
+                event_email.account_id  AS id,
                 'Email'                 AS \"groupName\",
                 'id'                    AS \"entityId\",
-                event_email.email      AS value
+                event_email.email       AS value,
+                event_account.score     AS score
 
             FROM
                 event_email
+
+            LEFT JOIN
+                event_account ON event_account.id = event_email.account_id
 
             WHERE
                 LOWER(event_email.email) LIKE LOWER(:query) AND
