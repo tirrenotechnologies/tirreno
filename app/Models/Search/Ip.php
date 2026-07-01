@@ -28,13 +28,17 @@ class Ip extends \Tirreno\Models\BaseSql {
 
         $query = (
             "SELECT
-                event_ip.id AS id,
-                'IP'        AS \"groupName\",
-                'ip'        AS \"entityId\",
-                event_ip.ip AS value
+                event_ip.id         AS id,
+                'IP'                AS \"groupName\",
+                'ip'                AS \"entityId\",
+                event_ip.ip         AS value,
+                countries.iso       AS country_iso
 
             FROM
                 event_ip
+
+            LEFT JOIN
+                countries ON countries.id = event_ip.country
 
             WHERE
                 LOWER(TEXT(event_ip.ip)) LIKE LOWER(:query) AND

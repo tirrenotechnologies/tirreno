@@ -31,7 +31,8 @@ class User extends \Tirreno\Models\BaseSql {
                 event_account.id     AS id,
                 'ID'                 AS \"groupName\",
                 'id'                 AS \"entityId\",
-                event_account.userid AS value
+                event_account.userid AS value,
+                event_account.score  AS score
 
             FROM
                 event_account
@@ -58,7 +59,8 @@ class User extends \Tirreno\Models\BaseSql {
                 'Name'                                  AS \"groupName\",
                 'id'                                    AS \"entityId\",
                 CONCAT_WS(' ', event_account.firstname,
-                               event_account.lastname)  AS value
+                               event_account.lastname)  AS value,
+                event_account.score                     AS score
 
             FROM
                 event_account
