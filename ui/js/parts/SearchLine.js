@@ -3,37 +3,8 @@ import {Tooltip} from './Tooltip.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {padZero} from './utils/Date.js?v=2';
 import {
-    renderClickableImportantUserWithScore,
-    renderIpWithCountry,
+    formatSearchResult,
 } from './DataRenderers.js?v=2';
-
-function domToHtml(node) {
-    const div = document.createElement('div');
-    div.appendChild(node.cloneNode(true));
-    return div.innerHTML;
-}
-
-function formatSearchResult(suggestion, currentValue) {
-    const category = suggestion.data?.category;
-    const data = suggestion.data ?? {};
-
-    if (category === 'IP') {
-        return domToHtml(renderIpWithCountry({
-            ip:          suggestion.value,
-            country_iso: data.country_iso ?? 'lh',
-        }));
-    }
-
-    // ID, Name, Email — all map to a user record
-    return domToHtml(renderClickableImportantUserWithScore({
-        accountid:        data.id ?? null,
-        email:            suggestion.value,
-        accounttitle:     suggestion.value,
-        score:            data.score ?? null,
-        score_updated_at: null,
-        is_important:     false,
-    }));
-}
 
 export class SearchLine {
     constructor() {
