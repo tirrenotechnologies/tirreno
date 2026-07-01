@@ -2,54 +2,31 @@ import {Loader} from './Loader.js?v=2';
 import {Tooltip} from './Tooltip.js?v=2';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
 import {padZero} from './utils/Date.js?v=2';
-
-function escapeHtml(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-function highlightMatch(text, query) {
-    if (!query) return text;
-    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return text.replace(new RegExp(`(${escaped})`, 'gi'), '<strong>$1</strong>');
-}
-
-function renderUserSuggestion(suggestion, currentValue) {
-    const name = escapeHtml(suggestion.value);
-    const highlighted = highlightMatch(name, currentValue);
-    const score = suggestion.data?.score != null
-        ? `<span class="search-suggestion-score">${suggestion.data.score}</span>`
-        : '';
-    return `<span class="search-suggestion-user">${highlighted}${score}</span>`;
-}
-
-function renderIpSuggestion(suggestion, currentValue) {
-    const ip = escapeHtml(suggestion.value);
-    const highlighted = highlightMatch(ip, currentValue);
-    const iso = suggestion.data?.country_iso;
-    const flag = iso
-        ? `<span class="search-suggestion-flag f32"><span class="flag ${iso.toLowerCase()}"></span></span>`
-        : '';
-    return `${flag}<span class="search-suggestion-ip">${highlighted}</span>`;
-}
+import {
+    renderClickableImportantUserWithScore,
+    renderIpWithCountry,
+} from './DataRenderers.js?v=2';
 
 function formatSearchResult(suggestion, currentValue) {
     const category = suggestion.data?.category;
-    switch (category) {
-        case 'ID':
-        case 'Name':
-        case 'Email':
-            return renderUserSuggestion(suggestion, currentValue);
-        case 'IP':
-            return renderIpSuggestion(suggestion, currentValue);
-        default: {
-            const safe = escapeHtml(suggestion.value);
-            return highlightMatch(safe, currentValue);
-        }
+    const data = suggestion.data ?? {};
+
+    if (category === 'IP') {
+        return renderIpWithCountry({
+            ip:          suggestion.value,
+            country_iso: data.country_iso ?? 'lh',
+        });
     }
+
+    // ID, Name, Email — all map to a user record
+    return renderClickableImportantUserWithScore({
+        accountid:        data.id ?? null,
+        email:            suggestion.value,
+        accounttitle:     suggestion.value,
+        score:            data.score ?? null,
+        score_updated_at: null,
+        is_important:     false,
+    });
 }
 
 export class SearchLine {
