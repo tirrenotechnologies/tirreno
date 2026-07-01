@@ -1960,6 +1960,36 @@ const renderChartTooltipPart = (color, label, val) => {
     return span;
 };
 
+// These two functions return a string (via div.innerHTML / outerHTML) rather than a DOM node.
+// A string return value is required by Devbridge jQuery Autocomplete's formatResult callback setting.
+const domToHtml = node => {
+    const div = document.createElement('div');
+    div.appendChild(node.cloneNode(true));
+    return div.innerHTML;
+};
+
+const formatSearchResult = (suggestion, currentValue) => {
+    const category = suggestion.data?.category;
+    const data = suggestion.data ?? {};
+
+    if (category === 'IP') {
+        return domToHtml(renderIpWithCountry({
+            ip:          suggestion.value,
+            country_iso: data.country_iso ?? 'lh',
+        }));
+    }
+
+    // ID, Name, Email — all map to a user record
+    return domToHtml(renderClickableImportantUserWithScore({
+        accountid:        data.id ?? null,
+        email:            suggestion.value,
+        accounttitle:     suggestion.value,
+        score:            data.score ?? null,
+        score_updated_at: null,
+        is_important:     false,
+    }));
+};
+
 export {
     //Primitive
     renderBoolean,
@@ -2112,4 +2142,7 @@ export {
 
     //Chart
     renderChartTooltipPart,
+
+    //Search autocomplete
+    formatSearchResult,
 };
