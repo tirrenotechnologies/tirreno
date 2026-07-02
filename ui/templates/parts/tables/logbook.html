@@ -12,8 +12,8 @@
 <div class="card events-card">
     <header class="card-header">
         <div class="card-header-title">
-            {{ @AdminLogbook_table_title }}
-            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @AdminLogbook_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
+            {{ sprintf(@logbook_table_title, htmlspecialchars(tirreno('utils')->variables->getLogbookLimit(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')) }}
+            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @logbook_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
             </p>
         </div>
     </header>
@@ -28,11 +28,11 @@
             <table class="table dim-table" id="logbook-table">
                 <thead>
                     <tr>
-                        <th class="tooltip logbook-ip-col" title="{{ @AdminLogbook_column_ip_tooltip }}">{{ @AdminLogbook_column_ip }}</th>
+                        <th class="tooltip logbook-ip-col" title="{{ @logbook_column_ip_tooltip }}">{{ @logbook_column_ip }}</th>
                         <th class="tooltip logbook-timestamp-col" title="{{ @Base_table_column_local_timestamp_tooltip }}">{{ @Base_table_column_local_timestamp }}</th>
-                        <th class="tooltip logbook-endpoint-col" title="{{ @AdminLogbook_column_endpoint_tooltip }}">{{ @AdminLogbook_column_endpoint }}</th>
+                        <th class="tooltip logbook-endpoint-col" title="{{ @logbook_column_endpoint_tooltip }}">{{ @logbook_column_endpoint }}</th>
                         <th class="tooltip logbook-status-col" title="{{ @Base_table_column_error_type_tooltip }}">{{ @Base_table_column_error_type }}</th>
-                        <th class="tooltip logbook-message-col" title="{{ @Base_table_column_error_text_tooltip }}">{{ @Base_table_column_error_text }}</th>
+                        <th class="tooltip logbook-raw-col" title="{{ @Base_table_column_raw_request_tooltip }}">{{ @Base_table_column_raw_request }}</th>
                     </tr>
                 </thead>
             </table>

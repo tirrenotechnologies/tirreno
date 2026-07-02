@@ -1,19 +1,18 @@
 <div class="details-card is-hidden" id="close-account-popup">
     <header class="card-header">
         <p class="card-header-title">
-            {{ @AdminSettings_account_deletion_warning_header }}<button class="delete"></button>
+            {{ @settings_account_deletion_warning_header }}<button class="delete"></button>
         </p>
     </header>
 
     <div class="content is-hidden">
-        <p class="level-left">{{ @AdminSettings_delete_account_warning_message_par1 }}</p>
+        <p class="level-left">{{ @settings_delete_account_warning_message_par1 }}</p>
         <br>
-        <p class="level-left">{{ @AdminSettings_delete_account_warning_message_par2 }}</p>
+        <p class="level-left">{{ @settings_delete_account_warning_message_par2 }}</p>
+        <footer class="pop-up-footer">
+            <div class="control">
+                <button class="button is-danger" id="confirm-close-account-button">{{ @settings_submit_account_deletion_button }}</button>
+            </div>
+        </footer>
     </div>
-
-    <footer class="pop-up-footer">
-        <div class="control">
-            <button class="button is-danger" id="confirm-close-account-button">{{ @AdminSettings_submit_account_deletion_button }}</button>
-        </div>
-    </footer>
 </div>

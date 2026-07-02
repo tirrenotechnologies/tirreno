@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'AdminDomains_page_title' => 'Domains',
-    'AdminDomains_breadcrumb_title' => 'Domains',
-    'AdminDomains_search_placeholder' => 'Domain or Created',
+    'domains_page_title' => 'Domains',
+    'domains_breadcrumb_title' => 'Domains',
+    'domains_search_placeholder' => 'Domain or Created',
 
-    'AdminDomains_table_title' => 'Domains',
-    'AdminDomains_table_title_tooltip' => 'This page provides analytics grouped by a domain of email addresses. The data is shown for a selected period of time. The chart displays the daily number of unique and newly reported domains. To open a page with more information about a particular email domain, click on a table row.',
+    'domains_table_title' => 'Domains',
+    'domains_table_title_tooltip' => 'This page provides analytics grouped by a domain of email addresses. The data is shown for a selected period of time. The chart displays the daily number of unique and newly reported domains. To open a page with more information about a particular email domain, click on a table row.',
 ];

@@ -1,15 +1,15 @@
-import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=0.10.0';
 import {
     renderIp,
     renderTimeMsLogbook,
     renderEndpoint,
     renderErrorType,
-    renderSensorErrorColumn,
-} from '../DataRenderers.js?v=2';
+    renderRawRequestColumn,
+} from '../DataRenderers.js?v=0.10.0';
 
 export class LogbookGrid extends BaseGridWithPanel {
     get orderConfig() {
-        return [[3, 'desc'], [1, 'desc']];
+        return [[1, 'desc']];
     }
 
     get columnDefs() {
@@ -31,7 +31,7 @@ export class LogbookGrid extends BaseGridWithPanel {
                 targets: 3
             },
             {
-                className: 'logbook-message-col',
+                className: 'logbook-raw-col',
                 targets: 4
             },
         ];
@@ -66,9 +66,9 @@ export class LogbookGrid extends BaseGridWithPanel {
                 }
             },
             {
-                data: 'error_text',
+                data: 'raw',
                 render: (data, type, record) => {
-                    return renderSensorErrorColumn(record);
+                    return renderRawRequestColumn(record);
                 }
             },
         ];

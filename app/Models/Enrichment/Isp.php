@@ -55,7 +55,6 @@ class Isp extends \Tirreno\Models\Enrichment\Base {
                 event_isp.key = :key
         ");
 
-        $model = new \Tirreno\Models\Isp();
-        $model->execQuery($query, $params);
+        tirreno('models')->isp->execQuery($query, $params);
     }
 }

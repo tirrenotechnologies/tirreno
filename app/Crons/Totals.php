@@ -23,27 +23,42 @@ class Totals extends Base {
         $this->addLog('Start totals calculation.');
 
         $start = time();
-        $models = \Tirreno\Utils\Constants::get()->REST_TOTALS_MODELS;
+        $models = tirreno('utils')->constants->REST_TOTALS_MODELS;
 
-        $batchSize = \Tirreno\Utils\Variables::getAccountOperationQueueBatchSize();
+        $batchSize = tirreno('utils')->variables->getAccountOperationQueueBatchSize();
         $bottom = false;
 
-        $queueModel = new \Tirreno\Models\Queue();
-
         // TODO check multiple batches
-        $keys = $queueModel->getNextBatchKeys(\Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE, $batchSize);
+        $keys = tirreno('models')->queue->getNextBatchKeys(tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE, $batchSize);
         $res = [];
+
+        $processed = [];
+        $awaited = [];
+
+        foreach (array_keys($models) as $name) {
+            foreach ($keys as $key) {
+                $awaited[] = strval($key) . ':' . $name;
+            }
+        }
 
         foreach ($models as $name => $modelClass) {
             $res[$name] = ['cnt' => 0, 's' => 0];
             $timeMark = time();
             $model = new $modelClass();
             foreach ($keys as $key) {
-                (new \Tirreno\Models\SessionStat())->updateStats($key);
+                tirreno('models')->sessionStat->updateStats($key);
 
                 $cnt = $model->updateAllTotals($key);
                 $res[$name]['cnt'] += $cnt;
-                if (time() - $start > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC) {
+
+                tirreno('log')->debug('Updated totals and stats for key %d.', $key);
+
+                $processed[] = strval($key) . ':' . $name;
+
+                if (time() - $start > tirreno('utils')->constants->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC) {
+                    $missed = array_values(array_diff($processed, $awaited));
+                    tirreno('log')->debug('Break totals update due to time limit. Processed model + key pairs -- %s. Missing -- %s.', json_encode($processed), json_encode($missed));
+
                     // TODO: any reason to put the rest keys to queue?
                     $res[$name]['s'] = time() - $timeMark;
                     break 2;
@@ -51,7 +66,6 @@ class Totals extends Base {
             }
             $res[$name]['s'] = time() - $timeMark;
         }
-
 
         $this->addLog(sprintf('Updated %s entities for %s keys and %s models in %s seconds.', array_sum(array_column(array_values($res), 'cnt')), count($keys), count($models), time() - $start));
     }

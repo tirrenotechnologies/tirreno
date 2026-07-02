@@ -1,10 +1,10 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {LogbookPanel} from '../parts/panel/LogbookPanel.js?v=2';
-import {LogbookGrid} from '../parts/grid/Logbook.js?v=2';
-import {LogbookChart} from '../parts/chart/Logbook.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {LogbookPanel} from '../parts/panel/LogbookPanel.js?v=0.10.0';
+import {LogbookGrid} from '../parts/grid/Logbook.js?v=0.10.0';
+import {LogbookChart} from '../parts/chart/Logbook.js?v=0.10.0';
 
 export class LogbookPage extends BasePage {
     constructor() {
@@ -15,12 +15,10 @@ export class LogbookPage extends BasePage {
         const datesFilter   = new DatesFilter();
         const searchFilter  = new SearchFilter();
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
-
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:            `${window.app_base}/admin/loadLogbook`,
+            url:            `${window.app_base}/loadLogbook`,
             tileId:         'totalLogbook',
             tableId:        'logbook-table',
             panelType:      'logbook',
@@ -33,8 +31,18 @@ export class LogbookPage extends BasePage {
             getParams:      this.getParamsSection,
         };
 
-        new LogbookChart(chartParams);
+        const chartParams = {
+            url:        `${window.app_base}/loadLogbookChart`,
+            getParams:  this.getParamsSection,
+        };
+
         new LogbookPanel();
-        new LogbookGrid(gridParams);
+
+        const elements = [
+            [LogbookChart,    chartParams],
+            [LogbookGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

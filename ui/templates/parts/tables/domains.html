@@ -14,12 +14,12 @@
         <div class="card-header-title">
             <check if="{{ isset(@innerDomains) && 1 === @innerDomains }}">
                 <true>
-                    {{ @AdminDomains_table_same_ip }}
-                    <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @AdminDomains_table_same_ip_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @domains_table_same_ip }}
+                    <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @domains_table_same_ip_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </true>
                 <false>
-                    {{ @AdminDomains_table_title }}
-                    <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @AdminDomains_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @domains_table_title }}
+                    <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @domains_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </false>
             </check>
         </div>

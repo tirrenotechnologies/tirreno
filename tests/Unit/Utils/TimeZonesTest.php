@@ -10,25 +10,26 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Timezones.
  *
- * Covered (unit-testable without refactor):
- * - Timezones::getTimezone() (valid/invalid fallback behavior)
- * - Timezones::getUtcTimezone() (returns UTC)
- * - Timezones::localizeTimestamp() (timezone conversion with fixed input)
- * - Timezones::addOffset() (adds seconds; preserves millisecond suffix when requested)
+ * Covered:
+ * - Timezones::getTimezone()
+ * - Timezones::getUtcTimezone()
+ * - Timezones::localizeTimestamp()
+ * - Timezones::addOffset()
+ * - Timezones::getSecondsSinceMonday()
+ * - Timezones::getTodayRange()
  *
- * Partially covered (weak assertions; time-dependent):
- * - range helpers (only invariants: format, ordering, and day-boundary properties)
+ * Partially covered:
+ * - range helpers are covered only through stable invariants because they use time().
  *
- * Not covered (recommended to refactor first):
- * - methods depending on Routes::getCurrentRequestOperator() (active-operator timezone)
- * - timezonesList() (depends on Variables::getAvailableTimezones() + now)
+ * @todo Cover active-operator timezone methods after current operator resolving
+ *       can be replaced in tests.
  *
- * @todo Refactor:
- * - extract ClockInterface (nowTimestamp(): int) for deterministic ranges
- * - extract ActiveOperatorProviderInterface for localize*ForActiveOperator methods
- * - extract TimezonesCatalogInterface for timezonesList()
+ * @todo Cover timezonesList() after available timezone catalog and current time
+ *       can be replaced in tests.
+ *
+ * @todo Add deterministic coverage for all range helpers after extracting Clock.
  */
-final class TimeZonesTest extends TestCase {
+final class TimezonesTest extends TestCase {
     public function testGetUtcTimezoneReturnsUtc(): void {
         $timezone = Timezones::getUtcTimezone();
 
@@ -52,13 +53,13 @@ final class TimeZonesTest extends TestCase {
         $until = new \DateTimeZone('Europe/Kyiv');
 
         $input = '2020-01-01 00:00:00';
+
         $result = Timezones::localizeTimestamp($input, $utc, $until, false);
 
-        // We don't hardcode offset (DST rules vary by date), we compute expected via DateTime.
-        $dtObj = \DateTime::createFromFormat(Timezones::FORMAT, $input, $utc);
-        $dtObj->setTimezone($until);
+        $date = \DateTime::createFromFormat(Timezones::FORMAT, $input, $utc);
+        $date->setTimezone($until);
 
-        $expected = $dtObj->format(Timezones::FORMAT);
+        $expected = $date->format(Timezones::FORMAT);
 
         $this->assertSame($expected, $result);
     }
@@ -68,6 +69,7 @@ final class TimeZonesTest extends TestCase {
         $until = new \DateTimeZone('UTC');
 
         $input = '2020-01-01 00:00:00.123456';
+
         $result = Timezones::localizeTimestamp($input, $utc, $until, true);
 
         $this->assertSame($input, $result);
@@ -75,34 +77,60 @@ final class TimeZonesTest extends TestCase {
 
     public function testAddOffsetAddsSecondsWithoutMilliseconds(): void {
         $input = '2020-01-01 00:00:00';
-        $offset = 60;
 
-        $result = Timezones::addOffset($input, $offset, false);
+        $result = Timezones::addOffset($input, 60, false);
 
         $this->assertSame('2020-01-01 00:01:00', $result);
     }
 
     public function testAddOffsetPreservesMillisecondSuffixWhenPresent(): void {
         $input = '2020-01-01 00:00:00.123456';
-        $offset = 1;
 
-        $result = Timezones::addOffset($input, $offset, true);
+        $result = Timezones::addOffset($input, 1, true);
 
         $this->assertSame('2020-01-01 00:00:01.123456', $result);
     }
 
     public function testAddOffsetFallsBackWhenMillisecondsRequestedButMissingInInput(): void {
         $input = '2020-01-01 00:00:00';
-        $offset = 1;
 
-        $result = Timezones::addOffset($input, $offset, true);
+        $result = Timezones::addOffset($input, 1, true);
 
-        // When input has no ".", function disables millisecond mode and returns plain FORMAT.
         $this->assertSame('2020-01-01 00:00:01', $result);
     }
 
+    /**
+     * @dataProvider secondsSinceMondayProvider
+     */
+    public function testGetSecondsSinceMonday(string $timestamp, int $expected): void {
+        $result = Timezones::getSecondsSinceMonday($timestamp);
+
+        $this->assertSame($expected, $result);
+    }
+
+    public static function secondsSinceMondayProvider(): array {
+        return [
+            'monday midnight' => [
+                'timestamp' => '2024-01-01 00:00:00',
+                'expected' => 0,
+            ],
+            'monday one hour' => [
+                'timestamp' => '2024-01-01 01:00:00',
+                'expected' => 3600,
+            ],
+            'tuesday midnight' => [
+                'timestamp' => '2024-01-02 00:00:00',
+                'expected' => 86400,
+            ],
+            'sunday last second' => [
+                'timestamp' => '2024-01-07 23:59:59',
+                'expected' => 604799,
+            ],
+        ];
+    }
+
     public function testCurDayRangeHasValidFormatAndOrdering(): void {
-        $range = Timezones::getCurDayRange(0);
+        $range = Timezones::getTodayRange(0);
 
         $startDate = (string) $range['startDate'];
         $endDate = (string) $range['endDate'];
@@ -112,8 +140,7 @@ final class TimeZonesTest extends TestCase {
 
         $this->assertStringEndsWith('00:00:00', $startDate);
 
-        $timezoneName = date_default_timezone_get();
-        $timezone = new \DateTimeZone($timezoneName);
+        $timezone = new \DateTimeZone(date_default_timezone_get());
 
         $start = \DateTimeImmutable::createFromFormat(Timezones::FORMAT, $startDate, $timezone);
         $end = \DateTimeImmutable::createFromFormat(Timezones::FORMAT, $endDate, $timezone);
@@ -121,9 +148,9 @@ final class TimeZonesTest extends TestCase {
         $this->assertInstanceOf(\DateTimeImmutable::class, $start);
         $this->assertInstanceOf(\DateTimeImmutable::class, $end);
 
-        $startTs = $start->getTimestamp();
-        $endTs = $end->getTimestamp();
-
-        $this->assertLessThanOrEqual($endTs, $startTs);
+        $this->assertLessThanOrEqual(
+            $end->getTimestamp(),
+            $start->getTimestamp()
+        );
     }
 }

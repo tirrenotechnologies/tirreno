@@ -1,5 +1,6 @@
-import {fireEvent} from './Event.js?v=2';
-import {handleAjaxError} from './ErrorHandler.js?v=2';
+import {fireEvent} from './Event.js?v=0.10.0';
+import {handleAjaxError} from './ErrorHandler.js?v=0.10.0';
+import {mapKeys} from './Functions.js?v=0.10.0';
 
 export class Constants {
     static init(callback) {
@@ -18,8 +19,8 @@ export class Constants {
         };
 
         $.ajax({
-            url: `${window.app_base}/admin/getConstants`,
-            type: 'get',
+            url: `${window.app_base}/getConstants`,
+            type: 'GET',
             data: params,
             error: onError,
             success: onSuccess,
@@ -27,16 +28,18 @@ export class Constants {
     }
 
     static onSuccess(data, status) {
-        if ('success' !== status || 0 === data.length) {
+        if ('success' !== status) {
             return;
         }
 
         this._loaded = true;
 
-        for (const [key, value] of Object.entries(data)) {
-            this[key] = value;
-
+        const dataKeys = mapKeys(data);
+        for (let i = 0; i < dataKeys.length; i++) {
+            const key = dataKeys[i];
+            this[key] = data[key];
         }
+
         fireEvent('constantsLoaded');
     }
 
@@ -64,9 +67,11 @@ export class Constants {
         Constants.MAX_STRING_LENGTH_FOR_TILE = 15;
         Constants.MAX_STRING_DEVICE_OS_LENGTH = 10;
         Constants.MAX_STRING_LENGTH_URL = 32;
-        Constants.MAX_STRING_LENGTH_ENDPOINT = 21;
+        Constants.MAX_STRING_LENGTH_ENDPOINT = 17;
+        Constants.MAX_STRING_LENGTH_RAW_REQUEST = 62;
         Constants.MAX_TOOLTIP_URL_LENGTH = 50;
         Constants.MAX_TOOLTIP_LENGTH = 121;
+        Constants.MAX_STRING_LENGTH_ERROR_TYPE = 10;
 
         Constants.COLOR_RED    = '#FB6E88';
         Constants.COLOR_GREEN  = '#25EAB5';
@@ -124,6 +129,9 @@ export class Constants {
         Constants.MIDLINE_HELLIP = '\u22EF';
         Constants.HELLIP = '\u2026';
         Constants.HYPHEN = '\uFF0D';
+        Constants.DOWNWARDS_ARROW = '\u2193';
+        Constants.UPWARDS_ARROW = '\u2191';
+        Constants.MULTIPLICATION_SIGN = '\u00D7';
 
         Constants.COLOR_MAP = {
             'red':      {
@@ -152,6 +160,14 @@ export class Constants {
             'edits':        1,
             'events':       100,
             'sessions':     20,
+        };
+
+        Constants.RULE_WEIGHTS = {
+            '70':   'extreme',
+            '20':   'high',
+            '10':   'medium',
+            '0':    'none',
+            '-20':  'positive',
         };
     }
 };

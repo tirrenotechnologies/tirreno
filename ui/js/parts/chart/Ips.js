@@ -1,4 +1,4 @@
-import {BaseLineChart} from './BaseLine.js?v=2';
+import {BaseLineChart} from './BaseLine.js?v=0.10.0';
 
 export class IpsChart extends BaseLineChart {
     getSeries() {

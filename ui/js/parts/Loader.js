@@ -1,3 +1,5 @@
+import {replaceChildren} from './utils/Functions.js?v=0.10.0';
+
 export class Loader {
     constructor() {
         this.symbols = [
@@ -29,7 +31,7 @@ export class Loader {
 
             let symbol = me.symbols[counter % me.symbols.length];
 
-            me.loaderEl.replaceChildren(symbol);
+            replaceChildren(me.loaderEl, symbol);
 
             counter++;
         }, 85);

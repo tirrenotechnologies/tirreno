@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Updates {
-    private const UPDATES_LIST = [
+    protected const UPDATES_LIST = [
         \Tirreno\Updates\Update001::class,
         \Tirreno\Updates\Update002::class,
         \Tirreno\Updates\Update003::class,
@@ -27,19 +27,17 @@ class Updates {
         \Tirreno\Updates\Update006::class,
         \Tirreno\Updates\Update007::class,
         \Tirreno\Updates\Update008::class,
+        \Tirreno\Updates\Update009::class,
     ];
 
     public static function syncUpdates(): void {
-        $f3 = \Base::instance();
-        $updates = new \Tirreno\Models\Updates($f3);
-        $applied = $updates->checkDb('core', self::UPDATES_LIST);
+        $applied = tirreno('models')->updates->checkDb('core', self::UPDATES_LIST);
 
         if ($applied) {
-            $controller = new \Tirreno\Controllers\Admin\Rules\Data();
             // update only core rules
-            $controller->updateRules(false);
+            tirreno('controllers')->rules->updateRules(false);
         }
 
-        \Tirreno\Utils\Routes::callExtra('UPDATES');
+        tirreno('utils')->routes->callExtra('UPDATES');
     }
 }

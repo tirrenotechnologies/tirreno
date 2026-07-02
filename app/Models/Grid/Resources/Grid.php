@@ -18,18 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Resources;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getResourcesByUserId(int $userId): array {
+    public function getResourcesByUserId(int $userId, int $apiKey): array {
         $params = [':account_id' => $userId];
 
-        $data = $this->getGrid($this->idsModel->getResourcesIdsByUserId(), $params);
+        $data = $this->getGrid($apiKey, $this->idsModel->getResourcesIdsByUserId(), $params);
         if (isset($data['data'])) {
             $data['data'] = $this->extendWithSuspiciousUrl($data['data']);
         }
@@ -37,8 +29,8 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
         return $data;
     }
 
-    public function getAll(): array {
-        $data = $this->getGrid();
+    public function getAll(int $apiKey): array {
+        $data = $this->getGrid($apiKey);
         if (isset($data['data'])) {
             $data['data'] = $this->extendWithSuspiciousUrl($data['data']);
         }
@@ -48,7 +40,7 @@ class Grid extends \Tirreno\Models\Grid\Base\Grid {
 
     private function extendWithSuspiciousUrl(array $result): array {
         if (count($result)) {
-            $suspiciousUrlList = \Tirreno\Utils\Assets\Lists\Url::getList();
+            $suspiciousUrlList = tirreno('assets')->urlList->getList();
             foreach ($result as &$record) {
                 $record['suspicious'] = $this->isUrlSuspicious($suspiciousUrlList, $record['url']);
             }

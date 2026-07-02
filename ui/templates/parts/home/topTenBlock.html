@@ -3,7 +3,7 @@
         <td class="table-card" id="most-active-users">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_most_active_users }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_most_active_users_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_most_active_users }}<p class="tooltip-info tooltip" title="{{ @home_top10_most_active_users_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_user,c2=@Top10_events,id=most-active-users-table"/>
             </div>
@@ -12,7 +12,7 @@
         <td class="table-card" id="most-active-countries">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_active_countries }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_active_countries_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_active_countries }}<p class="tooltip-info tooltip" title="{{ @home_top10_active_countries_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_country,c2=@Top10_users,id=most-active-countries-table"/>
             </div>
@@ -21,7 +21,7 @@
         <td class="table-card" id="most-active-urls">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_active_urls }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_active_urls_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_active_urls }}<p class="tooltip-info tooltip" title="{{ @home_top10_active_urls_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_resource,c2=@Top10_users,id=most-active-urls-table"/>
             </div>
@@ -32,7 +32,7 @@
         <td class="table-card" id="ips-with-the-most-users">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_ips_with_the_most_users }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_ips_with_the_most_users_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_ips_with_the_most_users }}<p class="tooltip-info tooltip" title="{{ @home_top10_ips_with_the_most_users_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_ip,c2=@Top10_users,id=ips-with-the-most-users-table"/>
             </div>
@@ -41,7 +41,7 @@
         <td class="table-card" id="users-with-most-login-fail">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_users_with_most_login_fail }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_users_with_most_login_fail_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_users_with_most_login_fail }}<p class="tooltip-info tooltip" title="{{ @home_top10_users_with_most_login_fail_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_user,c2=@Top10_attempts,id=users-with-most-login-fail-table"/>
             </div>
@@ -50,7 +50,7 @@
         <td class="table-card" id="users-with-most-ips">
             <div class="gapless">
                 <div class="subtitle">
-                    {{ @AdminHome_top10_users_with_the_most_ips }}<p class="tooltip-info tooltip" title="{{ @AdminHome_top10_users_with_the_most_ips_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+                    {{ @home_top10_users_with_the_most_ips }}<p class="tooltip-info tooltip" title="{{ @home_top10_users_with_the_most_ips_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
                 </div>
                 <include href="templates/parts/home/topTenTable.html" with="c1=@Top10_user,c2=@Top10_ips,id=users-with-most-ips-table"/>
             </div>

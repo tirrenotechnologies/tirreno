@@ -1,25 +1,25 @@
-import {BasePage} from './Base.js?v=2';
-import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
-import {Map} from '../parts/Map.js?v=2';
-import {EmailsGrid} from '../parts/grid/Emails.js?v=2';
-import {IpsGrid} from '../parts/grid/Ips.js?v=2';
-import {EventsGrid} from '../parts/grid/Events.js?v=2';
-import {DevicesGrid} from '../parts/grid/Devices.js?v=2';
-import {BaseBarChart} from '../parts/chart/BaseBar.js?v=2';
-import {BaseSparklineChart} from '../parts/chart/BaseSparkline.js?v=2';
-import {UserTiles} from '../parts/details/UserTiles.js?v=2';
-import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
-import {FieldPanel} from '../parts/panel/FieldPanel.js?v=2';
-import {SingleReviewButton} from '../parts/SingleReviewButton.js?v=2';
-import {ScoreDetails} from '../parts/ScoreDetails.js?v=2';
-import {PhonesGrid} from '../parts/grid/Phones.js?v=2';
-import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=2';
-import {IspsGrid} from '../parts/grid/Isps.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {Map} from '../parts/Map.js?v=0.10.0';
+import {EmailsGrid} from '../parts/grid/Emails.js?v=0.10.0';
+import {IpsGrid} from '../parts/grid/Ips.js?v=0.10.0';
+import {EventsGrid} from '../parts/grid/Events.js?v=0.10.0';
+import {DevicesGrid} from '../parts/grid/Devices.js?v=0.10.0';
+import {BaseBarChart} from '../parts/chart/BaseBar.js?v=0.10.0';
+import {BaseSparklineChart} from '../parts/chart/BaseSparkline.js?v=0.10.0';
+import {UserTiles} from '../parts/details/UserTiles.js?v=0.10.0';
+import {EventPanel} from '../parts/panel/EventPanel.js?v=0.10.0';
+import {FieldPanel} from '../parts/panel/FieldPanel.js?v=0.10.0';
+import {SingleReviewButton} from '../parts/button/SingleReviewButton.js?v=0.10.0';
+import {ScoreDetails} from '../parts/ScoreDetails.js?v=0.10.0';
+import {PhonesGrid} from '../parts/grid/Phones.js?v=0.10.0';
+import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=0.10.0';
+import {IspsGrid} from '../parts/grid/Isps.js?v=0.10.0';
 
-import {EmailPanel} from '../parts/panel/EmailPanel.js?v=2';
-import {PhonePanel} from '../parts/panel/PhonePanel.js?v=2';
-import {DevicePanel} from '../parts/panel/DevicePanel.js?v=2';
-import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
+import {EmailPanel} from '../parts/panel/EmailPanel.js?v=0.10.0';
+import {PhonePanel} from '../parts/panel/PhonePanel.js?v=0.10.0';
+import {DevicePanel} from '../parts/panel/DevicePanel.js?v=0.10.0';
+import {ReenrichmentButton} from '../parts/button/ReenrichmentButton.js?v=0.10.0';
 
 export class UserPage extends BasePage {
     constructor() {
@@ -41,10 +41,8 @@ export class UserPage extends BasePage {
         const mapParams         = this.getMapParams();
         const chartParams       = this.getBarChartParams();
         const statsChartParams  = {
-            getParams: () => ({
-                mode:   'stats',
-                id:     this.id,
-            }),
+            url:    `${window.app_base}/loadUserSparklinesChart`,
+            id:     this.id,
         };
 
         ipsGridParams.tileId        = null;
@@ -53,7 +51,7 @@ export class UserPage extends BasePage {
         mapParams.tileId            = null;
 
         const emailsGridParams = {
-            url:        `${window.app_base}/admin/loadEmails`,
+            url:        `${window.app_base}/loadEmails`,
             tableId:    'emails-table',
             panelType:  'email',
 
@@ -63,7 +61,7 @@ export class UserPage extends BasePage {
         };
 
         const phonesGridParams = {
-            url:        `${window.app_base}/admin/loadPhones`,
+            url:        `${window.app_base}/loadPhones`,
             tableId:    'phones-table',
             panelType:  'phone',
 

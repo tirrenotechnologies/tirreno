@@ -1,6 +1,7 @@
-import {Loader} from '../Loader.js?v=2';
-import {BaseChart}  from './BaseChart.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
+import {Loader} from '../Loader.js?v=0.10.0';
+import {BaseChart}  from './BaseChart.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
 export class BaseSparklineChart extends BaseChart {
     constructor(chartParams) {
@@ -17,7 +18,7 @@ export class BaseSparklineChart extends BaseChart {
     getOptions() {
         const tooltipsPlugin = this.tooltipsPlugin({cursorMemo: this.cursorMemo}, 'day', '0');
         return {
-            width: 200,
+            width: 215,
             height: 30,
             pxAlign: false,
             cursor: {
@@ -87,7 +88,7 @@ export class BaseSparklineChart extends BaseChart {
             const block = this.getChartBlock(name);
 
             block.classList.remove('is-hidden');
-            block.replaceChildren(el);
+            replaceChildren(block, el);
 
             const p = block.querySelector('p');
 

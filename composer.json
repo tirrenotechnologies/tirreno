@@ -37,7 +37,7 @@
         "bcosca/fatfree-core": "3.9.1",
         "phpmailer/phpmailer": "6.9.3",
         "ruler/ruler": "0.4.0",
-        "matomo/device-detector": "6.5.0"
+        "matomo/device-detector": "6.5.1"
     },
     "autoload": {
         "psr-4": {
@@ -72,6 +72,7 @@
             "chmod 755 assets/logs",
             "chmod 755 assets/lists",
             "chmod 755 assets/dashboard",
+            "chmod 755 assets/pages",
             "chmod 640 composer.json",
             "chmod 640 composer.lock",
             "chmod -R 750 config"

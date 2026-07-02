@@ -72,8 +72,7 @@ class PhoneValid extends \Tirreno\Models\Enrichment\Base {
         $this->country_code = 0;
 
         if ($this->iso_country_code !== null) {
-            $countryModel = new \Tirreno\Models\Country();
-            $this->country_code = $countryModel->getCountryIdByIso($this->iso_country_code);
+            $this->country_code = tirreno('models')->country->getCountryIdByIso($this->iso_country_code);
         }
 
         [$params, $updateString] = $this->prepareUpdate();
@@ -89,7 +88,6 @@ class PhoneValid extends \Tirreno\Models\Enrichment\Base {
                 event_phone.key = :key
         ");
 
-        $model = new \Tirreno\Models\Phone();
-        $model->execQuery($query, $params);
+        tirreno('models')->phone->execQuery($query, $params);
     }
 }

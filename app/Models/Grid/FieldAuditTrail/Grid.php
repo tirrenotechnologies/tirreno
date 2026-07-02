@@ -18,39 +18,31 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\FieldAuditTrail;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getDataByUserId(int $userId): array {
+    public function getDataByUserId(int $userId, int $apiKey): array {
         $params = [':account_id' => $userId];
 
-        return $this->getGrid($this->idsModel->getDataIdsByUserId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDataIdsByUserId(), $params);
     }
 
-    public function getDataByFieldId(int $fieldId): array {
+    public function getDataByFieldId(int $fieldId, int $apiKey): array {
         $params = [':field_id' => $fieldId];
 
-        return $this->getGrid($this->idsModel->getDataIdsByFieldId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDataIdsByFieldId(), $params);
     }
 
-    public function getDataByResourceId(int $resourceId): array {
+    public function getDataByResourceId(int $resourceId, int $apiKey): array {
         $params = [':resource_id' => $resourceId];
 
-        return $this->getGrid($this->idsModel->getDataIdsByResourceId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDataIdsByResourceId(), $params);
     }
 
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['created'];
 
-        \Tirreno\Utils\Timezones::translateTimezones($result, $fields);
+        $result = tirreno('utils')->timezones->translateTimezones($result, $fields);
     }
 }

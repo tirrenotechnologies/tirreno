@@ -18,27 +18,19 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Emails;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getEmailsByUserId(int $userId): array {
+    public function getEmailsByUserId(int $userId, int $apiKey): array {
         $params = [':account_id' => $userId];
 
-        return $this->getGrid($this->idsModel->getEmailsIdsByUserId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getEmailsIdsByUserId(), $params);
     }
 
     protected function calculateCustomParams(array &$result): void {
-        \Tirreno\Utils\Enrichment::calculateEmailReputation($result);
+        $result = tirreno('utils')->enrichment->calculateEmailReputation($result);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['lastseen'];
 
-        \Tirreno\Utils\Timezones::translateTimezones($result, $fields);
+        $result = tirreno('utils')->timezones->translateTimezones($result, $fields);
     }
 }

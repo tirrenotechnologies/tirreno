@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\UserDetails;
 
-class Total extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
-
+class Total extends \Tirreno\Models\Base {
     public function getDetails(int $userId, int $apiKey): array {
         $params = [
             ':user_id'  => $userId,

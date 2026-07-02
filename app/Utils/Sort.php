@@ -26,13 +26,21 @@ class Sort {
         return $right['score'] <=> $left['score'];
     }
 
+    public static function cmpSetScore(array $left, array $right): int {
+        return $right['set'] <=> $left['set'] ?: $right['score'] <=> $left['score'];
+    }
+
+    public static function cmpSetUid(array $left, array $right): int {
+        return $right['set'] <=> $left['set'] ?: $right['uid'] <=> $left['uid'];
+    }
+
     public static function cmpRule(array $left, array $right): int {
         if ($left['validated'] !== $right['validated']) {
             return ($right['validated'] <=> $left['validated']);
         }
 
         if (($left['missing'] === true) !== ($right['missing'] === true)) {
-            return (\Tirreno\Utils\Conversion::intVal($left['missing']) <=> \Tirreno\Utils\Conversion::intVal($right['missing']));
+            return (tirreno('utils')->conversion->intVal($left['missing']) <=> tirreno('utils')->conversion->intVal($right['missing']));
         }
 
         return $left['uid'] <=> $right['uid'];

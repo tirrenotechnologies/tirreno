@@ -19,8 +19,7 @@ namespace Tirreno\Utils;
 
 class Logger {
     public static function log(?string $title, string|array $message): void {
-        $f3 = \Base::instance();
-        $logFile = $f3->get('LOG_FILE');
+        $logFile = tirreno('storage')->get('LOG_FILE');
         $logger = new \Log($logFile);
 
         if (is_array($message)) {
@@ -35,9 +34,8 @@ class Logger {
     }
 
     public static function logSql(string $title, string $message): void {
-        $f3 = \Base::instance();
-        $logFile = $f3->get('LOG_SQL_FILE');
-        $logDelimiter = $f3->get('LOG_DELIMITER');
+        $logFile = tirreno('storage')->get('LOG_SQL_FILE');
+        $logDelimiter = tirreno('storage')->get('LOG_DELIMITER');
 
         $logger = new \Log($logFile);
         $logger->write($title . ':' . PHP_EOL . $message . $logDelimiter);

@@ -18,10 +18,9 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class SessionStat extends Base {
-    protected ?string $DB_TABLE_NAME = 'event_session';
-
     public function getData(int $apiKey): array {
         $itemsByDate = [];
+
         $items = $this->getCounts($apiKey);
 
         foreach ($items as $item) {
@@ -34,11 +33,11 @@ class SessionStat extends Base {
         }
 
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
-        $datesRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(14, $offset);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
+        $datesRange = tirreno('utils')->dateRange->getLatestNDatesRangeFromRequest(14, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = tirreno('utils')->constants->CHART_RESOLUTION[tirreno('utils')->dateRange->getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
@@ -94,16 +93,16 @@ class SessionStat extends Base {
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(14);
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
+        $dateRange = tirreno('utils')->dateRange->getLatestNDatesRangeFromRequest(14);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            //':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
-            ':resolution'   => \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY,
-            ':id'           => \Tirreno\Utils\Conversion::getIntRequestParam('id'),
+            //':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
+            ':resolution'   => tirreno('utils')->constants->SECONDS_IN_DAY,
+            ':id'           => tirreno('utils')->conversion->getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];
 
@@ -142,7 +141,7 @@ class SessionStat extends Base {
                 event_session.created <= :end_time
 
             GROUP BY ts
-            ORDER BY ts'
+            ORDER BY ts ASC'
         );
 
         return $this->executeOnRangeById($query, $apiKey);

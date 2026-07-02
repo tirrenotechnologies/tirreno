@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Users extends Base {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
@@ -32,26 +30,26 @@ class Users extends Base {
     }
 
     private function getFirstLine(int $apiKey): array {
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
         if (!$dateRange) {
             $dateRange = [
                 'endDate' => date('Y-m-d H:i:s'),
                 'startDate' => date('Y-m-d H:i:s', 0),
             ];
         }
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
             ':offset'       => strval($offset),
-            ':high_inf'     => \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_INF,
-            //':high_sup'     => \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_SUP,
-            ':med_inf'      => \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_INF,
-            ':med_sup'      => \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_SUP,
-            ':low_inf'      => \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_INF,
-            ':low_sup'      => \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_SUP,
+            ':high_inf'     => tirreno('utils')->constants->USER_HIGH_SCORE_INF,
+            //':high_sup'     => tirreno('utils')->constants->USER_HIGH_SCORE_SUP,
+            ':med_inf'      => tirreno('utils')->constants->USER_MEDIUM_SCORE_INF,
+            ':med_sup'      => tirreno('utils')->constants->USER_MEDIUM_SCORE_SUP,
+            ':low_inf'      => tirreno('utils')->constants->USER_LOW_SCORE_INF,
+            ':low_sup'      => tirreno('utils')->constants->USER_LOW_SCORE_SUP,
         ];
 
         $query = (

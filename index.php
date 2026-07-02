@@ -18,7 +18,6 @@ declare(strict_types=1);
 session_name('CONSOLESESSION');
 
 ini_set('session.cookie_httponly', '1');
-ini_set('session.cookie_samesite', 'Strict');
 
 chdir(dirname(__FILE__));
 
@@ -44,59 +43,57 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     });
 }
 
-$f3 = \Base::instance();
+include './app/tirreno.php';
 
 //Load configuration file with all project variables
-$f3->config('config/config.ini');
+tirreno('router')->config('config/config.ini');
 
 //Load specific configuration only for local development
-$localConfigFile = \Tirreno\Utils\Variables::getConfigFile();
+$localConfigFile = tirreno('utils')->variables->getConfigFile();
 $localConfigFile = sprintf('config/%s', $localConfigFile);
 
 //Load local configuration file
 if (file_exists($localConfigFile)) {
-    $f3->config($localConfigFile);
+    tirreno('router')->config($localConfigFile);
 }
 
 //Use custom onError function
-$f3->set('ONERROR', \Tirreno\Utils\ErrorHandler::getOnErrorHandler());
+tirreno('storage')->set('ONERROR', tirreno('utils')->errorHandler->getOnErrorHandler());
 
-if (\Tirreno\Utils\Variables::getForceHttps() || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')) {
+if (tirreno('utils')->variables->getForceHttps() || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')) {
     ini_set('session.cookie_secure', '1');
 }
 
-if (!\Tirreno\Utils\Variables::completedConfig()) {
-    if (is_file("./install/index.php")) {
-        if (($f3->get('PATH') === '/' || $f3->get('PATH') === '/index.php')) {
-            $f3->reroute('./install/index.php');
+if (!tirreno('utils')->variables->completedConfig()) {
+    if (is_file('./install/index.php')) {
+        if ((tirreno('request')->getPath() === '/' || tirreno('request')->getPath() === '/index.php')) {
+            tirreno('response')->redirect('./install/index.php');
         } else {
             header('HTTP/1.1 404 Page Not Found');
-            echo 'Error ' . \Tirreno\Utils\ErrorCodes::INCOMPLETE_CONFIG . ' Configuration is missing. Please visit /install/ to continue.';
+            echo 'Error ' . tirreno('utils')->errorCodes->INCOMPLETE_CONFIG . ' Configuration is missing. Please visit /install/ to continue.';
             exit(0);
         }
     } else {
         header('HTTP/1.1 404 Page Not Found');
-        echo 'Error ' . \Tirreno\Utils\ErrorCodes::INCOMPLETE_CONFIG . ' Configuration and install/index.php are missing.';
+        echo 'Error ' . tirreno('utils')->errorCodes->INCOMPLETE_CONFIG . ' Configuration and install/index.php are missing.';
         exit(0);
     }
 }
 
 //Load routes configuration
-$f3->config('config/routes.ini');
-$f3->config('config/apiEndpoints.ini');
+tirreno('router')->config('config/routes.ini');
+tirreno('router')->config('config/apiEndpoints.ini');
 
 //Override F3 host
-\Tirreno\Utils\Access::cleanHost();
+tirreno('utils')->access->cleanHost();
 
-if (\Tirreno\Utils\Variables::getDB()) {
+if (tirreno('utils')->variables->getDB()) {
     //Load dictionary file
-    $f3->set('LOCALES', 'app/Dictionary/');
-    $f3->set('LANGUAGE', 'en');
+    tirreno('storage')->set('LOCALES', 'app/Dictionary/');
+    tirreno('storage')->set('LANGUAGE', 'en');
 
-    $constants = \Tirreno\Utils\Constants::get();
-    $cron = \Tirreno\Controllers\Cron::instance();
-
-    $f3->set('CONSTANTS', $constants);
+    // tmp load all assets pages
+    $pages = tirreno('assets')->pages->getAllPagesObjects();
 }
 
-$f3->run();
+tirreno('router')->run();

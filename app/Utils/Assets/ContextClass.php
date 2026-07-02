@@ -40,7 +40,7 @@ class ContextClass extends Base {
             self::validateClass($filename, $cls);
             $obj = new $cls();
         } catch (\Throwable $e) {
-            self::log('Context validation failed with error ' . $e->getMessage());
+            tirreno('log')->info('additional context file %s not found: %s.', $filename, $e->getMessage());
         }
 
         return $obj;

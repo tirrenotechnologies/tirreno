@@ -62,7 +62,7 @@ class DomainFound extends \Tirreno\Models\Enrichment\Base {
 
         $dates = [$this->creation_date, $this->expiration_date, $this->closest_snapshot, $this->discovery_date];
 
-        if (($this->ip && !\Tirreno\Utils\Conversion::filterIp($this->ip)) || !$this->validateDates($dates)) {
+        if (($this->ip && !tirreno('utils')->conversion->filterIp($this->ip)) || !$this->validateDates($dates)) {
             throw new \Exception('Validation failed');
         }
     }
@@ -92,7 +92,6 @@ class DomainFound extends \Tirreno\Models\Enrichment\Base {
                 event_domain.key = :key
         ");
 
-        $model = new \Tirreno\Models\Domain();
-        $model->execQuery($query, $params);
+        tirreno('models')->domain->execQuery($query, $params);
     }
 }

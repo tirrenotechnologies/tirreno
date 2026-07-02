@@ -16,13 +16,13 @@
 declare(strict_types=1);
 
 return [
-    'AdminLogbook_page_title' => 'Logbook',
-    'AdminLogbook_breadcrumb_title' => 'Logbook',
-    'AdminLogbook_table_title' => 'API requests',
-    'AdminLogbook_table_title_tooltip' => 'This page lists the processing statuses of the recent API requests for troubleshooting purposes.',
-    'AdminLogbook_search_placeholder' => 'Raw POST data, Endpoint, IP, Error',
-    'AdminLogbook_column_ip' => 'Source IP',
-    'AdminLogbook_column_ip_tooltip' => 'An IP address originated the request to endpoint.',
-    'AdminLogbook_column_endpoint' => 'Endpoint',
-    'AdminLogbook_column_endpoint_tooltip' => 'A requested endpoint.',
+    'logbook_page_title' => 'Logbook',
+    'logbook_breadcrumb_title' => 'Logbook',
+    'logbook_table_title' => 'Latest %s requests',
+    'logbook_table_title_tooltip' => 'This page lists the processing statuses of the recent API requests for troubleshooting purposes.',
+    'logbook_search_placeholder' => 'Raw POST data, Endpoint, IP, Error',
+    'logbook_column_ip' => 'Source IP',
+    'logbook_column_ip_tooltip' => 'An IP address originated the request to endpoint.',
+    'logbook_column_endpoint' => 'Endpoint',
+    'logbook_column_endpoint_tooltip' => 'A requested endpoint.',
 ];

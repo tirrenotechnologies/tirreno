@@ -19,11 +19,10 @@ namespace Tirreno\Crons;
 
 class DeletionQueueHandler extends BaseQueue {
     public function process(): void {
-        parent::baseProcess(\Tirreno\Utils\Constants::get()->DELETE_USER_QUEUE_ACTION_TYPE);
+        parent::baseProcess(tirreno('utils')->constants->DELETE_USER_QUEUE_ACTION_TYPE);
     }
 
     protected function processItem(array $item): void {
-        $user = new \Tirreno\Models\User();
-        $user->deleteAllUserData($item['event_account'], $item['key']);
+        tirreno('models')->user->deleteAllUserData($item['event_account'], $item['key']);
     }
 }

@@ -7,7 +7,11 @@ import {
     renderPhoneType,
     renderPhoneCarrierName,
     renderAsn,
-} from '../parts/DataRenderers.js?v=2';
+} from '../parts/DataRenderers.js?v=0.10.0';
+import {
+    replaceChildren,
+    closest,
+} from './utils/Functions.js?v=0.10.0';
 
 export class ManualCheckItems {
     constructor() {
@@ -287,7 +291,7 @@ export class ManualCheckItems {
 
         if (!td) return null;
 
-        const tr = td.closest('tr');
+        const tr = closest(td, 'tr');
 
         const valueTd = tr.lastElementChild;
         if (returnNode) {
@@ -308,7 +312,7 @@ export class ManualCheckItems {
         const item = this.getItem(itemId, true);
         if (item) {
             if (item instanceof Node) {
-                item.replaceChildren(value);
+                replaceChildren(item, value);
             } else {
                 item.innerHTML = value;
             }

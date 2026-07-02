@@ -1,4 +1,4 @@
-import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=0.10.0';
 import {
     renderDate,
     renderBoolean,
@@ -6,7 +6,7 @@ import {
     renderOs,
     renderBrowser,
     renderLanguage,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class DevicesGrid extends BaseGridWithPanel {
     get columnDefs() {

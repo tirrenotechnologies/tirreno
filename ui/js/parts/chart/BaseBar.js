@@ -1,7 +1,8 @@
-import {BaseChart}  from './BaseChart.js?v=2';
-import {formatIntTimeUtc} from '../utils/Date.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
-import {renderChartTooltipPart} from '../DataRenderers.js?v=2';
+import {BaseChart}  from './BaseChart.js?v=0.10.0';
+import {formatIntTimeUtc} from '../utils/Date.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
+import {renderChartTooltipPart} from '../DataRenderers.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
 export class BaseBarChart extends BaseChart {
     getSeries() {
@@ -197,7 +198,7 @@ export class BaseBarChart extends BaseChart {
             }
 
             if (frag.children.length > 1) {
-                seriestt.replaceChildren(frag);
+                replaceChildren(seriestt, frag);
 
                 seriestt.style.top = Math.round(u.valToPos(maxVal, u.series[maxIdx].scale)) + 'px';
                 seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';

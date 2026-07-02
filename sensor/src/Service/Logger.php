@@ -37,12 +37,12 @@ class Logger {
         fclose($out);
     }
 
-    public function logWarning(string $description, \Throwable $err = null): void {
+    public function logWarning(string $description, ?\Throwable $err = null): void {
         $info = $err !== null ? ': ' . $this->getDebugInfo($err) : '';
         $this->fflush(sprintf('Warning: %s %s', $description, $info), 'stdout');
     }
 
-    public function logError(\Throwable $err, string $description = null): void {
+    public function logError(\Throwable $err, ?string $description = null): void {
         $this->fflush(sprintf('Error: %s', $description ?? $this->getDebugInfo($err)), 'stderr');
     }
 

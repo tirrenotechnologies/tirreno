@@ -1,4 +1,4 @@
-import {BasePanel} from './BasePanel.js?v=2';
+import {BasePanel} from './BasePanel.js?v=0.10.0';
 import {
     renderPhone,
     renderDefaultIfEmptyElement,
@@ -8,14 +8,14 @@ import {
     renderUserCounter,
     renderBoolean,
     renderUsersList,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class PhonePanel extends BasePanel {
     constructor() {
         let eventParams = {
-            enrichment: true,
+            enrichmentUrl: `${window.app_base}/phoneReenrichment`,
             type: 'phone',
-            url: `${window.app_base}/admin/phoneDetails`,
+            url: `${window.app_base}/phoneDetails`,
             cardId: 'phone-card',
             panelClosed: 'phonePanelClosed',
             closePanel: 'closePhonePanel',

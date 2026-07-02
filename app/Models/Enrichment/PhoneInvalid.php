@@ -66,7 +66,6 @@ class PhoneInvalid extends \Tirreno\Models\Enrichment\Base {
                 event_phone.key = :key
         ");
 
-        $model = new \Tirreno\Models\Phone();
-        $model->execQuery($query, $params);
+        tirreno('models')->phone->execQuery($query, $params);
     }
 }

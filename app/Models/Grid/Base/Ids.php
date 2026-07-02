@@ -17,23 +17,5 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Grid\Base;
 
-class Ids extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
-
-    private ?int $apiKey = null;
-
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-    }
-
-    public function execute(string $query, array $params): array {
-        $params[':api_key'] = $this->apiKey;
-
-        $data = $this->execQuery($query, $params);
-        $results = array_column($data, 'itemid');
-
-        return count($results) ? $results : [-1];
-    }
+abstract class Ids {
 }

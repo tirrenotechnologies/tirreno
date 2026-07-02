@@ -18,9 +18,9 @@ declare(strict_types=1);
 return [
     'Top10_ip' => 'IP',
     'Top10_ips' => 'IPs',
-    'Top10_user' => 'User',
-    'Top10_users' => 'Users',
-    'Top10_events' => 'Activities',
+    'Top10_user' => 'Entity',
+    'Top10_users' => 'Entities',
+    'Top10_events' => 'Events',
     'Top10_country' => 'Country',
     'Top10_resource' => 'Resource',
     'Top10_attempts' => 'Attempts',

@@ -5,15 +5,14 @@
         <input type="hidden" name="keyId" value="{{ @apiKeyId }}">
 
         <header class="card-header">
-            <div class="card-header-title">{{ @AdminRetentionPolicy_form_title }}<p class="tooltip-info tooltip" title="{{ @AdminRetentionPolicy_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            <div class="card-header-title">{{ @settings_retentionPolicy_form_title }}<p class="tooltip-info tooltip" title="{{ @settings_retentionPolicy_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
             </div>
         </header>
 
         <div class="card-content">
             <div class="content">
-                {{ @AdminRetentionPolicy_form_field_policy_warning }}
                 <div class="field">
-                    <label class="label">{{ @AdminRetentionPolicy_form_field_policy_label }}</label>
+                    <label class="label">{{ @settings_retentionPolicy_form_field_policy_label }}</label>
                     <div class="control">
                         <div class="selector">
                             <select class="input" name="retention-policy" id="retention-policy">
@@ -26,11 +25,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="field">
+                    <label class="label"></label>
+                    <div class="control">
+                        <div class="neutral-text level-right">{{ @settings_retentionPolicy_form_field_policy_warning }}</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-primary" value="{{ @AdminRetentionPolicy_form_button_save }}">
+            <input type="submit" class="button is-primary" value="{{ @settings_retentionPolicy_form_button_save }}">
         </footer>
     </form>
 </div>

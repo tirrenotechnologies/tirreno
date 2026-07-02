@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'AdminDevices_page_title' => 'Devices',
-    'AdminDevices_breadcrumb_title' => 'Devices',
-    'AdminDevices_search_placeholder' => 'Device Type, OS, Browser or User Agent',
+    'devices_page_title' => 'Devices',
+    'devices_breadcrumb_title' => 'Devices',
+    'devices_search_placeholder' => 'Device Type, OS, Browser or User Agent',
 
-    'AdminDevices_table_title' => 'User agent',
-    'AdminDevices_table_title_tooltip' => 'This page provides device information identified based on the requests’ user agents. The data is shown for a selected period of time. To view more information about a device, click on a table row. The chart illustrates the daily number of active devices, categorized as desktop or mobile, with bots being distinguished in a separate category.',
+    'devices_table_title' => 'User agents',
+    'devices_table_title_tooltip' => 'This page provides device information identified based on the requests\' user agents. The data is shown for a selected period of time. To view more information about a device, click on a table row. The chart illustrates the daily number of active devices, categorized as desktop or mobile, with bots being distinguished in a separate category.',
 ];

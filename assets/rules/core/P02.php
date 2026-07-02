@@ -8,7 +8,7 @@ class P02 extends \Tirreno\Assets\Rule {
     public const ATTRIBUTES = ['phone'];
 
     protected function prepareParams(array $params): array {
-        $params['lp_country_code_in_eip_country_id'] = \Tirreno\Utils\Rules::checkPhoneCountryMatchIp($params);
+        $params['lp_country_code_in_eip_country_id'] = tirreno('utils')->rules->checkPhoneCountryMatchIp($params);
 
         return $params;
     }

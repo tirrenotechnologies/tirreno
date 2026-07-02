@@ -1,10 +1,10 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {IpTypeFilter} from '../parts/choices/IpTypeFilter.js?v=2';
-import {IpsChart} from '../parts/chart/Ips.js?v=2';
-import {IpsGrid} from '../parts/grid/Ips.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {IpTypeFilter} from '../parts/choices/IpTypeFilter.js?v=0.10.0';
+import {IpsChart} from '../parts/chart/Ips.js?v=0.10.0';
+import {IpsGrid} from '../parts/grid/Ips.js?v=0.10.0';
 
 export class IpsPage extends BasePage {
     constructor() {
@@ -23,12 +23,12 @@ export class IpsPage extends BasePage {
         };
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadIps`,
+            url:        `${window.app_base}/loadIps`,
             tileId:     'totalIps',
             tableId:    'ips-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadIpsTimeFrameTotal`,
             totals: {
                 type: 'ip',
                 columns: ['total_visit'],
@@ -42,9 +42,16 @@ export class IpsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadIpsChart`,
+            getParams:  this.getParamsSection,
+        };
 
-        new IpsChart(chartParams);
-        new IpsGrid(gridParams);
+        const elements = [
+            [IpsChart,    chartParams],
+            [IpsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

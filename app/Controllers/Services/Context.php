@@ -1,0 +1,395 @@
+<?php
+
+/**
+ * tirreno ~ open-source security framework
+ * Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Tirreno Technologies Sàrl (https://www.tirreno.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.tirreno.com Tirreno(tm)
+ */
+
+declare(strict_types=1);
+
+namespace Tirreno\Controllers\Services;
+
+class Context extends \Tirreno\Controllers\Services\Base {
+    private \Tirreno\Models\Context\User $userModel;
+    private \Tirreno\Models\Context\Ip $ipModel;
+    private \Tirreno\Models\Context\Device $deviceModel;
+    private \Tirreno\Models\Context\Email $emailModel;
+    private \Tirreno\Models\Context\Phone $phoneModel;
+    private \Tirreno\Models\Context\Event $eventModel;
+    private \Tirreno\Models\Context\Session $sessionModel;
+
+    private ?\Tirreno\Assets\Context $extraModel;
+
+    private array $suspiciousWordsUrl;
+    private array $suspiciousWordsUserAgent;
+    private array $suspiciousWordsEmail;
+    private array $suspiciousAsns;
+    private array $aiBots;
+
+    public function __construct() {
+        $this->userModel    = new \Tirreno\Models\Context\User();
+        $this->ipModel      = new \Tirreno\Models\Context\Ip();
+        $this->deviceModel  = new \Tirreno\Models\Context\Device();
+        $this->emailModel   = new \Tirreno\Models\Context\Email();
+        $this->phoneModel   = new \Tirreno\Models\Context\Phone();
+        $this->eventModel   = new \Tirreno\Models\Context\Event();
+        $this->sessionModel = new \Tirreno\Models\Context\Session();
+
+        $this->extraModel   = tirreno('assets')->context->getContextObj();
+
+        $this->suspiciousWordsUrl       = tirreno('assets')->urlList->getList();
+        $this->suspiciousWordsUserAgent = tirreno('assets')->userAgentList->getList();
+        $this->suspiciousWordsEmail     = tirreno('assets')->emailList->getList();
+        $this->suspiciousAsns           = tirreno('assets')->asnList->getList();
+        $this->aiBots                   = tirreno('assets')->aiBotList->getList();
+    }
+
+    public function getContextByAccountIds(array $accountIds, int $apiKey): array {
+        return $this->getContext($accountIds, $apiKey);
+    }
+
+    public function getContextByAccountId(int $accountId, int $apiKey): array {
+        $accountIds = [$accountId];
+        $context = $this->getContext($accountIds, $apiKey);
+
+        return $context[$accountId] ?? [];
+    }
+
+    public function getContext(array $accountIds, int $apiKey): array {
+        $userDetails        = $this->userModel->getContext($accountIds, $apiKey);
+        $ipDetails          = $this->ipModel->getContext($accountIds, $apiKey);         // 43
+        $deviceDetails      = $this->deviceModel->getContext($accountIds, $apiKey);     // 6
+        $emailDetails       = $this->emailModel->getContext($accountIds, $apiKey);
+        $phoneDetails       = $this->phoneModel->getContext($accountIds, $apiKey);
+        $eventDetails       = $this->eventModel->getContext($accountIds, $apiKey);      // 30
+        //$domainDetails    = $this->domainModel->getContext($accountIds, $apiKey);
+        $extraDetails       = $this->extraModel?->getContext($accountIds, $apiKey) ?? [];
+
+        $timezoneName       = tirreno('models')->apiKeys->getTimezoneByKeyId($apiKey);
+        $utcTime            = new \DateTime('now', tirreno('utils')->timezones->getUtcTimezone());
+        $timezone           = tirreno('utils')->timezones->getTimezone($timezoneName);
+        $offsetInSeconds    = $timezone->getOffset($utcTime);
+
+        // get only suspicious sessions
+        $sessionDetails     = $this->sessionModel->getContext($accountIds, $apiKey, $offsetInSeconds);  // 17
+
+        $ip = [];
+        $device = [];
+        $email = [];
+        $phone = [];
+        $events = [];
+        $session = [];
+        $extra = [];
+
+        //Extend user details context
+        foreach ($userDetails as $user) {
+            $user['le_exists']      = ($user['le_email'] ?? null) !== null;
+            $user['le_email']       = $user['le_email'] ?? '';
+            $user['le_local_part']  = explode('@', $user['le_email'])[0];
+            $user['le_domain_part'] = explode('@', $user['le_email'])[1] ?? '';
+
+            $userId     = $user['ea_id'];
+            $ip         = $ipDetails[$userId] ?? [];
+            $device     = $deviceDetails[$userId] ?? [];
+            $email      = $emailDetails[$userId] ?? [];
+            $phone      = $phoneDetails[$userId] ?? [];
+            $events     = $eventDetails[$userId] ?? [];
+            $session    = $sessionDetails[$userId] ?? [];
+            $extra      = $extraDetails[$userId] ?? [];
+
+            // get ip cidr and country from eip_ip_id, look them up at eip_cidr_count, eip_country_count
+            $user['eip_ip_id']              = $ip['eip_ip_id'] ?? [];
+            $user['eip_cidr_count']         = $ip['eip_cidr_count'] ?? [];
+            $user['eip_country_count']      = $ip['eip_country_count'] ?? [];
+
+            $user['eip_country_id']         = $ip['eip_country_id'] ?? [];
+            $user['eip_asn']                = $ip['eip_asn'] ?? [];
+            $user['eip_data_center']        = $ip['eip_data_center'] ?? null;
+            $user['eip_tor']                = $ip['eip_tor'] ?? null;
+            $user['eip_vpn']                = $ip['eip_vpn'] ?? null;
+            $user['eip_relay']              = $ip['eip_relay'] ?? null;
+            $user['eip_starlink']           = $ip['eip_starlink'] ?? null;
+            $user['eip_blocklist']          = $ip['eip_blocklist'] ?? null;
+            $user['eip_shared']             = $ip['eip_shared'] ?? 0;
+            $user['eip_has_fraud']          = $ip['eip_has_fraud'] ?? null;
+            //$user['eip_domains']          = $ip['eip_domains'] ?? [];
+            $user['eip_domains_count_len']  = $ip['eip_domains_count_len'] ?? 0;
+            $user['eip_unique_cidrs']       = $ip['eip_unique_cidrs'] ?? 0;
+            $user['eip_asns']               = $ip['eip_asns'] ?? [];
+
+            $user['eup_device']             = $device['eup_device'] ?? [];
+            $user['eup_device_id']          = $device['eup_device_id'] ?? [];
+            $user['eup_browser_name']       = $device['eup_browser_name'] ?? [];
+            $user['eup_browser_version']    = $device['eup_browser_version'] ?? [];
+            $user['eup_os_name']            = $device['eup_os_name'] ?? [];
+            $user['eup_lang']               = $device['eup_lang'] ?? [];
+            $user['eup_ua']                 = $device['eup_ua'] ?? [];
+            // $user['eup_lastseen']        = $device['eup_lastseen'] ?? [];
+            // $user['eup_created']         = $device['eup_created'] ?? [];
+
+            $user['ee_email']               = $email['ee_email'] ?? [];
+            $user['ee_earliest_breach']     = $email['ee_earliest_breach'] ?? [];
+
+            $user['ep_phone_number']        = $phone['ep_phone_number'] ?? [];
+            $user['ep_shared']              = $phone['ep_shared'] ?? [];
+            $user['ep_type']                = $phone['ep_type'] ?? [];
+
+            $user['event_ip']               = $events['event_ip'] ?? [];
+            $user['event_url_string']       = $events['event_url_string'] ?? [];
+            $user['event_empty_referer']    = $events['event_empty_referer'] ?? [];
+            $user['event_device']           = $events['event_device'] ?? [];
+            $user['event_type']             = $events['event_type'] ?? [];
+            $user['event_http_method']      = $events['event_http_method'] ?? [];
+            $user['event_http_code']        = $events['event_http_code'] ?? [];
+            $user['event_device_created']   = $events['event_device_created'] ?? [];
+            $user['event_device_lastseen']  = $events['event_device_lastseen'] ?? [];
+
+            $user['event_session_single_event']     = $session['event_session_single_event'][0] ?? null;
+            $user['event_session_multiple_country'] = $session['event_session_multiple_country'][0] ?? null;
+            $user['event_session_multiple_ip']      = $session['event_session_multiple_ip'][0] ?? null;
+            $user['event_session_multiple_device']  = $session['event_session_multiple_device'][0] ?? null;
+            $user['event_session_night_time']       = $session['event_session_night_time'][0] ?? null;
+
+            //Extra params for rules
+            $this->extendParams($user);
+            $this->extendEventParams($user);
+
+            $this->extraModel?->expandContext($extra, $user);
+
+            $userDetails[$userId] = $user;
+        }
+
+        return $userDetails;
+    }
+
+    // event_session_stat has:
+    //  session duration in s
+    //  ips count per session
+    //  device count per session
+    //  event_count per session
+    //  country count per session
+    //  new ips count per session
+    //  new devices count per session
+    //  http codes list and count
+    //  event types list and count
+    //  completed mark
+
+    // most heavy: ip, event, session, device
+
+    private function extendParams(array &$record): void {
+        //$record['timezone']
+
+        $localPartLen   = strlen($record['le_local_part']);
+        $domainPartLen  = strlen($record['le_domain_part']);
+        $fullName       = $this->getUserFullName($record);
+
+        $record['le_local_part_len']                = $localPartLen;
+        $record['ea_fullname_has_numbers']          = preg_match('~[0-9]+~', $fullName) > 0;
+        $record['ea_fullname_has_spaces_hyphens']   = preg_match('~[\-\s]~', $fullName) > 0;
+        $record['ea_days_since_account_creation']   = $this->getDaysSinceAccountCreation($record);
+        $record['ea_days_since_last_visit']         = $this->getDaysSinceLastVisit($record);
+
+        //$record['le_has_no_profiles']               = $record['le_profiles'] === 0;
+        $record['le_has_no_data_breaches']          = $record['le_data_breach'] === false;
+        $record['le_has_suspicious_str']            = $this->checkEmailForSuspiciousString($record);
+        $record['le_has_numeric_only_local_part']   = preg_match('/^[0-9]+$/', $record['le_local_part']) > 0;
+        $record['le_email_has_consec_s_chars']      = preg_match('/[^a-zA-Z0-9]{2,}/', $record['le_local_part']) > 0;
+        $record['le_email_has_consec_nums']         = preg_match('/\d{2}/', $record['le_local_part']) > 0;
+        $record['le_email_has_no_digits']           = !preg_match('/\d/', $record['le_local_part']);
+        $record['le_email_has_vowels']              = preg_match('/[aeoui]/i', $record['le_local_part']) > 0;
+        $record['le_email_has_consonants']          = preg_match('/[bcdfghjklmnpqrstvwxyz]/i', $record['le_local_part']) > 0;
+
+        $record['le_with_long_local_part_length']   = $localPartLen > tirreno('utils')->constants->RULE_EMAIL_MAXIMUM_LOCAL_PART_LENGTH;
+        $record['le_with_long_domain_length']       = $domainPartLen > tirreno('utils')->constants->RULE_EMAIL_MAXIMUM_DOMAIN_LENGTH;
+        $record['le_email_in_blockemails']          = $record['le_blockemails'] ?? false;
+        $record['le_is_invalid']                    = $record['le_exists'] && !tirreno('utils')->conversion->filterEmail($record['le_email']);
+
+        $record['le_appears_on_alert_list']         = $record['le_alert_list'] ?? false;
+
+        $record['ld_is_disposable']                 = $record['ld_disposable_domains'] ?? false;
+        $record['ld_days_since_domain_creation']    = $this->getDaysSinceDomainCreation($record);
+        $record['ld_domain_free_email_provider']    = $record['ld_free_email_provider'] ?? false;
+        $record['ld_from_blockdomains']             = $record['ld_blockdomains'] ?? false;
+        $record['ld_domain_without_mx_record']      = $record['ld_mx_record'] === false;
+        $record['ld_website_is_disabled']           = $record['ld_disabled'] ?? false;
+        $record['ld_tranco_rank']                   = $record['ld_tranco_rank'] ?? -1;
+
+        $record['lp_invalid_phone'] = $record['lp_invalid'] === true;
+        $record['ep_shared_phone']  = (bool) count(array_filter($record['ep_shared'], static function ($item) {
+            return $item !== null && $item > 1;
+        }));
+
+        $daysSinceBreaches = array_map(function ($item) {
+            return $this->getDaysTillToday($item);
+        }, $record['ee_earliest_breach']);
+
+        $record['ee_days_since_first_breach'] = count($daysSinceBreaches) ? max($daysSinceBreaches) : -1;
+
+        $onlyNonResidentialParams = !($record['eip_has_fraud']
+            || $record['eip_blocklist']
+            || $record['eip_tor']
+            || $record['eip_starlink']
+            || $record['eip_relay']
+            || $record['eip_vpn']
+            || $record['eip_data_center']
+        );
+
+        $record['eip_only_residential'] = $onlyNonResidentialParams && !in_array(0, $record['eip_country_id']);
+        $record['eip_suspicious_asn']   = boolval(count(array_intersect($record['eip_asn'], $this->suspiciousAsns)));
+        $record['lp_fraud_detected']    = $record['lp_fraud_detected'] ?? false;
+        $record['le_fraud_detected']    = $record['le_fraud_detected'] ?? false;
+
+        $record['eup_has_rare_browser'] = (bool) count(array_diff($record['eup_browser_name'], array_keys(tirreno('utils')->constants->RULE_REGULAR_BROWSER_NAMES)));
+        $record['eup_has_rare_os']      = (bool) count(array_diff($record['eup_os_name'], tirreno('utils')->constants->RULE_REGULAR_OS_NAMES));
+        $record['eup_device_count']     = count($record['eup_device']);
+
+        $record['eup_vulnerable_ua']    = false;
+        $record['eup_empty_ua']         = false;
+
+        foreach ($record['eup_ua'] as $useragent) {
+            if ($useragent === null || $useragent === '') {
+                $record['eup_empty_ua'] = true;
+            } elseif (count($this->suspiciousWordsUserAgent)) {
+                foreach ($this->suspiciousWordsUserAgent as $sub) {
+                    if (stripos($useragent, $sub) !== false) {
+                        $record['eup_vulnerable_ua'] = true;
+                        break;
+                    }
+                }
+            }
+            if ($record['eup_vulnerable_ua'] && $record['eup_empty_ua']) {
+                break;
+            }
+        }
+
+        $record['eup_empty_lang']       = in_array(null, $record['eup_lang'], true) || in_array('', $record['eup_lang'], true);
+        $record['eup_ai_bot']           = boolval(count(array_intersect($record['eup_os_name'], $this->aiBots)));
+    }
+
+    private function extendEventParams(array &$record): void {
+        // Remove null values specifically
+        $eventTypeFiltered                  = $this->filterStringNum($record['event_type']);
+        $eventHttpCodeFiltered              = $this->filterStringNum($record['event_http_code']);
+
+        $eventTypeCount                     = array_count_values($eventTypeFiltered);
+
+        //$accountLoginFailId = tirreno('utils')->constants->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
+        $accountEmailChangeId               = tirreno('utils')->constants->ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID;
+        $accountPwdChangeId                 = tirreno('utils')->constants->ACCOUNT_PASSWORD_CHANGE_EVENT_TYPE_ID;
+
+        //$record['event_failed_login_attempts'] = $eventTypeCount[$accountLoginFailId] ?? 0;
+        $record['event_email_changed']      = array_key_exists($accountEmailChangeId, $eventTypeCount);
+        $record['event_password_changed']   = array_key_exists($accountPwdChangeId, $eventTypeCount);
+
+        $record['event_http_method_head']   = in_array(tirreno('utils')->constants->EVENT_REQUEST_TYPE_HEAD, $record['event_http_method']);
+
+        $record['event_empty_referer']      = in_array(true, $record['event_empty_referer'], true);
+
+        $clientErrors   = 0;
+        $serverErrors   = 0;
+        $successEvents  = 0;
+        foreach ($eventHttpCodeFiltered as $code) {
+            if (is_int($code) && $code >= 400 && $code < 500) {
+                ++$clientErrors;
+            } elseif (is_int($code) && $code >= 500 && $code < 600) {
+                ++$serverErrors;
+            } elseif (is_int($code) && $code >= 200 && $code < 300) {
+                ++$successEvents;
+            }
+        }
+
+        $record['event_multiple_5xx_http']  = $serverErrors;
+        $record['event_multiple_4xx_http']  = $clientErrors;
+
+        $record['event_2xx_http']           = (bool) $successEvents;
+
+        $record['event_vulnerable_url']     = false;
+
+        if (count($this->suspiciousWordsUrl)) {
+            foreach ($record['event_url_string'] as $url) {
+                foreach ($this->suspiciousWordsUrl as $sub) {
+                    if (stripos($url, $sub) !== false) {
+                        $record['event_vulnerable_url'] = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+    }
+
+    private function getDaysSinceDomainCreation(array $params): int {
+        $dt1 = date('Y-m-d');
+        $dt2 = $params['ld_creation_date'];
+
+        return $this->getDaysDiff($dt1, $dt2);
+    }
+
+    private function getDaysSinceAccountCreation(array $params): int {
+        $dt1 = date('Y-m-d');
+        $dt2 = $params['ea_created'] ?? null;
+
+        return $this->getDaysDiff($dt1, $dt2);
+    }
+
+    private function getDaysSinceLastVisit(array $params): int {
+        $dt1 = date('Y-m-d');
+        $dt2 = $params['ea_lastseen'] ?? null;
+
+        return $this->getDaysDiff($dt1, $dt2);
+    }
+
+    private function getDaysTillToday(?string $dt2): int {
+        return $this->getDaysDiff(date('Y-m-d'), $dt2);
+    }
+
+    private function getDaysDiff(?string $dt1, ?string $dt2): int {
+        $diff = -1;
+
+        if ($dt2) {
+            $dt1 = new \DateTime($dt1);
+            $dt2 = new \DateTime($dt2);
+            $diff = $dt1->diff($dt2)->format('%a');
+        }
+
+        return tirreno('utils')->conversion->intVal($diff, 0);
+    }
+
+    private function getUserFullName(array $record): string {
+        $name = [];
+        $fName = $record['ea_firstname'] ?? '';
+        if ($fName) {
+            $name[] = $fName;
+        }
+
+        $lName = $record['ea_lastname'] ?? '';
+        if ($lName) {
+            $name[] = $lName;
+        }
+
+        return trim(join(' ', $name));
+    }
+
+    private function checkEmailForSuspiciousString(array $record): bool {
+        foreach ($this->suspiciousWordsEmail as $sub) {
+            if (stripos($record['le_email'], $sub) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function filterStringNum(array $record): array {
+        return array_filter($record, static function ($value): bool {
+            return is_string($value) || is_int($value);
+        });
+    }
+}

@@ -1,4 +1,4 @@
-import {BasePanel} from './BasePanel.js?v=2';
+import {BasePanel} from './BasePanel.js?v=0.10.0';
 import {
     renderEmail,
     renderReputation,
@@ -7,14 +7,14 @@ import {
     renderDate,
     renderClickableDomain,
     renderHttpCode,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class EmailPanel extends BasePanel {
     constructor() {
         let eventParams = {
-            enrichment: true,
+            enrichmentUrl: `${window.app_base}/emailReenrichment`,
             type: 'email',
-            url: `${window.app_base}/admin/emailDetails`,
+            url: `${window.app_base}/emailDetails`,
             cardId: 'email-card',
             panelClosed: 'emailPanelClosed',
             closePanel: 'closeEmailPanel',

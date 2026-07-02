@@ -11,34 +11,20 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Validators.
  *
- * Covered (unit-testable without refactor):
- * - CSRF-only validators (purely depend on Access::CSRFTokenValid + F3 session):
- *   - Validators::validateCheckUpdates()
- *   - Validators::validateCloseAccount()
- *   - Validators::validateRefreshRules()
- * - Presence-only validators after CSRF (no DB, no Audit, no Models, no Routes):
- *   - Validators::validateLogin():
- *     - EMAIL_DOES_NOT_EXIST when missing email (and CSRF ok)
- *     - PASSWORD_DOES_NOT_EXIST when missing password (and CSRF ok)
- * - Password recovering key presence (no DB, only param presence checks):
- *   - Validators::validatePasswordRecovering() returns RENEW_KEY_DOES_NOT_EXIST when renewKey is missing
- * - Change email page key presence (no DB, only param presence checks):
- *   - Validators::validateChangeEmailPage() returns CHANGE_EMAIL_KEY_DOES_NOT_EXIST when renewKey is missing
+ * Covered:
+ * - Validators::validateCheckUpdates()
+ * - Validators::validateCloseAccount()
+ * - Validators::validateRefreshRules()
+ * - Validators::validateLogin()
+ * - Validators::validateForgotPassword()
+ * - Validators::validatePasswordRecoveringPost()
+ * - Validators::validatePasswordRecovering() renewKey presence branch
  *
- * Not covered (unstable without refactor):
- * - Any validator that touches:
- *   - Models (Operator, keyIds, keyIdCoOwner, ForgotPassword, ChangeEmail, ...)
- *   - Audit::instance()
- *   - Variables::getAvailableTimezones(), Variables::getEnrichmentApi()
- *   - Constants::get(...)
- *   - Routes::getCurrentRequestOperator()
- *   - Access::checkCurrentOperatorkeyIdAccess(), Access::getCurrentOperatorId(), ...
+ * @todo Cover validators that depend on models, Audit, variables,
+ *       constants, routes, assets or current operator context after those
+ *       dependencies can be replaced in tests.
  *
- * @todo Refactor:
- * - extract CsrfValidatorInterface (avoid Access::CSRFTokenValid + Base::instance())
- * - extract RequestContextInterface (F3 wrapper for SESSION/config)
- * - inject external dependencies (Audit, Variables, Constants, Models)
- * - split monolithic Validators into per-action validator classes
+ * @todo Split monolithic Validators into per-action validator classes.
  */
 final class ValidatorsTest extends TestCase {
     private \Base $f3;
@@ -49,6 +35,7 @@ final class ValidatorsTest extends TestCase {
     /** @var list<string> */
     private array $f3Keys = [
         'SESSION',
+        'MIN_PASSWORD_LENGTH',
     ];
 
     protected function setUp(): void {
@@ -58,9 +45,12 @@ final class ValidatorsTest extends TestCase {
 
         $this->backupF3();
         $this->clearF3();
+
+        $this->f3->set('MIN_PASSWORD_LENGTH', 8);
     }
 
     protected function tearDown(): void {
+        $this->clearF3();
         $this->restoreF3();
 
         parent::tearDown();
@@ -146,33 +136,33 @@ final class ValidatorsTest extends TestCase {
 
     public static function validateLoginProvider(): array {
         return [
-            'csrf invalid -> csrf error (short-circuit)' => [
+            'csrf invalid -> csrf error' => [
                 'params' => [
                     'token' => 'a',
                     'email' => 'user@example.com',
-                    'password' => 'pass',
+                    'password' => 'password',
                 ],
                 'sessionCsrf' => 'b',
                 'expected' => ErrorCodes::CSRF_ATTACK_DETECTED,
             ],
-            'csrf ok + missing email -> email missing error' => [
+            'csrf ok + missing email -> email missing' => [
                 'params' => [
                     'token' => 'a',
-                    'password' => 'pass',
+                    'password' => 'password',
                 ],
                 'sessionCsrf' => 'a',
                 'expected' => ErrorCodes::EMAIL_DOES_NOT_EXIST,
             ],
-            'csrf ok + empty email -> email missing error' => [
+            'csrf ok + empty email -> email missing' => [
                 'params' => [
                     'token' => 'a',
                     'email' => '',
-                    'password' => 'pass',
+                    'password' => 'password',
                 ],
                 'sessionCsrf' => 'a',
                 'expected' => ErrorCodes::EMAIL_DOES_NOT_EXIST,
             ],
-            'csrf ok + missing password -> password missing error' => [
+            'csrf ok + missing password -> password missing' => [
                 'params' => [
                     'token' => 'a',
                     'email' => 'user@example.com',
@@ -180,7 +170,7 @@ final class ValidatorsTest extends TestCase {
                 'sessionCsrf' => 'a',
                 'expected' => ErrorCodes::PASSWORD_DOES_NOT_EXIST,
             ],
-            'csrf ok + empty password -> password missing error' => [
+            'csrf ok + empty password -> password missing' => [
                 'params' => [
                     'token' => 'a',
                     'email' => 'user@example.com',
@@ -193,7 +183,122 @@ final class ValidatorsTest extends TestCase {
                 'params' => [
                     'token' => 'a',
                     'email' => 'user@example.com',
-                    'password' => 'pass',
+                    'password' => 'password',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider validateForgotPasswordProvider
+     */
+    public function testValidateForgotPassword(array $params, mixed $sessionCsrf, int|false $expected): void {
+        $this->setF3('SESSION.csrf', $sessionCsrf);
+
+        $actual = Validators::validateForgotPassword($params);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function validateForgotPasswordProvider(): array {
+        return [
+            'csrf invalid -> csrf error' => [
+                'params' => [
+                    'token' => 'a',
+                    'email' => 'user@example.com',
+                ],
+                'sessionCsrf' => 'b',
+                'expected' => ErrorCodes::CSRF_ATTACK_DETECTED,
+            ],
+            'csrf ok + missing email -> email missing' => [
+                'params' => [
+                    'token' => 'a',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::EMAIL_DOES_NOT_EXIST,
+            ],
+            'csrf ok + empty email -> email missing' => [
+                'params' => [
+                    'token' => 'a',
+                    'email' => '',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::EMAIL_DOES_NOT_EXIST,
+            ],
+            'csrf ok + email present -> false' => [
+                'params' => [
+                    'token' => 'a',
+                    'email' => 'user@example.com',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider validatePasswordRecoveringPostProvider
+     */
+    public function testValidatePasswordRecoveringPost(array $params, mixed $sessionCsrf, int|false $expected): void {
+        $this->setF3('SESSION.csrf', $sessionCsrf);
+
+        $actual = Validators::validatePasswordRecoveringPost($params);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function validatePasswordRecoveringPostProvider(): array {
+        return [
+            'csrf invalid -> csrf error' => [
+                'params' => [
+                    'token' => 'a',
+                    'new-password' => 'password123',
+                    'password-confirmation' => 'password123',
+                ],
+                'sessionCsrf' => 'b',
+                'expected' => ErrorCodes::CSRF_ATTACK_DETECTED,
+            ],
+            'csrf ok + missing new password -> missing new password' => [
+                'params' => [
+                    'token' => 'a',
+                    'password-confirmation' => 'password123',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::NEW_PASSWORD_DOES_NOT_EXIST,
+            ],
+            'csrf ok + short new password -> password too short' => [
+                'params' => [
+                    'token' => 'a',
+                    'new-password' => 'short',
+                    'password-confirmation' => 'short',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::PASSWORD_IS_TOO_SHORT,
+            ],
+            'csrf ok + missing confirmation -> confirmation missing' => [
+                'params' => [
+                    'token' => 'a',
+                    'new-password' => 'password123',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::PASSWORD_CONFIRMATION_MISSING,
+            ],
+            'csrf ok + passwords mismatch -> passwords not equal' => [
+                'params' => [
+                    'token' => 'a',
+                    'new-password' => 'password123',
+                    'password-confirmation' => 'password456',
+                ],
+                'sessionCsrf' => 'a',
+                'expected' => ErrorCodes::PASSWORDS_ARE_NOT_EQUAL,
+            ],
+            'csrf ok + valid passwords -> false' => [
+                'params' => [
+                    'token' => 'a',
+                    'new-password' => 'password123',
+                    'password-confirmation' => 'password123',
                 ],
                 'sessionCsrf' => 'a',
                 'expected' => false,
@@ -221,7 +326,9 @@ final class ValidatorsTest extends TestCase {
                 'expected' => ErrorCodes::RENEW_KEY_DOES_NOT_EXIST,
             ],
             'empty renewKey -> renew key missing' => [
-                'params' => ['renewKey' => ''],
+                'params' => [
+                    'renewKey' => '',
+                ],
                 'expected' => ErrorCodes::RENEW_KEY_DOES_NOT_EXIST,
             ],
         ];
@@ -252,12 +359,6 @@ final class ValidatorsTest extends TestCase {
     }
 
     private function restoreF3(): void {
-        foreach ($this->f3Keys as $key) {
-            $this->f3->clear($key);
-        }
-
-        $this->f3->clear('SESSION.csrf');
-
         foreach ($this->f3Backup as $key => $value) {
             $this->f3->set($key, $value);
         }

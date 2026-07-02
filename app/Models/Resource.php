@@ -17,10 +17,10 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Resource extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected ?string $DB_TABLE_NAME = 'event';
+class Resource extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
+    protected string $tableName = 'event_url';
 
-    public function getResourceById(int $resourceId): array {
+    public function getResourceById(int $resourceId, int $apiKey): array {
         $query = (
             'SELECT
                 url,
@@ -31,11 +31,13 @@ class Resource extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\Ap
                 event_url
 
             WHERE
-                event_url.id = :resource_id'
+                event_url.id = :resource_id AND
+                event_url.key = :api_key'
         );
 
         $params = [
-            ':resource_id' => $resourceId,
+            ':resource_id'  => $resourceId,
+            ':api_key'      => $apiKey,
         ];
 
         $results = $this->execQuery($query, $params);
@@ -117,7 +119,7 @@ class Resource extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\Ap
 
         $totalIp = $this->execQuery($query, $params);
 
-        $params[':field_edit'] = \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID;
+        $params[':field_edit'] = tirreno('utils')->constants->FIELD_EDIT_EVENT_TYPE_ID;
         $query = (
             "SELECT
                 event.url   AS id,
@@ -171,7 +173,7 @@ class Resource extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\Ap
 
         [$params, $flatIds] = $this->getArrayPlaceholders($ids);
         $params[':key'] = $apiKey;
-        $params[':field_edit'] = \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID;
+        $params[':field_edit'] = tirreno('utils')->constants->FIELD_EDIT_EVENT_TYPE_ID;
         $extraClause = $force ? '' : ' AND event_url.lastseen >= event_url.updated';
 
         $query = (
@@ -214,7 +216,7 @@ class Resource extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\Ap
     public function updateAllTotals(int $apiKey): int {
         $params = [
             ':key'          => $apiKey,
-            ':field_edit'   => \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID,
+            ':field_edit'   => tirreno('utils')->constants->FIELD_EDIT_EVENT_TYPE_ID,
         ];
 
         $query = (

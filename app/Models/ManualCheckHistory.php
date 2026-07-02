@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class ManualCheckHistory extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_manual_check_history';
+class ManualCheckHistory extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_manual_check_history';
 
     public function getLastByOperatorId(int $operatorId, int $limit = 15): array {
         $params = [

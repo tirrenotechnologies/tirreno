@@ -19,10 +19,10 @@ namespace Tirreno\Utils;
 
 class DictManager {
     public static function load(string $file): void {
-        $f3 = \Base::instance();
+        $locale = tirreno('storage')->get('LOCALES');
+        $language = tirreno('storage')->get('LANGUAGE');
 
-        $locale = $f3->get('LOCALES');
-        $language = $f3->get('LANGUAGE');
+        $file = ucfirst($file);
 
         $path = sprintf('%s%s/Additional/%s.php', $locale, $language, $file);
 
@@ -33,7 +33,7 @@ class DictManager {
 
             if ($values !== false) {
                 foreach ($values as $key => $value) {
-                    $f3->set($key, $value);
+                    tirreno('storage')->set($key, $value);
                 }
             }
         }

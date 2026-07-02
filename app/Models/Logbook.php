@@ -17,15 +17,15 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Logbook extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_logbook';
+class Logbook extends \Tirreno\Models\Base {
+    protected string $tableName = 'event_logbook';
 
     public function getLastSucceededEvent(int $apiKey): array {
         $params = [
             ':api_key'          => $apiKey,
             ':endpoint'         => '/sensor/',
-            ':success'          => \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_SUCCESS,
-            ':validation_error' => \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_VALIDATION_ERROR,
+            ':success'          => tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_SUCCESS,
+            ':validation_error' => tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_VALIDATION_ERROR,
         ];
 
         $query = (
@@ -52,6 +52,39 @@ class Logbook extends \Tirreno\Models\BaseSql {
         return $results[0] ?? [];
     }
 
+    public function getFirstSucceededEvent(int $apiKey): array {
+        $params = [
+            ':api_key'          => $apiKey,
+            ':endpoint'         => '/sensor/',
+            ':success'          => tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_SUCCESS,
+            ':validation_error' => tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_VALIDATION_ERROR,
+        ];
+
+        $query = (
+            'SELECT
+                event_logbook.event,
+                event_logbook.ended     AS lastseen
+
+            FROM
+                event_logbook
+
+            WHERE
+                event_logbook.key = :api_key AND
+                (
+                    event_logbook.error_type = :success  OR
+                    event_logbook.error_type = :validation_error
+                ) AND
+                event_logbook.endpoint = :endpoint
+            ORDER BY event_logbook.ended ASC
+            LIMIT 1'
+        );
+
+        $results = $this->execQuery($query, $params);
+
+        return $results[0] ?? [];
+    }
+
+
     public function getLogbookDetails(int $id, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
@@ -62,8 +95,10 @@ class Logbook extends \Tirreno\Models\BaseSql {
             'SELECT
                 event_logbook.id,
                 event_logbook.ip,
+                event_logbook.event,
                 event_logbook.raw,
                 event_logbook.started,
+                event_logbook.ended,
                 event_logbook.endpoint,
                 event_logbook.error_text,
                 event_logbook.error_type,
@@ -88,15 +123,16 @@ class Logbook extends \Tirreno\Models\BaseSql {
     }
 
     public function add(
-        string $ip,
+        ?string $ip,
         string $endpoint,
         ?int $event,
         int $errorType,
         ?string $errorText,
-        string $raw,
+        ?string $raw,
         string $started,
-        int $apiKey
-    ): void {
+        ?string $ended,
+        int $apiKey,
+    ): array {
         $params = [
             ':ip'           => $ip,
             ':endpoint'     => $endpoint,
@@ -105,23 +141,48 @@ class Logbook extends \Tirreno\Models\BaseSql {
             ':error_text'   => $errorText,
             ':raw'          => $raw,
             ':started'      => $started,
+            ':ended'        => $ended,
             ':key'          => $apiKey,
         ];
 
         $query = (
             'INSERT INTO event_logbook
-                (endpoint, key, ip, event, error_type, error_text, raw, started)
+                (endpoint, key, ip, event, error_type, error_text, raw, started, ended)
             VALUES
-                (:endpoint, :key, :ip, :event, :error_type, :error_text, :raw, :started)'
+                (:endpoint, :key, :ip, :event, :error_type, :error_text, :raw, :started, COALESCE(:ended, NOW()))
+            RETURNING id, ended'
         );
 
-        $this->execQuery($query, $params);
+        $result = $this->execQuery($query, $params);
+
+        return $result[0] ?? [];
+    }
+
+    public function getEventErrorType(int $errorType): array {
+        $params = [
+            ':error_type'   => $errorType,
+        ];
+
+        $query = (
+            'SELECT
+                event_error_type.id,
+                event_error_type.value,
+                event_error_type.name
+            FROM
+                event_error_type
+            WHERE
+                event_error_type.id = :error_type'
+        );
+
+        $result = $this->execQuery($query, $params);
+
+        return $result[0] ?? [];
     }
 
     public function rotateRequests(?int $apiKey): int {
         $params = [
             ':key'      => $apiKey,
-            ':limit'    => \Tirreno\Utils\Variables::getLogbookLimit(),
+            ':limit'    => tirreno('utils')->variables->getLogbookLimit(),
         ];
 
         $query = (

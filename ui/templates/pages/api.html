@@ -1,0 +1,77 @@
+<include href="templates/parts/popups/enrichAllPopup.html" />
+<include href="templates/parts/popups/resetApiKeyPopup.html" />
+
+<div class="columns">
+    <div class="column settings-page">
+        <div class="card events-card">
+            <header class="card-header">
+                <div class="card-header-title">{{ @api_http_endpoint }}<p class="tooltip-info tooltip"title="{{ @api_table_title_tooltip }}"><include href="images/icons/information.svg" alt='' /></p>
+                </div>
+            </header>
+
+            <div class="card-content">
+                <div class="card-table">
+                    <div class="content">
+                        <include href="templates/parts/tables/tokens.html" />
+
+                        <div class="field">
+                            <div class="control">
+                                <div class="selector">
+                                    <select class="input" name="version">
+                                        <option value="php" selected>PHP</option>
+                                        <option value="python">Python</option>
+                                        <option value="nodejs">Node.js</option>
+                                        <option value="ruby">Ruby</option>
+                                        <option value="curl">cURL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                            <div id="php">
+                                <pre class="tirreno" contenteditable="true" lang="zkk" spellcheck="false"
+                                    ><include href="templates/snippets/php.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}"/></pre>
+                            </div>
+
+                            <div id="python" class="is-hidden">
+                                <pre class="tirreno" contenteditable="true" lang="zkk" spellcheck="false"
+                                    ><include href="templates/snippets/python.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}"/></pre>
+                            </div>
+
+                            <div id="nodejs" class="is-hidden">
+                                <pre class="tirreno" contenteditable="true" lang="zkk" spellcheck="false"
+                                    ><include href="templates/snippets/nodejs.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}"/></pre>
+                            </div>
+
+                            <div id="ruby" class="is-hidden">
+                                <pre class="tirreno" contenteditable="true" lang="zkk" spellcheck="false"
+                                    ><include href="templates/snippets/ruby.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}"/></pre>
+                            </div>
+                            <div id="curl" class="is-hidden">
+                                <pre class="tirreno" contenteditable="true" lang="zkk" spellcheck="false"
+                                    ><include href="templates/snippets/curl.html" with="apiKey={{ @API_KEY.key }}, apiUrl={{ @API_URL }}"/></pre>
+                            </div>
+                        </repeat>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <check if="{{ @IS_OWNER }}">
+            <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                <div class="card events-card">
+                    <header class="card-header">
+                        <a name="subscription"></a>
+                        <div class="card-header-title">{{ @api_form_title }}<p class="tooltip-info tooltip" title="{{ @api_form_title_tooltip }}"><include href="images/icons/information.svg" alt='' /></p></div>
+                    </header>
+                    <include href="templates/parts/forms/updateApiUsageForm.html" />
+                </div>
+            </repeat>
+
+            <include href="templates/parts/tables/usageStats.html" />
+
+            <include href="templates/parts/forms/enrichAllForm.html" />
+        </check>
+    </div>
+</div>

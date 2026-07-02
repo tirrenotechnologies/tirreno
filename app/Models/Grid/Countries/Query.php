@@ -82,7 +82,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Add dates into request
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = '';
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {

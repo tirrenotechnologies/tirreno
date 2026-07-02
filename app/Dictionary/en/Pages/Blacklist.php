@@ -16,12 +16,12 @@
 declare(strict_types=1);
 
 return [
-    'AdminBlacklist_page_title' => 'Blacklist',
-    'AdminBlacklist_breadcrumb_title' => 'Blacklist',
-    'AdminBlacklist_search_placeholder' => 'User Name, Identity and Added',
-    'AdminBlacklist_entity_type_search_placeholder' => '+ Add another entity type',
-    'AdminBlacklst_table_title' => 'Blacklist',
-    'AdminBlacklst_table_title_tooltip' => 'This page lists user identities that were added to a blacklist during a selected period of time. The chart visualizes the daily number of blacklisted identities. To open a page with extended user analytics, click on a table row.',
+    'blacklist_page_title' => 'Blacklist',
+    'blacklist_breadcrumb_title' => 'Blacklist',
+    'blacklist_search_placeholder' => 'Entity Name, Identity and Added',
+    'blacklist_entity_type_search_placeholder' => '+ Add another identity type',
+    'blacklist_table_title' => 'Blacklisted identities',
+    'blacklist_table_title_tooltip' => 'This page lists identities that were added to a blacklist during a selected period of time. The chart visualizes the daily number of blacklisted entities. To open a page with extended entity analytics, click on a table row.',
     'Base_table_column_blacklist_added' => 'Added',
     'Base_table_column_blacklist_added_tooltip' => 'The date and time an identity was blacklisted.',
     'Base_table_column_blacklist_type' => 'Type',

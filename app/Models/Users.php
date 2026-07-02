@@ -17,12 +17,128 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Users extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_account';
+class Users extends \Tirreno\Models\Base {
+    protected string $tableName = 'event_account';
 
-    public function getLastThousandUsers(int $apiKey): array {
+    private function coreQuery(): string {
+        return (
+            'SELECT
+                event_account.id AS accountid,
+                event_account.userid,
+                event_account.lastseen,
+                event_account.created,
+                event_account.firstname,
+                event_account.lastname,
+                event_account.score,
+                event_account.score_details,
+                event_account.score_updated_at,
+                event_account.is_important,
+                event_account.fraud,
+                event_account.reviewed,
+                event_account.latest_decision,
+                event_account.added_to_review,
+
+                event_email.email
+
+            FROM
+                event_account
+
+            LEFT JOIN event_email
+            ON (event_account.lastemail = event_email.id) '
+        );
+    }
+
+    private function sortQuery(?array $orderBy = null, ?int $limit = null, ?int $offset = null): string {
+        $orderQuery = null;
+        $limitQuery = null;
+        $offsetQuery = null;
+
+        if ($orderBy !== null) {
+            $orders = [];
+
+            foreach ($orderBy as $order) {
+                if (count($order) === 2 && preg_match('/^[a-z._]+$/', $order[0]) && in_array(strtoupper($order[1]), ['ASC', 'DESC'])) {
+                    $orders[] = $order[0] . ' ' . strtoupper($order[1]);
+                }
+            }
+
+            if ($orders) {
+                $orderQuery = 'ORDER BY ' . implode(', ', $orders);
+            }
+        }
+
+        if ($limit !== null) {
+            $limitQuery = 'LIMIT ' . strval($limit);
+        }
+
+        if ($offset !== null) {
+            $offsetQuery = 'OFFSET ' . strval($offset);
+        }
+
+        return ' ' . implode(' ', array_filter([$orderQuery, $limitQuery, $offsetQuery]));
+    }
+
+    public function getUsersByIpId(int $ipId, int $apiKey, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array {
         $params = [
-            ':api_key' => $apiKey,
+            ':ip_id'    => $ipId,
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = $this->coreQuery() . (
+            'LEFT JOIN event
+            ON event.account = event_account.id
+
+            WHERE
+                event.ip = :ip_id AND
+                event_account.key = :api_key'
+        ) . $this->sortQuery($orderBy, $limit, $offset);
+
+        return $this->execQuery($query, $params);
+    }
+
+    public function getUsersByEventTimeRange(int $start, int $end, int $apiKey, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array {
+        $params = [
+            ':start'    => $start,
+            ':end'      => $end,
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = $this->coreQuery() . (
+            'LEFT JOIN event
+            ON event.account = event_account.id
+
+            WHERE
+                event.time >= :start AND
+                event.time <= :end AND
+                event_account.key = :api_key'
+        ) . $this->sortQuery($orderBy, $limit, $offset);
+
+        return $this->execQuery($query, $params);
+    }
+
+
+    public function getUsersByLastseenTimeRange(int $start, int $end, int $apiKey, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array {
+        $params = [
+            ':start'    => $start,
+            ':end'      => $end,
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = $this->coreQuery() . (
+            'WHERE
+                event_account.lastseen >= :start AND
+                event_account.lastseen <= :end AND
+                event_account.key = :api_key'
+        ) . $this->sortQuery($orderBy, $limit, $offset);
+
+        return $this->execQuery($query, $params);
+    }
+
+
+    public function getLastNUsers(int $limit, int $apiKey): array {
+        $params = [
+            ':api_key'  => $apiKey,
+            ':limit'    => $limit,
         ];
 
         $query = (
@@ -42,7 +158,7 @@ class Users extends \Tirreno\Models\BaseSql {
                 event_account.key = :api_key
 
             ORDER BY event_account.lastseen DESC
-            LIMIT 1000'
+            LIMIT :limit'
         );
 
         return $this->execQuery($query, $params);

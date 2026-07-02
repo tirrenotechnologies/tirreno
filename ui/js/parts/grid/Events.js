@@ -1,4 +1,4 @@
-import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=0.10.0';
 import {
     renderResourceWithQueryAndEventType,
     renderDeviceWithOs,
@@ -6,7 +6,7 @@ import {
     renderIpWithCountry,
     renderUserForEvent,
     renderTimestampForEvent,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class EventsGrid extends BaseGridWithPanel {
     // 7, 8 - invisible time and id columns to prevent sorting buttons appearence

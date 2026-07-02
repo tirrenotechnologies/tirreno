@@ -21,7 +21,7 @@ class Update003 extends Base {
     public static string $version = 'v0.9.7';
 
     public static function apply(\DB\SQL $database): void {
-        $data = [':type' => \Tirreno\Utils\Constants::get()->PAGE_ERROR_EVENT_TYPE_ID];
+        $data = [':type' => tirreno('utils')->constants->PAGE_ERROR_EVENT_TYPE_ID];
 
         $queries = [
             'ALTER TABLE event_logbook DROP COLUMN raw_time',

@@ -1,22 +1,18 @@
-import {BasePage} from './Base.js?v=2';
-import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {DashboardTile} from '../parts/DashboardTile.js?v=2';
-import {TopTenGrid} from '../parts/grid/TopTen.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {DashboardTile} from '../parts/DashboardTile.js?v=0.10.0';
+import {TopTenGrid} from '../parts/grid/TopTen.js?v=0.10.0';
 import {
     renderClickableImportantUserWithScoreTile,
     renderClickableCountry,
     renderClickableResourceWithoutQuery,
     renderClickableIpWithCountry,
-} from '../parts/DataRenderers.js?v=2';
+} from '../parts/DataRenderers.js?v=0.10.0';
 
 export class DashboardPage extends BasePage {
     constructor() {
         super('dashboard');
-    }
-
-    postInit() {
-        this.initUi();
     }
 
     initUi() {

@@ -31,9 +31,11 @@ class Constants extends \Tirreno\Assets\Constants {
     public const MAX_STRING_LENGTH_FOR_TILE = 15;
     public const MAX_STRING_DEVICE_OS_LENGTH = 10;
     public const MAX_STRING_LENGTH_URL = 32;
-    public const MAX_STRING_LENGTH_ENDPOINT = 21;
+    public const MAX_STRING_LENGTH_ENDPOINT = 17;
+    public const MAX_STRING_LENGTH_RAW_REQUEST = 62;
     public const MAX_TOOLTIP_URL_LENGTH = 50;
     public const MAX_TOOLTIP_LENGTH = 121;
+    public const MAX_STRING_LENGTH_ERROR_TYPE = 10;
 
     public const COLOR_RED    = '#FB6E88';
     public const COLOR_GREEN  = '#25EAB5';
@@ -93,5 +95,13 @@ class Constants extends \Tirreno\Assets\Constants {
             'main'  => self::COLOR_PURPLE,
             'light' => self::COLOR_LIGHT_PURPLE,
         ],
+    ];
+
+    public const RULE_WEIGHTS = [
+        '70'    => 'extreme',
+        '20'    => 'high',
+        '10'    => 'medium',
+        '0'     => 'none',
+        '-20'   => 'positive',
     ];
 }

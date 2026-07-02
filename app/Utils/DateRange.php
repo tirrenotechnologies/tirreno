@@ -18,26 +18,30 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class DateRange {
-    private static function getF3(): \Base {
-        return \Base::instance();
-    }
-
     public static function isQueueTimeouted(string $updated): bool {
-        return !self::inIntervalTillNow($updated, \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_SEC);
+        return !self::inIntervalTillNow($updated, tirreno('utils')->constants->ACCOUNT_OPERATION_QUEUE_AUTO_UNCLOG_AFTER_SEC);
     }
 
     public static function getDatesRangeByGivenDates(string $startDate, string $endDate, int $offset): array {
+        return static::getDatesRangeByUnixDates(strtotime($startDate), strtotime($endDate), $offset);
+    }
+
+    public static function getDatesRangeByUnixDates(int $startDate, int $endDate, int $offset): array {
         return [
-            'endDate' => date('Y-m-d H:i:s', strtotime($endDate) + $offset),
-            'startDate' => date('Y-m-d H:i:s', strtotime($startDate) + $offset),
+            'endDate'   => date('Y-m-d H:i:s', $endDate + $offset),
+            'startDate' => date('Y-m-d H:i:s', $startDate + $offset),
         ];
+    }
+
+    public static function getDateString(int $ts): string {
+        return date('Y-m-d H:i:s', $ts);
     }
 
     public static function getDatesRangeFromRequest(int $offset = 0): ?array {
         $dates      = null;
-        $dateTo     = \Tirreno\Utils\Conversion::getStringRequestParam('dateTo', true);
-        $dateFrom   = \Tirreno\Utils\Conversion::getStringRequestParam('dateFrom', true);
-        $keepDates  = \Tirreno\Utils\Conversion::getIntRequestParam('keepDates', true);
+        $dateTo     = tirreno('utils')->conversion->getTimestampRequestParam('dateTo', true);
+        $dateFrom   = tirreno('utils')->conversion->getTimestampRequestParam('dateFrom', true);
+        $keepDates  = tirreno('utils')->conversion->getIntRequestParam('keepDates', true);
 
         if ($dateTo && $dateFrom) {
             $dates = self::getDatesRangeByGivenDates($dateFrom, $dateTo, $offset);
@@ -45,15 +49,15 @@ class DateRange {
             $endDate = $keepDates ? $dates['endDate'] : null;
             $startDate = $keepDates ? $dates['startDate'] : null;
 
-            self::getF3()->set('SESSION.filterEndDate', $endDate);
-            self::getF3()->set('SESSION.filterStartDate', $startDate);
+            tirreno('session')->set('filterEndDate', $endDate);
+            tirreno('session')->set('filterStartDate', $startDate);
         }
 
         return $dates;
     }
 
     public static function getLatestNDatesRangeFromRequest(int $days, int $offset = 0): array {
-        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
+        $day = tirreno('utils')->constants->SECONDS_IN_DAY;
 
         return [
             'endDate'   => date('Y-m-d 23:59:59', time() + $offset),
@@ -62,9 +66,9 @@ class DateRange {
     }
 
     public static function getResolutionFromRequest(): string {
-        $resolution = \Tirreno\Utils\Conversion::getStringRequestParam('resolution', true) ?? 'day';
+        $resolution = tirreno('utils')->conversion->getStringRequestParam('resolution', true) ?? 'day';
 
-        return array_key_exists($resolution, \Tirreno\Utils\Constants::get()->CHART_RESOLUTION) ? $resolution : 'day';
+        return array_key_exists($resolution, tirreno('utils')->constants->CHART_RESOLUTION) ? $resolution : 'day';
     }
 
     public static function inIntervalTillNow(?string $time, int $interval): ?bool {

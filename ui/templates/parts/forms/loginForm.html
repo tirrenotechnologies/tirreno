@@ -3,26 +3,24 @@
 
     <div class="field">
         <div class="control">
-            <input autofocus class="input" placeholder="{{ @Login_form_email_label }}" type="email" id="email" name="email" required value="{{ isset(@VALUES)?@VALUES.email:'' }}" >
+            <input autofocus class="input" placeholder="{{ @login_form_email_label }}" type="email" id="email" name="email" required value="{{ isset(@VALUES)?@VALUES.email:'' }}" >
         </div>
     </div>
 
     <div class="field">
         <div class="control">
-            <input class="input" placeholder="{{ @Login_form_password_label }}" type="password" id="password" name="password" required>
+            <input class="input" placeholder="{{ @login_form_password_label }}" type="password" id="password" name="password" required>
         </div>
     </div>
-
-    <hr />
 
     <div class="bottom-line">
         <div>
             <check if="{{ @ALLOW_FORGOT_PASSWORD }}">
-                <a href="{{ @BASE }}/forgot-password">{{ @Login_form_forgot_password_link }}</a>
+                <a href="{{ @BASE }}/forgot-password">{{ @login_form_forgot_password_link }}</a>
             </check>
         </div>
         <div class="control">
-            <button id="submit-button" class="button is-primary" type="submit">{{ @Login_form_signin_button }}</button>
+            <button id="submit-button" class="button is-primary" type="submit">{{ @login_form_signin_button }}</button>
         </div>
     </div>
 </form>

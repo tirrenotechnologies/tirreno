@@ -133,7 +133,7 @@ class Update006 extends Base {
             $database->exec($sql);
         }
 
-        $params = [':field_edit' => \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID];
+        $params = [':field_edit' => tirreno('utils')->constants->FIELD_EDIT_EVENT_TYPE_ID];
         $sql = (
             'UPDATE event_url
             SET

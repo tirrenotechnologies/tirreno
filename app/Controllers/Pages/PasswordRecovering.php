@@ -17,38 +17,50 @@ declare(strict_types=1);
 
 namespace Tirreno\Controllers\Pages;
 
-class PasswordRecovering extends Base {
-    public ?string $page = 'PasswordRecovering';
+class PasswordRecovering extends \Tirreno\Controllers\Pages\Base {
+    public string $page = 'passwordRecovering';
+    protected bool $allowGuest = true;
 
-    public function getPageParams(): array {
-        $pageParams = [
-            'HTML_FILE' => 'passwordRecovering.html',
-        ];
+    protected function proceedPostRequest(): array {
+        $this->assertCanEdit();
 
-        $errorCode = \Tirreno\Utils\Validators::validatePasswordRecovering($this->f3->get('PARAMS'));
-        $pageParams['SUCCESS_CODE'] = $errorCode;
+        $pageParams = [];
 
-        if ($this->isPostRequest()) {
-            $params = $this->extractRequestParams(['token', 'new-password', 'password-confirmation']);
-            $errorCode = \Tirreno\Utils\Validators::validatePasswordRecoveringPost($params);
+        $params = tirreno('utils')->render->extractRequestParams(['token', 'new-password', 'password-confirmation']);
+        $errorCode = tirreno('utils')->validators->validatePasswordRecoveringPost($params);
 
-            $pageParams['SUCCESS_CODE'] = 0;
-            $pageParams['ERROR_CODE'] = $errorCode;
+        $pageParams['SUCCESS_CODE'] = 0;
+        $pageParams['ERROR_CODE'] = $errorCode;
 
-            if (!$errorCode) {
-                $forgotPasswordModel = new \Tirreno\Models\ForgotPassword();
-                $operatorId = $forgotPasswordModel->useByRenewKey($this->f3->get('PARAMS.renewKey'));
+        if (!$errorCode) {
+            $operatorId = tirreno('models')->forgotPassword->useByRenewKey(tirreno('request')->getUrlParam('renewKey'));
+            $password = tirreno('utils')->conversion->getStringRequestParam('new-password');
 
-                $password = \Tirreno\Utils\Conversion::getStringRequestParam('new-password');
-
-                $model = new \Tirreno\Models\Operator();
-                $model->updatePassword($password, $operatorId);
-                $model->activateByOperatorId($operatorId);
-
-                $pageParams['SUCCESS_CODE'] = \Tirreno\Utils\ErrorCodes::ACCOUNT_ACTIVATED;
+            if ($operatorId) {
+                tirreno('models')->operator->updatePassword($password, $operatorId);
+                tirreno('models')->operator->activateByOperatorId($operatorId);
+                $pageParams['SUCCESS_CODE'] = tirreno('utils')->errorCodes->ACCOUNT_ACTIVATED;
+            } else {
+                $pageParams['ERROR_CODE'] = tirreno('utils')->errorCodes->RENEW_KEY_IS_NOT_CORRECT;
             }
         }
 
-        return parent::applyPageParams($pageParams);
+        return $pageParams;
+    }
+
+    public function getPageParams(): array {
+        $this->assertCanView();
+
+        $pageParams = [
+            'HTML_FILE'     => 'passwordRecovering.html',
+            'INTERNAL_PAGE' => false,
+        ];
+
+        $errorCode = tirreno('utils')->validators->validatePasswordRecovering(tirreno('request')->getUrlParams());
+        $pageParams['SUCCESS_CODE'] = $errorCode;
+
+        $postParams = tirreno('request')->isPost() ? $this->proceedPostRequest() : [];
+
+        return array_merge($pageParams, $postParams);
     }
 }

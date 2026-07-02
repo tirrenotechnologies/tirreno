@@ -14,7 +14,7 @@ class D09 extends \Tirreno\Assets\Rule {
         $iters = count($params['eup_browser_name']);
 
         for ($i = 0; $i < $iters; ++$i) {
-            $minVersion = \Tirreno\Utils\Constants::get()->RULE_REGULAR_BROWSER_NAMES[$params['eup_browser_name'][$i]] ?? null;
+            $minVersion = tirreno('utils')->constants->RULE_REGULAR_BROWSER_NAMES[$params['eup_browser_name'][$i]] ?? null;
             if ($minVersion !== null) {
                 $browserVersion = explode('.', $params['eup_browser_version'][$i] ?? '')[0];
                 if (ctype_digit($browserVersion) && intval($browserVersion) < $minVersion) {

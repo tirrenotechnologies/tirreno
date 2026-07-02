@@ -44,7 +44,6 @@ class Device extends Base {
 
             WHERE
                 event_device.account_id IN ({$placeHolders}) AND
-                event_ua_parsed.checked IS TRUE AND
                 event_device.key = :api_key"
         );
 

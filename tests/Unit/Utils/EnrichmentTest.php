@@ -8,23 +8,16 @@ use Tirreno\Utils\Enrichment;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Unit tests for Enrichment utility.
+ * Unit tests for Tirreno\Utils\Enrichment.
  *
- * Notes about current behavior (important):
- * - calculateEmailReputation() treats blockemails = null as "not blocked" because !null === true,
- *   so it adds +1 to reputation level.
- * - calculateEmailReputationForContext() sets missing ee_* fields to false, not null, therefore
- *   missing fields produce "medium" (0 + 1) instead of "none".
+ * Covered:
+ * - Enrichment::calculateIpType()
+ * - Enrichment::calculateEmailReputation()
+ * - Enrichment::calculateEmailReputationForContext()
+ * - Enrichment::applyDeviceParams()
  *
- * @todo Refactor Enrichment::calculateEmailReputation():
- *   - Fix condition: it checks data_breach twice:
- *       if ($record['data_breach'] !== null && $record['data_breach'] !== null)
- *     should likely be:
- *       if ($record['data_breach'] !== null && $record['blockemails'] !== null)
- *
- * @todo Refactor Enrichment::calculateEmailReputationForContext():
- *   - Decide what "missing fields" means.
- *   - If missing should be "none", set defaults to null (not false) and fix condition above.
+ * @todo Cover Enrichment::calculateRuleType() after tirreno('assets')->rules
+ *       can be replaced in tests.
  */
 final class EnrichmentTest extends TestCase {
     /**
@@ -33,7 +26,7 @@ final class EnrichmentTest extends TestCase {
     public function testCalculateIpTypeMapsAndCleansFlags(array $record, string $expectedType): void {
         $records = [$record];
 
-        Enrichment::calculateIpType($records);
+        $records = Enrichment::calculateIpType($records);
 
         $this->assertArrayHasKey('ip_type', $records[0]);
         $this->assertSame($expectedType, $records[0]['ip_type']);
@@ -66,7 +59,6 @@ final class EnrichmentTest extends TestCase {
 
         $localhost = $base;
         $localhost['country_id'] = 0;
-        $localhost['checked'] = true;
 
         $tor = $base;
         $tor['tor'] = true;
@@ -95,7 +87,6 @@ final class EnrichmentTest extends TestCase {
         $priority['relay'] = true;
         $priority['vpn'] = true;
         $priority['data_center'] = true;
-        $priority['checked'] = true;
 
         return [
             'blacklisted wins' => [$blacklisted, 'Blacklisted'],
@@ -108,17 +99,21 @@ final class EnrichmentTest extends TestCase {
             'datacenter' => [$datacenter, 'Datacenter'],
             'unchecked forces unknown' => [$unchecked, 'Unknown'],
             'default residential' => [$base, 'Residential'],
-            'priority order (blacklisted first)' => [$priority, 'Blacklisted'],
+            'priority order blacklisted first' => [$priority, 'Blacklisted'],
         ];
     }
 
     /**
      * @dataProvider emailReputationProvider
      */
-    public function testCalculateEmailReputationMapsToExpectedLevel(array $record, string $fieldName, string $expected): void {
+    public function testCalculateEmailReputationMapsToExpectedLevel(
+        array $record,
+        string $fieldName,
+        string $expected
+    ): void {
         $records = [$record];
 
-        Enrichment::calculateEmailReputation($records, $fieldName);
+        $records = Enrichment::calculateEmailReputation($records, $fieldName);
 
         $this->assertArrayHasKey($fieldName, $records[0]);
         $this->assertSame($expected, $records[0][$fieldName]);
@@ -126,7 +121,6 @@ final class EnrichmentTest extends TestCase {
 
     public static function emailReputationProvider(): array {
         return [
-            // Core matrix (data_breach int + !blockemails int)
             'high when breach=1 and blockemails=false' => [
                 ['data_breach' => 1, 'blockemails' => false],
                 'reputation',
@@ -147,27 +141,21 @@ final class EnrichmentTest extends TestCase {
                 'reputation',
                 'low',
             ],
-
-            // Current (quirky) behavior: blockemails=null => !null === true => +1
-            'high when breach=1 and blockemails=null (because !null === true)' => [
+            'high when breach=1 and blockemails=null' => [
                 ['data_breach' => 1, 'blockemails' => null],
                 'reputation',
                 'high',
             ],
-            'medium when breach=0 and blockemails=null (because !null === true)' => [
+            'medium when breach=0 and blockemails=null' => [
                 ['data_breach' => 0, 'blockemails' => null],
                 'reputation',
                 'medium',
             ],
-
-            // Current (quirky) behavior: condition checks data_breach twice, so blockemails=null still enters.
-            'none when data_breach=null and blockemails=null (condition fails)' => [
+            'none when data_breach=null and blockemails=null' => [
                 ['data_breach' => null, 'blockemails' => null],
                 'reputation',
                 'none',
             ],
-
-            // Custom field name
             'writes to custom field name' => [
                 ['data_breach' => 1, 'blockemails' => false],
                 'custom_reputation',
@@ -184,7 +172,7 @@ final class EnrichmentTest extends TestCase {
             ],
         ];
 
-        Enrichment::calculateEmailReputationForContext($records);
+        $records = Enrichment::calculateEmailReputationForContext($records);
 
         $this->assertArrayHasKey('ee_reputation', $records[0]);
         $this->assertSame('high', $records[0]['ee_reputation']);
@@ -193,15 +181,10 @@ final class EnrichmentTest extends TestCase {
         $this->assertArrayNotHasKey('blockemails', $records[0]);
     }
 
-    public function testCalculateEmailReputationForContextDefaultsToMediumWhenFieldsMissing(): void {
-        // Current behavior:
-        // ee_data_breach missing => false
-        // ee_blockemails missing => false
-        // condition passes (false !== null) and computes:
-        // intVal(false)=0 + intVal(!false)=1 => 1 => "medium"
+    public function testCalculateEmailReputationForContextDefaultsMissingFieldsToFalse(): void {
         $records = [[]];
 
-        Enrichment::calculateEmailReputationForContext($records);
+        $records = Enrichment::calculateEmailReputationForContext($records);
 
         $this->assertArrayHasKey('ee_reputation', $records[0]);
         $this->assertSame('medium', $records[0]['ee_reputation']);
@@ -213,7 +196,7 @@ final class EnrichmentTest extends TestCase {
     public function testApplyDeviceParamsBuildsDerivedFields(array $record, array $expected): void {
         $records = [$record];
 
-        Enrichment::applyDeviceParams($records);
+        $records = Enrichment::applyDeviceParams($records);
 
         foreach ($expected as $key => $value) {
             $this->assertArrayHasKey($key, $records[0]);
@@ -297,7 +280,7 @@ final class EnrichmentTest extends TestCase {
             ],
         ];
 
-        Enrichment::calculateIpType($records);
+        $records = Enrichment::calculateIpType($records);
 
         $this->assertSame('Blacklisted', $records[0]['ip_type']);
         $this->assertSame('TOR', $records[1]['ip_type']);

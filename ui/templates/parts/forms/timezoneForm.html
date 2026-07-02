@@ -4,14 +4,14 @@
         <input type="hidden" name="cmd" value="changeTimezone" />
 
         <header class="card-header">
-            <div class="card-header-title">{{ @AdminTimezone_form_title }}<p class="tooltip-info tooltip" title="{{ @AdminTimezone_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            <div class="card-header-title">{{ @settings_timezone_form_title }}<p class="tooltip-info tooltip" title="{{ @settings_timezone_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
             </div>
         </header>
 
         <div class="card-content">
             <div class="content">
                 <div class="field">
-                    <label class="label">{{ @AdminTimezone_form_field_timezone_label }}</label>
+                    <label class="label">{{ @settings_timezone_form_field_timezone_label }}</label>
                     <div class="control">
                         <set TIMEZONE="{{ @PROFILE ? @PROFILE->timezone: 'UTC' }}" />
                         <set TIMEZONE="{{ isset(@TIME_ZONE_VALUES) ? @TIME_ZONE_VALUES.timezone : @TIMEZONE }}" />
@@ -22,7 +22,7 @@
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-primary" value="{{ @AdminTimezone_form_button_save }}">
+            <input type="submit" class="button is-primary" value="{{ @settings_timezone_form_button_save }}">
         </footer>
     </form>
 </div>

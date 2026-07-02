@@ -17,18 +17,43 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Events extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
+class Events extends \Tirreno\Models\Base {
+    protected string $tableName = 'event';
 
-    public function getDistinctAccounts(int $after, int $until): array {
+    public function getDistinctAccountsVisitLimit(int $after, int $until): array {
         $params = [
-            ':cursor' => $after,
-            ':next_cursor' => $until,
+            ':cursor'       => $after,
+            ':next_cursor'  => $until,
+            ':visit_limit'  => tirreno('utils')->variables->getUserQueueEventsLimit(),
         ];
 
         $query = (
             'SELECT DISTINCT
                 event.account AS "accountId",
+                event.key
+            FROM
+                event
+            JOIN
+                event_account ON event.account = event_account.id
+            WHERE
+                event.id > :cursor AND
+                event.id <= :next_cursor AND
+                (event_account.total_visit IS NULL OR :visit_limit = 0 OR event_account.total_visit < :visit_limit)'
+        );
+
+        return $this->execQuery($query, $params);
+    }
+
+    public function getDistinctAccounts(int $after, int $until): array {
+        $params = [
+            ':cursor'       => $after,
+            ':next_cursor'  => $until,
+        ];
+
+        $query = (
+            'SELECT DISTINCT
+                event.account AS "accountId",
+                eve
                 event.key
             FROM
                 event
@@ -43,8 +68,8 @@ class Events extends \Tirreno\Models\BaseSql {
     }
 
     protected function applyLimit(string &$query, array &$queryParams): void {
-        $start = \Tirreno\Utils\Conversion::getIntRequestParam('start');
-        $length = \Tirreno\Utils\Conversion::getIntRequestParam('length');
+        $start = tirreno('utils')->conversion->getIntRequestParam('start');
+        $length = tirreno('utils')->conversion->getIntRequestParam('length');
 
         if (isset($start) && isset($length)) {
             $query .= ' LIMIT :length OFFSET :start';
@@ -104,7 +129,7 @@ class Events extends \Tirreno\Models\BaseSql {
         $params = [
             ':api_key'  => $apiKey,
             ':weeks'    => $weeks,
-            ':week_sec' => \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK,
+            ':week_sec' => tirreno('utils')->constants->SECONDS_IN_WEEK,
         ];
 
         $query = (

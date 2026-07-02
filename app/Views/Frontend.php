@@ -20,15 +20,15 @@ namespace Tirreno\Views;
 class Frontend extends Base {
     public function render(): string|false|null {
         if ($this->data) {
-            $this->f3->mset($this->data);
+            tirreno('router')->mset($this->data);
         }
 
-        \Tirreno\Utils\Routes::callExtra('FRONTEND_VIEW');
+        tirreno('utils')->routes->callExtra('FRONTEND_VIEW');
 
         // Use anti-CSRF token in templates.
-        $this->f3->set('CSRF', $this->f3->get('SESSION.csrf'));
+        tirreno('storage')->set('CSRF', tirreno('session')->get('csrf'));
 
-        $tpl = $this->f3->get('TPL') ?? null;
+        $tpl = tirreno('storage')->get('TPL') ?? null;
         if ($tpl) {
             $tpl::registerExtends();
         }

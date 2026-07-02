@@ -1,6 +1,6 @@
-import {BasePage} from './Base.js?v=2';
-
-import {ManualCheckItems} from '../parts/ManualCheckItems.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {ManualCheckItems} from '../parts/ManualCheckItems.js?v=0.10.0';
+import {closest} from '../parts/utils/Functions.js?v=0.10.0';
 
 export class ManualCheckPage extends BasePage {
     constructor() {
@@ -13,7 +13,7 @@ export class ManualCheckPage extends BasePage {
         const onTableLinkClick = e => {
             e.preventDefault();
 
-            const f = e.target.closest('form');
+            const f = closest(e.target, 'form');
             f.submit();
 
             return false;

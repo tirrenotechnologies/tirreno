@@ -1,4 +1,4 @@
-import {BasePanel} from './BasePanel.js?v=2';
+import {BasePanel} from './BasePanel.js?v=0.10.0';
 import {
     renderDeviceWithOs,
     renderBrowser,
@@ -6,15 +6,15 @@ import {
     renderDate,
     renderBoolean,
     renderUserAgent,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
+import {defined} from '../utils/Functions.js?v=0.10.0';
 
 export class DevicePanel extends BasePanel {
     constructor() {
         let eventParams = {
-            //enrichment: true,
-            enrichemnt: false,
+            enrichemntUrl: false,
             type: 'device',
-            url: `${window.app_base}/admin/deviceDetails`,
+            url: `${window.app_base}/deviceDetails`,
             cardId: 'device-card',
             panelClosed: 'devicePanelClosed',
             closePanel: 'closeDevicePanel',
@@ -26,8 +26,8 @@ export class DevicePanel extends BasePanel {
     proceedData(data) {
         let browser_name    = data.browser_name;
         let browser_version = data.browser_version;
-        browser_name        = (browser_name !== null && browser_name !== undefined) ? browser_name : '';
-        browser_version     = (browser_version !== null && browser_version !== undefined) ? browser_version : '';
+        browser_name        = defined(browser_name) ? browser_name : '';
+        browser_version     = defined(browser_version) ? browser_version : '';
 
         const device_record   = {
             ua:             data.ua,

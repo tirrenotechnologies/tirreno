@@ -16,6 +16,6 @@
 declare(strict_types=1);
 
 return [
-    'AdminWatchlist_page_title' => 'Watchlist',
-    'AdminWatchlist_breadcrumb_title' => 'Watchlist',
+    'watchlist_page_title' => 'Watchlist',
+    'watchlist_breadcrumb_title' => 'Watchlist',
 ];

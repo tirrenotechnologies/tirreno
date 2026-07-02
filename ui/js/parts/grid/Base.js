@@ -1,12 +1,18 @@
-import {Loader} from '../Loader.js?v=2';
-import {Tooltip} from '../Tooltip.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
-import {getQueryParams} from '../utils/DataSource.js?v=2';
-import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
-import {formatKiloValue} from '../utils/String.js?v=2';
-import {TotalTile} from '../TotalTile.js?v=2';
-import {renderTotalFrame} from '../DataRenderers.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
+import {Loader} from '../Loader.js?v=0.10.0';
+import {Tooltip} from '../Tooltip.js?v=0.10.0';
+import {fireEvent} from '../utils/Event.js?v=0.10.0';
+import {getQueryParams} from '../utils/DataSource.js?v=0.10.0';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=0.10.0';
+import {formatKiloValue} from '../utils/String.js?v=0.10.0';
+import {TotalTile} from '../TotalTile.js?v=0.10.0';
+import {renderTotalFrame} from '../DataRenderers.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
+import {
+    replaceChildren,
+    closest,
+    inArray,
+    mapKeys,
+} from '../utils/Functions.js?v=0.10.0';
 
 export class BaseGrid {
     constructor(gridParams) {
@@ -71,9 +77,9 @@ export class BaseGrid {
             const onDraw = me.onDraw.bind(me);
             $(`#${tableId}`).on('draw.dt', onDraw);
 
-            $(`#${tableId}`).closest('.dt-container').find('nav').empty();
+            $(closest(this.table, '.dt-container')).find('nav').empty();
 
-            document.getElementById(tableId).classList.add('hide-body');
+            this.table.classList.add('hide-body');
 
             if (!me.config.sequential) {
                 me.loadData();
@@ -133,8 +139,12 @@ export class BaseGrid {
             },
 
             createdRow: function(row, data, dataIndex) {
-                $(row).attr('data-item-id', data.id);
+                me.createdRowCallback(row, data, dataIndex);
             },
+
+            //createdCell: function (td, cellData, rowData) {
+            //    me.createdCellCallback(td, cellData, rowData);
+            //}
 
             drawCallback: function(settings) {
                 me.drawCallback(settings);
@@ -150,7 +160,7 @@ export class BaseGrid {
     }
 
     performAdditional(response, config) {
-        if (!config.calculateTotals) {
+        if (!config.timeFrameTotalUrl) {
             fireEvent('dateFilterChangedCompleted');
 
             return;
@@ -172,9 +182,10 @@ export class BaseGrid {
             response.data.forEach(rec => {
                 preparedBase[rec.id] = rec;
             });
+            const url = config.timeFrameTotalUrl;
             $.ajax({
                 type: 'GET',
-                url: `${window.app_base}/admin/timeFrameTotal`,
+                url: url,
                 data: requestData,
                 success: (data) => this.onTotalsSuccess(data, config, preparedBase),
                 error: handleAjaxError,
@@ -223,7 +234,11 @@ export class BaseGrid {
 
         });
 
-        if (Object.values(idxs).includes(-1)) return;
+        for (let i = 0; i < columns.length; i++) {
+            if (idxs[columns[i]] === -1) {
+                return;
+            }
+        }
 
         let rowData;
         let id;
@@ -238,6 +253,13 @@ export class BaseGrid {
             }
         });
     }
+
+    createdRowCallback(row, data, dataIndex) {
+        $(row).attr('data-item-id', data.id);
+    }
+
+    //createdCellCallback(td, cellData, rowData) {
+    //}
 
     drawCallback(settings) {
         const me    = this;
@@ -264,7 +286,7 @@ export class BaseGrid {
 
     updateTableTitle(value) {
         const tableId = this.config.tableId;
-        const wrapper = document.getElementById(tableId).closest('.card');
+        const wrapper = closest(document.getElementById(tableId), '.card');
 
         if (wrapper) {
             const span = wrapper.querySelector('header span');
@@ -291,7 +313,10 @@ export class BaseGrid {
             return;
         }
 
-        $(`#${tableId}`).closest('.dt-container').find('nav').show();
+        const nav = closest(this.table, '.dt-container').querySelector('nav');
+        if (nav) {
+            nav.style.display = '';
+        }
         if (api.page.info().pages <= 1) {
             $(pagerSelector).hide();
         } else {
@@ -349,7 +374,7 @@ export class BaseGrid {
             return;
         }
 
-        const row  = event.target.closest('tr');
+        const row  = closest(event.target, 'tr');
         const link = row.querySelector('a');
 
         if (link) {
@@ -367,9 +392,10 @@ export class BaseGrid {
         const loaderPath = `${tableId}_processing`;
 
         const loaderWrapper = document.getElementById(loaderPath);
+
         const el = document.createElement('p');
         el.className = 'text-loader';
-        loaderWrapper.replaceChildren(el);
+        replaceChildren(loaderWrapper, el);
 
         this.loader.start(el);
 
@@ -417,17 +443,14 @@ export class BaseGrid {
     }
 
     get table() {
-        const tableId = this.config.tableId;
-        const tableEl = document.getElementById(tableId);
-
-        return tableEl;
+        return document.getElementById(this.config.tableId);
     }
 
     renderTotalsLoader(data, type, record, meta) {
         const span = document.createElement('span');
 
         const col_name = meta.settings.aoColumns[meta.col].name;
-        if (this.config.calculateTotals && this.config.totals.columns.includes(col_name)) {
+        if (this.config.timeFrameTotalUrl && inArray(this.config.totals.columns, col_name)) {
             span.className = 'loading-table-total';
             span.textContent = Constants.MIDLINE_HELLIP;
         } else {

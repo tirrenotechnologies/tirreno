@@ -21,7 +21,7 @@ class Update004 extends Base {
     public static string $version = 'v0.9.8';
 
     public static function apply(\DB\SQL $database): void {
-        $data = [':type' => \Tirreno\Utils\Constants::get()->FIELD_EDIT_EVENT_TYPE_ID];
+        $data = [':type' => tirreno('utils')->constants->FIELD_EDIT_EVENT_TYPE_ID];
 
         $queries = [
             ('CREATE SEQUENCE event_field_audit_trail_id_seq

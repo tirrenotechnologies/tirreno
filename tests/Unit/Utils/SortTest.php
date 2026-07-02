@@ -10,43 +10,47 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Sort.
  *
- * Covered (unit-testable without refactor):
- * - Sort::cmpTimestamp() (numeric timestamp delta)
- * - Sort::cmpScore() (descending score comparison via spaceship)
- * - Sort::cmpRule() (validated desc, missing false-before-true, uid asc)
+ * Covered:
+ * - Sort::cmpTimestamp()
+ * - Sort::cmpScore()
+ * - Sort::cmpSetScore()
+ * - Sort::cmpSetUid()
+ * - Sort::cmpRule()
  *
  * Notes:
  * - tests assert comparator sign (-/0/+) rather than exact values for robustness
- * - cmpTimestamp returns a numeric difference (not spaceship), so we assert sign as well
+ * - cmpTimestamp returns a numeric difference, not a spaceship result
  */
 final class SortTest extends TestCase {
     /**
      * @dataProvider cmpTimestampProvider
      */
-    public function testCmpTimestampReturnsExpectedSign(array $left, array $right, int $expectedSign): void {
+    public function testCmpTimestampReturnsExpectedSign(
+        array $left,
+        array $right,
+        int $expectedSign
+    ): void {
         $result = Sort::cmpTimestamp($left, $right);
 
-        $sign = $this->sign($result);
-
-        $this->assertSame($expectedSign, $sign);
+        $this->assertSame($expectedSign, $this->sign($result));
     }
 
     public static function cmpTimestampProvider(): array {
         return [
             'left smaller ts => negative' => [
-                ['ts' => 10],
-                ['ts' => 20],
-                -1,
+                'left' => ['ts' => 10],
+                'right' => ['ts' => 20],
+                'expectedSign' => -1,
             ],
             'equal ts => zero' => [
-                ['ts' => 10],
-                ['ts' => 10],
-                0,
+                'left' => ['ts' => 10],
+                'right' => ['ts' => 10],
+                'expectedSign' => 0,
             ],
             'left larger ts => positive' => [
-                ['ts' => 30],
-                ['ts' => 20],
-                1,
+                'left' => ['ts' => 30],
+                'right' => ['ts' => 20],
+                'expectedSign' => 1,
             ],
         ];
     }
@@ -54,30 +58,118 @@ final class SortTest extends TestCase {
     /**
      * @dataProvider cmpScoreProvider
      */
-    public function testCmpScoreReturnsExpectedSign(array $left, array $right, int $expectedSign): void {
+    public function testCmpScoreReturnsExpectedSign(
+        array $left,
+        array $right,
+        int $expectedSign
+    ): void {
         $result = Sort::cmpScore($left, $right);
 
-        $sign = $this->sign($result);
-
-        $this->assertSame($expectedSign, $sign);
+        $this->assertSame($expectedSign, $this->sign($result));
     }
 
     public static function cmpScoreProvider(): array {
         return [
-            'left higher score => negative (desc order)' => [
-                ['score' => 100],
-                ['score' => 50],
-                -1,
+            'left higher score => negative' => [
+                'left' => ['score' => 100],
+                'right' => ['score' => 50],
+                'expectedSign' => -1,
             ],
             'equal score => zero' => [
-                ['score' => 10],
-                ['score' => 10],
-                0,
+                'left' => ['score' => 10],
+                'right' => ['score' => 10],
+                'expectedSign' => 0,
             ],
-            'left lower score => positive (desc order)' => [
-                ['score' => 5],
-                ['score' => 10],
-                1,
+            'left lower score => positive' => [
+                'left' => ['score' => 5],
+                'right' => ['score' => 10],
+                'expectedSign' => 1,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider cmpSetScoreProvider
+     */
+    public function testCmpSetScoreReturnsExpectedSign(
+        array $left,
+        array $right,
+        int $expectedSign
+    ): void {
+        $result = Sort::cmpSetScore($left, $right);
+
+        $this->assertSame($expectedSign, $this->sign($result));
+    }
+
+    public static function cmpSetScoreProvider(): array {
+        return [
+            'left higher set => negative' => [
+                'left' => ['set' => 2, 'score' => 10],
+                'right' => ['set' => 1, 'score' => 100],
+                'expectedSign' => -1,
+            ],
+            'left lower set => positive' => [
+                'left' => ['set' => 1, 'score' => 100],
+                'right' => ['set' => 2, 'score' => 10],
+                'expectedSign' => 1,
+            ],
+            'same set left higher score => negative' => [
+                'left' => ['set' => 1, 'score' => 100],
+                'right' => ['set' => 1, 'score' => 50],
+                'expectedSign' => -1,
+            ],
+            'same set left lower score => positive' => [
+                'left' => ['set' => 1, 'score' => 50],
+                'right' => ['set' => 1, 'score' => 100],
+                'expectedSign' => 1,
+            ],
+            'same set same score => zero' => [
+                'left' => ['set' => 1, 'score' => 50],
+                'right' => ['set' => 1, 'score' => 50],
+                'expectedSign' => 0,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider cmpSetUidProvider
+     */
+    public function testCmpSetUidReturnsExpectedSign(
+        array $left,
+        array $right,
+        int $expectedSign
+    ): void {
+        $result = Sort::cmpSetUid($left, $right);
+
+        $this->assertSame($expectedSign, $this->sign($result));
+    }
+
+    public static function cmpSetUidProvider(): array {
+        return [
+            'left higher set => negative' => [
+                'left' => ['set' => 2, 'uid' => 'A01'],
+                'right' => ['set' => 1, 'uid' => 'Z99'],
+                'expectedSign' => -1,
+            ],
+            'left lower set => positive' => [
+                'left' => ['set' => 1, 'uid' => 'Z99'],
+                'right' => ['set' => 2, 'uid' => 'A01'],
+                'expectedSign' => 1,
+            ],
+            'same set left higher uid => negative' => [
+                'left' => ['set' => 1, 'uid' => 'B01'],
+                'right' => ['set' => 1, 'uid' => 'A01'],
+                'expectedSign' => -1,
+            ],
+            'same set left lower uid => positive' => [
+                'left' => ['set' => 1, 'uid' => 'A01'],
+                'right' => ['set' => 1, 'uid' => 'B01'],
+                'expectedSign' => 1,
+            ],
+            'same set same uid => zero' => [
+                'left' => ['set' => 1, 'uid' => 'A01'],
+                'right' => ['set' => 1, 'uid' => 'A01'],
+                'expectedSign' => 0,
             ],
         ];
     }
@@ -97,9 +189,7 @@ final class SortTest extends TestCase {
 
         $result = Sort::cmpRule($left, $right);
 
-        $sign = $this->sign($result);
-
-        $this->assertSame(1, $sign, 'validated=1 must come before validated=0');
+        $this->assertSame(1, $this->sign($result), 'validated=1 must come before validated=0');
     }
 
     public function testCmpRuleSortsByMissingFalseBeforeTrueWhenValidatedEqual(): void {
@@ -117,9 +207,7 @@ final class SortTest extends TestCase {
 
         $result = Sort::cmpRule($left, $right);
 
-        $sign = $this->sign($result);
-
-        $this->assertSame(-1, $sign, 'missing=false must come before missing=true');
+        $this->assertSame(-1, $this->sign($result), 'missing=false must come before missing=true');
     }
 
     public function testCmpRuleSortsByUidAscWhenValidatedAndMissingEqual(): void {
@@ -137,9 +225,7 @@ final class SortTest extends TestCase {
 
         $result = Sort::cmpRule($left, $right);
 
-        $sign = $this->sign($result);
-
-        $this->assertSame(-1, $sign, 'uid must be sorted ascending');
+        $this->assertSame(-1, $this->sign($result), 'uid must be sorted ascending');
     }
 
     public function testCmpRuleReturnsZeroWhenAllKeysEqual(): void {
@@ -165,7 +251,6 @@ final class SortTest extends TestCase {
             return 0;
         }
 
-        $result = ($value < 0) ? -1 : 1;
-        return $result;
+        return $value < 0 ? -1 : 1;
     }
 }

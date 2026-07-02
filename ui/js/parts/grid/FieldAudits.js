@@ -1,10 +1,10 @@
-import {BaseGrid} from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
 import {
     renderDate,
     renderTime,
     renderAuditFieldName,
     renderClickableAuditFieldId,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class FieldAuditsGrid extends BaseGrid {
     get orderConfig() {

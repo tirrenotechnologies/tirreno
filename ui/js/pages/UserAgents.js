@@ -1,9 +1,9 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {UserAgentsChart} from '../parts/chart/UserAgents.js?v=2';
-import {UserAgentsGrid} from '../parts/grid/UserAgents.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {UserAgentsChart} from '../parts/chart/UserAgents.js?v=0.10.0';
+import {UserAgentsGrid} from '../parts/grid/UserAgents.js?v=0.10.0';
 
 export class UserAgentsPage extends BasePage {
     constructor() {
@@ -17,12 +17,12 @@ export class UserAgentsPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadUserAgents`,
+            url:        `${window.app_base}/loadUserAgents`,
             // tileId:  'totalDevices',
             tableId:    'user-agents-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadUserAgentsTimeFrameTotal`,
             totals: {
                 type: 'userAgent',
                 columns: ['total_account'],
@@ -31,9 +31,16 @@ export class UserAgentsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadUserAgentsChart`,
+            getParams:  this.getParamsSection,
+        };
 
-        new UserAgentsChart(chartParams);
-        new UserAgentsGrid(gridParams);
+        const elements = [
+            [UserAgentsChart,    chartParams],
+            [UserAgentsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

@@ -8,9 +8,9 @@ class A01 extends \Tirreno\Assets\Rule {
     public const ATTRIBUTES = [];
 
     protected function prepareParams(array $params): array {
-        $maximumAttempts = \Tirreno\Utils\Constants::get()->RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS;
-        $loginFail = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
-        $windowSize = \Tirreno\Utils\Constants::get()->RULE_LOGIN_ATTEMPTS_WINDOW;
+        $maximumAttempts = tirreno('utils')->constants->RULE_MAXIMUM_NUMBER_OF_LOGIN_ATTEMPTS;
+        $loginFail = tirreno('utils')->constants->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
+        $windowSize = tirreno('utils')->constants->RULE_LOGIN_ATTEMPTS_WINDOW;
         $tooManyLoginAttempts = false;
         $cnt = 0;
         $start = 0;

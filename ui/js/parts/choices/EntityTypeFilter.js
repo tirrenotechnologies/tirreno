@@ -1,8 +1,8 @@
-import {BaseFilter} from './BaseFilter.js?v=2';
+import {BaseFilter} from './BaseFilter.js?v=0.10.0';
 import {
     renderEntityTypeSelectorItem,
     renderEntityTypeSelectorChoice,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class EntityTypeFilter extends BaseFilter {
     constructor() {

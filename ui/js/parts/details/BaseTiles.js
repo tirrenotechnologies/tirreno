@@ -1,7 +1,7 @@
-import {Loader} from '../Loader.js?v=2';
-import {Tooltip} from '../Tooltip.js?v=2';
-import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
+import {Loader} from '../Loader.js?v=0.10.0';
+import {Tooltip} from '../Tooltip.js?v=0.10.0';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=0.10.0';
+import {fireEvent} from '../utils/Event.js?v=0.10.0';
 
 export class BaseTiles {
     constructor(tilesParams) {
@@ -32,7 +32,7 @@ export class BaseTiles {
 
         $.ajax({
             url: `${url}?token=${token}`,
-            type: 'get',
+            type: 'GET',
             scope: me,
             data: params,
             success: function(response) {

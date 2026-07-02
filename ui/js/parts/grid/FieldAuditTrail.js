@@ -1,11 +1,11 @@
-import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=0.10.0';
 import {
     renderTime,
     renderAuditField,
     renderAuditValue,
     renderAuditParent,
     renderUserWithScore,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class FieldAuditTrailGrid extends BaseGridWithPanel {
     onTableRowClicked(e) {

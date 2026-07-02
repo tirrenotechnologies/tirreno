@@ -21,7 +21,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     protected ?string $defaultOrder = 'event_account.id DESC';
     protected string $dateRangeField = 'event_account.lastseen';
 
-    protected array $allowedColumns = ['score', 'accounttitle', 'firstname', 'lastname', 'created', 'lastseen', 'fraud', 'id'];
+    protected array $allowedColumns = ['score', 'accounttitle', 'created', 'lastseen', 'fraud', 'id'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -100,7 +100,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_account.id', $queryParams);
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -120,7 +120,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
-            $queryParams[':offset'] = strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset());
+            $queryParams[':offset'] = strval(tirreno('utils')->timezones->getCurrentOperatorOffset());
         }
 
         //Add search and ids into request
@@ -128,7 +128,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = \Tirreno\Utils\Conversion::getArrayRequestParam('ruleUids');
+        $ruleUids = tirreno('utils')->conversion->getArrayRequestParam('ruleUids');
         if (!$ruleUids) {
             return;
         }
@@ -143,7 +143,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyScore(string &$query, array &$queryParams): void {
-        $scoresRanges = \Tirreno\Utils\Conversion::getArrayRequestParam('scoresRange');
+        $scoresRanges = tirreno('utils')->conversion->getArrayRequestParam('scoresRange');
         if (!$scoresRanges) {
             return;
         }
@@ -151,7 +151,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $clauses = [];
         foreach ($scoresRanges as $key => $scoreBase) {
             $clauses[] = sprintf('event_account.score >= :score_base_%s AND event_account.score <= :score_base_%s + 10', $key, $key);
-            $queryParams[':score_base_' . $key] = \Tirreno\Utils\Conversion::intValCheckEmpty($scoreBase, 0);
+            $queryParams[':score_base_' . $key] = tirreno('utils')->conversion->intValCheckEmpty($scoreBase, 0);
         }
 
         $query .= ' AND (' . implode(' OR ', $clauses) . ')';

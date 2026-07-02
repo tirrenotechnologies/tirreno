@@ -16,5 +16,5 @@
 declare(strict_types=1);
 
 return [
-    'AdminTotals_success_message' => 'Totals calculated successfully.',
+    'totals_success_message' => 'Totals calculated successfully.',
 ];

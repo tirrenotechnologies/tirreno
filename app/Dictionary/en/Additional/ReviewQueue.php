@@ -16,5 +16,5 @@
 declare(strict_types=1);
 
 return [
-    'Base_table_column_reviewed_status_tooltip' => 'A user can be blacklisted or whitelisted. To put a user on a list, click "Not reviewed" button and then choose an applicable status.',
+    'Base_table_column_reviewed_status_tooltip' => 'An entity can be blacklisted or whitelisted. To put an entity on a list, click "Not reviewed" button and then choose an applicable status.',
 ];

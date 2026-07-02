@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Log extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_logs';
+class Log extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_logs';
 
     public function insertRecord(array $data): void {
         $params = [

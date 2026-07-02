@@ -84,12 +84,12 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Add dates into request
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = '';
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $extra = '';
-            if (\Tirreno\Utils\Conversion::filterIp($search['value'])) {
+            if (tirreno('utils')->conversion->filterIp($search['value'])) {
                 $extra = ' event_logbook.ip = :search_ip_value OR ';
                 $queryParams[':search_ip_value'] = $search['value'];
             }
@@ -114,8 +114,8 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
 
     protected function applyDateRange(string &$query, array &$queryParams): void {
         // apply server offset to utc requested date range because dateRangeField is in server time zone
-        $serverOffset = \Tirreno\Utils\Timezones::getServerOffset();
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest($serverOffset);
+        $serverOffset = tirreno('utils')->timezones->getServerOffset();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest($serverOffset);
 
         if ($dateRange) {
             $searchConditions = (

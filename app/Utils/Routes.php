@@ -18,56 +18,45 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Routes {
-    private static function getF3(): \Base {
-        return \Base::instance();
-    }
-
-    public static function getCurrentRequestOperator(): ?\Tirreno\Entities\Operator {
-        return self::getF3()->get('CURRENT_USER');
+    public static function getCurrentRequestOperator(): \Tirreno\Entities\Operator {
+        return tirreno('storage')->get('CURRENT_USER') ?? tirreno('entities')->operator->getById(tirreno('utils')->constants->GUEST_OPERATOR_ID);
     }
 
     public static function setCurrentRequestOperator(): void {
-        self::getF3()->set('CURRENT_USER', self::getCurrentSessionOperator());
+        tirreno('storage')->set('CURRENT_USER', self::getCurrentSessionOperator());
     }
 
-    public static function getCurrentSessionOperator(): ?\Tirreno\Entities\Operator {
-        $loggedInOperatorId = \Tirreno\Utils\Conversion::intValCheckEmpty(self::getF3()->get('SESSION.active_user_id'));
+    public static function getCurrentSessionOperator(): \Tirreno\Entities\Operator {
+        $loggedInOperatorId = tirreno('utils')->conversion->intValCheckEmpty(tirreno('session')->get('active_user_id'));
+        $loggedInOperatorId = $loggedInOperatorId ? $loggedInOperatorId : tirreno('utils')->constants->GUEST_OPERATOR_ID;
 
-        return $loggedInOperatorId ? \Tirreno\Entities\Operator::getById($loggedInOperatorId) : null;
+        if (!tirreno('models')->operatorsRoles->tableExists()) {
+            tirreno('utils')->updates->syncUpdates();
+        }
+
+        return tirreno('entities')->operator->getById($loggedInOperatorId);
     }
 
     public static function getCurrentRequestApiKey(): ?\Tirreno\Entities\ApiKey {
-        return self::getF3()->get('CURRENT_KEY');
+        return tirreno('storage')->get('CURRENT_KEY');
     }
 
     public static function setCurrentRequestApiKey(): void {
-        self::getF3()->set('CURRENT_KEY', self::getCurrentSessionApiKey());
+        tirreno('storage')->set('CURRENT_KEY', self::getCurrentSessionApiKey());
     }
 
     public static function getCurrentSessionApiKey(): ?\Tirreno\Entities\ApiKey {
-        $keyId = self::getF3()->get('TEST_API_KEY_ID');
+        $keyId = tirreno('storage')->get('TEST_API_KEY_ID');
 
         if (!$keyId) {
-            $keyId = \Tirreno\Utils\Conversion::intValCheckEmpty(self::getF3()->get('SESSION.active_key_id'));
+            $keyId = tirreno('utils')->conversion->intValCheckEmpty(tirreno('session')->get('active_key_id'));
         }
 
-        return $keyId ? \Tirreno\Entities\ApiKey::getById($keyId) : null;
-    }
-
-    public static function redirectIfUnlogged(string $targetPage = '/'): void {
-        if (!boolval(self::getCurrentRequestOperator())) {
-            self::getF3()->reroute($targetPage);
-        }
-    }
-
-    public static function redirectIfLogged(): void {
-        if (boolval(self::getCurrentRequestOperator())) {
-            self::getF3()->reroute('/');
-        }
+        return $keyId ? tirreno('entities')->apiKey->getById($keyId) : null;
     }
 
     public static function callExtra(string $method, mixed ...$extra): string|array|null {
-        $method = \Base::instance()->get('EXTRA_' . $method);
+        $method = tirreno('storage')->get('EXTRA_' . $method);
 
         return $method && is_callable($method) ? $method(...$extra) : null;
     }

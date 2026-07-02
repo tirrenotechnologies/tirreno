@@ -1,6 +1,6 @@
-<form method="POST" action="{{ @BASE }}{{ 'api' | alias }}">
+<form method="POST" action="{{ @BASE }}{{ 'api' | alias }}" id="reset-api-key-form">
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="cmd" value="resetKey">
     <input type="hidden" name="keyId" value="{{ @id }}">
-    <button class="button is-danger" type="submit" {{@isOwner ? '' : 'disabled'}}>{{@AdminApi_table_button_reset }}</button>
+    <button class="button is-danger" type="submit" id="reset-api-key-btn" {{@isOwner ? '' : 'disabled'}}>{{@api_table_button_reset }}</button>
 </form>

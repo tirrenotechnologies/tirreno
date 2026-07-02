@@ -19,5 +19,5 @@ return [
     'Welcome_hello_with_name' => 'Hello, ',
     'Welcome_hello_without_name' => 'Hello',
     'Welcome_how_are_you_doing' => 'I hope you are having a great day!',
-    'Welcome_global_search_placeholder' => 'Search User ID, Last name, IP, ASN',
+    'Welcome_global_search_placeholder' => 'Search Entity ID, IP, ASN',
 ];

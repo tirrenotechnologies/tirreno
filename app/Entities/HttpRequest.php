@@ -17,17 +17,17 @@ declare(strict_types=1);
 
 namespace Tirreno\Entities;
 
-final class HttpRequest {
-    private string $url;
-    private string $method;
+class HttpRequest {
+    protected string $url;
+    protected string $method;
 
     /** @var array<int, string> */
-    private array $headers;
+    protected array $headers;
 
-    private ?string $body;
-    private int $connectTimeoutSeconds;
-    private int $timeoutSeconds;
-    private bool $sslVerify;
+    protected ?string $body;
+    protected int $connectTimeoutSeconds;
+    protected int $timeoutSeconds;
+    protected bool $sslVerify;
 
     public function __construct(
         string $url,
@@ -36,7 +36,7 @@ final class HttpRequest {
         ?string $body,
         int $connectTimeoutSeconds = 3,
         int $timeoutSeconds = 15,
-        bool $sslVerify = true
+        bool $sslVerify = true,
     ) {
         $this->url = $url;
         $this->method = $method;
@@ -47,6 +47,42 @@ final class HttpRequest {
         $this->sslVerify = $sslVerify;
     }
 
+    public static function create(
+        string $url,
+        string $method,
+        array $headers,
+        ?string $body,
+        int $connectTimeoutSeconds = 3,
+        int $timeoutSeconds = 15,
+        bool $sslVerify = true,
+    ): self {
+        return new self(
+            $url,
+            $method,
+            $headers,
+            $body,
+            $connectTimeoutSeconds,
+            $timeoutSeconds,
+            $sslVerify,
+        );
+    }
+
+    public function __set(string $name, mixed $value): void {
+        if (!property_exists($this, $name)) {
+            throw new \Exception('Unknown property ' . $name);
+        }
+
+        $this->$name = $value;
+    }
+
+    public function __get(string $name): mixed {
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+
+        throw new \Exception('Unknown property ' . $name);
+    }
+
     public function url(): string {
         return $this->url;
     }
@@ -55,6 +91,9 @@ final class HttpRequest {
         return $this->method;
     }
 
+    /**
+     * @return array<int,string>
+     */
     public function headers(): array {
         return $this->headers;
     }

@@ -21,22 +21,20 @@ class QueuesClearer extends Base {
     public const DATETIME_FORMAT = 'Y-m-d H:i:s.u';
 
     public function process(): void {
-        $days = \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS;
+        $days = tirreno('utils')->constants->ACCOUNT_OPERATION_QUEUE_CLEAR_COMPLETED_AFTER_DAYS;
         $before = (new \DateTime(strval($days) . ' days ago'))->format(self::DATETIME_FORMAT);
 
         $queues = [
-            \Tirreno\Utils\Constants::get()->BLACKLIST_QUEUE_ACTION_TYPE,
-            \Tirreno\Utils\Constants::get()->DELETE_USER_QUEUE_ACTION_TYPE,
-            \Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE,
+            tirreno('utils')->constants->BLACKLIST_QUEUE_ACTION_TYPE,
+            tirreno('utils')->constants->DELETE_USER_QUEUE_ACTION_TYPE,
+            tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE,
         ];
 
         $cnt = 0;
 
-        $model = new \Tirreno\Models\Queue();
-
         // delete completed records
         foreach ($queues as $queue) {
-            $cnt += $model->clearQueue($queue, $before);
+            $cnt += tirreno('models')->queue->clearQueue($queue, $before);
         }
 
         $this->addLog(sprintf('Cleared %s completed items.', $cnt));

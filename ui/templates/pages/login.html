@@ -1,20 +1,14 @@
-<include href="templates/parts/header.html" />
-<section class="front-block">
-    <div class="container">
-        <div class="column-login">
-            <check if="{{ isset(@ERROR_MESSAGE) }}">
-                <true>
-                    <p class="warning-text">{{ @ERROR_MESSAGE }}</p>
-                </true>
-            </check>
-            <div class="card">
-                <div class="card-panel">
-                    <div class="content">
-                        <include href="templates/parts/forms/loginForm.html" />
-                    </div>
-                </div>
+<div class="column-login">
+    <check if="{{ isset(@ERROR_MESSAGE) }}">
+        <true>
+            <p class="warning-text">{{ @ERROR_MESSAGE }}</p>
+        </true>
+    </check>
+    <div class="card">
+        <div class="card-panel">
+            <div class="content">
+                <include href="templates/parts/forms/loginForm.html" />
             </div>
         </div>
     </div>
-</section>
-<include href="templates/parts/footer.html" />
+</div>

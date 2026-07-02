@@ -16,9 +16,9 @@
 declare(strict_types=1);
 
 return [
-    'AdminEmails_page_title' => 'Emails',
-    'AdminEmails_breadcrumb_title' => 'Emails',
-    'AdminEmails_table_title' => 'Emails',
-    'AdminEmails_table_title_tooltip' => 'A list of email addresses linked to the user.',
-    'AdminEmails_search_placeholder' => 'Search placeholder for emails',
+    'emails_page_title' => 'Emails',
+    'emails_breadcrumb_title' => 'Emails',
+    'emails_table_title' => 'Emails',
+    'emails_table_title_tooltip' => 'A list of email addresses linked to the entity.',
+    'emails_search_placeholder' => 'Search placeholder for emails',
 ];

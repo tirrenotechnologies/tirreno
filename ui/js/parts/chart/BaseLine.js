@@ -1,5 +1,5 @@
-import {BaseChart}  from './BaseChart.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
+import {BaseChart}  from './BaseChart.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
 
 export class BaseLineChart extends BaseChart {
     getSeries() {

@@ -18,6 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Entities;
 
 class Operator {
+    // TODO: should be private and immutable, should provide getters for operatorFields
     public int $id;
     public string $email;
     public ?string $password;
@@ -34,6 +35,8 @@ class Operator {
     public string $reminderFreq;
     //public ?string $lastUnreviewedItemsReminderFreq;
     public ?int $blacklistUsersCnt;
+    public array $roles;            // [string]
+    public array $permissions;      // [int]
 
     // TODO: do we need isOwner?
     public function __construct(
@@ -49,6 +52,7 @@ class Operator {
         ?string $lastEventTime,
         string $reminderFreq,
         ?int $blacklistUsersCnt,
+        array $rolesPermissions,
     ) {
         $this->id                   = $id;
         $this->email                = $email;
@@ -62,15 +66,18 @@ class Operator {
         $this->lastEventTime        = $lastEventTime;
         $this->reminderFreq         = $reminderFreq;
         $this->blacklistUsersCnt    = $blacklistUsersCnt;
+        $this->roles                = array_keys($rolesPermissions);
+        $this->permissions          = array_unique(array_column(array_merge(...array_values($rolesPermissions)), 'permission_value'));
     }
 
-    public static function getById(int $operatorId): ?self {
-        $model = new \Tirreno\Models\Operator();
-        $operator = $model->getOperatorById($operatorId);
+    public static function getById(int $operatorId): self {
+        $operator = tirreno('models')->operator->getOperatorById($operatorId);
 
         if (!$operator) {
-            return null;
+            $operator = tirreno('models')->operator->getOperatorById(tirreno('utils')->constants->GUEST_OPERATOR_ID);
         }
+
+        $rolesPermissions = tirreno('utils')->operatorAccess->getRolesWithPermissions($operator['id']);
 
         return new self(
             $operator['id'],
@@ -85,6 +92,59 @@ class Operator {
             $operator['last_event_time'],
             $operator['unreviewed_items_reminder_freq'],
             $operator['blacklist_users_cnt'],
+            $rolesPermissions
         );
+    }
+
+    public function addRole(string $role): void {
+        tirreno('utils')->operatorAccess->addOperatorRole($role, $this->id);
+    }
+
+    public function hasRole(string $role): bool {
+        return tirreno('utils')->operatorAccess->operatorHasRole($role, $this->id);
+    }
+
+    public function removeRole(string $role): void {
+        tirreno('utils')->operatorAccess->removeOperatorRole($role, $this->id);
+    }
+
+    public function getRoles(): array {
+        return tirreno('utils')->operatorAccess->getRoles($this->id);
+    }
+
+    public function hasPermission(int $permission): bool {
+        return tirreno('utils')->operatorAccess->hasPermission($permission, $this->id);
+    }
+
+    public function isSuperuser(): bool {
+        return in_array('superuser', $this->roles);
+    }
+
+    public function isGuest(): bool {
+        return $this->id === tirreno('utils')->constants->GUEST_OPERATOR_ID;
+    }
+
+    public function isLoggedIn(): bool {
+        return !$this->isGuest();
+    }
+
+    public function viewable(string $pageValue): bool {
+        return tirreno('utils')->operatorAccess->viewable($pageValue, $this->id);
+    }
+
+    public function editable(string $pageValue): bool {
+        return tirreno('utils')->operatorAccess->editable($pageValue, $this->id);
+    }
+
+    public function deleteable(string $pageValue): bool {
+        return tirreno('utils')->operatorAccess->deleteable($pageValue, $this->id);
+    }
+
+    public function publishable(string $pageValue): bool {
+        return tirreno('utils')->operatorAccess->publishable($pageValue, $this->id);
+    }
+
+    public function adminable(string $pageValue): bool {
+        return tirreno('utils')->operatorAccess->adminable($pageValue, $this->id);
     }
 }

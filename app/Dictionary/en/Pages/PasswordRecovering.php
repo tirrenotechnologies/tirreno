@@ -16,9 +16,9 @@
 declare(strict_types=1);
 
 return [
-    'PasswordRecovering_page_title' => 'Renew password',
-    'PasswordRecovering_form_title' => 'Renew password',
-    'PasswordRecovering_form_newPassword_label' => 'New Password',
-    'PasswordRecovering_form_confirmPassword_label' => 'Confirm Password',
-    'PasswordRecovering_form_renew_button' => 'Renew',
+    'passwordRecovering_page_title' => 'Renew password',
+    'passwordRecovering_form_title' => 'Renew password',
+    'passwordRecovering_form_newPassword_label' => 'New Password',
+    'passwordRecovering_form_confirmPassword_label' => 'Confirm Password',
+    'passwordRecovering_form_renew_button' => 'Renew',
 ];

@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'AdminCountries_page_title' => 'Countries',
-    'AdminCountries_breadcrumb_title' => 'Countries',
-    'AdminCountries_search_placeholder' => 'Country',
+    'countries_page_title' => 'Countries',
+    'countries_breadcrumb_title' => 'Countries',
+    'countries_search_placeholder' => 'Country',
 
-    'AdminCountries_map_title' => 'Countries',
-    'AdminCountries_map_title_tooltip' => 'This page outputs location-related information, as identified by IP addresses. The data is shown for a selected period of time. To open a page with detailed information on a particular country, click on a table row. The map visualizes the geolocated countries and the number of users from each country.',
+    'countries_map_title' => 'Countries',
+    'countries_map_title_tooltip' => 'This page outputs location-related information, as identified by IP addresses. The data is shown for a selected period of time. To open a page with detailed information on a particular country, click on a table row. The map visualizes the geolocated countries and the number of entities from each country.',
 ];

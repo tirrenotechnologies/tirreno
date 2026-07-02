@@ -36,29 +36,35 @@ class Conversion {
     }
 
     public static function getIntRequestParam(string $key, bool $nullable = false): ?int {
-        return self::intVal(\Base::instance()->get('REQUEST.' . $key), $nullable ? null : 0);
+        return self::intVal(tirreno('request')->getRequestParam($key), $nullable ? null : 0);
     }
 
     public static function getStringRequestParam(string $key, bool $nullable = false): ?string {
-        $value = \Base::instance()->get('REQUEST.' . $key);
+        $value = tirreno('request')->getRequestParam($key);
 
         return $value ? strval($value) : ($nullable ? null : '');
     }
 
+    public static function getTimestampRequestParam(string $key, bool $nullable = false): ?string {
+        $value = tirreno('request')->getRequestParam($key);
+
+        return $value && strtotime(strval($value)) ? strval($value) : ($nullable ? null : '');
+    }
+
     public static function getArrayRequestParam(string $key, bool $nullable = false): ?array {
-        $value = \Base::instance()->get('REQUEST.' . $key);
+        $value = tirreno('request')->getRequestParam($key);
 
         return is_array($value) ? array_values($value) : ($nullable ? null : []);
     }
 
     public static function getDictionaryRequestParam(string $key, bool $nullable = false): ?array {
-        $value = \Base::instance()->get('REQUEST.' . $key);
+        $value = tirreno('request')->getRequestParam($key);
 
         return is_array($value) ? $value : ($nullable ? null : []);
     }
 
     public static function getIntUrlParam(string $key, bool $nullable = false): ?int {
-        return self::intVal(\Base::instance()->get('PARAMS.' . $key), $nullable ? null : 0);
+        return self::intVal(tirreno('request')->getUrlParam($key), $nullable ? null : 0);
     }
 
     public static function formatKiloValue(int $value): string {

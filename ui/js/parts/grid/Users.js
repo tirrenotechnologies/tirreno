@@ -1,13 +1,11 @@
-import {BaseGrid} from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
 import {
     renderClickableImportantUserWithScore,
     renderDate,
-    renderUserFirstname,
     renderUserId,
-    renderUserLastname,
     renderUserReviewedStatus,
     renderTime,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class UsersGrid extends BaseGrid {
     get orderConfig() {
@@ -25,28 +23,20 @@ export class UsersGrid extends BaseGrid {
                 targets: 1
             },
             {
-                className: 'user-name-col',
+                className: 'user-date-col',
                 targets: 2
             },
             {
-                className: 'user-name-col',
+                className: 'user-timestamp-col',
                 targets: 3
             },
             {
-                className: 'user-date-col',
+                className: 'user-status-col',
                 targets: 4
             },
             {
-                className: 'user-timestamp-col',
-                targets: 5
-            },
-            {
-                className: 'user-status-col',
-                targets: 6
-            },
-            {
                 visible: false,
-                targets: 7
+                targets: 5
             }
         ];
 
@@ -64,18 +54,6 @@ export class UsersGrid extends BaseGrid {
             {
                 data: 'accounttitle',
                 render: renderUserId
-            },
-            {
-                data: 'firstname',
-                render: (data, type, record) => {
-                    return renderUserFirstname(record);
-                },
-            },
-            {
-                data: 'lastname',
-                render: (data, type, record) => {
-                    return renderUserLastname(record);
-                },
             },
             {
                 data: 'created',

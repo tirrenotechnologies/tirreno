@@ -16,24 +16,24 @@
 declare(strict_types=1);
 
 return [
-    'Details_placeholder' => 'Event report',
+    'Details_placeholder' => 'Event summary',
     'Details_event_time' => 'Timestamp',
     'Details_event_type' => 'Event type',
     'Details_event_http_method' => 'HTTP method',
     'Details_event_http_code' => 'HTTP code',
-    'Details_user_count' => 'User count',
+    'Details_user_count' => 'Entity count',
     'Details_event_count' => 'Event count',
     'Details_payload' => 'Payload',
 
     //User
     'Details_user_id' => 'Trust score & email',
-    'Details_accounttitle' => 'User ID',
+    'Details_accounttitle' => 'Entity ID',
     'Details_full_name' => 'Name',
     'Details_firstname' => 'First name',
     'Details_lastname' => 'Last name',
     'Details_reviewed_status' => 'Review status',
     'Details_latest_decision' => 'Latest decision',
-    'Details_score_details' => 'User score details',
+    'Details_score_details' => 'Matched rules',
 
     //Phone
     'Phone_details_placeholder' => 'Phone details',
@@ -45,7 +45,7 @@ return [
     'Details_phone_invalid' => 'Invalid',
     'Details_phone_fraud_detected' => 'Blacklisted',
     'Details_phone_alert_list' => 'Global alert',
-    'Details_shared_users' => 'Users with the same phone',
+    'Details_shared_users' => 'Entities with the same phone',
 
     //Email
     'Email_details_placeholder' => 'Email details',

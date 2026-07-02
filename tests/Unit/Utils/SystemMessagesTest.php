@@ -10,20 +10,15 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\SystemMessages.
  *
- * Covered (unit-testable without refactor):
- * - SystemMessages::syslogLine() (PRI calculation + message normalization + output format invariants)
+ * Covered:
+ * - SystemMessages::syslogLine()
  *
- * Not covered (recommended to refactor first):
- * - SystemMessages::get() (Routes/Models/Base/Timezones side effects; time-dependent formatting; DB access)
- * - private helpers (getNoEventsMessage/getOveruseMessage/getInactiveCronMessage/canTakeLastEventTimeFromCache/getCustomErrorMessage)
- *   because they instantiate Models directly and call global statics.
+ * @todo Cover SystemMessages::get() after routes, models, entities,
+ *       date range, timezone, storage and current time dependencies
+ *       can be replaced in tests.
  *
- * @todo Refactor:
- * - extract side-effecting collaborators behind interfaces:
- *   RoutesInterface, TimezoneServiceInterface, DateRangeInterface, ClockInterface,
- *   SystemMessagesRepositoryInterface (Message/Logbook/Cursor/ApiKeys/Operator access),
- *   ErrorTextProviderInterface (Base dictionary access).
- * - after that, get() becomes deterministic and properly unit-testable (including edge cases).
+ * @todo Cover message-building branches after private helper logic is
+ *       extracted into deterministic collaborators.
  */
 final class SystemMessagesTest extends TestCase {
     public function testSyslogLineBuildsPriTimestampHostAppPidAndMessage(): void {

@@ -10,61 +10,31 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\ApiKeys.
  *
- * Covered (unit-testable without refactor):
- * - ApiKeys::getCurrentOperatorApiKeyId() returns null when current operator is missing
- * - ApiKeys::getCurrentOperatorApiKeyString() returns null when current operator is missing
- * - ApiKeys::getCurrentOperatorEnrichmentKeyString() returns null when current operator is missing
+ * Covered:
+ * - ApiKeys::getCurrentOperatorApiKeyId() returns null when current request API key is missing.
+ * - ApiKeys::getCurrentOperatorApiKeyString() returns null when current request API key is missing.
+ * - ApiKeys::getCurrentOperatorEnrichmentKeyString() returns null when current request API key is missing.
  *
- * Not covered (unstable without refactor):
- * - ApiKeys::getOperatorApiKeys() (new Models inside; DB / storage required)
- * - ApiKeys::getCurrentOperatorApiKeyObject() positive branches:
- *   - depends on Routes::getCurrentRequestOperator() (static global)
- *   - depends on Models\ApiKeys / ApiKeyCoOwner (new Models inside)
- *   - "TEST_API_KEY_ID" branch depends on getKeyById() and storage
+ * @todo Cover positive branches of current request API key methods after
+ *       tirreno('utils')->routes current request API key resolving can be replaced in tests.
  *
- * @todo Refactor:
- * - extract CurrentOperatorProviderInterface (instead of static Routes::getCurrentRequestOperator())
- * - inject ApiKeysModelInterface / ApiKeyCoOwnerModelInterface (instead of new Models)
- * - avoid calling getKeyById() multiple times in TEST_API_KEY_ID branch (fetch once)
+ * @todo Cover ApiKeys::getOperatorApiKeys() after ApiKeys and ApiKeyCoOwner
+ *       model access is extracted into replaceable dependencies or repository interfaces.
+ *
+ * @todo Cover ApiKeys::getFirstKeyByOperatorId() after ApiKeys and ApiKeyCoOwner
+ *       model access is extracted into replaceable dependencies or repository interfaces.
  */
 final class ApiKeysTest extends TestCase {
-    private \Base $f3;
-
-    /** @var array<string, mixed> */
-    private array $f3Backup = [];
-
-    /** @var list<string> */
-    private array $f3Keys = [
-        'TEST_API_KEY_ID',
-    ];
-
-    protected function setUp(): void {
-        parent::setUp();
-
-        $this->f3 = \Base::instance();
-
-        $this->backupF3();
-        $this->clearF3();
-    }
-
-    protected function tearDown(): void {
-        $this->restoreF3();
-
-        parent::tearDown();
-    }
-
     /**
-     * @dataProvider nullWhenNoCurrentOperatorProvider
+     * @dataProvider nullWhenNoCurrentApiKeyProvider
      */
-    public function testReturnsNullWhenNoCurrentOperator(string $method): void {
-        $this->f3->clear('TEST_API_KEY_ID');
-
+    public function testReturnsNullWhenNoCurrentApiKey(string $method): void {
         $actual = ApiKeys::$method();
 
         $this->assertNull($actual);
     }
 
-    public static function nullWhenNoCurrentOperatorProvider(): array {
+    public static function nullWhenNoCurrentApiKeyProvider(): array {
         return [
             'getCurrentOperatorApiKeyId' => [
                 'method' => 'getCurrentOperatorApiKeyId',
@@ -76,29 +46,5 @@ final class ApiKeysTest extends TestCase {
                 'method' => 'getCurrentOperatorEnrichmentKeyString',
             ],
         ];
-    }
-
-    private function backupF3(): void {
-        foreach ($this->f3Keys as $key) {
-            if ($this->f3->exists($key)) {
-                $this->f3Backup[$key] = $this->f3->get($key);
-            }
-        }
-    }
-
-    private function clearF3(): void {
-        foreach ($this->f3Keys as $key) {
-            $this->f3->clear($key);
-        }
-    }
-
-    private function restoreF3(): void {
-        foreach ($this->f3Keys as $key) {
-            $this->f3->clear($key);
-        }
-
-        foreach ($this->f3Backup as $key => $value) {
-            $this->f3->set($key, $value);
-        }
     }
 }

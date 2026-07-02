@@ -11,7 +11,7 @@ class A04 extends \Tirreno\Assets\Rule {
         $eventNewDeviceNewCidr = false;
         if ($params['eup_device_count'] > 1 && $params['eip_unique_cidrs'] > 1) {
             foreach (array_keys($params['event_device']) as $idx) {
-                if (\Tirreno\Utils\Rules::eventDeviceIsNew($params, $idx) && \Tirreno\Utils\Rules::cidrIsNewByIpId($params, $params['event_ip'][$idx])) {
+                if (tirreno('utils')->rules->eventDeviceIsNew($params, $idx) && tirreno('utils')->rules->cidrIsNewByIpId($params, $params['event_ip'][$idx])) {
                     $eventNewDeviceNewCidr = true;
                     break;
                 }

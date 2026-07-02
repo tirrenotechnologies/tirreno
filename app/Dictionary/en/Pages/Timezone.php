@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'AdminTimezone_form_title' => 'Time zone',
-    'AdminTimezone_form_title_tooltip' => 'Select the server’s time zone.',
-    'AdminTimezone_form_button_save' => 'Update',
+    'settings_timezone_form_title' => 'Time zone',
+    'settings_timezone_form_title_tooltip' => 'Select the server\'s time zone.',
+    'settings_timezone_form_button_save' => 'Update',
 
-    'AdminTimezone_form_field_timezone_label' => 'City',
-    'AdminTimezone_changeTimezone_success_message' => 'Time zone has been successfully updated.',
+    'settings_timezone_form_field_timezone_label' => 'City',
+    'settings_timezone_changeTimezone_success_message' => 'Time zone has been successfully updated.',
 ];

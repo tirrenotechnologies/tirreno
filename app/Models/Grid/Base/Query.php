@@ -17,8 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Grid\Base;
 
-class Query {
-    protected ?\Base $f3 = null;
+abstract class Query {
     protected ?int $apiKey = null;
     protected ?string $ids = null;
     protected ?array $idsParams = [];
@@ -30,23 +29,23 @@ class Query {
 
     protected array $allowedColumns = [];
 
-    public function __construct(int $apiKey) {
-        $this->f3 = \Base::instance();
-        $this->apiKey = $apiKey;
-    }
+    abstract public function getData(): array;
 
-    public function setIds(?string $ids, array $idsParams): void {
+    abstract public function getTotal(): array;
+
+    public function setIds(?string $ids, array $idsParams, int $apiKey): void {
         $this->ids = $ids;
         $this->idsParams = $idsParams;
         if (count($this->idsParams)) {
             $this->itemKey = array_keys($this->idsParams)[0];
             $this->itemId = $this->idsParams[$this->itemKey];
         }
+        $this->apiKey = $apiKey;
     }
 
     protected function applyOrder(string &$query): void {
-        $order = \Tirreno\Utils\Conversion::getArrayRequestParam('order');
-        $columns = \Tirreno\Utils\Conversion::getArrayRequestParam('columns');
+        $order = tirreno('utils')->conversion->getArrayRequestParam('order');
+        $columns = tirreno('utils')->conversion->getArrayRequestParam('columns');
 
         $orderCondition = $this->defaultOrder;
 
@@ -72,7 +71,7 @@ class Query {
     }
 
     protected function applyDateRange(string &$query, array &$queryParams): void {
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
 
         if ($dateRange) {
             $searchConditions = (
@@ -88,8 +87,8 @@ class Query {
     }
 
     protected function applyLimit(string &$query, array &$queryParams): void {
-        $start = \Tirreno\Utils\Conversion::getIntRequestParam('start');
-        $length = \Tirreno\Utils\Conversion::getIntRequestParam('length');
+        $start = tirreno('utils')->conversion->getIntRequestParam('start');
+        $length = tirreno('utils')->conversion->getIntRequestParam('length');
 
         if (isset($start) && isset($length)) {
             $query .= ' LIMIT :length OFFSET :start';

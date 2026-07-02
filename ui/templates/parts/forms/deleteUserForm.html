@@ -2,6 +2,12 @@
     <input type="hidden" name="cmd" value="delete" />
     <input type="hidden" name="token" value="{{ @CSRF }}">
     <input type="hidden" name="accountid" value="{{@USER.accountid}}"/>
-    <button class="button is-danger" data-type="remove" id="right-to-be-forgotten-button" type="submit" {{@SCHEDULED_FOR_DELETION ? 'disabled' : ''}}>{{ @AdminUser_remove_user_button }}</button>
-    <span id="scheduled-deletion-text" {{@SCHEDULED_FOR_DELETION ? '' : 'style="display: none"'}}>{{ @AdminUser_scheduled_for_removal }}</span>
+    <check if="{{ @SCHEDULED_FOR_DELETION }}">
+        <true>
+            <span id="scheduled-deletion-text" class="warning-text">{{ @user_scheduled_for_removal }}</span>
+        </true>
+        <false>
+            <button class="button is-danger" data-type="remove" id="right-to-be-forgotten-button" type="submit">{{ @user_remove_user_button }}</button>
+        </false>
+    </check>
 </form>

@@ -1,6 +1,7 @@
-import {renderScoreDetails} from './DataRenderers.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
-import {Tooltip} from './Tooltip.js?v=2';
+import {renderScoreDetails} from './DataRenderers.js?v=0.10.0';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
+import {Tooltip} from './Tooltip.js?v=0.10.0';
+import {replaceChildren} from './utils/Functions.js?v=0.10.0';
 
 export class ScoreDetails {
     constructor(scoreParams) {
@@ -13,8 +14,8 @@ export class ScoreDetails {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: `${window.app_base}/admin/scoreDetails`,
-            type: 'get',
+            url: `${window.app_base}/scoreDetails`,
+            type: 'GET',
             data: {userId: this.config.userId, token: token},
             success: onScoreDetailsLoaded,
             error: handleAjaxError,
@@ -26,12 +27,7 @@ export class ScoreDetails {
             return;
         }
 
-        let el = this.contentDiv;
-
-        if (el) {
-            el.replaceChildren(renderScoreDetails(data));
-        }
-
+        replaceChildren(this.contentDiv, renderScoreDetails(data));
         this.initTooltips();
     }
 

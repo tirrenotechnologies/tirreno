@@ -1,4 +1,4 @@
-import {BasePanel} from './BasePanel.js?v=2';
+import {BasePanel} from './BasePanel.js?v=0.10.0';
 import {
     renderIp,
     renderTimeMsLogbook,
@@ -7,14 +7,14 @@ import {
     renderSensorError,
     renderJsonTextarea,
     renderMailto,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class LogbookPanel extends BasePanel {
     constructor() {
         let eventParams = {
-            enrichment: false,
+            enrichmentUrl: false,
             type: 'logbook',
-            url: `${window.app_base}/admin/logbookDetails`,
+            url: `${window.app_base}/logbookDetails`,
             cardId: 'logbook-card',
             panelClosed: 'logbookPanelClosed',
             closePanel: 'closeLogbookPanel',
@@ -24,10 +24,11 @@ export class LogbookPanel extends BasePanel {
     }
 
     proceedData(data) {
+        // ! render ip after endpoint because endpoint render checks if ip is empty
+        data.endpoint   = renderEndpoint(data, true);
         data.ip         = renderIp(data);
-        data.endpoint   = renderEndpoint(data);
         data.created    = renderTimeMsLogbook(data);
-        data.error_type = renderErrorType(data);
+        data.error_type = renderErrorType(data, true);
         data.error_text = renderSensorError(data);
         data.request    = renderJsonTextarea(data.raw);
 

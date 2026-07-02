@@ -1,6 +1,7 @@
-import {renderUserActionButtons} from './DataRenderers.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
-import {replaceAll} from './utils/String.js?v=2';
+import {renderUserActionButtons} from './DataRenderers.js?v=0.10.0';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
+import {replaceAll} from './utils/String.js?v=0.10.0';
+import {closest} from './utils/Functions.js?v=0.10.0';
 
 export class WatchlistBlock {
     constructor(userId) {
@@ -15,7 +16,7 @@ export class WatchlistBlock {
             if ('true'  == me.legitFraudButtonsBlock.dataset.userFraud) fraud = true;
             if ('false' == me.legitFraudButtonsBlock.dataset.userFraud) fraud = false;
 
-            const record = {reviewed: true, accountid: me.userId, fraud: fraud};
+            const record = {addedToReview: true, accountid: me.userId, fraud: fraud};
 
             let html = renderUserActionButtons(record);
             html = replaceAll(html, 'is-small', '');
@@ -49,13 +50,16 @@ export class WatchlistBlock {
         target.classList.add('is-loading');
 
         $.ajax({
-            type: 'POST',
+            type: 'PUT',
             url: url,
             data: data,
             scope: me,
             target: target,
             success: me.onSuccess,
             error: handleAjaxError,
+            complete: function() {
+                target.classList.remove('is-loading');
+            },
             dataType: 'json'
         });
 
@@ -87,7 +91,7 @@ export class WatchlistBlock {
             let html = renderUserActionButtons(record);
             html = replaceAll(html, 'is-small', '');
 
-            const div = target.closest('div.head-button');
+            const div = closest(target, 'div.head-button');
             div.innerHTML = html;
 
             const onButtonClick = me.onButtonClick.bind(me);

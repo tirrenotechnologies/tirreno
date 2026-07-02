@@ -1,0 +1,33 @@
+<div class="card events-card">
+    <header class="card-header">
+        <div class="card-header-title">{{ @LB_TITLE }}</div>
+    </header>
+
+    <div class="card-table">
+        <div class="content">
+            <table class="table dim-table" id="llm-bots-table">
+                <thead>
+                    <tr>
+                        <th>{{ @LB_COL_USERID }}</th>
+                        <th>{{ @LB_COL_EMAIL }}</th>
+                        <th>{{ @LB_COL_LASTSEEN }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <repeat group="{{ @ENTITIES }}" value="{{ @entity }}">
+                        <tr>
+                            <td><a href="{{ @BASE }}/id/{{ @entity['id'] }}">{{ @entity['userid'] }}</a></td>
+                            <td>{{ @entity['email'] }}</td>
+                            <td>{{ @entity['lastseen'] }}</td>
+                        </tr>
+                    </repeat>
+                    <check if="{{ !@ENTITIES }}">
+                        <tr>
+                            <td colspan="3">{{ @LB_NO_RESULTS }}</td>
+                        </tr>
+                    </check>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

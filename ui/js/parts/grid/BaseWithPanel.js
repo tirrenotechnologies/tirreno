@@ -1,5 +1,6 @@
-import {BaseGrid} from './Base.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
+import {fireEvent} from '../utils/Event.js?v=0.10.0';
+import {closest} from '../utils/Functions.js?v=0.10.0';
 
 export class BaseGridWithPanel extends BaseGrid {
     constructor(gridParams) {
@@ -85,7 +86,7 @@ export class BaseGridWithPanel extends BaseGrid {
 
         e.preventDefault();
 
-        const row    = e.target.closest('tr');
+        const row    = closest(e.target, 'tr');
         const itemId = row.dataset.itemId;
         const data   = {itemId: itemId};
 

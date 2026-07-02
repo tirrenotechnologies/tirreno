@@ -16,14 +16,14 @@
 declare(strict_types=1);
 
 return [
-    'AdminCountry_page_title' => 'Country',
-    'AdminCountry_breadcrumb_title' => 'Country',
+    'country_page_title' => 'Country',
+    'country_breadcrumb_title' => 'Country',
 
-    'AdminCountry_counters_total_users' => 'User count',
-    'AdminCountry_counters_total_ips' => 'IP count',
-    'AdminCountry_counters_total_events' => 'Event count',
+    'country_counters_total_users' => 'Entity count',
+    'country_counters_total_ips' => 'IP count',
+    'country_counters_total_events' => 'Event count',
 
-    'AdminCountry_counters_total_users_tooltip' => 'The number of users detected as making requests from the country.',
-    'AdminCountry_counters_total_ips_tooltip' => 'The number of IP addresses geolocated to the country.',
-    'AdminCountry_counters_total_events_tooltip' => 'The number of events reported for the country.',
+    'country_counters_total_users_tooltip' => 'The number of entities detected as making requests from the country.',
+    'country_counters_total_ips_tooltip' => 'The number of IP addresses geolocated to the country.',
+    'country_counters_total_events_tooltip' => 'The number of events reported for the country.',
 ];

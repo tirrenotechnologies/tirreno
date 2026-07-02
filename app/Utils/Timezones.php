@@ -25,22 +25,25 @@ class Timezones {
     private static function translateTimezone(array &$row, array $attributes = ['time', 'lastseen'], bool $useMilliseconds = false): void {
         foreach ($attributes as $attribute) {
             if (isset($row[$attribute])) {
-                self::localizeForActiveOperator($row[$attribute], $useMilliseconds);
+                $row[$attribute] = self::localizeForActiveOperator($row[$attribute], $useMilliseconds);
             }
         }
     }
 
-    public static function translateTimezones(array &$rows, array $attributes = ['time', 'lastseen'], bool $useMilliseconds = false): void {
-        $rows = array_map(function ($row) use ($attributes, $useMilliseconds) {
+    public static function translateTimezones(array $rows, array $attributes = ['time', 'lastseen'], bool $useMilliseconds = false): array {
+        foreach ($rows as &$row) {
             self::translateTimezone($row, $attributes, $useMilliseconds);
+        }
 
-            return $row;
-        }, $rows);
+        unset($row);
+
+        return $rows;
     }
 
     public static function localizeTimestamp(string $time, \DateTimeZone $from, \DateTimeZone $until, bool $useMilliseconds): string {
         $format = ($useMilliseconds) ? self::EVENT_FORMAT : self::FORMAT;
         $time = ($useMilliseconds) ? $time : explode('.', $time)[0];
+        $time = ($useMilliseconds && !str_contains($time, '.')) ? ($time . '.000') : $time;
 
         $new = \DateTime::createFromFormat($format, $time, $from);
         $new->setTimezone($until);
@@ -48,17 +51,17 @@ class Timezones {
         return $new->format($format);
     }
 
-    public static function localizeForActiveOperator(string &$time, bool $useMilliseconds = false): void {
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
-        $operatorTimezone = self::getTimezone($currentOperator?->timezone);
+    public static function localizeForActiveOperator(string $time, bool $useMilliseconds = false): string {
+        $currentOperator = tirreno('utils')->routes->getCurrentRequestOperator();
+        $operatorTimezone = self::getTimezone($currentOperator->timezone);
         $utc = self::getUtcTimezone();
 
-        $time = self::localizeTimestamp($time, $utc, $operatorTimezone, $useMilliseconds);
+        return self::localizeTimestamp($time, $utc, $operatorTimezone, $useMilliseconds);
     }
 
-    public static function localizeTimestampsForActiveOperator(array $keys, array &$data): void {
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
-        $operatorTimezone = self::getTimezone($currentOperator?->timezone);
+    public static function localizeTimestampsForActiveOperator(array $keys, array $data): array {
+        $currentOperator = tirreno('utils')->routes->getCurrentRequestOperator();
+        $operatorTimezone = self::getTimezone($currentOperator->timezone);
         $utc = self::getUtcTimezone();
 
         $timestamps = array_intersect_key($data, array_flip($keys));
@@ -68,6 +71,8 @@ class Timezones {
                 $data[$key] = self::localizeTimestamp($t, $utc, $operatorTimezone, false);
             }
         }
+
+        return $data;
     }
 
     public static function addOffset(string $time, int $offset, bool $useMilliseconds = false): string {
@@ -87,15 +92,17 @@ class Timezones {
         return $useMilliseconds ? $time . '.' . $milliPart : $time;
     }
 
-    public static function localizeUnixTimestamps(array &$timestamps): void {
-        $currentOperator = \Tirreno\Utils\Routes::getCurrentRequestOperator();
-        $operatorTimezone = self::getTimezone($currentOperator?->timezone);
+    public static function localizeUnixTimestamps(array $timestamps): array {
+        $currentOperator = tirreno('utils')->routes->getCurrentRequestOperator();
+        $operatorTimezone = self::getTimezone($currentOperator->timezone);
         $utcTime = new \DateTime('now', self::getUtcTimezone());
         $offsetInSeconds = $operatorTimezone->getOffset($utcTime);
 
         foreach (array_keys($timestamps) as $idx) {
             $timestamps[$idx] += $offsetInSeconds;
         }
+
+        return $timestamps;
     }
 
     public static function getOperatorOffset(?\Tirreno\Entities\Operator $operator): int {
@@ -106,7 +113,7 @@ class Timezones {
     }
 
     public static function getCurrentOperatorOffset(): int {
-        return self::getOperatorOffset(\Tirreno\Utils\Routes::getCurrentRequestOperator());
+        return self::getOperatorOffset(tirreno('utils')->routes->getCurrentRequestOperator());
     }
 
     public static function getServerOffset(): int {
@@ -123,7 +130,7 @@ class Timezones {
 
     public static function getLastNDaysRange(int $days = 1, int $offset = 0): array {
         $now = time();
-        $daySeconds = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
+        $daySeconds = tirreno('utils')->constants->SECONDS_IN_DAY;
 
         $date = new \DateTime();
         $date->setTimestamp($now - ($daySeconds * $days) - (($now + $offset) % $daySeconds));
@@ -143,8 +150,8 @@ class Timezones {
         $date = new \DateTime();
         $date->setTimestamp($now + $offset);
         $date->setTime(0, 0, 0);
-        $dow = \Tirreno\Utils\Conversion::intValCheckEmpty($date->format('N'), 1);
-        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
+        $dow = tirreno('utils')->conversion->intValCheckEmpty($date->format('N'), 1);
+        $day = tirreno('utils')->constants->SECONDS_IN_DAY;
 
         $weekStart = $date->getTimestamp() - $offset - ($dow - 1) * $day;
 
@@ -155,7 +162,7 @@ class Timezones {
         ];
     }
 
-    public static function getCurDayRange(int $offset = 0): array {
+    public static function getTodayRange(int $offset = 0): array {
         $now = time();
 
         $date = new \DateTime();
@@ -170,7 +177,32 @@ class Timezones {
         ];
     }
 
-    public static function getWeekAgoDayRange(int $offset = 0): array {
+    public static function getYesterdayRange(int $offset = 0): array {
+        $now = time();
+
+        $date = new \DateTime();
+        $date->setTimestamp($now - tirreno('utils')->constants->SECONDS_IN_DAY + $offset);
+
+        $date->setTime(0, 0, 0);
+
+        return [
+            'endDate'   => date(self::FORMAT, $date->getTimestamp() + tirreno('utils')->constants->SECONDS_IN_DAY - $offset),
+            'startDate' => date(self::FORMAT, $date->getTimestamp() - $offset),
+            'offset'    => $offset,
+        ];
+    }
+
+    public static function getSecondsSinceMonday(string $timestamp): int {
+        $time = strtotime($timestamp);
+
+        $dow = intval(date('N', $time));
+
+        $weekStart = strtotime(date('Y-m-d 00:00:00', $time)) - (($dow - 1) * tirreno('utils')->constants->SECONDS_IN_DAY);
+
+        return $time - $weekStart;
+    }
+
+    public static function getLatestWeekAgoDayRange(int $offset = 0): array {
         $now = time();
 
         $date = new \DateTime();
@@ -178,8 +210,8 @@ class Timezones {
 
         $date->setTime(0, 0, 0);
 
-        $week = \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK;
-        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
+        $week = tirreno('utils')->constants->SECONDS_IN_WEEK;
+        $day = tirreno('utils')->constants->SECONDS_IN_DAY;
 
         return [
             'endDate'   => date(self::FORMAT, $date->getTimestamp() - $offset - $week + $day),
@@ -194,8 +226,8 @@ class Timezones {
         $date = new \DateTime();
         $date->setTimestamp($now + $offset);
         $date->setTime(0, 0, 0);
-        $dow = \Tirreno\Utils\Conversion::intValCheckEmpty($date->format('N'), 0);
-        $day = \Tirreno\Utils\Constants::get()->SECONDS_IN_DAY;
+        $dow = tirreno('utils')->conversion->intValCheckEmpty($date->format('N'), 0);
+        $day = tirreno('utils')->constants->SECONDS_IN_DAY;
 
         return [
             'endDate'   => date(self::FORMAT, $now),
@@ -206,7 +238,7 @@ class Timezones {
 
     public static function timezonesList(): array {
         $utcTime = new \DateTime('now', self::getUtcTimezone());
-        $timezones = \Tirreno\Utils\Variables::getAvailableTimezones();
+        $timezones = tirreno('utils')->variables->getAvailableTimezones();
 
         foreach ($timezones as $key => $value) {
             $offset = (new \DateTimeZone($key))->getOffset($utcTime);

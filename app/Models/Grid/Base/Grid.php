@@ -17,33 +17,38 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Grid\Base;
 
-class Grid extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
-
+abstract class Grid extends \Tirreno\Models\Base {
     protected ?object $idsModel = null;
     protected ?object $queryModel = null;
-    protected ?int $apiKey = null;
 
-    protected function getGrid(?string $ids = null, array $idsParams = []): array {
-        $this->setIds($ids, $idsParams);
+    public function __construct() {
+        $parts = explode('\\', static::class);
+        $classname = $parts[count($parts) - 2];
 
-        $draw = $this->f3->get('REQUEST.draw') ?? 1;
+        $this->idsModel = new ('\\Tirreno\\Models\\Grid\\' . $classname . '\\Ids')();
+        $this->queryModel = new ('\\Tirreno\\Models\\Grid\\' . $classname . '\\Query')();
+    }
+
+    protected function getGrid(int $apiKey, ?string $ids = null, array $idsParams = []): array {
+        $this->setIds($ids, $idsParams, $apiKey);
+
+        $draw = tirreno('request')->getRequestParam('draw') ?? 1;
         $data = $this->getData();
         $total = $this->getTotal();
 
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
 
         return [
-            'data' => $data,
-            'draw' => $draw,
-            'recordsTotal' => $total,
-            'recordsFiltered' => $total,
-            'dateRange' => $dateRange,
+            'data'              => $data,
+            'draw'              => $draw,
+            'recordsTotal'      => $total,
+            'recordsFiltered'   => $total,
+            'dateRange'         => $dateRange,
         ];
     }
 
-    public function setIds(?string $ids, array $idsParams): void {
-        $this->queryModel->setIds($ids, $idsParams);
+    public function setIds(?string $ids, array $idsParams, int $apiKey): void {
+        $this->queryModel->setIds($ids, $idsParams, $apiKey);
     }
 
     protected function getData(): array {
@@ -66,7 +71,7 @@ class Grid extends \Tirreno\Models\BaseSql {
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
-        \Tirreno\Utils\Timezones::translateTimezones($result);
+        $result = tirreno('utils')->timezones->translateTimezones($result);
     }
 
     protected function calculateCustomParams(array &$result): void {

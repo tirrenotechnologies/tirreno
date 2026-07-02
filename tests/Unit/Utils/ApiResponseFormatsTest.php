@@ -35,4 +35,18 @@ final class ApiResponseFormatsTest extends TestCase {
 
         self::assertFalse($result);
     }
+
+    public function testMatchResponseIgnoresExtraKeys(): void {
+        $format = ['a', 'b'];
+
+        $response = [
+            'a' => 1,
+            'b' => 2,
+            'c' => 3,
+        ];
+
+        self::assertTrue(
+            ApiResponseFormats::matchResponse($response, $format)
+        );
+    }
 }

@@ -19,35 +19,33 @@ namespace Tirreno\Utils;
 
 class ApiKeys {
     public static function getCurrentOperatorApiKeyId(): ?int {
-        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
+        $key = tirreno('utils')->routes->getCurrentRequestApiKey();
 
         return $key ? $key->id : null;
     }
 
     public static function getCurrentOperatorApiKeyString(): ?string {
-        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
+        $key = tirreno('utils')->routes->getCurrentRequestApiKey();
 
         return $key ? $key->key : null;
     }
 
     public static function getCurrentOperatorEnrichmentKeyString(): ?string {
-        $key = \Tirreno\Utils\Routes::getCurrentRequestApiKey();
+        $key = tirreno('utils')->routes->getCurrentRequestApiKey();
 
         return $key ? $key->token : null;
     }
 
     public static function getOperatorApiKeys(int $operatorId): array {
-        $model = new \Tirreno\Models\ApiKeys();
-        $apiKeys = $model->getKeys($operatorId);
+        $apiKeys = tirreno('models')->apiKeys->getKeys($operatorId);
 
         $isOwner = true;
         if (!$apiKeys) {
-            $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $keyId = $coOwnerModel->getCoOwnershipKeyId($operatorId);
+            $keyId = tirreno('models')->apiKeyCoOwner->getCoOwnershipKeyId($operatorId);
 
             if ($keyId) {
                 $isOwner = false;
-                $apiKeys[] = $model->getKeyById($keyId);
+                $apiKeys[] = tirreno('models')->apiKeys->getKeyById($keyId);
             }
         }
 
@@ -55,15 +53,13 @@ class ApiKeys {
     }
 
     public static function getFirstKeyByOperatorId(int $operatorId): ?int {
-        $model = new \Tirreno\Models\ApiKeys();
-        $apiKeys = $model->getKeys($operatorId);
+        $apiKeys = tirreno('models')->apiKeys->getKeys($operatorId);
 
         if (!$apiKeys) {
-            $coOwnerModel = new \Tirreno\Models\ApiKeyCoOwner();
-            $keyId = $coOwnerModel->getCoOwnershipKeyId($operatorId);
+            $keyId = tirreno('models')->apiKeyCoOwner->getCoOwnershipKeyId($operatorId);
 
             if ($keyId) {
-                $apiKeys[] = $model->getKeyById($keyId);
+                $apiKeys[] = tirreno('models')->apiKeys->getKeyById($keyId);
             }
         }
 

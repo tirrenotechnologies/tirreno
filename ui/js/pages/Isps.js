@@ -1,9 +1,9 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {IspsChart} from '../parts/chart/Isps.js?v=2';
-import {IspsGrid} from '../parts/grid/Isps.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {IspsChart} from '../parts/chart/Isps.js?v=0.10.0';
+import {IspsGrid} from '../parts/grid/Isps.js?v=0.10.0';
 
 export class IspsPage extends BasePage {
     constructor() {
@@ -17,12 +17,12 @@ export class IspsPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadIsps`,
+            url:        `${window.app_base}/loadIsps`,
             tileId:     'totalIsps',
             tableId:    'isps-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadIspsTimeFrameTotal`,
             totals: {
                 type: 'isp',
                 columns: ['total_visit', 'total_account', 'total_ip'],
@@ -31,9 +31,16 @@ export class IspsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadIspsChart`,
+            getParams:  this.getParamsSection,
+        };
 
-        new IspsChart(chartParams);
-        new IspsGrid(gridParams);
+        const elements = [
+            [IspsChart,    chartParams],
+            [IspsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

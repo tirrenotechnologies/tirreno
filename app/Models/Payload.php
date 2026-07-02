@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Payload extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_payload';
+class Payload extends \Tirreno\Models\Base {
+    protected string $tableName = 'event_payload';
 
     public function getByEventId(int $eventId, int $apiKey): ?string {
         $params = [

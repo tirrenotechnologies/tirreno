@@ -1,11 +1,11 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {EntityTypeFilter} from '../parts/choices/EntityTypeFilter.js?v=2';
-import {BlacklistGridActionButtons} from '../parts/BlacklistGridActionButtons.js?v=2';
-import {BlacklistChart} from '../parts/chart/Blacklist.js?v=2';
-import {BlacklistGrid} from '../parts/grid/Blacklist.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {EntityTypeFilter} from '../parts/choices/EntityTypeFilter.js?v=0.10.0';
+import {BlacklistGridActionButtons} from '../parts/button/BlacklistGridActionButtons.js?v=0.10.0';
+import {BlacklistChart} from '../parts/chart/Blacklist.js?v=0.10.0';
+import {BlacklistGrid} from '../parts/grid/Blacklist.js?v=0.10.0';
 
 export class BlacklistPage extends BasePage {
     constructor() {
@@ -21,7 +21,7 @@ export class BlacklistPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:            `${window.app_base}/admin/loadBlacklist`,
+            url:            `${window.app_base}/loadBlacklist`,
             tileId:         'totalBlacklist',
             tableId:        'blacklist-table',
 
@@ -38,10 +38,18 @@ export class BlacklistPage extends BasePage {
             this.filters.entityTypeIds = entityTypeFilter;
         }
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadBlacklistChart`,
+            getParams: this.getParamsSection,
+        };
 
-        new BlacklistChart(chartParams);
-        new BlacklistGrid(gridParams);
         new BlacklistGridActionButtons(this.tableId);
+
+        const elements = [
+            [BlacklistChart,    chartParams],
+            [BlacklistGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

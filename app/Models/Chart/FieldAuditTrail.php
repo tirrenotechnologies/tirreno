@@ -20,7 +20,7 @@ namespace Tirreno\Models\Chart;
 class FieldAuditTrail extends BaseEventsCount {
     public function getCounts(int $apiKey): array {
         $query = (
-            "SELECT
+            'SELECT
                 EXTRACT(EPOCH FROM date_trunc(:resolution, event_field_audit_trail.created + :offset))::bigint AS ts,
                 0                                                   AS event_normal_type_count,
                 COUNT(DISTINCT event_field_audit_trail.event_id)    AS event_editing_type_count,
@@ -36,7 +36,7 @@ class FieldAuditTrail extends BaseEventsCount {
                 event_field_audit_trail.created <= :end_time
 
             GROUP BY ts
-            ORDER BY ts"
+            ORDER BY ts'
         );
 
         return $this->executeOnRangeById($query, $apiKey);
@@ -44,15 +44,15 @@ class FieldAuditTrail extends BaseEventsCount {
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(180);
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
+        $dateRange = tirreno('utils')->dateRange->getLatestNDatesRangeFromRequest(180);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
-            ':id'           => \Tirreno\Utils\Conversion::getIntRequestParam('id'),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
+            ':id'           => tirreno('utils')->conversion->getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];
 

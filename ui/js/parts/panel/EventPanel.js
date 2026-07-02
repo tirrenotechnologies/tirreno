@@ -1,4 +1,5 @@
-import {BasePanel} from './BasePanel.js?v=2';
+import {BasePanel} from './BasePanel.js?v=0.10.0';
+import {defined} from '../utils/Functions.js?v=0.10.0';
 import {
     renderTime,
     renderHttpCode,
@@ -35,14 +36,14 @@ import {
     renderUserLastname,
     renderIpType,
     renderJsonTextarea,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class EventPanel extends BasePanel {
     constructor(eventParams = null) {
         eventParams = eventParams !== null ? eventParams : {
-            enrichment: false,
+            enrichmentUrl: false,
             type: 'event',
-            url: `${window.app_base}/admin/eventDetails`,
+            url: `${window.app_base}/eventDetails`,
             cardId: 'event-card',
             panelClosed: 'eventPanelClosed',
             closePanel: 'closeEventPanel',
@@ -147,8 +148,8 @@ export class EventPanel extends BasePanel {
 
         let browser_name    = data.browser_name;
         let browser_version = data.browser_version;
-        browser_name        = (browser_name !== null && browser_name !== undefined) ? browser_name : '';
-        browser_version     = (browser_version !== null && browser_version !== undefined) ? browser_version : '';
+        browser_name        = defined(browser_name) ? browser_name : '';
+        browser_version     = defined(browser_version) ? browser_version : '';
 
         const device_record = {
             id:             data.deviceid,

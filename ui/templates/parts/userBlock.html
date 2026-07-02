@@ -1,21 +1,48 @@
-<check if="@USER.reviewed">
-    <true>
-        {~
-            $fraud = 'null';
-            if(true  === $USER['fraud']) $fraud = 'true';
-            if(false === $USER['fraud']) $fraud = 'false';
-        ~}
+{~
+    $fraud = $USER['fraud'] ? 'true' : ($USER['fraud'] === false ? 'false' : null);
+~}
 
-        <div class="head-button"
-            id="legit-fraud-buttons-block"
-            data-user-id="{{ @USER['userid'] }}"
-            data-user-fraud="{{ @fraud }}" >
-        </div>
+<check if="{{ @USER.fraud !== null }}">
+    <true>
+        <check if="{{ !@USER.reviewed && @USER.fraud }}">
+            <true>
+                <div class="head-button">
+                    <button class="button is-warning dark-loader"
+                        data-type="add-to-review"
+                        id="add-to-review-button"
+                        type="button">{{ @users_auto_blocked }}</button>
+                </div>
+
+            </true>
+            <false>
+                <div class="head-button"
+                    id="legit-fraud-buttons-block"
+                    data-user-id="{{ @USER.userid }}"
+                    data-user-fraud="{{ @fraud }}" >
+                </div>
+            </false>
+        </check>
     </true>
     <false>
-        <div class="head-button">
-            <button class="button is-warning dark-loader" data-type="reviewed" id="reviewed-button" type="button">{{ (@USER.fraud === true) ? @AdminUsers_auto_blocked : @AdminUsers_remove_reviewed_flag }}</button>
-        </div>
+        <check if="{{ @USER.added_to_review !== null }}">
+            <true>
+                {~ // b/w button ~}
+                <div class="head-button"
+                    id="legit-fraud-buttons-block"
+                    data-user-id="{{ @USER.userid }}"
+                    data-user-fraud="{{ @fraud }}" >
+                </div>
+            </true>
+            <false>
+                {~ //"add to review" button sets review status, then b/w button shown ~}
+                <div class="head-button">
+                    <button class="button is-warning dark-loader"
+                        data-type="add-to-review"
+                        id="add-to-review-button"
+                        type="button">{{ @users_add_to_review }}</button>
+                </div>
+            </false>
+        </check>
     </false>
 </check>
 
@@ -31,11 +58,7 @@
         }
     }
 
-    if ($USER['fraud'] !== null) {
-        [$score, $cls] = $USER['fraud'] ? ['X', 'low'] : ['OK', 'high'];
-    } else {
-        [$score, $cls] = \Tirreno\Utils\Assets\RulesClasses::getUserScoreClass($USER['score']);
-    }
+    [$score, $cls] = tirreno('utils')->render->getUserScoreClass($USER['score'], $USER['fraud'], $USER['added_to_review']);
 ~}
 
 <h1 class="title grey-title">

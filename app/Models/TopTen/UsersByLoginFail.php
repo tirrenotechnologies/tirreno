@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\TopTen;
 
 class UsersByLoginFail extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
@@ -27,7 +25,7 @@ class UsersByLoginFail extends Base {
         $queryConditions[] = 'event.type = :event_type';
         $queryConditions = join(' AND ', $queryConditions);
 
-        $params[':event_type'] = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
+        $params[':event_type'] = tirreno('utils')->constants->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
 
         $query = (
             "SELECT
@@ -36,6 +34,7 @@ class UsersByLoginFail extends Base {
                 event_account.fraud,
                 event_account.score,
                 event_account.score_updated_at,
+                event_account.added_to_review,
                 event_email.email,
                 COUNT(event_account.userid) AS value
 
@@ -64,10 +63,12 @@ class UsersByLoginFail extends Base {
 
         $results = $this->execQuery($query, $params);
 
-        foreach ($results as $row) {
+        foreach ($results as &$row) {
             $tsColumns = ['score_updated_at'];
-            \Tirreno\Utils\Timezones::localizeTimestampsForActiveOperator($tsColumns, $row);
+            $row = tirreno('utils')->timezones->localizeTimestampsForActiveOperator($tsColumns, $row);
         }
+
+        unset($row);
 
         return $results;
     }

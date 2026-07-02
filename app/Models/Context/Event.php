@@ -23,7 +23,7 @@ class Event extends Base {
     protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
-        $params[':context_limit'] = \Tirreno\Utils\Constants::get()->RULE_EVENT_CONTEXT_LIMIT;
+        $params[':context_limit'] = tirreno('utils')->constants->RULE_EVENT_CONTEXT_LIMIT;
 
         $query = (
             "WITH ranked_events AS (

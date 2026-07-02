@@ -76,7 +76,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applySearch(string &$query, array &$queryParams): void {
-        //$search = $this->f3->get('REQUEST.search');
+        //$search = tirreno('request')->getRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_device.id', $queryParams);
 
         //Add ids into request

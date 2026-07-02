@@ -17,64 +17,73 @@ declare(strict_types=1);
 
 namespace Tirreno\Controllers\Pages;
 
-class ForgotPassword extends Base {
-    public ?string $page = 'ForgotPassword';
+class ForgotPassword extends \Tirreno\Controllers\Pages\Base {
+    public string $page = 'forgotPassword';
+    protected bool $allowGuest = true;
 
-    public function getPageParams(): array {
-        if (!\Tirreno\Utils\Variables::getForgotPasswordAllowed()) {
-            return [];
-        }
+    protected function proceedPostRequest(): array {
+        $this->assertCanEdit();
 
-        $pageParams = [
-            'HTML_FILE' => 'forgotPassword.html',
-        ];
+        $pageParams = [];
 
-        if ($this->isPostRequest()) {
-            $params = $this->extractRequestParams(['token', 'email']);
-            $errorCode = \Tirreno\Utils\Validators::validateForgotPassword($params);
+        $params = tirreno('utils')->render->extractRequestParams(['token', 'email']);
+        $errorCode = tirreno('utils')->validators->validateForgotPassword($params);
 
-            if (!$errorCode) {
-                $email = \Tirreno\Utils\Conversion::getStringRequestParam('email');
-                $model = new \Tirreno\Models\Operator();
-                $operatorId = $model->getActivatedByEmail($email);
+        if (!$errorCode) {
+            $email = tirreno('utils')->conversion->getStringRequestParam('email');
+            $operatorId = tirreno('models')->operator->getActivatedByEmail($email);
 
-                if ($operatorId) {
-                    // Create forgot password record.
-                    $forgotPasswordModel = new \Tirreno\Models\ForgotPassword();
-                    $renewKey = $forgotPasswordModel->insertRecord($operatorId);
-
-                    // Send forgot password email.
-                    $this->sendPasswordRenewEmail($operatorId, $renewKey);
-                }
-
-                // Random sleep between 0.5 and 1 second to prevent timing attacks.
-                usleep(rand(500000, 1000000));
-
-                // Always report back that the email was sent.
-                $pageParams['SUCCESS_CODE'] = \Tirreno\Utils\ErrorCodes::RENEW_KEY_CREATED;
+            if ($operatorId) {
+                // Create forgot password record.
+                $renewKey = tirreno('models')->forgotPassword->insertRecord($operatorId);
+                // Send forgot password email.
+                $this->sendPasswordRenewEmail($operatorId, $renewKey);
             }
 
-            $pageParams['VALUES'] = $params;
-            $pageParams['ERROR_CODE'] = $errorCode;
+            // Random sleep between 0.5 and 1 second to prevent timing attacks.
+            usleep(rand(500000, 1000000));
+
+            // Always report back that the email was sent.
+            $pageParams['SUCCESS_CODE'] = tirreno('utils')->errorCodes->RENEW_KEY_CREATED;
         }
 
-        return parent::applyPageParams($pageParams);
+        $pageParams['VALUES'] = $params;
+        $pageParams['ERROR_CODE'] = $errorCode;
+
+        return $pageParams;
+    }
+
+    protected function isAllowed(): bool {
+        return parent::isAllowed() && tirreno('utils')->variables->getForgotPasswordAllowed();
+    }
+
+    public function getPageParams(): array {
+        $this->assertCanView();
+
+        $pageParams = [
+            'HTML_FILE'     => 'forgotPassword.html',
+            'INTERNAL_PAGE' => false,
+        ];
+
+        $postParams = tirreno('request')->isPost() ? $this->proceedPostRequest() : [];
+
+        return array_merge($pageParams, $postParams);
     }
 
     private function sendPasswordRenewEmail(int $operatorId, string $renewKey): void {
-        $url = \Tirreno\Utils\Variables::getHostWithProtocolAndBase();
+        $url = tirreno('utils')->variables->getHostWithProtocolAndBase();
 
-        $operator = \Tirreno\Entities\Operator::getById($operatorId);
+        $operator = tirreno('entities')->operator->getById($operatorId);
 
         $toName = $operator->firstname;
         $toAddress = $operator->email;
 
-        $subject = $this->f3->get('ForgotPassowrd_renew_password_subject');
-        $message = $this->f3->get('ForgotPassowrd_renew_password_body');
+        $subject = tirreno('storage')->get('ForgotPassowrd_renew_password_subject');
+        $message = tirreno('storage')->get('ForgotPassowrd_renew_password_body');
 
         $renewUrl = sprintf('%s/password-recovering/%s', $url, $renewKey);
         $message = sprintf($message, $renewUrl);
 
-        \Tirreno\Utils\Mailer::send($toName, $toAddress, $subject, $message);
+        tirreno('utils')->mailer->send($toName, $toAddress, $subject, $message);
     }
 }

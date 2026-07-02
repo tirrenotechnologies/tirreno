@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class ReviewQueue extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getData(int $apiKey): array {
         $field1 = 'ts_new_users_whitelisted';
         $data1  = $this->getFirstLine($apiKey);

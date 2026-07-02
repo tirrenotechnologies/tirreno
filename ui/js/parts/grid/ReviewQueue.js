@@ -1,12 +1,10 @@
-import {BaseGrid} from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
 import {
     renderTime,
     renderDate,
-    renderUserFirstname,
-    renderUserLastname,
     renderUserActionButtons,
     renderClickableImportantUserWithScore,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class ReviewQueueGrid extends BaseGrid {
     get orderConfig() {
@@ -28,20 +26,16 @@ export class ReviewQueueGrid extends BaseGrid {
                 targets: 1
             },
             {
-                className: 'review-queue-name-col',
+                className: 'review-queue-timestamp-col',
                 targets: 2
             },
             {
-                className: 'review-queue-name-col',
+                className: 'review-queue-date-col',
                 targets: 3
             },
             {
-                className: 'review-queue-date-col',
-                targets: 4
-            },
-            {
                 className: 'review-queue-button-col',
-                targets: 5
+                targets: 4
             }
         ];
 
@@ -61,16 +55,8 @@ export class ReviewQueueGrid extends BaseGrid {
                 render: renderTime
             },
             {
-                data: 'firstname',
-                render: (data, type, record) => {
-                    return renderUserFirstname(record);
-                },
-            },
-            {
-                data: 'lastname',
-                render: (data, type, record) => {
-                    return renderUserLastname(record);
-                },
+                data: 'lastseen',
+                render: renderTime
             },
             {
                 data: 'created',
@@ -82,6 +68,8 @@ export class ReviewQueueGrid extends BaseGrid {
                 orderable: false,
                 data: 'actions',
                 render: (data, type, record) => {
+                    record.addedToReview = record.added_to_review;
+
                     return renderUserActionButtons(record);
                 },
             },

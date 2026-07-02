@@ -17,5 +17,5 @@ declare(strict_types=1);
 
 return [
     'Base_page_enrich_entity' => 'Re-enrich data',
-    'AdminEnrichment_success_message' => 'Data has been successfully enriched.',
+    'enrichment_success_message' => 'Data has been successfully enriched.',
 ];

@@ -1,0 +1,32 @@
+<include href="templates/parts/panel/eventPanel.html" />
+
+{***
+<include href="templates/parts/infoHeader.html" with="title={{@USER_AGENT.id}}, lastseen={{@USER_AGENT.lastseen ?? null}}, subtitle={{@USER_AGENT.ua}}, type=ua, id={{@USER_AGENT.id}}, dataIncomplete={{!@USER_AGENT.checked && @IS_ENRICHABLE}}"/>
+***}
+{~
+    $TITLE = '';
+
+    $parts = [
+        $USER_AGENT['device'],
+        $USER_AGENT['os_name'],
+        $USER_AGENT['browser_name'],
+    ];
+
+    foreach ($parts as $part) {
+        $TITLE .= $part && is_string($part) ? ucfirst(substr($part, 0, 3)) : '';
+    }
+
+    $part = $USER_AGENT['browser_version'];
+
+    $TITLE .= $part && is_string($part) ? rtrim(ucfirst(substr($part, 0, 3)), '.') : '';
+
+    $TITLE = $TITLE ? $TITLE : rtrim(substr($USER_AGENT['ua'] ?? '', 0, 12), '.');
+    $TITLE = $TITLE ? $TITLE : 'empty';
+~}
+<include href="templates/parts/infoHeader.html" with="title={{@TITLE}}, lastseen={{@USER_AGENT.lastseen ?? null}}, subtitle={{@USER_AGENT.ua}}"/>
+
+<include href="templates/parts/widgets/userAgent.html" />
+<include href="templates/parts/tables/users.html" />
+<include href="templates/parts/mapWithIps.html" />
+
+<include href="templates/parts/tables/events.html" with="showChart=1"/>

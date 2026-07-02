@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Events extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
@@ -32,22 +30,22 @@ class Events extends Base {
     }
 
     private function getFirstLine(int $apiKey): array {
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
         if (!$dateRange) {
             $dateRange = [
                 'endDate' => date('Y-m-d H:i:s'),
                 'startDate' => date('Y-m-d H:i:s', 0),
             ];
         }
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
-        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ALERT_EVENT_TYPES, 'alert');
-        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->EDITING_EVENT_TYPES, 'edit');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_EVENT_TYPES, 'normal');
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
+        [$alertTypesParams, $alertFlatIds]      = $this->getArrayPlaceholders(tirreno('utils')->constants->ALERT_EVENT_TYPES, 'alert');
+        [$editTypesParams, $editFlatIds]        = $this->getArrayPlaceholders(tirreno('utils')->constants->EDITING_EVENT_TYPES, 'edit');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(tirreno('utils')->constants->NORMAL_EVENT_TYPES, 'normal');
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
             ':offset'       => strval($offset),
         ];
         $params = array_merge($params, $alertTypesParams);

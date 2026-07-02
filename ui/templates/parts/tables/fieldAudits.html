@@ -13,8 +13,8 @@
 <div class="card events-card">
     <header class="card-header">
         <div class="card-header-title">
-            {{ @AdminFieldAudit_table_title }}
-            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @AdminFieldAudit_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            {{ @fieldAudit_table_title }}
+            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @fieldAudit_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
         </div>
     </header>
 
@@ -28,10 +28,10 @@
             <table class="table dim-table" id="field-audits-table">
                 <thead>
                     <tr>
-                        <th class="tooltip field-audit-trail-field-col" title="{{ @AdminFieldAudit_table_column_audit_trail_field_id_tooltip }}">{{ @AdminFieldAudit_table_column_audit_trail_field_id }}</th>
-                        <th class="tooltip field-audit-trail-field-col" title="{{ @AdminFieldAudit_table_column_audit_trail_field_name_tooltip }}">{{ @AdminFieldAudit_table_column_audit_trail_field_name }}</th>
-                        <th class="tooltip field-audit-trail-date-col" title="{{ @AdminFieldAudit_table_column_audit_trail_created_tooltip }}">{{ @AdminFieldAudit_table_column_audit_trail_created }}</th>
-                        <th class="tooltip field-audit-trail-date-col" title="{{ @AdminFieldAudit_table_column_audit_trail_lastseen_tooltip }}">{{ @AdminFieldAudit_table_column_audit_trail_lastseen }}</th>
+                        <th class="tooltip field-audit-trail-field-col" title="{{ @fieldAudit_table_column_audit_trail_field_id_tooltip }}">{{ @fieldAudit_table_column_audit_trail_field_id }}</th>
+                        <th class="tooltip field-audit-trail-field-col" title="{{ @fieldAudit_table_column_audit_trail_field_name_tooltip }}">{{ @fieldAudit_table_column_audit_trail_field_name }}</th>
+                        <th class="tooltip field-audit-trail-date-col" title="{{ @fieldAudit_table_column_audit_trail_created_tooltip }}">{{ @fieldAudit_table_column_audit_trail_created }}</th>
+                        <th class="tooltip field-audit-trail-date-col" title="{{ @fieldAudit_table_column_audit_trail_lastseen_tooltip }}">{{ @fieldAudit_table_column_audit_trail_lastseen }}</th>
                         <th class="tooltip field-audit-trail-cnt-col" title="{{ @Base_table_column_total_edits_tooltip_field_audit }}">{{ @Base_table_column_total_edits }}</th>
                         <th class="tooltip field-audit-trail-cnt-col" title="{{ @Base_table_column_total_users_tooltip_field_audit }}">{{ @Base_table_column_total_users }}</th>
                     </tr>

@@ -16,14 +16,14 @@
 declare(strict_types=1);
 
 return [
-    'Signup_page_title' => 'Create an account',
-    'Signup_form_title' => 'Create an account',
-    'Signup_form_email_label' => 'Email address',
-    'Signup_form_password_label' => 'Password',
-    'Signup_form_signin_button' => 'Continue',
-    'Signup_form_create_account_question' => 'Already have an account?',
-    'Signup_form_create_account_link' => 'Log in',
+    'signup_page_title' => 'Create an account',
+    'signup_form_title' => 'Create an account',
+    'signup_form_email_label' => 'Email address',
+    'signup_form_password_label' => 'Password',
+    'signup_form_signin_button' => 'Continue',
+    'signup_form_create_account_question' => 'Already have an account?',
+    'signup_form_create_account_link' => 'Log in',
 
-    'Signup_activation_email_subject' => 'Activate your account',
-    'Signup_activation_email_body' => 'Thanks for your registration. Please activate your account and start using the system. %s',
+    'signup_activation_email_subject' => 'Activate your account',
+    'signup_activation_email_body' => 'Thanks for your registration. Please activate your account and start using the system. %s',
 ];

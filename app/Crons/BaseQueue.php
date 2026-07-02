@@ -21,21 +21,32 @@ abstract class BaseQueue extends Base {
     abstract protected function processItem(array $item): void;
 
     protected function readyToProcess(string $action): bool {
-        $model = new \Tirreno\Models\Queue();
-
-        $result = $model->checkExecuting($action);
+        $result = tirreno('models')->queue->checkExecuting($action);
 
         if (!$result) {
             return true;    // no executing action
         }
 
-        if (!\Tirreno\Utils\DateRange::isQueueTimeouted($result['updated'])) {
+        if (!tirreno('utils')->dateRange->isQueueTimeouted($result['updated'])) {
             return false;   // previous job still executing
         }
 
-        $model->setFailedForStuckAction($action);
+        $culprit = $result['event_account'];
+        $allStuckIds = tirreno('models')->queue->getAllExecuting($action);
 
-        $this->addLog(sprintf('Uncloging stuck queue (now - updated > 30 minutes) on account %d.', $result['event_account']));
+        // set failed for all stuck accounts
+        tirreno('models')->queue->setFailedForStuckAction($action);
+
+        $culpritIdx = array_search($culprit, $allStuckIds);
+        if ($culpritIdx !== false) {
+            unset($allStuckIds[$culpritIdx]);
+            $allStuckIds = array_values($allStuckIds);
+        }
+
+        // add back to queue all accounts excluding culprit
+        tirreno('models')->queue->addBatchIds($allStuckIds, $action);
+
+        $this->addLog(sprintf('Uncloging stuck queue (now - updated > 30 minutes) on account %d. Added %d accounts back to queue.', $result['event_account'], count($allStuckIds)));
 
         return true; // set failed on stuck, can continue
     }
@@ -44,21 +55,19 @@ abstract class BaseQueue extends Base {
         $prefix = '';
 
         switch ($action) {
-            case \Tirreno\Utils\Constants::get()->DELETE_USER_QUEUE_ACTION_TYPE:
+            case tirreno('utils')->constants->DELETE_USER_QUEUE_ACTION_TYPE:
                 $prefix = 'Deletion';
                 break;
-            case \Tirreno\Utils\Constants::get()->BLACKLIST_QUEUE_ACTION_TYPE:
+            case tirreno('utils')->constants->BLACKLIST_QUEUE_ACTION_TYPE:
                 $prefix = 'Blacklist';
                 break;
-            case \Tirreno\Utils\Constants::get()->ENRICHMENT_QUEUE_ACTION_TYPE:
+            case tirreno('utils')->constants->ENRICHMENT_QUEUE_ACTION_TYPE:
                 $prefix = 'Enrichment';
                 break;
-            case \Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE:
+            case tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE:
                 $prefix = 'Risk score';
                 break;
         }
-
-        $model = new \Tirreno\Models\Queue();
 
         if (!$prefix || !$this->readyToProcess($action)) {
             $this->addLog($prefix . ' queue is already being executed by another cron job.');
@@ -75,20 +84,19 @@ abstract class BaseQueue extends Base {
         $batch = [];
         $bottom = false;
 
-        $model = new \Tirreno\Models\Queue();
-
         while (!$bottom) {
-            $batchSize = \Tirreno\Utils\Variables::getAccountOperationQueueBatchSize();
-            $this->addLog(sprintf('Fetching next batch (%s) in queue.', $batchSize));
+            $batchSize = tirreno('utils')->variables->getAccountOperationQueueBatchSize();
 
             // status waiting action deletion, older first
-            $batch = $model->getNextBatchInQueue($action, $batchSize);
+            $batch = tirreno('models')->queue->getNextBatchInQueue($action, $batchSize);
+
+            $this->addLog(sprintf('Fetching next batch (%s/%s) in queue.', count($batch), $batchSize));
 
             if (!$batch) {
                 break;
             }
 
-            $model->setExecuting(array_column($batch, 'id'));
+            tirreno('models')->queue->setExecuting(array_column($batch, 'id'));
 
             foreach ($batch as $item) {
                 if (!$item) {
@@ -106,18 +114,18 @@ abstract class BaseQueue extends Base {
                 }
 
                 // exit if took too long
-                $batchTimeout = (time() - $start) > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
+                $batchTimeout = (time() - $start) > tirreno('utils')->constants->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
                 if ($batchTimeout) {
                     break;
                 }
             }
             // exit if took too long
-            $bottom = (time() - $start) > \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
+            $bottom = (time() - $start) > tirreno('utils')->constants->ACCOUNT_OPERATION_QUEUE_EXECUTE_TIME_SEC;
         }
 
-        $model->setCompleted($success);
-        $model->setFailed($failed);
-        $model->setWaiting(array_diff(array_diff(array_column($batch, 'id'), $success), $failed));     // not fitted
+        tirreno('models')->queue->setCompleted($success);
+        tirreno('models')->queue->setFailed($failed);
+        tirreno('models')->queue->setWaiting(array_diff(array_diff(array_column($batch, 'id'), $success), $failed));     // not fitted
 
         if (count($errors)) {
             $errObj = [
@@ -126,7 +134,7 @@ abstract class BaseQueue extends Base {
                 'trace'     => $errors[0],
                 'sql_log'   => '',
             ];
-            \Tirreno\Utils\ErrorHandler::saveErrorInformation(\Base::instance(), $errObj);
+            tirreno('utils')->errorHandler->saveErrorInformation($errObj);
         }
 
         $this->addLog(sprintf(

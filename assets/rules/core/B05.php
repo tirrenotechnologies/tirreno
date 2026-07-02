@@ -9,7 +9,7 @@ class B05 extends \Tirreno\Assets\Rule {
 
     protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
-            $this->rb['event_multiple_4xx_http']->greaterThanOrEqualTo(\Tirreno\Utils\Constants::get()->RULE_MAXIMUM_NUMBER_OF_404_CODES),
+            $this->rb['event_multiple_4xx_http']->greaterThanOrEqualTo(tirreno('utils')->constants->RULE_MAXIMUM_NUMBER_OF_404_CODES),
         );
     }
 }

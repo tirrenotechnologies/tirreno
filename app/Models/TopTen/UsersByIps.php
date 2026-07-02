@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\TopTen;
 
 class UsersByIps extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getList(int $apiKey, ?array $dateRange): array {
         $params = $this->getQueryParams($apiKey, $dateRange);
 
@@ -33,6 +31,7 @@ class UsersByIps extends Base {
                 event_account.fraud,
                 event_account.score,
                 event_account.score_updated_at,
+                event_account.added_to_review,
                 COUNT(DISTINCT event.ip)    AS value,
                 event_email.email
 
@@ -64,10 +63,12 @@ class UsersByIps extends Base {
 
         $results = $this->execQuery($query, $params);
 
-        foreach ($results as $row) {
+        foreach ($results as &$row) {
             $tsColumns = ['score_updated_at'];
-            \Tirreno\Utils\Timezones::localizeTimestampsForActiveOperator($tsColumns, $row);
+            $row = tirreno('utils')->timezones->localizeTimestampsForActiveOperator($tsColumns, $row);
         }
+
+        unset($row);
 
         return $results;
     }

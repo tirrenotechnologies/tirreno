@@ -5,30 +5,35 @@
         <input type="hidden" name="keyId" value="{{ @apiKeyId }}">
 
         <header class="card-header">
-            <div class="card-header-title">{{ @AdminThresholdValues_form_title }}<p class="tooltip-info tooltip" title="{{ @AdminThresholdValues_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            <div class="card-header-title">{{ @rules_thresholdValues_form_title }}<p class="tooltip-info tooltip" title="{{ @rules_thresholdValues_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
             </div>
         </header>
 
         <div class="card-content">
             <div class="content">
-                {{ @AdminThresholdValues_form_field_warning }}
                 <div class="field">
-                    <label class="label">{{ @AdminThresholdValues_form_field_review_queue_threshold_label }}</label>
+                    <label class="label">{{ @rules_thresholdValues_form_field_review_queue_threshold_label }}</label>
                     <div class="control">
-                        <input class="input" name="review-queue-threshold" type="number" value="{{ @reviewQueueThreshold }}" min="0" max="99" placeholder="{{ @AdminThresholdValues_form_review_queue_threshold_placeholder }}" required />
+                        <input class="input" name="review-queue-threshold" type="number" value="{{ @reviewQueueThreshold }}" min="0" max="99" placeholder="{{ @rules_thresholdValues_form_review_queue_threshold_placeholder }}" required />
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">{{ @AdminThresholdValues_form_field_blacklist_threshold_label }}</label>
+                    <label class="label">{{ @rules_thresholdValues_form_field_blacklist_threshold_label }}</label>
                     <div class="control">
-                        <input class="input" name="blacklist-threshold" type="number" value="{{ @blacklistThreshold !== -1 ? @blacklistThreshold : ''}}" min="0" max="98" placeholder="{{ @AdminThresholdValues_form_blacklist_threshold_placeholder }}" />
+                        <input class="input" name="blacklist-threshold" type="number" value="{{ @blacklistThreshold !== -1 ? @blacklistThreshold : ''}}" min="0" max="98" placeholder="{{ @rules_thresholdValues_form_blacklist_threshold_placeholder }}" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label"></label>
+                    <div class="control">
+                        <div class="neutral-text level-right">{{ @rules_thresholdValues_form_field_blacklist_warning }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-primary" value="{{ @AdminThresholdValues_form_button_save }}">
+            <input type="submit" class="button is-primary" value="{{ @rules_thresholdValues_form_button_save }}">
         </footer>
     </form>
 </div>

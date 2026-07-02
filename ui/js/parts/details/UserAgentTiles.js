@@ -1,12 +1,13 @@
-import {BaseTiles} from './BaseTiles.js?v=2';
+import {BaseTiles} from './BaseTiles.js?v=0.10.0';
 import {
     renderBoolean,
     renderDefaultIfEmptyElement,
     renderBrowser,
     renderOs,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
-const URL   = `${window.app_base}/admin/loadUserAgentDetails`;
+const URL   = `${window.app_base}/loadUserAgentDetails`;
 const ELEMS = ['title', 'os', 'browser', 'modified'];
 
 export class UserAgentTiles extends BaseTiles {
@@ -24,10 +25,10 @@ export class UserAgentTiles extends BaseTiles {
             browser: browser.join(' ')
         };
 
-        document.getElementById('title').replaceChildren(renderDefaultIfEmptyElement(data.title));
-        document.getElementById('os').replaceChildren(renderOs(record));
-        document.getElementById('browser').replaceChildren(renderBrowser(record));
-        document.getElementById('modified').replaceChildren(renderBoolean(data.modified));
+        replaceChildren(document.getElementById('title'), renderDefaultIfEmptyElement(data.title));
+        replaceChildren(document.getElementById('os'), renderOs(record));
+        replaceChildren(document.getElementById('browser'), renderBrowser(record));
+        replaceChildren(document.getElementById('modified'), renderBoolean(data.modified));
     }
 
     get elems() {

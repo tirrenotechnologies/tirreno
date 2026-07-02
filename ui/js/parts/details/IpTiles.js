@@ -1,12 +1,13 @@
-import {BaseTiles} from './BaseTiles.js?v=2';
-import {Tooltip} from '../Tooltip.js?v=2';
+import {BaseTiles} from './BaseTiles.js?v=0.10.0';
+import {Tooltip} from '../Tooltip.js?v=0.10.0';
 import {
     renderBoolean,
     renderClickableCountryTruncated,
     renderClickableAsn,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
-const URL   = `${window.app_base}/admin/loadIpDetails`;
+const URL   = `${window.app_base}/loadIpDetails`;
 const ELEMS = ['country', 'asn', 'blocklist', 'blacklist', 'dc', 'vpn', 'tor', 'ar'];
 
 export class IpTiles extends BaseTiles {
@@ -19,14 +20,14 @@ export class IpTiles extends BaseTiles {
             ispid:          data.ispid,
         };
 
-        document.getElementById('country').replaceChildren(renderClickableCountryTruncated(record));
-        document.getElementById('asn').replaceChildren(renderClickableAsn(record));
-        document.getElementById('blocklist').replaceChildren(renderBoolean(data.blocklist));
-        document.getElementById('blacklist').replaceChildren(renderBoolean(data.fraud_detected));
-        document.getElementById('dc').replaceChildren(renderBoolean(data.data_center));
-        document.getElementById('vpn').replaceChildren(renderBoolean(data.vpn));
-        document.getElementById('tor').replaceChildren(renderBoolean(data.tor));
-        document.getElementById('ar').replaceChildren(renderBoolean(data.relay));
+        replaceChildren(document.getElementById('country'), renderClickableCountryTruncated(record));
+        replaceChildren(document.getElementById('asn'), renderClickableAsn(record));
+        replaceChildren(document.getElementById('blocklist'), renderBoolean(data.blocklist));
+        replaceChildren(document.getElementById('blacklist'), renderBoolean(data.fraud_detected));
+        replaceChildren(document.getElementById('dc'), renderBoolean(data.data_center));
+        replaceChildren(document.getElementById('vpn'), renderBoolean(data.vpn));
+        replaceChildren(document.getElementById('tor'), renderBoolean(data.tor));
+        replaceChildren(document.getElementById('ar'), renderBoolean(data.relay));
     }
 
     initTooltips() {

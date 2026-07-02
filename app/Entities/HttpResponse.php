@@ -17,16 +17,16 @@ declare(strict_types=1);
 
 namespace Tirreno\Entities;
 
-final class HttpResponse {
-    private bool $ok;
-    private ?int $code;
-    private ?array $body;
-    private ?string $error;
+class HttpResponse {
+    protected bool $ok;
+    protected ?int $code;
+    protected ?array $body;
+    protected ?string $error;
 
     /** @var array<int, string> */
-    private array $headers;
+    protected array $headers;
 
-    private function __construct(bool $ok, ?int $code, ?string $body, ?string $error, array $headers) {
+    public function __construct(bool $ok, ?int $code, ?string $body, ?string $error, array $headers) {
         if ($body !== null) {
             $json = json_decode($body, true);
             $body = is_array($json) ? $json : [];
@@ -39,14 +39,32 @@ final class HttpResponse {
         $this->headers = $headers;
     }
 
+    public static function create(bool $ok, ?int $code, ?string $body, ?string $error, array $headers): self {
+        return new self($ok, $code, $body, $error, $headers);
+    }
+
     public static function success(?int $code, ?string $body, array $headers): self {
-        $result = new self(true, $code, $body, null, $headers);
-        return $result;
+        return static::create(true, $code, $body, null, $headers);
     }
 
     public static function failure(?int $code, ?string $error, array $headers): self {
-        $result = new self(false, $code, null, $error, $headers);
-        return $result;
+        return static::create(false, $code, null, $error, $headers);
+    }
+
+    public function __set(string $name, mixed $value): void {
+        if (!property_exists($this, $name)) {
+            throw new \Exception('Unknown property ' . $name);
+        }
+
+        $this->$name = $value;
+    }
+
+    public function __get(string $name): mixed {
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+
+        throw new \Exception('Unknown property ' . $name);
     }
 
     public function ok(): bool {
@@ -65,6 +83,9 @@ final class HttpResponse {
         return $this->error;
     }
 
+    /**
+     * @return array<int,string>
+     */
     public function headers(): array {
         return $this->headers;
     }

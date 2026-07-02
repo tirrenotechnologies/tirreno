@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Message extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_message';
+class Message extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_message';
 
     public function addMessage(string $msg): int {
         $params = [

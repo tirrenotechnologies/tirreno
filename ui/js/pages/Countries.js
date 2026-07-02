@@ -1,9 +1,9 @@
-import {BasePage} from './Base.js?v=2';
-
-import {Map} from '../parts/Map.js?v=2';
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {CountriesGrid} from '../parts/grid/Countries.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {Map} from '../parts/Map.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {CountriesGrid} from '../parts/grid/Countries.js?v=0.10.0';
 
 export class CountriesPage extends BasePage {
     constructor() {
@@ -22,12 +22,12 @@ export class CountriesPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadCountries`,
+            url:        `${window.app_base}/loadCountries`,
             tileId:     'totalCountries',
             tableId:    'countries-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadCountriesTimeFrameTotal`,
             totals: {
                 type: 'country',
                 columns: ['total_visit', 'total_account', 'total_ip'],
@@ -42,7 +42,11 @@ export class CountriesPage extends BasePage {
             tooltipField:   'total_account'
         };
 
-        new Map(mapParams);
-        new CountriesGrid(gridParams);
+        const elements = [
+            [Map,               mapParams],
+            [CountriesGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

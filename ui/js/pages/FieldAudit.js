@@ -1,11 +1,11 @@
-import {BasePage} from './Base.js?v=2';
-import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
-import {IpsGrid} from '../parts/grid/Ips.js?v=2';
-import {IspsGrid} from '../parts/grid/Isps.js?v=2';
-import {UsersGrid} from '../parts/grid/Users.js?v=2';
-import {StaticTiles} from '../parts/StaticTiles.js?v=2';
-import {FieldPanel} from '../parts/panel/FieldPanel.js?v=2';
-import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {IpsGrid} from '../parts/grid/Ips.js?v=0.10.0';
+import {IspsGrid} from '../parts/grid/Isps.js?v=0.10.0';
+import {UsersGrid} from '../parts/grid/Users.js?v=0.10.0';
+import {StaticTiles} from '../parts/StaticTiles.js?v=0.10.0';
+import {FieldPanel} from '../parts/panel/FieldPanel.js?v=0.10.0';
+import {FieldAuditTrailGrid} from '../parts/grid/FieldAuditTrail.js?v=0.10.0';
 
 export class FieldAuditPage extends BasePage {
     constructor() {

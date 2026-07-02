@@ -98,7 +98,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = $this->injectIdQuery('event_field_audit_trail.id', $queryParams);
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (

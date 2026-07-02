@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Watchlist extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
+class Watchlist extends \Tirreno\Models\Base {
     public function add(int $accountId, int $apiKey): void {
         $params = [
             ':account_id'   => $accountId,

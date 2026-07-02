@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Search;
 
-class Isp extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_isp';
-
+class Isp extends \Tirreno\Models\Base {
     public function searchByIsp(string $query, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,

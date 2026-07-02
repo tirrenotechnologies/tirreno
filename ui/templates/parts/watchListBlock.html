@@ -14,7 +14,7 @@
     </true>
     <false>
         <div class="head-button">
-            <button class="button is-warning" data-type="reviewed" id="reviewed-button" type="button">{{ @AdminUsers_remove_reviewed_flag }}</button>
+            <button class="button is-warning" data-type="reviewed" id="reviewed-button" type="button">{{ @users_remove_reviewed_flag }}</button>
         </div>
     </false>
 </check>
@@ -25,22 +25,18 @@
             $title = "<span class='important-user'>$title</span>";
         ~}
         <div class="head-button is-hidden">
-            <button class="button is-warning" data-type="remove" id="watchlist-button" type="button">{{ @AdminUsers_remove_from_watchlist }}</button>
+            <button class="button is-warning" data-type="remove" id="watchlist-button" type="button">{{ @users_remove_from_watchlist }}</button>
         </div>
     </true>
     <false>
         <div class="head-button is-hidden">
-            <button class="button is-warning" data-type="add" id="watchlist-button" type="button">{{ @AdminUsers_add_to_watchlist }}</button>
+            <button class="button is-warning" data-type="add" id="watchlist-button" type="button">{{ @users_add_to_watchlist }}</button>
         </div>
     </false>
 </check>
 
 {~
-    if ($USER['fraud'] !== null) {
-        [$score, $cls] = $USER['fraud'] ? ['X', 'low'] : ['OK', 'high'];
-    } else {
-        [$score, $cls] = \Tirreno\Utils\Assets\RulesClasses::getUserScoreClass($USER['score']);
-    }
+    [$score, $cls] = tirreno('utils')->render->getUserScoreClass($USER['score'], $USER['fraud'], $USER['added_to_review']);
 ~}
 
 <h1 class="title">

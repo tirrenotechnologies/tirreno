@@ -1,4 +1,4 @@
-import {BaseGridWithPanel} from './BaseWithPanel.js?v=2';
+import {BaseGridWithPanel} from './BaseWithPanel.js?v=0.10.0';
 import {
     renderDevice,
     renderOs,
@@ -8,7 +8,7 @@ import {
     renderPhoneCarrierName,
     renderPhoneType,
     renderUserCounter,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class PhonesGrid extends BaseGridWithPanel {
     get orderConfig() {

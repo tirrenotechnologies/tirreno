@@ -1,11 +1,15 @@
-import {Loader} from '../Loader.js?v=2';
-import {getQueryParams}  from '../utils/DataSource.js?v=2';
-import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
-import {formatKiloValue} from '../utils/String.js?v=2';
-import {formatIntTimeUtc} from '../utils/Date.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
-import {renderChartTooltipPart} from '../DataRenderers.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
+import {Loader} from '../Loader.js?v=0.10.0';
+import {getQueryParams}  from '../utils/DataSource.js?v=0.10.0';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=0.10.0';
+import {formatKiloValue} from '../utils/String.js?v=0.10.0';
+import {formatIntTimeUtc} from '../utils/Date.js?v=0.10.0';
+import {fireEvent} from '../utils/Event.js?v=0.10.0';
+import {renderChartTooltipPart} from '../DataRenderers.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
+import {
+    replaceChildren,
+    defined,
+} from '../utils/Functions.js?v=0.10.0';
 
 export class BaseChart {
     constructor(chartParams) {
@@ -60,7 +64,7 @@ export class BaseChart {
         el.className = 'text-loader';
 
         this.loaderBlock.classList.remove('is-hidden');
-        this.loaderBlock.replaceChildren(el);
+        replaceChildren(this.loaderBlock, el);
 
         const p = this.loaderBlock.querySelector('p');
 
@@ -73,10 +77,18 @@ export class BaseChart {
         }
 
         const token  = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        const params = this.config.getParams();
-        const data   = getQueryParams(params);
+        const url = this.config.url;
+        //const params = this.config.getParams();
+        const data   = Object.hasOwn(this.config, 'getParams') ? getQueryParams(this.config.getParams()) : {};
 
-        data['mode']        = params.mode;
+        if (this.config.mode) {
+            data['mode'] = this.config.mode;
+        }
+
+        if (this.config.id) {
+            data['id'] = this.config.id;
+        }
+
         data['token']       = token;
         data['resolution']  = 'day';
         if (data['dateFrom']) {
@@ -92,8 +104,8 @@ export class BaseChart {
         fireEvent('dateFilterChangedCaught');
 
         $.ajax({
-            url: `${window.app_base}/admin/loadChart`,
-            type: 'get',
+            url: url,
+            type: 'GET',
             data: data,
             success: (responseData, status) => this.onChartLoaded(responseData, status, data['resolution']),
             error: handleAjaxError,
@@ -298,7 +310,7 @@ export class BaseChart {
             }
 
             if (frag.children.length > 1) {
-                seriestt.replaceChildren(frag);
+                replaceChildren(seriestt, frag);
 
                 let val = null;
                 let lvl = 1;
@@ -312,7 +324,7 @@ export class BaseChart {
                     }
                 }
 
-                val = (val !== null && val != undefined) ? val : defaultVal;
+                val = defined(val) ? val : defaultVal;
 
                 seriestt.style.top = Math.round(u.valToPos(val, u.series[lvl].scale)) + 'px';
                 seriestt.style.left = Math.round(u.valToPos(xVal, vtp)) + 'px';
@@ -353,7 +365,7 @@ export class BaseChart {
         if (data.length > lvl) {
             let series = u.series[lvl];
             let val = (idx !== null) ? data[lvl][idx] : data[lvl];
-            val = (val !== null && val != undefined) ? val : defaultVal;
+            val = defined(val) ? val : defaultVal;
 
             frag.appendChild(document.createElement('br'));
             frag.appendChild(renderChartTooltipPart(series.stroke(), series.label, val));

@@ -1,5 +1,5 @@
-import {BaseTiles} from './BaseTiles.js?v=2';
-import {Constants} from '../utils/Constants.js?v=2';
+import {BaseTiles} from './BaseTiles.js?v=0.10.0';
+import {Constants} from '../utils/Constants.js?v=0.10.0';
 import {
     renderDateWithTimestampTooltip,
     renderBoolean,
@@ -10,9 +10,10 @@ import {
     renderUserLastname,
     renderUserReviewedStatus,
     renderTotalFrameCmp,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
-const URL   = `${window.app_base}/admin/loadUserDetails`;
+const URL   = `${window.app_base}/loadUserDetails`;
 
 export class UserTiles extends BaseTiles {
     updateTiles(data) {
@@ -32,13 +33,13 @@ export class UserTiles extends BaseTiles {
         const record = data.userDetails;
         this.removeLoaderBackground(tile);
 
-        tile.querySelector('#signup-date').replaceChildren(renderDateWithTimestampTooltip(record.created));
-        tile.querySelector('#lastseen').replaceChildren(renderDateWithTimestampTooltip(record.lastseen));
-        tile.querySelector('#latest-decision').replaceChildren(renderDateWithTimestampTooltip(record.latest_decision));
-        tile.querySelector('#review-status').replaceChildren(renderUserReviewedStatus(record));
-        tile.querySelector('#firstname').replaceChildren(renderUserFirstname(record));
-        tile.querySelector('#lastname').replaceChildren(renderUserLastname(record));
-        tile.querySelector('#userid').replaceChildren(renderUserId(record.userid));
+        replaceChildren(tile.querySelector('#signup-date'), renderDateWithTimestampTooltip(record.created));
+        replaceChildren(tile.querySelector('#lastseen'), renderDateWithTimestampTooltip(record.lastseen));
+        replaceChildren(tile.querySelector('#latest-decision'), renderDateWithTimestampTooltip(record.latest_decision));
+        replaceChildren(tile.querySelector('#review-status'), renderUserReviewedStatus(record));
+        replaceChildren(tile.querySelector('#firstname'), renderUserFirstname(record));
+        replaceChildren(tile.querySelector('#lastname'), renderUserLastname(record));
+        replaceChildren(tile.querySelector('#userid'), renderUserId(record.userid));
     }
 
     updateTotalsDetails(data) {
@@ -63,7 +64,7 @@ export class UserTiles extends BaseTiles {
         ];
 
         for (const [id, el] of map) {
-            tile.querySelector(id).replaceChildren(renderUserCounter(record[el], limits[el], false, true));
+            replaceChildren(tile.querySelector(id), (renderUserCounter(record[el], limits[el], false, true)));
         }
     }
 
@@ -71,8 +72,8 @@ export class UserTiles extends BaseTiles {
         const na_tile = false;
         const tile = document.querySelector('#user-behaviour-tile');
 
-        const record = data.dayDetails;
-        const week = data.weekDetails;
+        const today = data.todayDetails;
+        const yesterday = data.yesterdayDetails;
 
         if (!tile) {
             return;
@@ -80,8 +81,8 @@ export class UserTiles extends BaseTiles {
 
         this.removeLoaderBackground(tile);
 
-        const useHyphenOld = !week.session_cnt;
-        const useHyphenNew = !record.session_cnt;
+        const useHyphenOld = !yesterday.session_cnt;
+        const useHyphenNew = !today.session_cnt;
 
         const map = [
             ['#failed-login-count',     'failed_login_cnt'],
@@ -94,8 +95,8 @@ export class UserTiles extends BaseTiles {
         ];
 
         for (const [id, el] of map) {
-            tile.querySelector(id).replaceChildren(renderTotalFrameCmp(
-                week[el], record[el], useHyphenOld, useHyphenNew
+            replaceChildren(tile.querySelector(id), renderTotalFrameCmp(
+                yesterday[el], today[el], useHyphenOld, useHyphenNew
             ));
         }
     }
@@ -110,13 +111,13 @@ export class UserTiles extends BaseTiles {
         const record = data.ipDetails;
         this.removeLoaderBackground(tile);
 
-        tile.querySelector('#datacenter').replaceChildren(renderBoolean(record.withdc));
-        tile.querySelector('#vpn').replaceChildren(renderBoolean(record.withvpn));
-        tile.querySelector('#tor').replaceChildren(renderBoolean(record.withtor));
-        tile.querySelector('#apple-relay').replaceChildren(renderBoolean(record.withar));
-        tile.querySelector('#ip-shared').replaceChildren(renderBoolean(record.sharedips));
-        tile.querySelector('#spam-list').replaceChildren(renderBoolean(record.spamlist));
-        tile.querySelector('#blacklisted').replaceChildren(renderBoolean(record.fraud_detected));
+        replaceChildren(tile.querySelector('#datacenter'), renderBoolean(record.withdc));
+        replaceChildren(tile.querySelector('#vpn'), renderBoolean(record.withvpn));
+        replaceChildren(tile.querySelector('#tor'), renderBoolean(record.withtor));
+        replaceChildren(tile.querySelector('#apple-relay'), renderBoolean(record.withar));
+        replaceChildren(tile.querySelector('#ip-shared'), renderBoolean(record.sharedips));
+        replaceChildren(tile.querySelector('#spam-list'), renderBoolean(record.spamlist));
+        replaceChildren(tile.querySelector('#blacklisted'), renderBoolean(record.fraud_detected));
     }
 
 

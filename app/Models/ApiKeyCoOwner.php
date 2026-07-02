@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class ApiKeyCoOwner extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_api_co_owners';
+class ApiKeyCoOwner extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_api_co_owners';
 
     public function getCoOwnershipKeyId(int $operatorId): ?int {
         $params = [

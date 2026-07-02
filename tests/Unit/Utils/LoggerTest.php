@@ -10,17 +10,14 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Logger.
  *
- * Covered (unit-testable without refactor):
- * - Logger::logCronLine() (pure formatting)
+ * Covered:
+ * - Logger::logCronLine()
  *
- * Not covered (recommended to refactor first):
- * - Logger::log() (hard dependency on F3 \Log + filesystem write side effect)
- * - Logger::logSql() (hard dependency on F3 \Log + filesystem write side effect)
+ * @todo Cover Logger::log() after \Log creation can be replaced
+ *       with an injectable log writer.
  *
- * @todo Refactor:
- * - extract side-effecting collaborator behind an interface:
- *   LogWriterInterface (or LogFactoryInterface) with write(string $message): void
- * - then Logger::log() / logSql() become deterministic and properly unit-testable without filesystem.
+ * @todo Cover Logger::logSql() after \Log creation can be replaced
+ *       with an injectable log writer.
  */
 final class LoggerTest extends TestCase {
     /**

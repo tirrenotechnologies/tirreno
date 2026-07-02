@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Logbook extends Base {
-    protected ?string $DB_TABLE_NAME = 'event_logbook';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 
@@ -33,8 +31,8 @@ class Logbook extends Base {
 
     private function getFirstLine(int $apiKey): array {
         // apply server offset to utc requested date range because dateRangeField is in server time zone
-        $serverOffset = \Tirreno\Utils\Timezones::getServerOffset();
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest($serverOffset);
+        $serverOffset = tirreno('utils')->timezones->getServerOffset();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest($serverOffset);
 
         if (!$dateRange) {
             $dateRange = [
@@ -43,20 +41,20 @@ class Logbook extends Base {
             ];
         }
 
-        //$dateRange['endDate']   = \Tirreno\Utils\Timezones::localizeForActiveOperator($dateRange['endDate']);
-        //$dateRange['startDate'] = \Tirreno\Utils\Timezones::localizeForActiveOperator($dateRange['startDate']);
+        //$dateRange['endDate']   = tirreno('utils')->timezones->localizeForActiveOperator($dateRange['endDate']);
+        //$dateRange['startDate'] = tirreno('utils')->timezones->localizeForActiveOperator($dateRange['startDate']);
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
-            ':comb_offset'  => strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset() - $serverOffset),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
+            ':comb_offset'  => strval(tirreno('utils')->timezones->getCurrentOperatorOffset() - $serverOffset),
         ];
 
-        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->FAILED_LOGBOOK_EVENT_TYPES, 'failed');
-        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ISSUED_LOGBOOK_EVENT_TYPES, 'issued');
-        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_LOGBOOK_EVENT_TYPES, 'normal');
+        [$failedTypesParams, $failedFlatIds]    = $this->getArrayPlaceholders(tirreno('utils')->constants->FAILED_LOGBOOK_EVENT_TYPES, 'failed');
+        [$issuedTypesParams, $issuedFlatIds]    = $this->getArrayPlaceholders(tirreno('utils')->constants->ISSUED_LOGBOOK_EVENT_TYPES, 'issued');
+        [$normalTypesParams, $normalFlatIds]    = $this->getArrayPlaceholders(tirreno('utils')->constants->NORMAL_LOGBOOK_EVENT_TYPES, 'normal');
 
         $params = array_merge($params, $failedTypesParams);
         $params = array_merge($params, $issuedTypesParams);

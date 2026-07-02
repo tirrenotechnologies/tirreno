@@ -1,90 +1,25 @@
 <div class="card events-card">
     <header class="card-header">
         <div class="card-header-title">
-            {{ @AdminRules_table_title }}
-            <span>{{ count(@RULES) }}</span><p class="tooltip-info tooltip" title="{{ @AdminRules_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            {{ @rules_table_title }}
+            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @rules_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
         </div>
     </header>
 
-    <include href="templates/parts/forms/searchForm.html" />
     <div class="card-table">
         <div class="content">
+            <include href="templates/parts/forms/searchForm.html" />
             <table class="table" id="rules-table">
                 <thead>
-                <tr>
-                    <th class="tooltip rules-code-col" title="{{@AdminRules_table_header_code_tooltip}}">{{ @AdminRules_table_header_code }}</th>
-                    <th class="tooltip rules-type-col" title="{{@AdminRules_table_header_group_tooltip}}">{{ @AdminRules_table_header_group }}</th>
-                    <th class="tooltip rules-description-col" title="{{@AdminRules_table_header_description_tooltip}}">{{ @AdminRules_table_header_description }}</th>
-                    <th class="tooltip rules-proportion-col" title="{{@AdminRules_table_header_proportion_tooltip}}">{{ @AdminRules_table_header_proportion }}</th>
-                    <th class="tooltip rules-weight-col" title="{{@AdminRules_table_header_weight_tooltip}}">{{ @AdminRules_table_header_weight }}</th>
-                    <th class="tooltip rules-action-col" title="{{@AdminRules_table_header_users_tooltip}}">{{ @AdminRules_table_header_users }}</th>
-                </tr>
+                    <tr>
+                        <th class="tooltip rules-code-col" title="{{@rules_table_header_code_tooltip}}">{{ @rules_table_header_code }}</th>
+                        <th class="tooltip rules-type-col" title="{{@rules_table_header_group_tooltip}}">{{ @rules_table_header_group }}</th>
+                        <th class="tooltip rules-description-col" title="{{@rules_table_header_description_tooltip}}">{{ @rules_table_header_description }}</th>
+                        <th class="tooltip rules-proportion-col" title="{{@rules_table_header_proportion_tooltip}}">{{ @rules_table_header_proportion }}</th>
+                        <th class="tooltip rules-weight-col" title="{{@rules_table_header_weight_tooltip}}">{{ @rules_table_header_weight }}</th>
+                        <th class="tooltip rules-action-col" title="{{@rules_table_header_users_tooltip}}">{{ @rules_table_header_users }}</th>
+                    </tr>
                 </thead>
-                <tbody>
-                    <loop from="{{ @I }}=0" to="{{ @I }} < {{ count(@RULES) }}" step="{{ @I }}++">
-                        <SET VALUE="{{ @RULES[@I].value ?? 0}}" />
-                        <SET PROPORTION="{{ @RULES[@I].proportion !== null ? (@RULES[@I].proportion < 1.0 && @RULES[@I].proportion > 0.0 ? '<1%' : strval(intval(@RULES[@I].proportion)).'%') : '&minus;' }}"/>
-                        <SET PROPORTION_UPD="{{ @RULES[@I].proportion_updated_at !== null ? 'Last updated: '.(new DateTime(@RULES[@I].proportion_updated_at))->format('d/m/Y') : '&minus;' }}"/>
-                        <tr data-rule-uid="{{ @RULES[@I].uid }}">
-                            <td align="right">
-                                <a href="{{ @BASE }}/id?ruleUid={{@RULES[@I].uid}}"><h3 class="ruleHighlight {{ \Tirreno\Utils\Assets\RulesClasses::getRuleClass(@VALUE, @RULES[@I].broken) }}">{{@RULES[@I].uid}}</h3></a>
-                            </td>
-                            <td>
-                                <check if="{{ !@RULES[@I].broken }}">
-                                    <true>
-                                        {{@RULES[@I].type}}
-                                    </true>
-                                    <false>
-                                        <p class="addlight">{{@RULES[@I].type}}</p>
-                                    </false>
-                                </check>
-                            </td>
-                            <td>
-                                <p {{@RULES[@I].broken ? 'class="inactive-rulename"' : ''}}>{{@RULES[@I].name}}</p>
-                                <p class="addlight">{{@RULES[@I].descr}}</p>
-                            </td>
-
-                            <td align="center">
-                                <check if="{{ !@RULES[@I].broken }}">
-                                    <true>
-                                        <span class="tooltip" title="{{ @PROPORTION_UPD }}">{{ @PROPORTION }}</span>
-                                    </true>
-                                </check>
-                            </td>
-                            <td>
-                                <check if="{{ !@RULES[@I].broken }}">
-                                    <true>
-                                        <div class="selector">
-                                        <select class="input rulescore" name="{{@RULES[@I].uid}}" data-initial-value="{{ @VALUE }}">
-                                            <loop from="{{ @J }}=0" to="{{ @J }} < {{ count(@RULE_VALUES) }}" step="{{ @J }}++">
-                                                <SET RULE_VALUE="{{ @RULE_VALUES[@J] }}" />
-                                                <set IS_RULE_ACTIVE="{{ @VALUE === @RULE_VALUE['value'] }} " />
-                                                <option value="{{ @RULE_VALUE.value }}" {{ @IS_RULE_ACTIVE ? 'selected' : '' }}>{{ @RULE_VALUE.text }}</option>
-                                            </loop>
-                                        </select>
-                                        </div>
-                                    </true>
-                                </check>
-                            </td>
-                            <td>
-                                <check if="{{ !@RULES[@I].broken }}">
-                                    <true>
-                                        <button class="button dark-loader" data-rule-uid="{{ @RULES[@I].uid }}">
-                                            <span class="icon ruleIcon">
-                                                <include href="images/icons/play.svg" />
-                                            </span>
-                                        </button>
-                                        <button class="button dark-loader is-primary is-hidden" type="button">
-                                            <span class="icon ruleIcon">
-                                                <include href="images/icons/save.svg" />
-                                            </span>
-                                        </button>
-                                    </true>
-                                </check>
-                            </td>
-                        </tr>
-                    </loop>
-                </tbody>
             </table>
             <include href="templates/parts/forms/reloadRulesForm.html">
         </div>

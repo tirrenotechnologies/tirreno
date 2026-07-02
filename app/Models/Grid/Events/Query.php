@@ -220,7 +220,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         //Apply itemId into request
         $this->applyRelatedToIdSearchConitions($query);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = '';
 
         // WARN only for field_id filter
@@ -237,7 +237,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         }
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
-            if (\Tirreno\Utils\Conversion::filterIp($search['value'])) {
+            if (tirreno('utils')->conversion->filterIp($search['value'])) {
                 $searchConditions .= (
                     ' AND
                     (
@@ -265,7 +265,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
                 );
 
                 $queryParams[':search_value'] = '%' . $search['value'] . '%';
-                $queryParams[':offset'] = strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset());
+                $queryParams[':offset'] = strval(tirreno('utils')->timezones->getCurrentOperatorOffset());
             }
         }
 
@@ -321,7 +321,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyEventTypes(string &$query, array &$queryParams): void {
-        $eventTypeIds = \Tirreno\Utils\Conversion::getArrayRequestParam('eventTypeIds');
+        $eventTypeIds = tirreno('utils')->conversion->getArrayRequestParam('eventTypeIds');
         if (!$eventTypeIds) {
             return;
         }
@@ -336,7 +336,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyDeviceTypes(string &$query, array &$queryParams): void {
-        $deviceTypes = \Tirreno\Utils\Conversion::getArrayRequestParam('deviceTypes');
+        $deviceTypes = tirreno('utils')->conversion->getArrayRequestParam('deviceTypes');
         if (!$deviceTypes) {
             return;
         }
@@ -346,7 +346,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
             if ($deviceType === 'other') {
                 $placeholders = [];
 
-                foreach (\Tirreno\Utils\Constants::get()->DEVICE_TYPES as $device) {
+                foreach (tirreno('utils')->constants->DEVICE_TYPES as $device) {
                     if ($device !== 'unknown' && $device !== 'other') {
                         $param = ':device_exclude_' . $device;
                         $placeholders[] = $param;
@@ -370,7 +370,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = \Tirreno\Utils\Conversion::getArrayRequestParam('ruleUids');
+        $ruleUids = tirreno('utils')->conversion->getArrayRequestParam('ruleUids');
         if (!$ruleUids) {
             return;
         }
