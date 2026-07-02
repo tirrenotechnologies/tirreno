@@ -65,22 +65,8 @@ export class BaseGrid {
             const config = me.getDataTableConfig();
             $(`#${tableId}`).DataTable(config);
 
-            const reloadBtn = document.getElementById(tableId)
-                .closest('.card')
-                .querySelector('button.reload');
-                
-            if (reloadBtn) {
-                reloadBtn.addEventListener('click', () => {
-                    if (me.config.datesFilter) {
-                        const activeLink = document.querySelector('nav.filters-form.daterange a.active');
-                        const hours = activeLink ? parseInt(activeLink.dataset.value, 10) : null;
-                        if (hours) {
-                            me.config.datesFilter.setDateRangeFromNow(hours);
-                        }
-                    }
-                    me.loadData();
-                });
-            }
+            const onReloadButtonClick = me.onReloadButtonClick.bind(me);
+            me.reloadButton?.addEventListener('click', onReloadButtonClick);
 
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
@@ -410,6 +396,18 @@ export class BaseGrid {
         $(me.table).DataTable().ajax.reload();
     }
 
+    onReloadButtonClick(e) {
+        e.preventDefault();
+        if (this.config.datesFilter) {
+            const activeLink = document.querySelector('nav.filters-form.daterange a.active');
+            const hours = activeLink ? parseInt(activeLink.dataset.value, 10) : null;
+            if (hours) {
+                this.config.datesFilter.setDateRangeFromNow(hours);
+            }
+        }
+        this.loadData();
+    }
+
     onDateFilterChanged() {
         this.loadData();
     }
@@ -438,6 +436,10 @@ export class BaseGrid {
         const tableEl = document.getElementById(tableId);
 
         return tableEl;
+    }
+
+    get reloadButton() {
+        return this.table.closest('.card').querySelector('a.reload');
     }
 
     renderTotalsLoader(data, type, record, meta) {
