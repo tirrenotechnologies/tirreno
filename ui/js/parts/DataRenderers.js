@@ -1,12 +1,17 @@
-import {padZero} from './utils/Date.js?v=2';
-import {Constants} from './utils/Constants.js?v=2';
+import {padZero} from './utils/Date.js?v=0.10.0';
+import {Constants} from './utils/Constants.js?v=0.10.0';
 import {
     //truncateWithHellip,
     formatKiloValue,
     getRuleClass,
     formatTime,
     openJson,
-} from './utils/String.js?v=2';
+} from './utils/String.js?v=0.10.0';
+import {
+    inArray,
+    mapKeys,
+    defined,
+} from './utils/Functions.js?v=0.10.0';
 
 const isDashboardPage = () => !!document.getElementById('most-active-users');
 
@@ -37,7 +42,7 @@ const tooltipWrap = (tooltip, value, wrap = true, wordBreak = false) => {
         result.appendChild(node);
     }
 
-    if (tooltip !== null && tooltip !== undefined && tooltip !== '') {
+    if (defined(tooltip) && tooltip !== '') {
         result.classList.add('tooltip');
         if (wordBreak) {
             result.classList.add('tooltipster-word-break');
@@ -463,7 +468,7 @@ const renderDeviceTypeSelectorItem = (classNames, data) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
 
-    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(value);
+    const deviceIsNormal = inArray(Constants.NORMAL_DEVICES, value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
     img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
@@ -481,7 +486,7 @@ const renderDeviceTypeSelectorChoice = (classNames, data, itemSelectText) => {
     const [value] = splitLabel(data.label);
     const innerHtml = document.createElement('span');
 
-    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(value);
+    const deviceIsNormal = inArray(Constants.NORMAL_DEVICES, value);
     const deviceTypeImg = deviceIsNormal ? value : 'unknown';
     const img = document.createElement('img');
     img.src = `${window.app_base}/ui/images/icons/${deviceTypeImg}.svg`;
@@ -586,18 +591,18 @@ const renderHttpMethod = record => {
     return renderDefaultIfEmptySpan(span);
 };
 
-const renderTotalFrameCmp = (oldval, newval, hyphenOnEmptyOld = false, hyphenOnEmptyNew = false) => {
+const renderTotalFrameCmp = (yesterday, today, hyphenOnEmptyOld = false, hyphenOnEmptyNew = false) => {
     const frag = document.createDocumentFragment();
 
-    oldval = parseInt(oldval, 10) || (hyphenOnEmptyOld ? renderDefaultIfEmpty(oldval) : 0);
-    newval = parseInt(newval, 10) || (hyphenOnEmptyNew ? renderDefaultIfEmpty(newval) : 0);
+    yesterday = parseInt(yesterday, 10) || (hyphenOnEmptyOld ? renderDefaultIfEmpty(yesterday) : 0);
+    today = parseInt(today, 10) || (hyphenOnEmptyNew ? renderDefaultIfEmpty(today) : 0);
 
     const span = document.createElement('span');
     span.className = 'addlight';
-    span.textContent = newval + '/';
+    span.textContent = yesterday + '/';
 
     frag.appendChild(span);
-    frag.appendChild(document.createTextNode(oldval));
+    frag.appendChild(document.createTextNode(today));
 
     return frag;
 };
@@ -606,7 +611,7 @@ const renderTotalFrame = (base, val) => {
     const frag = document.createDocumentFragment();
 
     if (parseInt(base, 10) > parseInt(val, 10)) {
-        const rest = (base !== null && base !== undefined && base > 0 && base >= val)
+        const rest = (defined(base) && base > 0 && base >= val)
             ? (base - val)
             : Constants.MIDLINE_HELLIP;
         const span = document.createElement('span');
@@ -658,18 +663,18 @@ const renderBoolean = (data) => {
 const renderProportion = (n, t) => {
     const number = (typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 100)
         ? (n > 0.0 && n < 1.0 ? '<1%' : `${Math.floor(n)}%`)
-        : '&minus;';
+        : '\u2212';
     const tooltip = t ? `Last updated: ${renderDateString(t)}` : '\u2212';
 
     return tooltipWrap(tooltip, number, true);
 };
 
 const renderUserScore = record => {
-    let score = (record.score !== null && record.score !== undefined) ? record.score : '\u2212';
+    let score = defined(record.score) ? record.score : '\u2212';
     let cls = 'empty';
 
-    if (record.fraud !== undefined && record.fraud !== null) {
-        score = (record.fraud) ? 'X' : 'OK';
+    if (defined(record.fraud)) {
+        score = (record.fraud) ? Constants.MULTIPLICATION_SIGN : 'OK';
         cls = (record.fraud) ? 'low' : 'high';
     } else {
         if (score >= Constants.USER_HIGH_TRUST_SCORE_INF) {
@@ -682,6 +687,10 @@ const renderUserScore = record => {
 
         if (score >= Constants.USER_LOW_TRUST_SCORE_INF && score < Constants.USER_LOW_TRUST_SCORE_SUP) {
             cls = 'low';
+        }
+
+        if (record.added_to_review) {
+            score = '!';
         }
     }
 
@@ -855,10 +864,10 @@ const renderUserReviewedStatus = record => {
 
 const renderUserActionButtons = (record, small = true) => {
     let html;
-    if (record.reviewed) {
+    if (record.addedToReview) {
         html = getFraudLegitButtons(record, small);
     } else {
-        html = getToBeReviewedButton(record, small);
+        html = addToReviewButton(record, small);
     }
 
     return html;
@@ -920,17 +929,41 @@ const getFraudLegitButtons = (record, small = true) => {
     return div;
 };
 
-const getToBeReviewedButton = (record, small = true) => {
+const addToReviewButton = (record, small = true) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'reviewed button dark-loader' + ((small) ? ' is-small' : '');
     button.textContent = 'Not reviewed';
 
-    button.setAttribute('data-type', 'reviewed');
+    button.id = 'add-to-review-button';
+    button.setAttribute('data-type', 'add-to-review');
     button.setAttribute('data-user-id', record.accountid);
-    button.setAttribute('data-button-type', 'reviewedButton');
 
     return button;
+};
+
+const renderSingleRuleTile = record => {
+    const uid = defined(record.uid) ? record.uid : '';
+    const descr = defined(record.descr) ? record.descr : '';
+    const name = defined(record.name) ? record.name : '';
+
+    const span = document.createElement('span');
+    span.className = `ruleHighlight ${getRuleClass(record.score)}`;
+    span.textContent = uid;
+
+    const el = document.createTextNode('\u00A0');
+
+    let t = document.createElement('span');
+    t.className = 'ruleName';
+    t.textContent = name;
+    t = tooltipWrap(descr, t, false);
+
+    const part = document.createElement('p');
+    part.appendChild(span);
+    part.appendChild(el);
+    part.appendChild(t);
+
+    return wrapWithRuleLink(part, uid);
 };
 
 const renderScoreDetails = record => {
@@ -948,36 +981,13 @@ const renderScoreDetails = record => {
     const details = record.score_details;
 
     if (Array.isArray(details)) {
-        let uid = '';
-        let descr = '';
-        let name = '';
-        //let part = '';
-
         for (let i = 0; i < details.length; i++) {
-            uid = (details[i].uid !== null && details[i].uid !== undefined) ? details[i].uid : '';
-            descr = (details[i].descr !== null && details[i].descr !== undefined) ? details[i].descr : '';
-            name = (details[i].name!== null && details[i].name !== undefined) ? details[i].name : '';
-
-            const span = document.createElement('span');
-            span.className = `ruleHighlight ${getRuleClass(details[i].score)}`;
-            span.textContent = uid;
-
-            const el = document.createTextNode('\u00A0');
-
-            let t = document.createElement('span');
-            t.className = 'ruleName';
-            t.textContent = name;
-            t = tooltipWrap(descr, t, false);
-
-            const part = document.createElement('p');
-            part.appendChild(span);
-            part.appendChild(el);
-            part.appendChild(t);
+            const tile = renderSingleRuleTile(details[i]);
 
             if (details[i].score !== 0) {
-                frag.appendChild(wrapWithRuleLink(part, uid));
+                frag.appendChild(tile);
             } else {
-                extra.appendChild(wrapWithRuleLink(part, uid));
+                extra.appendChild(tile);
             }
         }
     }
@@ -1060,7 +1070,7 @@ const renderClickableEmail = record => {
 };
 
 const renderReputation = record => {
-    record = (record !== null && record !== undefined) ? record : {};
+    record = defined(record) ? record : {};
 
     let icon = 'reputation-none';
     let reputation = record.reputation;
@@ -1090,8 +1100,8 @@ const renderPhone = (record) => {
     const phone = record.phonenumber;
 
     if (phone) {
-        const code = !Constants.COUNTRIES_EXCEPTIONS.includes(record.country_iso) ? record.country_iso : 'lh';
-        const tooltip = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
+        const code = !inArray(Constants.COUNTRIES_EXCEPTIONS, record.country_iso) ? record.country_iso : 'lh';
+        const tooltip = defined(record.full_country) ? record.full_country : '';
 
         const n       = Constants.MAX_STRING_LENGTH_FOR_PHONE;
         const number  = truncateWithHellip(phone, n);
@@ -1146,8 +1156,8 @@ const renderPhoneType = record => {
 
     if (type) {
         let src = 'smartphone.svg';
-        if (Constants.PHONE_LANDLINE.includes(type)) src = 'landline.svg';
-        if (['nonFixedVoip', 'VOIP'].includes(type)) src = 'voip.svg';
+        if (inArray(Constants.PHONE_LANDLINE, type)) src = 'landline.svg';
+        if (inArray(['nonFixedVoip', 'VOIP'], type)) src = 'voip.svg';
 
         const tooltip = type.toLowerCase().replace(/_/g, ' ');
 
@@ -1280,12 +1290,12 @@ const renderClickableIp = record => {
 
 const renderIpAndFlag = (ip, record) => {
     const countryCode = record.country_iso;
-    const code = !Constants.COUNTRIES_EXCEPTIONS.includes(countryCode) ? countryCode.toLowerCase() : 'lh';
-    const iso = (countryCode !== null && countryCode !== undefined) ? countryCode : '';
+    const code = !inArray(Constants.COUNTRIES_EXCEPTIONS, countryCode) ? countryCode.toLowerCase() : 'lh';
+    const iso = defined(countryCode) ? countryCode : '';
 
     const net = record.isp_name;
-    const tooltip = (net !== null && net !== undefined && net !== '') ? `${iso} - ${net}` : `${iso}`;
-    const alternative = (record.full_country !== null && record.full_country !== undefined) ? record.full_country : '';
+    const tooltip = (defined(net) && net !== '') ? `${iso} - ${net}` : `${iso}`;
+    const alternative = defined(record.full_country) ? record.full_country : '';
 
     const frag = document.createDocumentFragment();
 
@@ -1344,7 +1354,7 @@ const renderIpType = record => {
 
     const ipType  = record.ip_type.toLowerCase().replace(' ', '_');
     let tooltip = tooltipMap[ipType];
-    tooltip = (tooltip !== null && tooltip !== undefined) ? tooltip : record.ip_type;
+    tooltip = defined(tooltip) ? tooltip : record.ip_type;
 
     const span = document.createElement('span');
     span.className = `iptype ${ipType}`;
@@ -1381,7 +1391,7 @@ const renderCidr = record => {
 };
 
 const renderAsn = record => {
-    const asn = (Constants.ASN_OVERRIDE[record.asn] !== undefined) ? Constants.ASN_OVERRIDE[record.asn] : record.asn;
+    const asn = defined(Constants.ASN_OVERRIDE[record.asn]) ? Constants.ASN_OVERRIDE[record.asn] : record.asn;
     const span = document.createElement('span');
     span.textContent = renderDefaultIfEmpty(asn);
 
@@ -1397,8 +1407,8 @@ const renderClickableAsn = record => {
 
 //Country
 const renderCountry = (code, value, tooltip) => {
-    code = !Constants.COUNTRIES_EXCEPTIONS.includes(code) ? code : 'lh';
-    value = (value !== null && value !== undefined) ? value : '';
+    code = !inArray(Constants.COUNTRIES_EXCEPTIONS, code) ? code : 'lh';
+    value = defined(value) ? value : '';
 
     const frag = document.createDocumentFragment();
 
@@ -1437,7 +1447,7 @@ const renderClickableCountry = (record, applyTooltip = true) => {
 
 const renderClickableCountryName = record => {
     const value   = record.full_country;
-    const country = (value !== null && value !== undefined) ? value : '';
+    const country = defined(value) ? value : '';
 
     const el = document.createTextNode(country);
 
@@ -1447,7 +1457,7 @@ const renderClickableCountryName = record => {
 const renderClickableCountryTruncated = record => {
     const fullValue = record.full_country;
     let value   = record.full_country;
-    value = (value !== null && value !== undefined) ? value : '';
+    value = defined(value) ? value : '';
     value = value.length <= Constants.MAX_STRING_LENGTH_FOR_TILE ? value : record.country_iso;
 
     const span = tooltipWrap(fullValue, value, true);
@@ -1520,7 +1530,7 @@ const renderAuditFieldId = (record, length = 'medium') => {
 
 const renderClickableAuditFieldId = (record, length = 'medium') => {
     let span = renderAuditFieldId(record, length);
-    const el = (record.id !== null && record.id !== undefined) ? wrapWithFieldIdLink(span, record) : span;
+    const el = defined(record.id) ? wrapWithFieldIdLink(span, record) : span;
 
     return el;
 };
@@ -1549,7 +1559,7 @@ const renderClickableUserAgentId = record => {
 };
 
 const renderDevice = record => {
-    const deviceIsNormal = Constants.NORMAL_DEVICES.includes(record.device_name);
+    const deviceIsNormal = inArray(Constants.NORMAL_DEVICES, record.device_name);
 
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
     const deviceTypeImg = deviceIsNormal ? record.device_name : 'unknown';
@@ -1574,7 +1584,7 @@ const renderDevice = record => {
 
 const renderDeviceWithOs = record => {
     const deviceTypeTooltip = record.device_name ? record.device_name : 'unknown';
-    const deviceTypeImg = Constants.NORMAL_DEVICES.includes(record.device_name) ? record.device_name : 'unknown';
+    const deviceTypeImg = inArray(Constants.NORMAL_DEVICES, record.device_name) ? record.device_name : 'unknown';
 
     let os = record.os_name ? record.os_name : 'N/A';
     os += record.os_version ? ' ' + record.os_version : '';
@@ -1674,7 +1684,7 @@ const renderDomain = (record, length = 'short') => {
 
 const renderClickableDomain = (record, length = 'short') => {
     let span = renderDomain(record, length);
-    const el = (record.id !== null && record.id !== undefined) ? wrapWithDomainLink(span, record) : span;
+    const el = defined(record.id) ? wrapWithDomainLink(span, record) : span;
 
     return el;
 };
@@ -1686,463 +1696,4 @@ const renderTextarea = (value, h=4, w=37) => {
     textarea.cols = w;
     textarea.textContent = renderDefaultIfEmpty(value);
 
-    return textarea;
-};
-
-const renderQuery = record => {
-    const result = renderTextarea(record.query);
-    result.classList.add('word-break');
-
-    return result;
-};
-
-const renderReferer = record => {
-    const result = renderTextarea(record.referer);
-    result.classList.add('word-break');
-
-    return result;
-};
-
-const renderUserAgent = record => {
-    return renderTextarea(record.ua, 5);
-};
-
-const renderDefaultIfEmptyElement = (value) => {
-    const span = document.createElement('span');
-    span.textContent = (value) ? value : Constants.HYPHEN;
-
-    return span;
-};
-
-const renderDefaultIfEmpty = (value) => {
-    if (value) {
-        return value;
-    }
-
-    return Constants.HYPHEN;
-};
-
-const renderDefaultIfEmptySpan = (span) => {
-    if (!span) {
-        span = document.createElement('span');
-    }
-
-    if (!span.childNodes.length) {
-        span.textContent = renderDefaultIfEmpty(span.textContent);
-    }
-
-    return span;
-};
-
-const renderBlacklistItem = record => {
-    let span = null;
-    let rec = {};
-
-    const type = record.type;
-
-    if (type === 'ip') {
-        rec.ip = record.value;
-        rec.ipid = record.entity_id;
-        span = renderClickableIp(rec);
-    }
-    if (type === 'email' || type === 'phone') {
-        const el = document.createTextNode(renderDefaultIfEmpty(record.value));
-        rec.accountid = record.accountid;
-        span = wrapWithUserLink(el, rec);
-    }
-
-    return renderDefaultIfEmptySpan(span);
-};
-
-const renderBlacklistType = record => {
-    const span = document.createElement('span');
-    let type = record.type;
-
-    if (type) {
-        if (type.toUpperCase() === 'IP') {
-            type = 'IP';
-        } else {
-            type = type.replace(/\b\w+/g, capitalizeValue);
-        }
-
-        span.textContent = type;
-        span.className = 'typestatus';
-    }
-
-    return renderDefaultIfEmptySpan(span);
-};
-
-const renderSensorErrorColumn = record => {
-    const obj = openJson(record.error_text);
-    const s = (obj !== null) ? obj.join('; ') : null;
-    return truncateWithHellip(s, Constants.MAX_STRING_LONG_NETNAME_IN_TABLE);
-};
-
-const renderSensorError = record => {
-    const obj = openJson(record.error_text);
-    const s = (obj !== null) ? obj.join(';\n') : null;
-
-    return renderTextarea(s);
-};
-
-const renderTimeMsLogbook = (record) => {
-    const span = renderTimeMs(record.created);
-    const tooltip = renderTimeString(record.server_time);
-
-    return tooltipWrap(tooltip, span, false);
-};
-
-const renderEndpoint = record => {
-    return truncateWithHellip(record.endpoint, Constants.MAX_STRING_LENGTH_ENDPOINT, true);
-};
-
-const renderJsonTextarea = value => {
-    const obj = openJson(value);
-    const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
-
-    const rows = s ? s.split(/\r\n|\r|\n/).length : 0;
-    const h = rows > 24 ? 24 : (rows < 4 ? 4 : rows);
-
-    return renderTextarea(s, h);
-};
-
-const renderErrorType = record => {
-    const frag = document.createDocumentFragment();
-
-    const el = document.createElement('p');
-    el.className = `bullet ${record.error_value}`;
-    frag.appendChild(el);
-
-    const span = document.createElement('span');
-    span.textContent = record.error_name;
-    frag.appendChild(span);
-
-    return frag;
-};
-
-const renderMailto = record => {
-    const subject = 'Request body';
-    const body = record.raw;
-
-    const href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    const el = document.createElement('a');
-    el.href = href;
-    el.textContent = 'Email request data';
-
-    return el;
-};
-
-const currentPlanRender = (data, type, record, _meta) => {
-    const value = record.sub_plan_api_calls;
-    const text = (value !== null && value !== undefined) ? value + ' API calls' : Constants.MIDLINE_HELLIP;
-
-    const span = document.createElement('span');
-    span.textContent = text;
-
-    return span;
-};
-
-const currentStatusRender = (data, type, record, meta) => {
-    const value = record.sub_status;
-    const text = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
-
-    const span = document.createElement('span');
-    span.textContent = text;
-
-    return span;
-};
-
-const currentUsageRender = (data, type, record, meta) => {
-    let value = record.sub_calls_used;
-    const used = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
-    value = record.sub_calls_limit;
-    const limit = (value !== null && value !== undefined) ? value : Constants.MIDLINE_HELLIP;
-
-    const span = document.createElement('span');
-    span.textContent = used + '/' + limit;
-
-    return span;
-};
-
-const currentBillingEndRender = (data, type, record, meta) => {
-    const value = record.sub_next_billed;
-    const text = (value !== null && value !== undefined)
-        ? renderDateString(value.replace('T', ' '))
-        : Constants.MIDLINE_HELLIP;
-
-    const span = document.createElement('span');
-    span.textContent = text;
-
-    return span;
-};
-
-const updateCardButtonRender = (data, type, record, meta) => {
-    const url = record.sub_update_url;
-    const token = record.apiToken;
-    const disabled = (url !== null && url !== undefined && token !== null && token !== undefined) ? '' : 'disabled';
-
-    const button = document.createElement('button');
-    button.className = 'button is-primary';
-    button.type = 'submit';
-    button.textContent = 'Update';
-    button.onclick = (e) => {
-        window.open(url, '_blank');
-    };
-
-    if (disabled) {
-        button.disabled = true;
-    }
-
-    return button;
-};
-
-const renderEnrichmentCalculation = data => {
-    const keys = {
-        ip: 'IP',
-        //ua: 'Devices',
-        phone: 'Phones',
-        email: 'Emails',
-        domain: 'Domains',
-    };
-    let result = [];
-    let sum = 0;
-
-    for (const key in keys) {
-        const c = (data[key] === undefined || data[key] === null) ? 0 : data[key];
-        sum += c;
-        result.push(keys[key].padEnd(16, '.') + String(c));
-    }
-
-    result.push(''.padEnd(16, '='));
-    result.push('Total: ' + String(sum));
-    const text = result.join('\n');
-
-    return renderTextarea(text, 6);
-};
-
-const renderRulePlayResult = (users, count, section, uid) => {
-    if (!count) {
-        return document.createTextNode(`There are no users that match ${uid} rule.`);
-    }
-
-    section = section === 1000 ? '1k' : section;
-
-    const result = document.createDocumentFragment();
-    const txt = (count === 1)
-        ? `One user from last ${section} matching ${uid} rule: `
-        : `${count} users from last ${section} matching ${uid} rule: `;
-    result.appendChild(document.createTextNode(txt));
-
-    const list = document.createDocumentFragment();
-    users.forEach((record, idx) => {
-        if (idx > 0) list.appendChild(document.createTextNode(', '));
-        list.appendChild(renderClickableUser(record));
-    });
-
-    result.appendChild(list);
-
-    return result;
-};
-
-const renderChartTooltipPart = (color, label, val) => {
-    const span = document.createElement('span');
-
-    if (label !== null) {
-        span.style.backgroundColor = color;
-        span.className = 'chart-tooltip';
-        span.textContent = `${label}: ${val}`;
-    } else {
-        span.style.color = color;
-        span.textContent = val;
-    }
-
-    return span;
-};
-
-// These two functions return a string (via div.innerHTML) rather than a DOM node.
-// A string return value is required by Devbridge jQuery Autocomplete's formatResult callback setting.
-const domToHtml = function(node) {
-    const div = document.createElement('div');
-    div.appendChild(node.cloneNode(true));
-    return div.innerHTML;
-};
-
-const formatSearchResult = function(suggestion, currentValue) {
-    const data = suggestion.data ? suggestion.data : {};
-    const category = data.category ? data.category : null;
-
-    if (category === 'IP') {
-        return domToHtml(renderIpWithCountry({
-            ip:          suggestion.value,
-            country_iso: data.country_iso ? data.country_iso : 'lh',
-        }));
-    }
-
-    // ID, Name, Email — all map to a user record
-    return domToHtml(renderClickableImportantUserWithScore({
-        accountid:        data.id ? data.id : null,
-        email:            suggestion.value,
-        accounttitle:     suggestion.value,
-        score:            data.score ? data.score : null,
-        score_updated_at: null,
-        is_important:     false,
-    }));
-};
-
-export {
-    //Primitive
-    renderBoolean,
-    renderDefaultIfEmptyElement,
-    renderProportion,
-
-    //Event
-    renderHttpCode,
-    renderHttpMethod,
-    renderTotalFrame,
-
-    //Time
-    renderTime,
-    renderDate,
-    renderTimeMs,
-    renderDateWithTimestampTooltip,
-
-    //Choices selector
-    renderRuleSelectorItem,
-    renderRuleSelectorChoice,
-    renderEventTypeSelectorItem,
-    renderEventTypeSelectorChoice,
-    renderIpTypeSelectorItem,
-    renderIpTypeSelectorChoice,
-    renderFileTypeSelectorItem,
-    renderFileTypeSelectorChoice,
-    renderDeviceTypeSelectorItem,
-    renderDeviceTypeSelectorChoice,
-    renderEntityTypeSelectorItem,
-    renderEntityTypeSelectorChoice,
-    renderScoresRangeSelectorItem,
-    renderScoresRangeSelectorChoice,
-
-    //User
-    renderUser,                                 //! only internal usage
-    renderUserId,
-    renderUserScore,                            //! only internal usage
-    renderUserWithScore,                        //! only internal usage
-    renderClickableImportantUserWithScore,
-    renderClickableImportantUserWithScoreTile,
-    renderUserForEvent,
-    renderTimestampForEvent,
-    renderUserFirstname,
-    renderUserLastname,
-    renderClickableUser,
-    renderImportantUser,                        //! not used
-    renderClickableImportantUser,               //! only internal usage
-    renderUserActionButtons,
-    renderUserReviewedStatus,
-    renderBlacklistButtons,
-    renderScoreDetails,
-    renderUserCounter,
-    renderTotalFrameCmp,
-
-    //Email
-    renderEmail,
-    renderReputation,
-    renderClickableEmail,                       //! not used
-
-    //Phone
-    renderPhone,
-    renderFullCountry,
-    renderPhoneType,
-    renderClickablePhone,                       //! not used
-    renderPhoneCarrierName,
-    renderUsersList,
-
-    //Country
-    renderCountryIso,
-    renderCountryFull,                          //! only internal usage
-    renderClickableCountry,
-    renderClickableCountryName,
-    renderClickableCountryTruncated,
-
-    //Resource
-    renderResourceWithQueryAndEventType,
-    renderResourceWithoutQuery,                 //! only internal usage
-    renderClickableResourceWithoutQuery,
-    renderAuthStatus,
-
-    //IP
-    renderIp,
-    renderIpType,
-    renderClickableIp,
-    renderIpWithCountry,
-    renderClickableIpWithCountry,
-
-    //Net
-    renderAsn,
-    renderClickableAsn,
-    renderNetName,
-    renderCidr,
-
-    //Audit Trail
-    renderAuditField,
-    renderAuditValue,
-    renderAuditParent,
-    renderClickableAuditFieldId,
-    renderAuditFieldName,
-
-    //Device
-    renderDevice,
-    renderDeviceWithOs,
-    renderClickableUserAgentId,
-
-    //OS
-    renderOs,
-    renderClickableOs,                          //! not used
-
-    //Domain
-    renderDomain,
-    renderClickableDomain,
-
-    //Browser
-    renderBrowser,
-
-    //Language
-    renderLanguage,
-
-    //Details panel
-    renderQuery,
-    renderUserAgent,
-    renderReferer,
-
-    //Blacklist item
-    renderBlacklistType,
-    renderBlacklistItem,
-
-    //Logbook
-    renderSensorErrorColumn,
-    renderSensorError,
-    renderTimeMsLogbook,
-    renderEndpoint,
-    renderJsonTextarea,
-    renderErrorType,
-    renderMailto,
-
-    //UsageStats
-    currentPlanRender,
-    currentStatusRender,
-    currentUsageRender,
-    currentBillingEndRender,
-    updateCardButtonRender,
-
-    //Enrichment
-    renderEnrichmentCalculation,
-
-    //Rule
-    renderRulePlayResult,
-
-    //Chart
-    renderChartTooltipPart,
-
-    //Search autocomplete
-    formatSearchResult,
-};
+    return texta
