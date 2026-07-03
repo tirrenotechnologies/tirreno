@@ -117,6 +117,20 @@ composer require tirreno/tirreno
 * [NodeJS](https://github.com/tirrenotechnologies/tirreno-nodejs-tracker)
 * [WordPress](https://github.com/tirrenotechnologies/tirreno-wordpress-tracker)
 
+## Custom page examples
+
+tirreno ingests the universal primitives (users/entities, IPs, devices, sessions, events) and exposes them through composable machinery: the rule engine, the tirreno('queries') builder, and the file-based assets/pages/ extension system — through which an operator can express whatever risk model they have. The examples below show custom pages built on that extension system.
+
+### LLM bots
+
+* [llm-bots.example.php](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/llm-bots.example.php)
+* [llm-bots.example.html](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/views/llm-bots.example.html)
+
+### Risk users
+
+* [risk-users.example.php](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/risk-users.example.php)
+* [risk-users.example.html](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/views/risk-users.example.html)
+
 ## Documentation
 
 See the [User guide](https://docs.tirreno.com/) for details on how to use tirreno, [Developers documentation](https://github.com/tirrenotechnologies/DEVELOPMENT.md) to customize your integration, [Admin documentation](https://github.com/tirrenotechnologies/ADMIN.md) for installation, maintenance and updates.
