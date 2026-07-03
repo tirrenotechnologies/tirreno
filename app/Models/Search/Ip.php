@@ -17,7 +17,9 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Search;
 
-class Ip extends \Tirreno\Models\Base {
+class Ip extends \Tirreno\Models\BaseSql {
+    protected ?string $DB_TABLE_NAME = 'event_ip';
+
     public function searchByIp(string $query, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
@@ -26,13 +28,17 @@ class Ip extends \Tirreno\Models\Base {
 
         $query = (
             "SELECT
-                event_ip.id AS id,
-                'IP'        AS \"groupName\",
-                'ip'        AS \"entityId\",
-                event_ip.ip AS value
+                event_ip.id         AS id,
+                'IP'                AS \"groupName\",
+                'ip'                AS \"entityId\",
+                event_ip.ip         AS value,
+                countries.iso       AS country_iso
 
             FROM
                 event_ip
+
+            LEFT JOIN
+                countries ON countries.id = event_ip.country
 
             WHERE
                 LOWER(TEXT(event_ip.ip)) LIKE LOWER(:query) AND

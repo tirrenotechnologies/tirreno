@@ -1,7 +1,10 @@
-import {Loader} from './Loader.js?v=0.10.0';
-import {Tooltip} from './Tooltip.js?v=0.10.0';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
-import {padZero} from './utils/Date.js?v=0.10.0';
+import {Loader} from './Loader.js?v=2';
+import {Tooltip} from './Tooltip.js?v=2';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {padZero} from './utils/Date.js?v=2';
+import {
+    formatSearchResult,
+} from './DataRenderers.js?v=2';
 
 export class SearchLine {
     constructor() {
@@ -11,7 +14,7 @@ export class SearchLine {
 
         const me = this;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        const url = `${window.app_base}/search?token=${token}`;
+        const url = `${window.app_base}/admin/search?token=${token}`;
 
         $('#auto-complete').autocomplete({
             serviceUrl: url,
@@ -20,6 +23,8 @@ export class SearchLine {
             groupBy: 'category',
             showNoSuggestionNotice: true,
             noSuggestionNotice: 'Sorry, no matching results',
+
+            formatResult: formatSearchResult,
 
             onSelect: function(suggestion) {
                 window.open(`${window.app_base}/${suggestion.entityId}/${suggestion.id}`, '_self');
@@ -40,9 +45,10 @@ export class SearchLine {
         });
 
         // clock setup
-        //const restoreClock = this.restoreClock.bind(this);
-        //document.addEventListener('visibilitychange', restoreClock, false);
-        //setInterval(this.updateTime.bind(this), 1000);
+        const restoreClock = this.restoreClock.bind(this);
+        document.addEventListener('visibilitychange', restoreClock, false);
+
+        setInterval(this.updateTime.bind(this), 1000);
     }
 
     restoreClock() {
@@ -54,8 +60,8 @@ export class SearchLine {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: `${window.app_base}/currentTime`,
-            type: 'GET',
+            url: `${window.app_base}/admin/currentTime`,
+            type: 'get',
             data: {token: token},
             success: onDetailsLoaded,
             error: handleAjaxError,

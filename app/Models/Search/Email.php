@@ -17,7 +17,9 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Search;
 
-class Email extends \Tirreno\Models\Base {
+class Email extends \Tirreno\Models\BaseSql {
+    protected ?string $DB_TABLE_NAME = 'event_email';
+
     public function searchByEmail(string $query, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
@@ -26,13 +28,17 @@ class Email extends \Tirreno\Models\Base {
 
         $query = (
             "SELECT
-                event_email.account_id AS id,
+                event_email.account_id  AS id,
                 'Email'                 AS \"groupName\",
                 'id'                    AS \"entityId\",
-                event_email.email      AS value
+                event_email.email       AS value,
+                event_account.score     AS score
 
             FROM
                 event_email
+
+            LEFT JOIN
+                event_account ON event_account.id = event_email.account_id
 
             WHERE
                 LOWER(event_email.email) LIKE LOWER(:query) AND

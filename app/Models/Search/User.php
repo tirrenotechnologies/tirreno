@@ -17,7 +17,9 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Search;
 
-class User extends \Tirreno\Models\Base {
+class User extends \Tirreno\Models\BaseSql {
+    protected ?string $DB_TABLE_NAME = 'event_account';
+
     public function searchByUserId(string $query, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
@@ -29,7 +31,8 @@ class User extends \Tirreno\Models\Base {
                 event_account.id     AS id,
                 'ID'                 AS \"groupName\",
                 'id'                 AS \"entityId\",
-                event_account.userid AS value
+                event_account.userid AS value,
+                event_account.score  AS score
 
             FROM
                 event_account
@@ -56,7 +59,8 @@ class User extends \Tirreno\Models\Base {
                 'Name'                                  AS \"groupName\",
                 'id'                                    AS \"entityId\",
                 CONCAT_WS(' ', event_account.firstname,
-                               event_account.lastname)  AS value
+                               event_account.lastname)  AS value,
+                event_account.score                     AS score
 
             FROM
                 event_account
