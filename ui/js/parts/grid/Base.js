@@ -457,7 +457,8 @@ export class BaseGrid {
     }
 
     get reloadButton() {
-        return this.table.closest('.card').querySelector('a.reload');
+        const card = this.table.closest('.card');
+        return card ? card.querySelector('a.reload') : null;
     }
 
     renderTotalsLoader(data, type, record, meta) {
