@@ -73,6 +73,8 @@ class Main extends \Tirreno\Controllers\Services\Base {
         for ($i = 0; $i < $iters; ++$i) {
             $result[$i]['data'] = [
                 'category'    => $result[$i]['groupName'],
+                'id'          => $result[$i]['id'],
+                'entityId'    => $result[$i]['entityId'],
                 'score'       => $result[$i]['score'] ?? null,
                 'country_iso' => $result[$i]['country_iso'] ?? null,
             ];
