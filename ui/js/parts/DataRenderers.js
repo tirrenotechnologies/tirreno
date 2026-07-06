@@ -1696,4 +1696,624 @@ const renderTextarea = (value, h=4, w=37) => {
     textarea.cols = w;
     textarea.textContent = renderDefaultIfEmpty(value);
 
-    return texta
+    return textarea;
+};
+
+const renderQuery = record => {
+    const result = renderTextarea(record.query);
+    result.classList.add('word-break');
+
+    return result;
+};
+
+const renderReferer = record => {
+    const result = renderTextarea(record.referer);
+    result.classList.add('word-break');
+
+    return result;
+};
+
+const renderUserAgent = record => {
+    return renderTextarea(record.ua, 5);
+};
+
+const renderDefaultIfEmptyElement = (value) => {
+    const span = document.createElement('span');
+    span.textContent = (value) ? value : Constants.HYPHEN;
+
+    return span;
+};
+
+const renderDefaultIfEmpty = (value) => {
+    if (value) {
+        return value;
+    }
+
+    return Constants.HYPHEN;
+};
+
+const renderDefaultIfEmptySpan = (span) => {
+    if (!span) {
+        span = document.createElement('span');
+    }
+
+    if (!span.childNodes.length) {
+        span.textContent = renderDefaultIfEmpty(span.textContent);
+    }
+
+    return span;
+};
+
+const renderBlacklistItem = record => {
+    let span = null;
+    let rec = {};
+
+    const type = record.type;
+
+    if (type === 'ip') {
+        rec.ip = record.value;
+        rec.ipid = record.entity_id;
+        span = renderClickableIp(rec);
+    }
+    if (type === 'email' || type === 'phone') {
+        const el = document.createTextNode(renderDefaultIfEmpty(record.value));
+        rec.accountid = record.accountid;
+        span = wrapWithUserLink(el, rec);
+    }
+
+    return renderDefaultIfEmptySpan(span);
+};
+
+const renderBlacklistType = record => {
+    const span = document.createElement('span');
+    let type = record.type;
+
+    if (type) {
+        if (type.toUpperCase() === 'IP') {
+            type = 'IP';
+        } else {
+            type = type.replace(/\b\w+/g, capitalizeValue);
+        }
+
+        span.textContent = type;
+        span.className = 'typestatus';
+    }
+
+    return renderDefaultIfEmptySpan(span);
+};
+
+const renderSensorErrorColumn = record => {
+    const obj = openJson(record.error_text);
+    const s = (obj !== null) ? obj.join('; ') : null;
+    return truncateWithHellip(s, Constants.MAX_STRING_LONG_NETNAME_IN_TABLE);
+};
+
+const renderSensorError = record => {
+    const obj = openJson(record.error_text);
+    const s = (obj !== null) ? obj.join(';\n') : null;
+
+    return renderTextarea(s);
+};
+
+const renderRawRequestColumn = record => {
+    const raw = truncateWithHellip(record.raw, Constants.MAX_STRING_LENGTH_RAW_REQUEST, true);
+    raw.classList.add('addlight');
+
+    return raw;
+};
+
+const renderTimeMsLogbook = (record) => {
+    const span = renderTimeMs(record.created);
+    const tooltip = renderTimeString(record.server_time);
+
+    return tooltipWrap(tooltip, span, false);
+};
+
+const renderEndpoint = (record, panel = false) => {
+    const arrow = document.createElement('span');
+    arrow.textContent = (record.ip ? Constants.DOWNWARDS_ARROW : Constants.UPWARDS_ARROW) + ' ';
+    arrow.className = 'addlight';
+
+    const limit = !panel ? Constants.MAX_STRING_LENGTH_ENDPOINT : Constants.MAX_STRING_LENGTH_ENDPOINT + 10;
+
+    const endpoint = truncateWithHellip(record.endpoint, limit, true);
+
+    const frag = document.createDocumentFragment();
+
+    frag.appendChild(arrow);
+    frag.appendChild(endpoint);
+
+    return frag;
+};
+
+const renderJsonTextarea = value => {
+    const obj = openJson(value);
+    const s = (obj !== null) ? JSON.stringify(obj, null, 2) : null;
+    const width = 37;
+
+    const splitted = (s !== null) ? s.split(/\r\n|\r|\n/) : [];
+    let rows = 0;
+    for (const line of splitted) {
+        rows += Math.ceil(line.length / width);
+    }
+
+    const h = rows > 24 ? 24 : (rows < 4 ? 4 : rows);
+
+    return renderTextarea(s, h, width);
+};
+
+const renderErrorType = (record, panel = false) => {
+    const frag = document.createDocumentFragment();
+
+    const el = document.createElement('p');
+    el.className = `bullet ${record.error_value}`;
+    frag.appendChild(el);
+
+    const limit = !panel ? Constants.MAX_STRING_LENGTH_ERROR_TYPE : Constants.MAX_STRING_LENGTH_ERROR_TYPE + 10;
+    const span = truncateWithHellip(record.error_name, limit, true);
+
+    frag.appendChild(span);
+
+    return frag;
+};
+
+const renderMailto = record => {
+    const subject = 'Request body';
+    const body = record.raw;
+
+    const href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    const el = document.createElement('a');
+    el.href = href;
+    el.textContent = 'Email request data';
+
+    return el;
+};
+
+const currentPlanRender = (data, type, record, _meta) => {
+    const value = record.sub_plan_api_calls;
+    const text = defined(value) ? value + ' API calls' : Constants.MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
+};
+
+const currentStatusRender = (data, type, record, meta) => {
+    const value = record.sub_status;
+    const text = defined(value) ? value : Constants.MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
+};
+
+const currentUsageRender = (data, type, record, meta) => {
+    let value = record.sub_calls_used;
+    const used = defined(value) ? value : Constants.MIDLINE_HELLIP;
+    value = record.sub_calls_limit;
+    const limit = defined(value) ? value : Constants.MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = used + '/' + limit;
+
+    return span;
+};
+
+const currentBillingEndRender = (data, type, record, meta) => {
+    const value = record.sub_next_billed;
+    const text = defined(value)
+        ? renderDateString(value.replace('T', ' '))
+        : Constants.MIDLINE_HELLIP;
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    return span;
+};
+
+const updateCardButtonRender = (data, type, record, meta) => {
+    const url = record.sub_update_url;
+    const token = record.tokenPresent;
+    const disabled = (defined(url) && defined(token)) ? '' : 'disabled';
+
+    const button = document.createElement('button');
+    button.className = 'button is-primary';
+    button.type = 'submit';
+    button.textContent = 'Update';
+    button.onclick = (e) => {
+        window.open(url, '_blank');
+    };
+
+    if (disabled) {
+        button.disabled = true;
+    }
+
+    return button;
+};
+
+const renderEnrichmentCalculation = data => {
+    const keys = {
+        ip: 'IP',
+        //ua: 'Devices',
+        phone: 'Phones',
+        email: 'Emails',
+        domain: 'Domains',
+    };
+    let result = [];
+    let sum = 0;
+
+    for (const key in keys) {
+        const c = !defined(data[key]) ? 0 : data[key];
+        sum += c;
+        result.push(keys[key].padEnd(16, '.') + String(c));
+    }
+
+    result.push(''.padEnd(16, '='));
+    result.push('Total: ' + String(sum));
+    const text = result.join('\n');
+
+    return renderTextarea(text, 6);
+};
+
+const renderRulePlayResult = (users, count, section, uid) => {
+    if (!count) {
+        return document.createTextNode(`There are no users that match ${uid} rule.`);
+    }
+
+    section = section === 1000 ? '1k' : section;
+
+    const result = document.createDocumentFragment();
+    const txt = (count === 1)
+        ? `One user from last ${section} matching ${uid} rule: `
+        : `${count} users from last ${section} matching ${uid} rule: `;
+    result.appendChild(document.createTextNode(txt));
+
+    const list = document.createDocumentFragment();
+    users.forEach((record, idx) => {
+        if (idx > 0) list.appendChild(document.createTextNode(', '));
+        list.appendChild(renderClickableUser(record));
+    });
+
+    result.appendChild(list);
+
+    return result;
+};
+
+const renderChartTooltipPart = (color, label, val) => {
+    const span = document.createElement('span');
+
+    if (label !== null) {
+        span.style.backgroundColor = color;
+        span.className = 'chart-tooltip';
+        span.textContent = `${label}: ${val}`;
+    } else {
+        span.style.color = color;
+        span.textContent = val;
+    }
+
+    return span;
+};
+
+//Rules
+const renderRuleUid = record => {
+    const elem = document.createElement('a');
+    const header = document.createElement('h3');
+
+    const ruleWeight = record.value ? record.value : 0;
+
+    header.textContent = record.uid;
+    header.classList.add('ruleHighlight');
+    header.classList.add(record.broken ? 'broken' : getRuleClass(ruleWeight));
+
+    elem.href = `${window.app_base}/id?ruleUid=${encodeURIComponent(record.uid)}`;
+    elem.appendChild(header);
+
+    return elem;
+};
+
+const renderRuleType = record => {
+    if (!record.broken) {
+        return document.createTextNode(record.type);
+    }
+
+    const elem = document.createElement('p');
+    elem.classList.add('addlight');
+    elem.textContent = record.type;
+
+    return elem;
+};
+
+const renderRuleDescription = record => {
+    const first = document.createElement('p');
+    if (record.broken) {
+        first.classList.add('inactive-rulename');
+    }
+    first.textContent = record.name;
+
+    const second = document.createElement('p');
+    second.classList.add('addlight');
+    second.textContent = record.descr;
+
+    const frag = document.createDocumentFragment();
+    frag.append(first);
+    frag.append(second);
+
+    return frag;
+};
+
+const renderRuleProportion = record => {
+    const frag = document.createDocumentFragment();
+    if (!record.broken) {
+        const proportionSpan = renderProportion(record.proportion, record.proportion_updated_at);
+        frag.append(proportionSpan);
+    }
+
+    return frag;
+};
+
+const renderRuleWeightSelector = record => {
+    const frag = document.createDocumentFragment();
+
+    if (!record.broken) {
+        const ruleWeight = record.value ? record.value : 0;
+
+        const div = document.createElement('div');
+        div.classList.add('selector');
+
+        const select = document.createElement('select');
+        select.classList.add('input');
+        select.classList.add('rulescore');
+        select.name = record.uid;
+        select.dataset.initialValue = ruleWeight.toString();
+
+        const ruleWeightKeys = mapKeys(Constants.RULE_WEIGHTS);
+        for (let i = 0; i < ruleWeightKeys.length; i++) {
+            const key = ruleWeightKeys[i];
+            const value = Constants.RULE_WEIGHTS[key];
+
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = value.charAt(0).toUpperCase() + value.slice(1);
+            if (record.value === parseInt(key, 10)) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+
+
+        div.appendChild(select);
+        frag.append(div);
+    }
+
+    return frag;
+};
+
+const renderRuleManageButtons = record => {
+    const frag = document.createDocumentFragment();
+
+    if (!record.broken) {
+        const playButton = document.createElement('button');
+        playButton.classList.add('button');
+        playButton.classList.add('dark-loader');
+        playButton.dataset.ruleUid = record.uid;
+
+        const playSpan = document.createElement('span');
+        playSpan.classList.add('icon');
+        playSpan.classList.add('ruleIcon');
+        const playImg = document.createElement('img');
+        playImg.src = `${window.app_base}/ui/images/icons/play.svg`;
+
+        playSpan.appendChild(playImg);
+        playButton.appendChild(playSpan);
+        frag.append(playButton);
+
+        const saveButton = document.createElement('button');
+        saveButton.classList.add('button');
+        saveButton.classList.add('dark-loader');
+        saveButton.classList.add('is-primary');
+        saveButton.classList.add('is-hidden');
+        saveButton.type = 'button';
+        const saveSpan = document.createElement('span');
+        saveSpan.classList.add('icon');
+        saveSpan.classList.add('ruleIcon');
+        const saveImg = document.createElement('img');
+        saveImg.src = `${window.app_base}/ui/images/icons/save.svg`;
+
+        saveSpan.appendChild(saveImg);
+        saveButton.appendChild(saveSpan);
+        frag.append(saveButton);
+    }
+
+    return frag;
+};
+
+const domToHtml = (node) => {
+    const div = document.createElement('div');
+    div.appendChild(node.cloneNode(true));
+
+    return div.innerHTML;
+};
+
+const formatSearchResult = (suggestion, _currentValue) => {
+    const data = suggestion && suggestion.data ? suggestion.data : {};
+    const category = data.category;
+
+    if (category === 'IP') {
+        return domToHtml(renderIpWithCountry(suggestion));
+    }
+
+    if (category === 'ID' || category === 'Name' || category === 'Email') {
+        return domToHtml(renderClickableImportantUserWithScore(suggestion, 'long'));
+    }
+
+    return suggestion.value;
+};
+
+export {
+    //Primitive
+    renderBoolean,
+    renderDefaultIfEmptyElement,
+    renderProportion,
+
+    //Event
+    renderHttpCode,
+    renderHttpMethod,
+    renderTotalFrame,
+
+    //Time
+    renderTime,
+    renderDate,
+    renderTimeMs,
+    renderDateWithTimestampTooltip,
+
+    //Choices selector
+    renderRuleSelectorItem,
+    renderRuleSelectorChoice,
+    renderEventTypeSelectorItem,
+    renderEventTypeSelectorChoice,
+    renderIpTypeSelectorItem,
+    renderIpTypeSelectorChoice,
+    renderFileTypeSelectorItem,
+    renderFileTypeSelectorChoice,
+    renderDeviceTypeSelectorItem,
+    renderDeviceTypeSelectorChoice,
+    renderEntityTypeSelectorItem,
+    renderEntityTypeSelectorChoice,
+    renderScoresRangeSelectorItem,
+    renderScoresRangeSelectorChoice,
+
+    //User
+    renderUser,                                 //! only internal usage
+    renderUserId,
+    renderUserScore,                            //! only internal usage
+    renderUserWithScore,                        //! only internal usage
+    renderClickableImportantUserWithScore,
+    renderClickableImportantUserWithScoreTile,
+    renderUserForEvent,
+    renderTimestampForEvent,
+    renderUserFirstname,
+    renderUserLastname,
+    renderClickableUser,
+    renderImportantUser,                        //! not used
+    renderClickableImportantUser,               //! only internal usage
+    renderUserActionButtons,
+    renderUserReviewedStatus,
+    renderBlacklistButtons,
+    renderScoreDetails,
+    renderUserCounter,
+    renderTotalFrameCmp,
+
+    //Email
+    renderEmail,
+    renderReputation,
+    renderClickableEmail,                       //! not used
+
+    //Phone
+    renderPhone,
+    renderFullCountry,
+    renderPhoneType,
+    renderClickablePhone,                       //! not used
+    renderPhoneCarrierName,
+    renderUsersList,
+
+    //Country
+    renderCountryIso,
+    renderCountryFull,                          //! only internal usage
+    renderClickableCountry,
+    renderClickableCountryName,
+    renderClickableCountryTruncated,
+
+    //Resource
+    renderResourceWithQueryAndEventType,
+    renderResourceWithoutQuery,                 //! only internal usage
+    renderClickableResourceWithoutQuery,
+    renderAuthStatus,
+
+    //IP
+    renderIp,
+    renderIpType,
+    renderClickableIp,
+    renderIpWithCountry,
+    renderClickableIpWithCountry,
+
+    //Net
+    renderAsn,
+    renderClickableAsn,
+    renderNetName,
+    renderCidr,
+
+    //Audit Trail
+    renderAuditField,
+    renderAuditValue,
+    renderAuditParent,
+    renderClickableAuditFieldId,
+    renderAuditFieldName,
+
+    //Device
+    renderDevice,
+    renderDeviceWithOs,
+    renderClickableUserAgentId,
+
+    //OS
+    renderOs,
+    renderClickableOs,                          //! not used
+
+    //Domain
+    renderDomain,
+    renderClickableDomain,
+
+    //Browser
+    renderBrowser,
+
+    //Language
+    renderLanguage,
+
+    //Details panel
+    renderQuery,
+    renderUserAgent,
+    renderReferer,
+
+    //Blacklist item
+    renderBlacklistType,
+    renderBlacklistItem,
+
+    //Logbook
+    renderSensorErrorColumn,
+    renderSensorError,
+    renderRawRequestColumn,
+    renderTimeMsLogbook,
+    renderEndpoint,
+    renderJsonTextarea,
+    renderErrorType,
+    renderMailto,
+
+    //UsageStats
+    currentPlanRender,
+    currentStatusRender,
+    currentUsageRender,
+    currentBillingEndRender,
+    updateCardButtonRender,
+
+    //Enrichment
+    renderEnrichmentCalculation,
+
+    //Rule
+    renderRulePlayResult,
+
+    //Chart
+    renderChartTooltipPart,
+
+    //Rules
+    renderRuleUid,
+    renderRuleType,
+    renderRuleDescription,
+    renderRuleProportion,
+    renderRuleWeightSelector,
+    renderRuleManageButtons,
+
+    //Search
+    formatSearchResult,
+};
