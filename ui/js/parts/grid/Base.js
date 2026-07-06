@@ -46,6 +46,11 @@ export class BaseGrid {
         if (!this.config.sequential) {
             window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
         }
+
+        const onReloadButtonClick = this.onReloadButtonClick.bind(this);
+        if (this.reloadButton) {
+            this.reloadButton.addEventListener('click', onReloadButtonClick);
+        }
     }
 
     initLoad() {
@@ -70,11 +75,6 @@ export class BaseGrid {
 
             const config = me.getDataTableConfig();
             $(`#${tableId}`).DataTable(config);
-
-            const onReloadButtonClick = me.onReloadButtonClick.bind(me);
-            if (me.reloadButton) {
-                me.reloadButton.addEventListener('click', onReloadButtonClick);
-            }
 
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
@@ -426,13 +426,6 @@ export class BaseGrid {
 
     onReloadButtonClick(e) {
         e.preventDefault();
-        if (this.config.datesFilter) {
-            const activeLink = document.querySelector('nav.filters-form.daterange a.active');
-            const hours = activeLink ? parseInt(activeLink.dataset.value, 10) : null;
-            if (hours) {
-                this.config.datesFilter.setDateRangeFromNow(hours);
-            }
-        }
         this.loadData();
     }
 
