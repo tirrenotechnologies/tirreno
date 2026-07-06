@@ -18,12 +18,8 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Variables {
-    private static function getF3(): \Base {
-        return \Base::instance();
-    }
-
     public static function getDB(): ?string {
-        return getenv('DATABASE_URL') ?: self::getF3()->get('DATABASE_URL');
+        return getenv('DATABASE_URL') ?: tirreno('storage')->get('DATABASE_URL');
     }
 
     public static function getConfigFile(): string {
@@ -32,7 +28,7 @@ class Variables {
 
     public static function getHosts(): array {
         $env = getenv('SITE');
-        $conf = self::getF3()->get('SITE');
+        $conf = tirreno('storage')->get('SITE');
 
         return $env ? explode(',', $env) : (is_array($conf) ? $conf : [$conf]);
     }
@@ -42,54 +38,65 @@ class Variables {
     }
 
     public static function getAdminEmail(): ?string {
-        return getenv('ADMIN_EMAIL') ?: self::getF3()->get('ADMIN_EMAIL');
+        return static::get('ADMIN_EMAIL');
     }
 
     public static function getMailLogin(): ?string {
-        return getenv('MAIL_LOGIN') ?: self::getF3()->get('MAIL_LOGIN');
+        return static::get('MAIL_LOGIN');
     }
 
     public static function getMailPassword(): ?string {
-        return getenv('MAIL_PASS') ?: self::getF3()->get('MAIL_PASS');
+        return static::get('MAIL_PASS');
     }
 
     public static function getEnrichmentApi(): string {
-        return getenv('ENRICHMENT_API') ?: self::getF3()->get('ENRICHMENT_API');
+        return static::get('ENRICHMENT_API');
     }
 
     public static function getPepper(): string {
-        return getenv('PEPPER') ?: self::getF3()->get('PEPPER');
+        return static::get('PEPPER');
     }
 
     public static function getLogbookLimit(): int {
-        $value = getenv('LOGBOOK_LIMIT') ?: self::getF3()->get('LOGBOOK_LIMIT') ?: \Tirreno\Utils\Constants::get()->LOGBOOK_LIMIT;
+        return static::getInt('LOGBOOK_LIMIT');
+    }
 
-        return \Tirreno\Utils\Conversion::intValCheckEmpty($value, \Tirreno\Utils\Constants::get()->LOGBOOK_LIMIT);
+    public static function getCheckRuleUsersLimit(): int {
+        return static::getInt('CHECK_RULE_USERS_LIMIT');
+    }
+
+    public static function getRecalculateTotalsOnVisit(): bool {
+        return static::getBool('RECALCULATE_TOTALS_ON_VISIT', false);
     }
 
     public static function getForgotPasswordAllowed(): bool {
-        $variable = getenv('ALLOW_FORGOT_PASSWORD') ?: self::getF3()->get('ALLOW_FORGOT_PASSWORD') ?? 'false';
-
-        return \Tirreno\Utils\Conversion::filterBool($variable) ?? false;
+        return static::getBool('ALLOW_FORGOT_PASSWORD', false);
     }
 
     public static function getEmailPhoneAllowed(): bool {
-        $variable = getenv('ALLOW_EMAIL_PHONE') ?: self::getF3()->get('ALLOW_EMAIL_PHONE') ?? 'false';
+        return static::getBool('ALLOW_EMAIL_PHONE', false);
+    }
 
-        return \Tirreno\Utils\Conversion::filterBool($variable) ?? false;
+    public static function getDebug(): bool {
+        return static::getBool('DEBUG', false);
+    }
+
+    public static function getDebugLevel(): int {
+        return tirreno('utils')->conversion->intValCheckEmpty(static::get('DEBUG'), 0) ?? 0;
+    }
+
+    public static function getLogToStderr(): bool {
+        return static::getBool('LOG_TO_STDERR', false);
     }
 
     public static function getForceHttps(): bool {
-        // set 'false' string if FORCE_HTTPS wasn't set due to filter_var() issues
-        $variable = getenv('FORCE_HTTPS') ?: self::getF3()->get('FORCE_HTTPS') ?? 'false';
-
-        return \Tirreno\Utils\Conversion::filterBool($variable) ?? true;
+        return static::getBool('FORCE_HTTPS', true);
     }
 
     public static function getHostWithProtocol(): string {
         $host = self::getHost();
 
-        if (!str_starts_with($host, '[') && \Tirreno\Utils\Conversion::filterIpGetType($host) === 6) {
+        if (!str_starts_with($host, '[') && tirreno('utils')->conversion->filterIpGetType($host) === 6) {
             $host = '[' . $host . ']';
         }
 
@@ -97,30 +104,46 @@ class Variables {
     }
 
     public static function getHostWithProtocolAndBase(): string {
-        return self::getHostWithProtocol() . self::getF3()->get('BASE');
+        return self::getHostWithProtocol() . tirreno('storage')->get('BASE');
     }
 
     public static function getAccountOperationQueueBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->ACCOUNT_OPERATION_QUEUE_BATCH_SIZE);
+        return static::getInt('ACCOUNT_OPERATION_QUEUE_BATCH_SIZE');
     }
 
     public static function getNewEventsBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('NEW_EVENTS_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->NEW_EVENTS_BATCH_SIZE);
+        return static::getInt('NEW_EVENTS_BATCH_SIZE');
     }
 
     public static function getRuleUsersBatchSize(): int {
-        return \Tirreno\Utils\Conversion::intValCheckEmpty(getenv('RULE_USERS_BATCH_SIZE'), \Tirreno\Utils\Constants::get()->RULE_USERS_BATCH_SIZE);
+        return static::getInt('RULE_USERS_BATCH_SIZE');
+    }
+
+    public static function getUserQueueEventsLimit(): int {
+        return static::getInt('USER_QUEUE_EVENTS_LIMIT');
     }
 
     public static function getAvailableTimezones(): array {
-        return array_intersect_key(self::getF3()->get('timezones'), array_flip(\DateTimeZone::listIdentifiers()));
+        return array_intersect_key(tirreno('storage')->get('timezones'), array_flip(\DateTimeZone::listIdentifiers()));
     }
 
     public static function completedConfig(): bool {
         return
-            (getenv('SITE') || self::getF3()->get('SITE')) &&
-            (getenv('PEPPER') || self::getF3()->get('PEPPER')) &&
-            (getenv('ENRICHMENT_API') || self::getF3()->get('ENRICHMENT_API')) &&
-            (getenv('DATABASE_URL') || self::getF3()->get('DATABASE_URL'));
+            (getenv('SITE') || tirreno('storage')->get('SITE')) &&
+            (getenv('PEPPER') || tirreno('storage')->get('PEPPER')) &&
+            (getenv('ENRICHMENT_API') || tirreno('storage')->get('ENRICHMENT_API')) &&
+            (getenv('DATABASE_URL') || tirreno('storage')->get('DATABASE_URL'));
+    }
+
+    protected static function get(string $var, bool $useConstant = false): mixed {
+        return getenv($var) ?: tirreno('storage')->get($var) ?: ($useConstant ? tirreno('utils')->constants->$var : null);
+    }
+
+    protected static function getInt(string $var): int {
+        return tirreno('utils')->conversion->intValCheckEmpty(static::get($var, true), tirreno('utils')->constants->$var);
+    }
+
+    protected static function getBool(string $var, bool $default = false): bool {
+        return tirreno('utils')->conversion->filterBool(static::get($var) ?? 'false') ?? $default;
     }
 }

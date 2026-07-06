@@ -1,10 +1,10 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {FileTypeFilter} from '../parts/choices/FileTypeFilter.js?v=2';
-import {ResourcesChart} from '../parts/chart/Resources.js?v=2';
-import {ResourcesGrid} from '../parts/grid/Resources.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {FileTypeFilter} from '../parts/choices/FileTypeFilter.js?v=0.10.0';
+import {ResourcesChart} from '../parts/chart/Resources.js?v=0.10.0';
+import {ResourcesGrid} from '../parts/grid/Resources.js?v=0.10.0';
 
 export class ResourcesPage extends BasePage {
     constructor() {
@@ -23,12 +23,12 @@ export class ResourcesPage extends BasePage {
         };
 
         const gridParams = {
-            url:            `${window.app_base}/admin/loadResources`,
+            url:            `${window.app_base}/loadResources`,
             tileId:         'totalResources',
             tableId:        'resources-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadResourcesTimeFrameTotal`,
             totals: {
                 type: 'resource',
                 columns: ['total_visit', 'total_account', 'total_ip', 'total_edit'],
@@ -39,9 +39,16 @@ export class ResourcesPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadResourcesChart`,
+            getParams:  this.getParamsSection,
+        };
 
-        new ResourcesChart(chartParams);
-        new ResourcesGrid(gridParams);
+        const elements = [
+            [ResourcesChart,    chartParams],
+            [ResourcesGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

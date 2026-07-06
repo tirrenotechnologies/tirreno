@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class UserAgent extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected ?string $DB_TABLE_NAME = 'event_ua_parsed';
+class UserAgent extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
+    protected string $tableName = 'event_ua_parsed';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $query = (

@@ -17,14 +17,25 @@ declare(strict_types=1);
 
 namespace Tirreno\Controllers\Pages;
 
-class Error extends Base {
-    public function getPageParams(array $errorData): array {
-        $pageTitle = $this->getInternalPageTitleWithPostfix(strval($errorData['code']));
+class Error extends \Tirreno\Controllers\Pages\Base {
+    protected string $page = 'error';
+    protected bool $allowGuest = true;
+
+    protected function isAllowed(): bool {
+        return true;
+    }
+
+    public function getPageParams(?array $errorData = null): array {
+        $this->assertCanView();
+
+        $pageTitle = tirreno('utils')->render->getInternalPageTitleWithPostfix(strval($errorData['code']));
 
         return [
-            'HTML_FILE' => 'error.html',
-            'ERROR_DATA' => $errorData,
-            'PAGE_TITLE' => $pageTitle,
+            'USE_TEMPLATING_SUBDIR' => true,
+            'HTML_FILE'             => 'error.html',
+            'ERROR_DATA'            => $errorData ?? [],
+            'PAGE_TITLE'            => $pageTitle,
+            'INTERNAL_PAGE'         => false,
         ];
     }
 }

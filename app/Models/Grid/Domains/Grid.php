@@ -18,21 +18,13 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Domains;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getDomainsBySameIpDomainId(int $domainId): array {
+    public function getDomainsBySameIpDomainId(int $domainId, int $apiKey): array {
         $params = [':domain_id' => $domainId];
 
-        return $this->getGrid($this->idsModel->getDomainsIdsBySameIpDomainId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDomainsIdsBySameIpDomainId(), $params);
     }
 
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 }

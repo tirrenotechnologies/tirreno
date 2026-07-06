@@ -9,7 +9,7 @@
     </a>
 </p>
 
-[tirreno](https://www.tirreno.com) is an open-source security framework.
+[tirreno](https://www.tirreno.com) is a security framework.
 
 tirreno *[tir.ˈrɛ.no]* helps understand, monitor, and protect your product from threats, fraud, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypasses firewalls, SIEM, WAFs, and other defenses. tirreno detects threats where they actually happen: inside your product.
 
@@ -42,7 +42,7 @@ tirreno is a hand-written, few-dependency, "low-tech" PHP/PostgreSQL application
 * **SaaS and digital platforms**: Prevent cross-tenant data leakage,
   online fraud, privilege escalation, data exfiltration and business
   logic abuse.
-* **E-commerce and online marketplaces**: Detect payment fraud, account 
+* **E-commerce and online marketplaces**: Detect payment fraud, account
   abuse, fake reviews, promotional code exploitation, inventory manipulation,
   and protect against credential stuffing and carding attacks.
 * **Mission critical applications**: Sensitive application protection,
@@ -116,14 +116,28 @@ composer require tirreno/tirreno
 * [Python](https://github.com/tirrenotechnologies/tirreno-python-tracker)
 * [NodeJS](https://github.com/tirrenotechnologies/tirreno-nodejs-tracker)
 * [WordPress](https://github.com/tirrenotechnologies/tirreno-wordpress-tracker)
-  
+
+## Custom page examples
+
+tirreno ingests the universal primitives (users/entities, IPs, devices, sessions, events) and exposes them through composable machinery: the rule engine, the tirreno('queries') builder, and the file-based assets/pages/ extension system — through which an operator can express whatever risk model they have. The examples below show custom pages built on that extension system.
+
+### LLM bots
+
+* [llm-bots.example.php](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/llm-bots.example.php)
+* [llm-bots.example.html](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/views/llm-bots.example.html)
+
+### Risk users
+
+* [risk-users.example.php](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/risk-users.example.php)
+* [risk-users.example.html](https://github.com/tirrenotechnologies/tirreno/blob/master/assets/pages/views/risk-users.example.html)
+
 ## Documentation
 
 See the [User guide](https://docs.tirreno.com/) for details on how to use tirreno, [Developers documentation](https://github.com/tirrenotechnologies/DEVELOPMENT.md) to customize your integration, [Admin documentation](https://github.com/tirrenotechnologies/ADMIN.md) for installation, maintenance and updates.
 
 ## About
 
-tirreno is an [open-source security framework](https://www.tirreno.com) that embeds protection against threats, fraud, and abuse right into your product.
+tirreno is is a free, [open source security framework](https://www.tirreno.com). Event tracking, threat detection, and risk scoring for any product.
 
 The project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
@@ -148,7 +162,7 @@ While working on the logo, we conducted our own historical study and traced ment
 * [User guide](https://docs.tirreno.com)
 * [Packagist](https://packagist.org/packages/tirreno/tirreno)
 * [Mattermost community](https://chat.tirreno.com)
-  
+
 ## Reporting a security issue
 
 If you've found a security-related issue with tirreno, please email security@tirreno.com. Submitting the issue on GitHub exposes the vulnerability to the public, making it easy to exploit. We will publicly disclose the security issue after it has been resolved.

@@ -1,4 +1,8 @@
-import {fireEvent, handleEscape} from '../utils/Event.js?v=2';
+import {
+    fireEvent,
+    handleEscape,
+} from '../utils/Event.js?v=0.10.0';
+import {mapKeys} from '../utils/Functions.js?v=0.10.0';
 
 export class BasePopUp {
     constructor(formParams) {
@@ -10,7 +14,8 @@ export class BasePopUp {
         this.allPopups = {
             'enrich-all-popup':         'enrichAllPopUpClosed',
             'close-account-popup':      'closeAccountPopUpClosed',
-            'apply-rules-set-popup':    'applyRulesSetPopUpClosed',
+            'apply-rules-preset-popup': 'applyRulesPresetPopUpClosed',
+            'reset-api-key-popup':      'ResetApiKeyPopUpClosed',
         };
 
         const onMainButtonClick = this.onMainButtonClick.bind(this);
@@ -44,11 +49,14 @@ export class BasePopUp {
 
         let card = null;
 
-        for (const [key, value] of Object.entries(this.allPopups)) {
+        const popupKeys = mapKeys(this.allPopups);
+        for (let i = 0; i < popupKeys.length; i++) {
+            const key = popupKeys[i];
+
             card = document.querySelector(`.details-card#${key}`);
             if (key !== this.popupId && card && !card.classList.contains('is-hidden')) {
                 card.classList.add('is-hidden');
-                fireEvent(value);
+                fireEvent(this.allPopups[key]);
             }
         }
 

@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Chart;
 
-abstract class Base extends \Tirreno\Models\BaseSql {
+abstract class Base extends \Tirreno\Models\Base {
     protected function concatDataLines(array $data1, string $field1, array $data2, string $field2, array $data3 = [], ?string $field3 = null): array {
         $data0 = [];
         $iters = count($data1);
@@ -86,14 +86,14 @@ abstract class Base extends \Tirreno\Models\BaseSql {
         $cnt = count($params);
         $data = array_fill(0, $cnt, []);
 
-        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = tirreno('utils')->constants->CHART_RESOLUTION[tirreno('utils')->dateRange->getResolutionFromRequest()];
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest($offset);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest($offset);
 
         if (!$dateRange) {
             $now = time() + $offset;
-            $week = \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK;
+            $week = tirreno('utils')->constants->SECONDS_IN_WEEK;
             if (count($params[0]) === 0) {
                 $dateRange = [
                     'endDate' => date('Y-m-d H:i:s', $now),
@@ -133,7 +133,7 @@ abstract class Base extends \Tirreno\Models\BaseSql {
 
     protected function execute(string $query, int $apiKey): array {
         // do not use offset because :start_time/:end_time compared with UTC db timestamps
-        $dateRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $dateRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
 
         // Search request does not contain daterange param
         if (!$dateRange) {
@@ -143,13 +143,13 @@ abstract class Base extends \Tirreno\Models\BaseSql {
             ];
         }
 
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
             ':offset'       => strval($offset),     // str for postgres
         ];
 

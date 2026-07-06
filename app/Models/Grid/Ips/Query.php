@@ -104,7 +104,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_ip.id', $queryParams);
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -127,7 +127,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyIpTypes(string &$query): void {
-        $ipTypeIds = \Tirreno\Utils\Conversion::getArrayRequestParam('ipTypeIds');
+        $ipTypeIds = tirreno('utils')->conversion->getArrayRequestParam('ipTypeIds');
         if (!$ipTypeIds) {
             return;
         }

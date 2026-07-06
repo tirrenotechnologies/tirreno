@@ -17,14 +17,12 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class NotificationPreferences extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_operators';
-
+class NotificationPreferences extends \Tirreno\Models\Base {
     public function operatorsToNotify(): array {
         $params = [
-            ':daily'    => \Tirreno\Utils\Constants::get()->DAILY_NOTIFICATION_REMINDER,
-            ':weekly'   => \Tirreno\Utils\Constants::get()->WEEKLY_NOTIFICATION_REMINDER,
-            ':off'      => \Tirreno\Utils\Constants::get()->NO_NOTIFICATION_REMINDER,
+            ':daily'    => tirreno('utils')->constants->DAILY_NOTIFICATION_REMINDER,
+            ':weekly'   => tirreno('utils')->constants->WEEKLY_NOTIFICATION_REMINDER,
+            ':off'      => tirreno('utils')->constants->NO_NOTIFICATION_REMINDER,
         ];
 
         $query = (

@@ -1,0 +1,33 @@
+<div class="card events-card">
+    <header class="card-header">
+        <div class="card-header-title">{{ @AB_TITLE }}</div>
+    </header>
+
+    <div class="card-table">
+        <div class="content">
+            <table class="table dim-table" id="risk-entities-table">
+                <thead>
+                    <tr>
+                        <th>{{ @AB_COL_USERID }}</th>
+                        <th>{{ @AB_COL_EMAIL }}</th>
+                        <th>{{ @AB_COL_LASTSEEN }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <repeat group="{{ @ENTITIES }}" value="{{ @entity }}">
+                        <tr>
+                            <td><a href="{{ @BASE }}/id/{{ @entity['id'] }}">{{ @entity['userid'] }}</a></td>
+                            <td>{{ @entity['email'] }}</td>
+                            <td>{{ @entity['lastseen'] }}</td>
+                        </tr>
+                    </repeat>
+                    <check if="{{ !@ENTITIES }}">
+                        <tr>
+                            <td colspan="3">{{ @AB_NO_RESULTS }}</td>
+                        </tr>
+                    </check>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

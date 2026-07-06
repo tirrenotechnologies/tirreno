@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Chart;
 
-abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
-
+abstract class BaseEventsCount extends \Tirreno\Models\Base {
     protected array $alertTypesParams;
     protected array $editTypesParams;
     protected array $normalTypesParams;
@@ -29,11 +27,9 @@ abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
     protected string $normalFlatIds;
 
     public function __construct() {
-        parent::__construct();
-
-        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->ALERT_EVENT_TYPES, 'alert');
-        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->EDITING_EVENT_TYPES, 'edit');
-        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(\Tirreno\Utils\Constants::get()->NORMAL_EVENT_TYPES, 'normal');
+        [$this->alertTypesParams, $this->alertFlatIds]      = $this->getArrayPlaceholders(tirreno('utils')->constants->ALERT_EVENT_TYPES, 'alert');
+        [$this->editTypesParams, $this->editFlatIds]        = $this->getArrayPlaceholders(tirreno('utils')->constants->EDITING_EVENT_TYPES, 'edit');
+        [$this->normalTypesParams, $this->normalFlatIds]    = $this->getArrayPlaceholders(tirreno('utils')->constants->NORMAL_EVENT_TYPES, 'normal');
     }
 
     abstract public function getCounts(int $apiKey): array;
@@ -50,11 +46,11 @@ abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
             ];
         }
         // use offset shift because $startTs/$endTs compared with shifted ['ts']
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
-        $datesRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(180, $offset);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
+        $datesRange = tirreno('utils')->dateRange->getLatestNDatesRangeFromRequest(180, $offset);
         $endTs = strtotime($datesRange['endDate']);
         $startTs = strtotime($datesRange['startDate']);
-        $step = \Tirreno\Utils\Constants::get()->CHART_RESOLUTION[\Tirreno\Utils\DateRange::getResolutionFromRequest()];
+        $step = tirreno('utils')->constants->CHART_RESOLUTION[tirreno('utils')->dateRange->getResolutionFromRequest()];
 
         $endTs = $endTs - ($endTs % $step);
         $startTs = $startTs - ($startTs % $step);
@@ -86,15 +82,15 @@ abstract class BaseEventsCount extends \Tirreno\Models\BaseSql {
 
     protected function executeOnRangeById(string $query, int $apiKey): array {
         // do not use offset because :start_time/:end_time compared with UTC event.time
-        $dateRange = \Tirreno\Utils\DateRange::getLatestNDatesRangeFromRequest(180);
-        $offset = \Tirreno\Utils\Timezones::getCurrentOperatorOffset();
+        $dateRange = tirreno('utils')->dateRange->getLatestNDatesRangeFromRequest(180);
+        $offset = tirreno('utils')->timezones->getCurrentOperatorOffset();
 
         $params = [
             ':api_key'      => $apiKey,
             ':end_time'     => $dateRange['endDate'],
             ':start_time'   => $dateRange['startDate'],
-            ':resolution'   => \Tirreno\Utils\DateRange::getResolutionFromRequest(),
-            ':id'           => \Tirreno\Utils\Conversion::getIntRequestParam('id'),
+            ':resolution'   => tirreno('utils')->dateRange->getResolutionFromRequest(),
+            ':id'           => tirreno('utils')->conversion->getIntRequestParam('id'),
             ':offset'       => strval($offset),     // str for postgres
         ];
 

@@ -1,0 +1,19 @@
+<include href="templates/parts/popups/applyRulesPresetPopup.html" />
+<div class="columns">
+    <div class="column rules-page">
+        <check if="{{ @IS_OWNER }}">
+            <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                    <include href="templates/parts/forms/thresholdValuesForm.html"
+                        with="apiKeyId={{ @API_KEY.id }},blacklistThreshold={{ @API_KEY.blacklist_threshold }},reviewQueueThreshold={{ @API_KEY.review_queue_threshold }}"/>
+            </repeat>
+        </check>
+
+        <include href="templates/parts/tables/rules.html" />
+
+        <check if="{{ @IS_OWNER }}">
+            <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                    <include href="templates/parts/forms/rulesPresetesForm.html" with="apiKeyId={{ @API_KEY.id }}"/>
+            </repeat>
+        </check>
+    </div>
+</div>

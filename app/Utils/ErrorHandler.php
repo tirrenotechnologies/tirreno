@@ -18,10 +18,10 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class ErrorHandler {
-    public static function getErrorDetails(\Base $f3): array {
+    public static function getErrorDetails(): array {
         $errorTraceArray = [];
 
-        $errorTraceString = $f3->get('ERROR.trace');
+        $errorTraceString = tirreno('storage')->get('ERROR.trace');
         $errorTraceArray = preg_split('/$\R?^/m', $errorTraceString);
         $maximalStringIndex = 0;
         $maximalStringLength = 0;
@@ -45,64 +45,63 @@ class ErrorHandler {
             $errorTraceArray[$i] = str_replace(['&gt;', '&lt;'], ['>', '<'], $errorTraceArray[$i]);
         }
 
-        $errorCode = $f3->get('ERROR.code');
-        $errorMessage = join(', ', ['ERROR_' . $errorCode, $f3->get('ERROR.text')]);
+        $errorCode = tirreno('storage')->get('ERROR.code');
+        $errorMessage = join(', ', ['ERROR_' . $errorCode, tirreno('storage')->get('ERROR.text')]);
 
         return [
-            'ip' => $f3->get('IP'),
-            'code' => $errorCode,
-            'message' => $errorMessage,
-            'trace' => join('<br>', $errorTraceArray),
-            'date' => date('l jS \of F Y h:i:s A'),
-            'post' => $f3->get('POST'),
-            'get' => $f3->get('GET'),
+            'ip'        => tirreno('request')->getIp(),
+            'code'      => $errorCode,
+            'message'   => $errorMessage,
+            'trace'     => join('<br>', $errorTraceArray),
+            'date'      => date('l jS \of F Y h:i:s A'),
+            'post'      => tirreno('storage')->get('POST'),
+            'get'       => tirreno('storage')->get('GET'),
         ];
     }
 
-    public static function saveErrorInformation(\Base $f3, array $errorData): void {
-        \Tirreno\Utils\Logger::log(null, $errorData['message']);
+    public static function saveErrorInformation(array $errorData): void {
+        tirreno('utils')->logger->log(null, $errorData['message']);
 
         $errorTraceArray = explode('<br>', $errorData['trace']);
-        $printErrorTraceToLog = $f3->get('PRINT_ERROR_TRACE_TO_LOG');
+        $printErrorTraceToLog = tirreno('storage')->get('PRINT_ERROR_TRACE_TO_LOG');
         if ($printErrorTraceToLog) {
             $iters = count($errorTraceArray);
 
             for ($i = 0; $i < $iters; ++$i) {
-                \Tirreno\Utils\Logger::log(null, $errorTraceArray[$i]);
+                tirreno('utils')->logger->log(null, $errorTraceArray[$i]);
             }
         }
 
-        $database = \Tirreno\Utils\Database::getDb();
-        if ($database && \Tirreno\Utils\Routes::getCurrentRequestOperator()) {
+        $database = tirreno('utils')->database->getDb();
+        if ($database && tirreno('utils')->routes->getCurrentRequestOperator()->isLoggedIn()) {
             $errorData['sql_log'] = $database->log();
-            $logModel = new \Tirreno\Models\Log();
-            $logModel->insertRecord($errorData);
+            tirreno('models')->log->insertRecord($errorData);
 
-            \Tirreno\Utils\Logger::log('SQL', $errorData['sql_log']);
+            tirreno('utils')->logger->log('SQL', $errorData['sql_log']);
         }
 
         if ($errorData['code'] === 500) {
             $toName = 'Admin';
-            $toAddress = \Tirreno\Utils\Variables::getAdminEmail();
+            $toAddress = tirreno('utils')->variables->getAdminEmail();
             if ($toAddress === null) {
-                \Tirreno\Utils\Logger::log('Log mail error', 'ADMIN_EMAIL is not set');
+                tirreno('utils')->logger->log('Log mail error', 'ADMIN_EMAIL is not set');
 
                 return;
             }
 
-            $subject = $f3->get('error_email_subject') ?? '%s';
+            $subject = tirreno('storage')->get('error_email_subject') ?? tirreno('utils')->constants->BASE_ERROR_EMAIL_SUBJECT;
             $subject = sprintf($subject, $errorData['code']);
 
             $currentTime = date('d-m-Y H:i:s');
             $errorMessage = $errorData['message'];
             $errorTrace = $errorData['trace'];
 
-            $hosts = json_encode(\Tirreno\Utils\Variables::getHosts());
+            $hosts = json_encode(tirreno('utils')->variables->getHosts());
 
-            $message = $f3->get('error_email_body_template');
+            $message = tirreno('storage')->get('error_email_body_template') ?? tirreno('utils')->constants->BASE_ERROR_EMAIL_BODY_TEMPLATE;
             $message = sprintf($message, $currentTime, $hosts, $errorMessage, $errorTrace);
 
-            \Tirreno\Utils\Mailer::send($toName, $toAddress, $subject, $message, true);
+            tirreno('utils')->mailer->send($toName, $toAddress, $subject, $message, true);
         }
     }
 
@@ -121,22 +120,19 @@ class ErrorHandler {
          * Custom onError handler: http://stackoverflow.com/questions/19763414/fat-free-framework-f3-custom-404-page-and-others-errors, https://groups.google.com/forum/#!topic/f3-framework/BOIrLs5_aEA
          * We can can use $f3->get('ERROR.text'), and decide which template should be displayed.
          *
-         * @param $f3
          */
-        return function (\Base $f3): void {
-            $isAjax = $f3->get('AJAX');
-
-            $errorData = self::getErrorDetails($f3);
+        return function (): void {
+            $errorData = self::getErrorDetails();
 
             // clean template if anything was rendered already
             while (ob_get_level() > 0) {
                 ob_end_clean();
             }
 
-            self::saveErrorInformation($f3, $errorData);
+            self::saveErrorInformation($errorData);
 
-            if ($errorData['code'] === 403 && !$isAjax) {
-                $f3->reroute('/logout');
+            if ($errorData['code'] === 403 && !tirreno('request')->isAjax()) {
+                tirreno('response')->redirect('/logout');
 
                 return;
             }
@@ -145,40 +141,47 @@ class ErrorHandler {
             if ($errorData['code'] === 404) {
             }
 
-            if ($isAjax) {
+            if (tirreno('request')->isAjax()) {
                 echo self::getAjaxErrorMessage($errorData);
 
                 return;
             }
 
-            $response = new \Tirreno\Views\Frontend();
-            $pageController = new \Tirreno\Controllers\Pages\Error();
-
             $errorData['message'] = 'ERROR_' . $errorData['code'];
             $errorData['raw'] = false;
 
             if ($errorData['code'] !== 404) {
-                $errorData['extra_message'] = $f3->get('ErrorPage_extra_message');
+                $errorData['extra_message'] = tirreno('storage')->get('ErrorPage_extra_message');
                 $errorData['raw'] = true;
             }
 
             if ($errorData['code'] === 400) {
-                $errorData['message'] = 'Error code ' . \Tirreno\Utils\ErrorCodes::INVALID_HOSTNAME;
-                $errorData['extra_message'] = 'Visit page via correct hostname: ' . \Tirreno\Utils\Variables::getHostWithProtocol() . $f3->get('PATH');
+                $errorData['message'] = 'Error code ' . tirreno('utils')->errorCodes->INVALID_HOSTNAME;
+                $errorData['extra_message'] = 'Visit page via correct hostname: ' . tirreno('utils')->variables->getHostWithProtocol() . tirreno('request')->getPath();
             }
 
             if ($errorData['code'] === 503) {
-                $errorData['message'] = 'Error code ' . \Tirreno\Utils\ErrorCodes::FAILED_DB_CONNECT;
+                $errorData['message'] = 'Error code ' . tirreno('utils')->errorCodes->FAILED_DB_CONNECT;
                 $errorData['extra_message'] = 'Database connection failed.';
             }
 
             if ($errorData['code'] === 422) {
-                $errorData['message'] = 'Error code ' . \Tirreno\Utils\ErrorCodes::INCOMPLETE_CONFIG;
+                $errorData['message'] = 'Error code ' . tirreno('utils')->errorCodes->INCOMPLETE_CONFIG;
                 $errorData['extra_message'] = 'App configuration is incomplete. Check config/local/config.local.ini and possible environment overrides.';
             }
 
-            unset($errorData['trace']);
-            $pageParams = $pageController->getPageParams($errorData);
+            if ($errorData['code'] === 500 && tirreno('utils')->variables->getDebugLevel() > 0) {
+                $errorText = tirreno('storage')->get('ERROR.text');
+                if ($errorText) {
+                    $errorData['extra_message'] = strval($errorText);
+                    $errorData['raw'] = false;
+                }
+            } else {
+                unset($errorData['trace']);
+            }
+
+            $pageParams = tirreno('pages')->error->getPageParams($errorData);
+            $response = new \Tirreno\Views\Frontend();
 
             $response->data = $pageParams;
             echo $response->render();
@@ -186,9 +189,9 @@ class ErrorHandler {
     }
 
     public static function getCronErrorHandler(): callable {
-        return function (\Base $f3): void {
-            $errorData = self::getErrorDetails($f3);
-            self::saveErrorInformation($f3, $errorData);
+        return function (): void {
+            $errorData = self::getErrorDetails();
+            self::saveErrorInformation($errorData);
         };
     }
 

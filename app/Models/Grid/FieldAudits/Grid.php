@@ -18,21 +18,13 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\FieldAudits;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['created', 'lastseen'];
 
-        \Tirreno\Utils\Timezones::translateTimezones($result, $fields);
+        $result = tirreno('utils')->timezones->translateTimezones($result, $fields);
     }
 }

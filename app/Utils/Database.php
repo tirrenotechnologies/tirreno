@@ -18,16 +18,12 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Database {
-    private static function getF3(): \Base {
-        return \Base::instance();
-    }
-
     public static function getDb(): \DB\SQL|false|null {
-        return self::getF3()->get('APP_DATABASE');
+        return tirreno('storage')->get('APP_DATABASE');
     }
 
     public static function setDb(\DB\SQL|false|null $database): void {
-        self::getF3()->set('APP_DATABASE', $database);
+        tirreno('storage')->set('APP_DATABASE', $database);
     }
 
     public static function initConnect(bool $keepSession = true): bool {
@@ -35,7 +31,7 @@ class Database {
             $database = self::getDb();
 
             if (!$database) {
-                $url = \Tirreno\Utils\Variables::getDB();
+                $url = tirreno('utils')->variables->getDB();
 
                 if ($url === null) {
                     return false;
@@ -50,7 +46,7 @@ class Database {
 
             return true;
         } catch (\Exception $e) {
-            self::getF3()->error(503);
+            tirreno('response')->error(503);
         }
 
         return false;

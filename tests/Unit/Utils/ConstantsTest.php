@@ -5,71 +5,39 @@ declare(strict_types=1);
 namespace Tests\Unit\Utils;
 
 use Tirreno\Utils\Constants;
-use Base;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Runner\ErrorException;
 
 /**
  * Unit tests for Tirreno\Utils\Constants.
  *
- * Focus:
- * - Constants::get() behavior (native constant lookup + F3 overrides)
- * - basic integrity invariants that are easy to break accidentally
+ * Covered:
+ * - Constants::get() returns defined constant values.
+ * - Undefined constants throw LogicException.
+ * - Constants are read-only.
+ * - Event type IDs are unique.
+ * - Event type groups do not overlap.
  */
 final class ConstantsTest extends TestCase {
-    /**
-     * @var Base
-     */
-    private Base $f3;
-    private Constants $constants;
-
-    protected function setUp(): void {
-        parent::setUp();
-
-        $this->f3 = Base::instance();
-
-        //$key = 'EXTRA_DEVICE_TYPES';
-        //$override = ['wearable'];
-        //$this->f3->set($key, $override);
-
-        $this->constants = Constants::get();
-        $this->clearExtraOverrides();
-    }
-
-    protected function tearDown(): void {
-        $this->clearExtraOverrides();
-
-        parent::tearDown();
-    }
-
     public function testGetReturnsConstantValue(): void {
         $value = Constants::get()->SECONDS_IN_MINUTE;
 
         $this->assertSame(60, $value);
     }
 
-    /*public function testGetMergesArrayFromF3(): void {
-        $key = 'EXTRA_DEVICE_TYPES';
-        $override = [
-            'wearable',
-        ];
-        $this->f3->set($key, $override);
-
-        $value = Constants::get()->DEVICE_TYPES;
-
-        $this->assertIsArray($value);
-
-        $expected = array_merge(Constants::get()->DEVICE_TYPES, $override);
-        $this->assertSame($expected, $value);
-    }*/
-
-    public function testGetUndefinedConstantThrowsRuntimeException(): void {
+    public function testGetUndefinedConstantThrowsLogicException(): void {
         $missing = 'THIS_CONSTANT_DOES_NOT_EXIST';
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Undefined constant: ' . $missing);
 
         Constants::get()->$missing;
+    }
+
+    public function testConstantsAreReadOnly(): void {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Constants are read-only');
+
+        Constants::get()->SECONDS_IN_MINUTE = 120;
     }
 
     public function testEventTypeIdsAreUnique(): void {
@@ -106,28 +74,5 @@ final class ConstantsTest extends TestCase {
         $this->assertSame([], array_values($intersectAlertEditing), 'ALERT and EDITING event types must not overlap.');
         $this->assertSame([], array_values($intersectAlertNormal), 'ALERT and NORMAL event types must not overlap.');
         $this->assertSame([], array_values($intersectEditingNormal), 'EDITING and NORMAL event types must not overlap.');
-    }
-
-    /**
-     * Clears all EXTRA_* overrides used by this test suite.
-     *
-     * @return void
-     */
-    private function clearExtraOverrides(): void {
-        $keys = [
-            'EXTRA_SECONDS_IN_MINUTE',
-            'EXTRA_DEVICE_TYPES',
-        ];
-
-        $iters = count($keys);
-
-        for ($i = 0; $i < $iters; ++$i) {
-            $key = $keys[$i];
-
-            $exists = $this->f3->exists($key);
-            if ($exists) {
-                $this->f3->clear($key);
-            }
-        }
     }
 }

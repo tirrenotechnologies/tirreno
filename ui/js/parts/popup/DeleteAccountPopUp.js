@@ -1,4 +1,4 @@
-import {BasePopUp} from './BasePopUp.js?v=2';
+import {BasePopUp} from './BasePopUp.js?v=0.10.0';
 
 export class DeleteAccountPopUp extends BasePopUp {
     constructor() {

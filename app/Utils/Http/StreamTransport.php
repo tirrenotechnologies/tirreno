@@ -17,50 +17,50 @@ declare(strict_types=1);
 
 namespace Tirreno\Utils\Http;
 
-final class StreamTransport implements \Tirreno\Interfaces\HttpTransportInterface {
-    public function isAvailable(): bool {
+class StreamTransport {
+    public static function isAvailable(): bool {
         return function_exists('file_get_contents');
     }
 
-    public function request(\Tirreno\Entities\HttpRequest $request): \Tirreno\Entities\HttpResponse {
+    public static function request(\Tirreno\Entities\HttpRequest $request): \Tirreno\Entities\HttpResponse {
         $options = [
             'http' => [
-                'method' => $request->method(),
-                'header' => implode("\r\n", $request->headers()),
-                'timeout' => $request->timeoutSeconds(),
+                'method'    => $request->method,
+                'header'    => implode("\r\n", $request->headers),
+                'timeout'   => $request->timeoutSeconds,
             ],
         ];
 
-        if (!$request->sslVerify()) {
+        if (!$request->sslVerify) {
             $options['ssl'] = [
-                'verify_peer' => false,
-                'verify_peer_name' => false,
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
                 'allow_self_signed' => true,
             ];
         }
 
-        $body = $request->body();
+        $body = $request->body;
         if ($body !== null) {
             $options['http']['content'] = $body;
         }
 
-        $resultArr = $this->safeFileGetContents($request->url(), $options);
+        $resultArr = static::safeFileGetContents($request->url, $options);
 
         $raw = $resultArr['content'];
         $respHeaders = $resultArr['headers'];
 
-        $code = $this->extractHttpStatus($respHeaders);
+        $code = static::extractHttpStatus($respHeaders);
 
         if ($raw === null) {
-            $result = \Tirreno\Entities\HttpResponse::failure($code, 'stream_request_failed', $respHeaders);
+            $result = tirreno('entities')->httpResponse->failure($code, 'stream_request_failed', $respHeaders);
 
             return $result;
         }
 
-        return \Tirreno\Entities\HttpResponse::success($code, $raw, $respHeaders);
+        return tirreno('entities')->httpResponse->success($code, $raw, $respHeaders);
     }
 
-    private function safeFileGetContents(string $url, ?array $options): array {
+    protected static function safeFileGetContents(string $url, ?array $options): array {
         set_error_handler([\Tirreno\Utils\ErrorHandler::class, 'exceptionErrorHandler']);
 
         try {
@@ -89,8 +89,7 @@ final class StreamTransport implements \Tirreno\Interfaces\HttpTransportInterfac
         return $result;
     }
 
-
-    private function extractHttpStatus(array $headers): ?int {
+    protected static function extractHttpStatus(array $headers): ?int {
         if (!isset($headers[0])) {
             return null;
         }

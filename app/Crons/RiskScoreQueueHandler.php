@@ -18,26 +18,22 @@ declare(strict_types=1);
 namespace Tirreno\Crons;
 
 class RiskScoreQueueHandler extends BaseQueue {
-    private \Tirreno\Controllers\Admin\Rules\Data $rulesController;
+    private object $rulesController;
 
     public function __construct() {
-        $this->rulesController = new \Tirreno\Controllers\Admin\Rules\Data();
+        $this->rulesController = tirreno('controllers')->rules;
         $this->rulesController->buildEvaluationModels();
     }
 
     public function process(): void {
-        $batchSize = \Tirreno\Utils\Variables::getAccountOperationQueueBatchSize();
-        $queueModel = new \Tirreno\Models\Queue();
-        $keys = $queueModel->getNextBatchKeys(\Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE, $batchSize);
+        $batchSize = tirreno('utils')->variables->getAccountOperationQueueBatchSize();
+        $keys = tirreno('models')->queue->getNextBatchKeys(tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE, $batchSize);
 
-        parent::baseProcess(\Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE);
-
-        $blacklist = new \Tirreno\Controllers\Admin\Blacklist\Data();
-        $reviewQueue = new \Tirreno\Controllers\Admin\ReviewQueue\Data();
+        parent::baseProcess(tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE);
 
         foreach ($keys as $key) {
-            $blacklist->setBlacklistUsersCount(false, $key);
-            $reviewQueue->setNotReviewedCount(false, $key);
+            tirreno('controllers')->blacklist->setBlacklistUsersCount(false, $key);
+            tirreno('controllers')->reviewQueue->setNotReviewedCount(false, $key);
         }
     }
 

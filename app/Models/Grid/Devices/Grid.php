@@ -18,43 +18,35 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Devices;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getDevicesByIpId(int $ipId): array {
+    public function getDevicesByIpId(int $ipId, int $apiKey): array {
         $params = [':ip_id' => $ipId];
 
-        return $this->getGrid($this->idsModel->getDevicesIdsByIpId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDevicesIdsByIpId(), $params);
     }
 
-    public function getDevicesByUserId(int $userId): array {
+    public function getDevicesByUserId(int $userId, int $apiKey): array {
         $params = [':account_id' => $userId];
 
-        return $this->getGrid($this->idsModel->getDevicesIdsByUserId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDevicesIdsByUserId(), $params);
     }
 
-    public function getDevicesByResourceId(int $resourceId): array {
+    public function getDevicesByResourceId(int $resourceId, int $apiKey): array {
         $params = [':resource_id' => $resourceId];
 
-        return $this->getGrid($this->idsModel->getDevicesIdsByResourceId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getDevicesIdsByResourceId(), $params);
     }
 
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 
     protected function calculateCustomParams(array &$result): void {
-        \Tirreno\Utils\Enrichment::applyDeviceParams($result);
+        $result = tirreno('utils')->enrichment->applyDeviceParams($result);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['created'];
 
-        \Tirreno\Utils\Timezones::translateTimezones($result, $fields);
+        $result = tirreno('utils')->timezones->translateTimezones($result, $fields);
     }
 }

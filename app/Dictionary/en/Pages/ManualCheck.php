@@ -16,22 +16,22 @@
 declare(strict_types=1);
 
 return [
-    'AdminManualCheck_page_title' => 'Manual check',
+    'manualCheck_page_title' => 'Manual check',
 
-    'AdminManualCheck_form_title' => 'Manual check',
-    'AdminManualCheck_form_field_type_label' => 'Type',
-    'AdminManualCheck_form_types' => [
+    'manualCheck_form_title' => 'Manual check',
+    'manualCheck_form_field_type_label' => 'Type',
+    'manualCheck_form_types' => [
         'ip' => 'IP',
         'email' => 'Email',
         'domain' => 'Domain',
         'phone' => 'Phone',
     ],
-    'AdminManualCheck_form_field_search_query_label' => 'Search query',
-    'AdminManualCheck_form_button_search' => 'Search',
+    'manualCheck_form_field_search_query_label' => 'Search query',
+    'manualCheck_form_button_search' => 'Search',
 
-    'AdminManualCheck_result_title' => '%s result',
+    'manualCheck_result_title' => '%s result',
 
-    'AdminManualCheck_key_overwrites' => [
+    'manualCheck_key_overwrites' => [
         'ip' => 'IP',
         'email' => 'Email',
         'domain' => 'Domain',
@@ -47,5 +47,5 @@ return [
         'cidr' => 'CIDR',
     ],
 
-    'AdminManualCheck_history_title' => 'History',
+    'manualCheck_history_title' => 'History',
 ];

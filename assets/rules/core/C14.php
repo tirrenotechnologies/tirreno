@@ -8,7 +8,7 @@ class C14 extends \Tirreno\Assets\Rule {
     public const ATTRIBUTES = ['ip'];
 
     protected function prepareParams(array $params): array {
-        $params['eip_has_specific_country'] = in_array(\Tirreno\Utils\Constants::get()->COUNTRY_CODE_AUSTRALIA, $params['eip_country_id']);
+        $params['eip_has_specific_country'] = in_array(tirreno('utils')->constants->COUNTRY_CODE_AUSTRALIA, $params['eip_country_id']);
 
         return $params;
     }

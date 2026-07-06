@@ -17,16 +17,11 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Updates extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_updates';
+class Updates extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_updates';
 
-    public function __construct(\Base $f3) {
-        $this->f3 = $f3;
-
-        \Tirreno\Utils\Database::initConnect(false);
-        $database = $this->getDatabaseConnection();
-
-        \DB\SQL\Mapper::__construct($database, $this->DB_TABLE_NAME, $this->DB_TABLE_FIELDS, $this->DB_TABLE_TTL);
+    public function __construct() {
+        tirreno('utils')->database->initConnect(false);
 
         $this->createIfNotExists();
     }
@@ -37,17 +32,19 @@ class Updates extends \Tirreno\Models\BaseSql {
         try {
             foreach ($updatesList as $migration) {
                 if (!$migration::isApplied($this)) {
+                    $timer = tirreno('request')->setTimer();
                     $database->begin();
                     $this->addStub($migration::$version, $service);
                     $migration::apply($database);
                     $this->addCompleted($migration::$version, $service);
                     $database->commit();
                     $applied = true;
+                    tirreno('log')->info('applied migration %s %s in %f', $migration::$version, $service, tirreno('request')->getTimer($timer));
                 }
             }
         } catch (\Exception $e) {
             $database->rollback();
-            error_log($e->getMessage());
+            tirreno('log')->error('failed applying migration, rolling back: %s.', $e->getMessage());
             throw $e;
         }
 
@@ -90,9 +87,7 @@ class Updates extends \Tirreno\Models\BaseSql {
     }
 
     private function createIfNotExists(): void {
-        $query = 'SELECT 1 FROM information_schema.tables WHERE table_name = \'dshb_updates\'';
-
-        if (count($this->execQuery($query, null))) {
+        if ($this->tableExists()) {
             return;
         }
 

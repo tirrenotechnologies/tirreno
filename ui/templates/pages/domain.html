@@ -1,0 +1,14 @@
+<include href="templates/parts/panel/eventPanel.html" />
+
+{~
+    $subtitle = '';
+~}
+
+<include href="templates/parts/infoHeader.html" with="title={{@DOMAIN.domain}}, lastseen={{@DOMAIN.lastseen}}, subtitle={{@subtitle}}, type=domain, id={{@DOMAIN.id}}, dataIncomplete={{!@DOMAIN.checked && @IS_ENRICHABLE}}"/>
+
+<include href="templates/parts/widgets/domain.html" />
+<include href="templates/parts/tables/users.html" />
+<include href="templates/parts/tables/domains.html" with="innerDomains=1"/>
+<include href="templates/parts/mapWithIps.html" />
+<include href="templates/parts/tables/isps.html" />
+<include href="templates/parts/tables/events.html" with="showChart=1"/>

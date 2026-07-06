@@ -4,22 +4,21 @@
         <input type="hidden" name="cmd" value="updateNotificationPreferences" />
 
         <header class="class-header">
-            <div class="card-header-title">{{ @AdminSettings_notificationPreferences_title }}<p class="tooltip-info tooltip" title="{{ @AdminSettings_notificationPreferences_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            <div class="card-header-title">{{ @settings_notificationPreferences_title }}<p class="tooltip-info tooltip" title="{{ @settings_notificationPreferences_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
             </div>
         </header>
 
         <div class="card-content">
             <div class="content">
                 <div class="field">
-                    <label class="label">{{ @AdminSettings_notificationPreferences_reviewReminderFrequency_label
-                        }}</label>
+                    <label class="label">{{ @settings_notificationPreferences_reviewReminderFrequency_label }}</label>
                     <div class="control">
                         <div class="selector">
                             <select class="input" name="review-reminder-frequency" id="review-reminder-frequency">
-                                <repeat group="{{ \Tirreno\Utils\Constants::get()->NOTIFICATION_REMINDER_TYPES }}" value="{{ @key }}">
+                                <repeat group="{{ tirreno('utils')->constants->NOTIFICATION_REMINDER_TYPES }}" value="{{ @key }}">
                                     <set active="{{ @frequency === @key }}" />
                                     <option value="{{ @key }}" {{ @active ? 'selected' : '' }}>{{
-                                        @AdminSettings_notificationPreferences_reviewReminderFrequency_options[@key] }}
+                                        @settings_notificationPreferences_reviewReminderFrequency_options[@key] }}
                                     </option>
                                 </repeat>
                             </select>
@@ -31,7 +30,7 @@
 
         <footer class="card-footer">
             <input type="submit" class="button is-primary"
-                value="{{ @AdminSettings_notificationPreferences_button_save }}">
+                value="{{ @settings_notificationPreferences_button_save }}">
         </footer>
     </form>
 </div>

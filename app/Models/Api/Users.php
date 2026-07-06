@@ -17,13 +17,11 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Api;
 
-class Users extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
+class Users extends \Tirreno\Models\Base {
     public function getUsersByApiKey(?int $userId, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,
-            ':user_url' => \Tirreno\Utils\Variables::getHostWithProtocolAndBase() . '/id/',
+            ':user_url' => tirreno('utils')->variables->getHostWithProtocolAndBase() . '/id/',
         ];
 
         $query = (

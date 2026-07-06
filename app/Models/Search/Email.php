@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\Search;
 
-class Email extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_email';
-
+class Email extends \Tirreno\Models\Base {
     public function searchByEmail(string $query, int $apiKey): array {
         $params = [
             ':api_key' => $apiKey,

@@ -1,4 +1,4 @@
-import {BaseGrid} from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
 import {
     renderIpType,
     renderUserCounter,
@@ -6,7 +6,7 @@ import {
     renderFullCountry,
     renderAsn,
     renderClickableIpWithCountry,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 
 export class IpsGrid extends BaseGrid {

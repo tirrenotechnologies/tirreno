@@ -18,63 +18,55 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Users;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getUsersByIpId(int $ipId): array {
+    public function getUsersByIpId(int $ipId, int $apiKey): array {
         $params = [':ip_id' => $ipId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByIpId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByIpId(), $params);
     }
 
-    public function getUsersByIspId(int $ispId): array {
+    public function getUsersByIspId(int $ispId, int $apiKey): array {
         $params = [':isp_id' => $ispId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByIspId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByIspId(), $params);
     }
 
-    public function getUsersByDomainId(int $domainId): array {
+    public function getUsersByDomainId(int $domainId, int $apiKey): array {
         $params = [':domain_id' => $domainId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByDomainId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByDomainId(), $params);
     }
 
-    public function getUsersByCountryId(int $countryId): array {
+    public function getUsersByCountryId(int $countryId, int $apiKey): array {
         $params = [':country_id' => $countryId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByCountryId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByCountryId(), $params);
     }
 
-    public function getUsersByDeviceId(int $deviceId): array {
+    public function getUsersByDeviceId(int $deviceId, int $apiKey): array {
         $params = [':device_id' => $deviceId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByDeviceId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByDeviceId(), $params);
     }
 
-    public function getUsersByResourceId(int $resourceId): array {
+    public function getUsersByResourceId(int $resourceId, int $apiKey): array {
         $params = [':resource_id' => $resourceId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByResourceId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByResourceId(), $params);
     }
 
-    public function getUsersByFieldId(int $fieldId): array {
+    public function getUsersByFieldId(int $fieldId, int $apiKey): array {
         $params = [':field_id' => $fieldId];
 
-        return $this->getGrid($this->idsModel->getUsersIdsByFieldId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getUsersIdsByFieldId(), $params);
     }
 
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 
     protected function convertTimeToUserTimezone(array &$result): void {
         $fields = ['time', 'lastseen', 'latest_decision', 'created', 'score_updated_at'];
 
-        \Tirreno\Utils\Timezones::translateTimezones($result, $fields);
+        $result = tirreno('utils')->timezones->translateTimezones($result, $fields);
     }
 }

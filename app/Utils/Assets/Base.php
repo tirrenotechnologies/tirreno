@@ -22,10 +22,6 @@ abstract class Base {
         return include_once $filename;
     }
 
-    protected static function log(string $message): void {
-        error_log($message);
-    }
-
     abstract protected static function getClassFilename(string $filename): string;
 
     abstract protected static function getDirectory(): string;

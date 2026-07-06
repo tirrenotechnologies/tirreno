@@ -25,4 +25,13 @@ abstract class Base {
     public static function isApplied(\Tirreno\Models\Updates $updatesModel): bool {
         return $updatesModel->isApplied(static::$version, 'core');
     }
+
+    protected static function regularSequence(string $name): string {
+        return 'CREATE SEQUENCE ' . $name . (' AS BIGINT
+                START WITH 1
+                INCREMENT BY 1
+                NO MINVALUE
+                NO MAXVALUE
+                CACHE 1');
+    }
 }

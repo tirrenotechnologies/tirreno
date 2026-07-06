@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\TopTen;
 
-class Base extends \Tirreno\Models\BaseSql {
+class Base extends \Tirreno\Models\Base {
     public function getQueryParams(int $apiKey, ?array $dateRange): array {
         $queryParams = [':api_key' => $apiKey];
 

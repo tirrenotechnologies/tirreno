@@ -1,0 +1,30 @@
+<include href="templates/parts/popups/closeAccountPopup.html" />
+
+<div class="columns">
+    <div class="column settings-page">
+        <include href="templates/parts/forms/checkUpdatesForm.html" />
+        <include href="templates/parts/forms/timezoneForm.html" />
+
+        <check if="{{ @IS_OWNER }}">
+            <repeat group="{{ @API_KEYS }}" value="{{ @API_KEY }}">
+                <include href="templates/parts/forms/retentionPolicyForm.html"
+                    with="apiKeyId={{ @API_KEY.id }},retentionPolicy={{ @API_KEY.retention_policy }}" />
+            </repeat>
+        </check>
+
+        <set FREQUENCY="{{ isset(@VALUES)?@VALUES.unreviewed_items_reminder_freq:@PROFILE->reminderFreq }}" />
+        <include href="templates/parts/forms/notificationPreferencesForm.html" with="frequency={{ @FREQUENCY }}" />
+
+        <check if="{{ @IS_OWNER }}">
+            <include href="templates/parts/tables/sharedOperators.html" />
+        </check>
+
+        <include href="templates/parts/forms/changePasswordForm.html" />
+
+        <set EMAIL="{{ @PROFILE ? @PROFILE->email : '' }}" />
+        <set EMAIL="{{ isset(@EMAIL_VALUES) ? @EMAIL_VALUES.email : @EMAIL }}" />
+        <include href="templates/parts/forms/changeEmailForm.html" with="email={{ @EMAIL }}" />
+
+        <include href="templates/parts/forms/closeAccountForm.html" />
+    </div>
+</div>

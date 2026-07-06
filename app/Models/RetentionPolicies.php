@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class RetentionPolicies extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_api';
-
+class RetentionPolicies extends \Tirreno\Models\Base {
     public function getRetentionKeys(): array {
         $query = (
             'SELECT

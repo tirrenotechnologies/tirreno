@@ -16,9 +16,9 @@
 declare(strict_types=1);
 
 return [
-    'AdminIsps_page_title' => 'ISPs',
-    'AdminIsps_breadcrumb_title' => 'ISPs',
-    'AdminIsps_search_placeholder' => 'ASN, Network operator or Description',
-    'AdminIsps_table_title' => 'ISPs',
-    'AdminIsps_table_title_tooltip' => 'This page displays analytics grouped by an internet service provider (ISP), as identified by IP address. The data is shown for a selected period of time. The chart displays the daily number of unique and newly reported active ISPs. To open a page with more details on a particular ISP, click on a table row.',
+    'isps_page_title' => 'ISPs',
+    'isps_breadcrumb_title' => 'ISPs',
+    'isps_search_placeholder' => 'ASN, Network operator or Description',
+    'isps_table_title' => 'ISPs',
+    'isps_table_title_tooltip' => 'This page displays analytics grouped by an internet service provider (ISP), as identified by IP address. The data is shown for a selected period of time. The chart displays the daily number of unique and newly reported active ISPs. To open a page with more details on a particular ISP, click on a table row.',
 ];

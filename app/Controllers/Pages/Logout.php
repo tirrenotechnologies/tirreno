@@ -17,30 +17,43 @@ declare(strict_types=1);
 
 namespace Tirreno\Controllers\Pages;
 
-class Logout extends Base {
-    public ?string $page = 'Logout';
+class Logout extends \Tirreno\Controllers\Pages\Base {
+    public string $page = 'logout';
+
+    protected function proceedPostRequest(): array {
+        $this->assertCanEdit();
+
+        $pageParams = [];
+
+        $params = tirreno('utils')->render->extractRequestParams(['token']);
+        $errorCode = tirreno('utils')->access->CSRFTokenValid($params);
+
+        if (!$errorCode) {
+            tirreno('session')->clear();
+            session_commit();
+            tirreno('response')->redirect('/');
+        }
+
+        $pageParams['ERROR_CODE'] = $errorCode;
+
+        return $pageParams;
+    }
 
     public function getPageParams(): array {
+        $this->assertCanView();
+
         $pageParams = [
             'HTML_FILE'     => 'logout.html',
             'JS'            => 'user_main.js',
+            'INTERNAL_PAGE' => false,
         ];
 
-        if ($this->isPostRequest()) {
-            $params = $this->extractRequestParams(['token']);
+        $postParams = tirreno('request')->isPost() ? $this->proceedPostRequest() : [];
 
-            $errorCode = \Tirreno\Utils\Access::CSRFTokenValid($params, $this->f3);
+        return array_merge($pageParams, $postParams);
+    }
 
-            if (!$errorCode) {
-                $this->f3->clear('SESSION');
-                session_commit();
-
-                $this->f3->reroute('/');
-            }
-
-            $pageParams['ERROR_CODE'] = $errorCode;
-        }
-
-        return parent::applyPageParams($pageParams);
+    protected function getRequiredPermission(): int {
+        return tirreno('utils')->constants->PAGE_VIEW_PERMISSION_ID;
     }
 }

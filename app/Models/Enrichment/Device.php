@@ -65,7 +65,6 @@ class Device extends \Tirreno\Models\Enrichment\Base {
                 event_ua_parsed.key = :key
         ");
 
-        $model = new \Tirreno\Models\Device();
-        $model->execQuery($query, $params);
+        tirreno('models')->device->execQuery($query, $params);
     }
 }

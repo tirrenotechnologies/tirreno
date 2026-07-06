@@ -16,9 +16,9 @@
 declare(strict_types=1);
 
 return [
-    'AdminUserAgents_page_title' => 'User agents',
-    'AdminUserAgents_breadcrumb_title' => 'User agents',
-    'AdminUserAgents_search_placeholder' => 'OS or User-Agent',
-    'AdminUserAgents_table_title' => 'User agents',
-    'AdminUserAgents_table_title_tooltip' => 'This page provides device information identified based on the requests’ user agents. The data is shown for a selected period of time. To view more information about a device, click on a table row. The chart illustrates the daily number of active devices, categorized as desktop or mobile, with bots being distinguished in a separate category.',
+    'userAgents_page_title' => 'User agents',
+    'userAgents_breadcrumb_title' => 'User agents',
+    'userAgents_search_placeholder' => 'OS or User-Agent',
+    'userAgents_table_title' => 'User agents',
+    'userAgents_table_title_tooltip' => 'This page provides device information identified based on the requests\' user agents. The data is shown for a selected period of time. To view more information about a device, click on a table row. The chart illustrates the daily number of active devices, categorized as desktop or mobile, with bots being distinguished in a separate category.',
 ];

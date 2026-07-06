@@ -21,8 +21,7 @@ class Blacklist extends Endpoint {
     public function search(): void {
         $value = $this->getBodyProp('value', 'string');
 
-        $model = new \Tirreno\Models\BlacklistItems();
-        $itemFound = $model->searchBlacklistedItem($value, $this->apiKeyId);
+        $itemFound = tirreno('models')->blacklistItems->searchBlacklistedItem($value, $this->apiKeyId);
 
         $this->data = [
             'value'         => $value,

@@ -1,0 +1,33 @@
+<include href="templates/parts/panel/eventPanel.html" />
+{~
+    $subtitle = '';
+    if(isset($ISP['description']) && !empty($ISP['description'])) {
+        $subtitle = $ISP['description'];
+    }
+
+
+    $pageTitle = '';
+    if($ISP['name']) {
+        $pageTitle = $ISP['name'];
+    }
+
+    if(!$pageTitle && $ISP['description']) {
+        $pageTitle = $ISP['description'];
+    }
+
+    if(!$pageTitle && $ISP['asn']) {
+        $pageTitle = $ISP['asn'];
+    }
+
+    if($pageTitle) {
+        $regex1 = '/-|_/i';
+        $pageTitle = preg_replace($regex1, ' ', $pageTitle);
+    }
+~}
+
+<include href="templates/parts/infoHeader.html" with="title={{@pageTitle}}, lastseen={{@ISP.lastseen}}, subtitle={{@subtitle}}"/>
+
+<include href="templates/parts/widgets/isp.html" />
+<include href="templates/parts/tables/users.html" />
+<include href="templates/parts/mapWithIps.html" />
+<include href="templates/parts/tables/events.html" with="showChart=1"/>

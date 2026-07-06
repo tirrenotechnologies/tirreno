@@ -68,13 +68,13 @@ class Base {
         }
 
         $ipAddr = $parts[0];
-        $netmask = \Tirreno\Utils\Conversion::intVal($parts[1], -1);
+        $netmask = tirreno('utils')->conversion->intVal($parts[1], -1);
 
         if ($netmask < 0) {
             return false;
         }
 
-        $ipType = \Tirreno\Utils\Conversion::filterIpGetType($ipAddr);
+        $ipType = tirreno('utils')->conversion->filterIpGetType($ipAddr);
 
         return $ipType === 4 ? $netmask <= 32 : ($ipType === 6 ? $netmask <= 128 : false);
     }

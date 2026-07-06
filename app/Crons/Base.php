@@ -27,7 +27,7 @@ abstract class Base {
     }
 
     protected function addLog(string $msg): void {
-        $this->log[] = \Tirreno\Utils\Logger::logCronLine($msg, $this->getName());
+        $this->log[] = tirreno('utils')->logger->logCronLine($msg, $this->getName());
     }
 
     protected function getName(): string {

@@ -1,6 +1,6 @@
 <div class="card events-card is-hidden" data-item-id="manual-check-result-{{ @type }}" data-item-type="{{ @type }}" >
     <header class="card-header">
-        <p class="card-header-title">{{ sprintf(@AdminManualCheck_result_title, @AdminManualCheck_form_types[@type]) }}</p>
+        <p class="card-header-title">{{ sprintf(@manualCheck_result_title, @manualCheck_form_types[@type]) }}</p>
     </header>
 
     <div class="card-table">
@@ -10,7 +10,7 @@
                     <check if="{{ is_array(@results) }}">
                         <repeat group="{{ @results }}" key="{{ @key }}" value="{{ @value }}">
                             <tr>
-                                <td data-item-id="{{ @key }}">{{ \Tirreno\Controllers\Admin\ManualCheck\Page::stylizeKey(@key) }}</td>
+                                <td data-item-id="{{ @key }}">{{ tirreno('pages')->manualCheck->stylizeKey(@key) }}</td>
                                 <td>
                                     {{ is_string(@value) ? @value : json_encode(@value) }}
                                 </td>

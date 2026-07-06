@@ -17,32 +17,30 @@ declare(strict_types=1);
 
 namespace Tirreno\Utils\Http;
 
-final class CurlTransport implements \Tirreno\Interfaces\HttpTransportInterface {
-    public function isAvailable(): bool {
+class CurlTransport {
+    public static function isAvailable(): bool {
         return function_exists('curl_init');
     }
 
-    public function request(\Tirreno\Entities\HttpRequest $request): \Tirreno\Entities\HttpResponse {
-        $ch = curl_init($request->url());
+    public static function request(\Tirreno\Entities\HttpRequest $request): \Tirreno\Entities\HttpResponse {
+        $ch = curl_init($request->url);
         if ($ch === false) {
-            $result = \Tirreno\Entities\HttpResponse::failure(null, 'curl_init_failed', []);
-
-            return $result;
+            return tirreno('entities')->httpResponse->failure(null, 'curl_init_failed', []);
         }
 
         $options = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => $request->connectTimeoutSeconds(),
-            CURLOPT_TIMEOUT => $request->timeoutSeconds(),
-            CURLOPT_HTTPHEADER => $request->headers(),
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_CONNECTTIMEOUT  => $request->connectTimeoutSeconds,
+            CURLOPT_TIMEOUT         => $request->timeoutSeconds,
+            CURLOPT_HTTPHEADER      => $request->headers,
         ];
 
-        if (!$request->sslVerify()) {
+        if (!$request->sslVerify) {
             $options[CURLOPT_SSL_VERIFYPEER] = false;
             $options[CURLOPT_SSL_VERIFYHOST] = 0;
         }
 
-        $methodUpper = strtoupper($request->method());
+        $methodUpper = strtoupper($request->method);
 
         if ($methodUpper === 'GET') {
             $options[CURLOPT_HTTPGET] = true;
@@ -50,7 +48,7 @@ final class CurlTransport implements \Tirreno\Interfaces\HttpTransportInterface 
             $options[CURLOPT_CUSTOMREQUEST] = $methodUpper;
         }
 
-        $body = $request->body();
+        $body = $request->body;
         if ($body !== null) {
             $options[CURLOPT_POSTFIELDS] = $body;
         }
@@ -66,19 +64,19 @@ final class CurlTransport implements \Tirreno\Interfaces\HttpTransportInterface 
             $error = strval(curl_error($ch));
             curl_close($ch);
 
-            return \Tirreno\Entities\HttpResponse::failure($code, $error, []);
+            return tirreno('entities')->httpResponse->failure($code, $error, []);
         }
 
         curl_close($ch);
 
         if ($raw === false) {
-            $result = \Tirreno\Entities\HttpResponse::failure($code, 'curl_exec_failed', []);
+            $result = tirreno('entities')->httpResponse->failure($code, 'curl_exec_failed', []);
 
             return $result;
         }
 
         $bodyString = strval($raw);
-        $result = \Tirreno\Entities\HttpResponse::success($code, $bodyString, []);
+        $result = tirreno('entities')->httpResponse->success($code, $bodyString, []);
 
         return $result;
     }

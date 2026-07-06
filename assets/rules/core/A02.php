@@ -9,10 +9,10 @@ class A02 extends \Tirreno\Assets\Rule {
 
     protected function prepareParams(array $params): array {
         $suspiciousLoginFailed = false;
-        $loginFail = \Tirreno\Utils\Constants::get()->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
+        $loginFail = tirreno('utils')->constants->ACCOUNT_LOGIN_FAIL_EVENT_TYPE_ID;
 
         foreach ($params['event_type'] as $idx => $event) {
-            if ($event === $loginFail && \Tirreno\Utils\Rules::eventDeviceIsNew($params, $idx)) {
+            if ($event === $loginFail && tirreno('utils')->rules->eventDeviceIsNew($params, $idx)) {
                 $suspiciousLoginFailed = true;
                 break;
             }

@@ -33,7 +33,7 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
     public function init(array $data): void {
         $this->ip = $data['value'];
 
-        if (!\Tirreno\Utils\Conversion::filterIp($this->ip) || $data['error'] !== \Tirreno\Utils\Constants::get()->ENRICHMENT_IP_IS_BOGON) {
+        if (!tirreno('utils')->conversion->filterIp($this->ip) || $data['error'] !== tirreno('utils')->constants->ENRICHMENT_IP_IS_BOGON) {
             throw new \Exception('Validation failed');
         }
     }
@@ -54,14 +54,11 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
 
     // TODO: update countries table counters
     public function updateEntityInDb(int $entityId, int $apiKey): void {
-        $ipModel = new \Tirreno\Models\Ip();
-
-        $previousIpData = $ipModel->getFullIpInfoById($entityId, $apiKey);
+        $previousIpData = tirreno('models')->ip->getIpById($entityId, $apiKey);
         $previousIspId = count($previousIpData) ? $previousIpData['ispid'] : null;
         $previousCountryId = count($previousIpData) ? $previousIpData['country_id'] : 0;
         // get current isp id
-        $ispModel = new \Tirreno\Models\Isp();
-        $newIspId = $ispModel->getIdByAsn($this->asn, $apiKey);
+        $newIspId = tirreno('models')->isp->getIdByAsn($this->asn, $apiKey);
 
         $newIspData = [
             'asn'           => $this->asn,
@@ -74,23 +71,22 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
         // new isp is not in db
         if ($newIspId === null) {
             $newIspData['lastseen'] = $previousIpData['lastseen'];
-            $newIspId = $ispModel->insertRecord($newIspData, $apiKey);
+            $newIspId = tirreno('models')->isp->insertRecord($newIspData, $apiKey);
         } else {
             $newIspModel->updateEntityInDb($newIspId, $apiKey);
         }
 
         $this->isp = $newIspId;
 
-        $countryModel = new \Tirreno\Models\Country();
         $newCountryId = $this->country;
 
-        $countryRecord = $countryModel->getCountryById($newCountryId, $apiKey);
+        $countryRecord = tirreno('controllers')->country->getCountryById($newCountryId, $apiKey);
         if (!count($countryRecord)) {
             $newCountryData = [
                 'id'        => $newCountryId,
                 'lastseen'  => $previousIpData['lastseen'],
             ];
-            $countryModel->insertRecord($newCountryData, $apiKey);
+            tirreno('models')->country->insertRecord($newCountryData, $apiKey);
         }
 
         // total_visit and total_account should remain still
@@ -108,14 +104,13 @@ class LocalhostIp extends \Tirreno\Models\Enrichment\Base {
                 event_ip.key = :key
         ");
 
-        $model = new \Tirreno\Models\Ip();
-        $model->execQuery($query, $params);
+        tirreno('models')->ip->execQuery($query, $params);
 
         // update totals only after event_ip update!
         $ispIds = $this->slimIds([$previousIspId, $newIspId]);
-        $ispModel->updateTotalsByEntityIds($ispIds, $apiKey, true);
+        tirreno('models')->isp->updateTotalsByEntityIds($ispIds, $apiKey, true);
 
         $countryIds = $this->slimIds([$previousCountryId, $newCountryId]);
-        $countryModel->updateTotalsByEntityIds($countryIds, $apiKey, true);
+        tirreno('models')->country->updateTotalsByEntityIds($countryIds, $apiKey, true);
     }
 }

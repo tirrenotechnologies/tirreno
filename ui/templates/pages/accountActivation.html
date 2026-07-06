@@ -1,24 +1,18 @@
-<include href="templates/parts/header.html" />
-<section class="front-block">
-    <div class="container">
-        <div class="columns is-centered">
-            <div class="column column-login">
-                <div class="card">
-                    <div class="card-panel">
-                        <div class="content">
-                            <check if="{{ isset(@ERROR_MESSAGE) }}">
-                                <true>
-                                    <p class="warning-text">{{ @ERROR_MESSAGE }}</p>
-                                </true>
-                                <false>
-                                    {{ @AccountActivation_success_message }} <a href="{{ @BASE }}/login">{{ @AccountActivation_login }}</a>
-                                </false>
-                            </check>
-                        </div>
-                    </div>
+<div class="columns is-centered">
+    <div class="column column-login">
+        <div class="card">
+            <div class="card-panel">
+                <div class="content">
+                    <check if="{{ isset(@ERROR_MESSAGE) }}">
+                        <true>
+                            <p class="warning-text">{{ @ERROR_MESSAGE }}</p>
+                        </true>
+                        <false>
+                            {{ @AccountActivation_success_message }} <a href="{{ @BASE }}/login">{{ @AccountActivation_login }}</a>
+                        </false>
+                    </check>
                 </div>
             </div>
         </div>
     </div>
-</section>
-<include href="templates/parts/footer.html" />
+</div>

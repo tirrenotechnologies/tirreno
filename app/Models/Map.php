@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Map extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'countries';
+class Map extends \Tirreno\Models\Base {
+    protected string $tableName = 'countries';
 
     public function getAllCountries(?string $dateFrom, ?string $dateTo, int $apiKey): array {
         $params = [
@@ -61,7 +61,7 @@ class Map extends \Tirreno\Models\BaseSql {
     }
 
     public function getAllCountriesByDateRange(int $apiKey): array {
-        $datesRange = \Tirreno\Utils\DateRange::getDatesRangeFromRequest();
+        $datesRange = tirreno('utils')->dateRange->getDatesRangeFromRequest();
 
         $dateTo = $datesRange ? ($datesRange['endDate'] ?? null) : null;
         $dateFrom = $datesRange ? ($datesRange['startDate'] ?? null) : null;

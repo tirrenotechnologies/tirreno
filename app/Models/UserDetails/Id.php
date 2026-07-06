@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models\UserDetails;
 
-class Id extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
+class Id extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $params = [
             ':user_id' => $subjectId,
@@ -83,7 +81,7 @@ class Id extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
         $result = $results[0] ?? [];
 
         $tsColumns = ['created', 'lastseen', 'score_updated_at', 'latest_decision', 'updated', 'added_to_review'];
-        \Tirreno\Utils\Timezones::localizeTimestampsForActiveOperator($tsColumns, $result);
+        $result = tirreno('utils')->timezones->localizeTimestampsForActiveOperator($tsColumns, $result);
 
         return $result;
     }

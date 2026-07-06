@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Domain extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
-    protected ?string $DB_TABLE_NAME = 'event_domain';
+class Domain extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface {
+    protected string $tableName = 'event_domain';
 
     public function checkAccess(int $subjectId, int $apiKey): bool {
         $params = [

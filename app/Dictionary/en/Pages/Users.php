@@ -16,17 +16,18 @@
 declare(strict_types=1);
 
 return [
-    'AdminUsers_page_title' => 'Users',
-    'AdminUsers_breadcrumb_title' => 'Users',
-    'AdminUsers_search_placeholder' => 'User Name, ID and Signup Date',
-    'AdminUsers_rules_search_placeholder' => '+ Add another rule',
-    'AdminUsers_scores_range_search_placeholder' => '+ Add another score',
+    'users_page_title' => 'Entities',
+    'users_breadcrumb_title' => 'Entities',
+    'users_search_placeholder' => 'Entity Name, ID and Signup Date',
+    'users_rules_search_placeholder' => '+ Add another rule',
+    'users_scores_range_search_placeholder' => '+ Add another score',
 
-    'AdminUsers_table_title' => 'Users',
-    'AdminUsers_table_title_tooltip' => 'This page outputs basic information about users, including their trust scores. The data is shown for a selected period of time. To open a page with extended analytics, click on a table row. The chart displays the daily number of new visitors, grouped by their trust scores values.',
+    'users_table_title' => 'Entities',
+    'users_table_title_tooltip' => 'This page outputs basic information about entities, including their trust scores. The data is shown for a selected period of time. To open a page with extended analytics, click on a table row. The chart displays the daily number of new visitors, grouped by their trust scores values.',
 
-    'AdminUsers_add_to_watchlist' => 'Add to Watchlist',
-    'AdminUsers_remove_from_watchlist' => 'Remove from Watchlist',
-    'AdminUsers_remove_reviewed_flag' => 'Not reviewed',
-    'AdminUsers_auto_blocked' => 'Auto-blocked',
+    'users_add_to_watchlist' => 'Add to Watchlist',
+    'users_remove_from_watchlist' => 'Remove from Watchlist',
+    'users_remove_reviewed_flag' => 'Not reviewed',
+    'users_auto_blocked' => 'Auto-blocked',
+    'users_add_to_review' => 'Add to review',
 ];

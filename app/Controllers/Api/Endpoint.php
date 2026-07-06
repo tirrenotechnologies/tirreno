@@ -20,8 +20,6 @@ namespace Tirreno\Controllers\Api;
 abstract class Endpoint {
     public const API_KEY = 'Api-Key';
 
-    protected \Base $f3;
-
     protected \Tirreno\Views\Json $response;
     protected string $responseType;
     protected int $error;
@@ -38,14 +36,13 @@ abstract class Endpoint {
     protected array|null $data = null;
 
     public function __construct() {
-        $this->f3 = \Base::instance();
-        $this->f3->set('ONERROR', function (): void {
+        tirreno('storage')->set('ONERROR', function (): void {
             $this->handleInternalServerError();
         });
-        \Tirreno\Utils\Database::initConnect(false);
+        tirreno('utils')->database->initConnect(false);
 
         $this->response = new \Tirreno\Views\Json();
-        $this->responseType = \Tirreno\Utils\Constants::get()->SINGLE_RESPONSE_TYPE;
+        $this->responseType = tirreno('utils')->constants->SINGLE_RESPONSE_TYPE;
     }
 
     public function beforeRoute(): void {
@@ -58,7 +55,7 @@ abstract class Endpoint {
     public function afterRoute(): void {
         if (isset($this->error)) {
             $errorI18nCode = sprintf('error_%s', $this->error);
-            $errorMessage = $this->f3->get($errorI18nCode);
+            $errorMessage = tirreno('storage')->get($errorI18nCode);
             $this->response->data = [
                 'code' => $this->error,
                 'message' => $errorMessage,
@@ -78,7 +75,7 @@ abstract class Endpoint {
     }
 
     protected function identify(): void {
-        $headers = $this->f3->get('HEADERS') ?? [];
+        $headers = tirreno('request')->getHeaders();
 
         if (array_key_exists(self::API_KEY, $headers) && is_string($headers[self::API_KEY])) {
             $this->apiKeyString = $headers[self::API_KEY];
@@ -86,12 +83,11 @@ abstract class Endpoint {
             return;
         }
 
-        $this->setError(400, \Tirreno\Utils\ErrorCodes::REST_API_KEY_DOES_NOT_EXIST);
+        $this->setError(400, tirreno('utils')->errorCodes->REST_API_KEY_DOES_NOT_EXIST);
     }
 
     protected function authenticate(): void {
-        $model = new \Tirreno\Models\ApiKeys();
-        $apiKeyId = $model->getKeyIdByHash($this->apiKeyString);
+        $apiKeyId = tirreno('models')->apiKeys->getKeyIdByHash($this->apiKeyString);
 
         if ($apiKeyId) {
             $this->apiKeyId = $apiKeyId;
@@ -99,7 +95,7 @@ abstract class Endpoint {
             return;
         }
 
-        $this->setError(401, \Tirreno\Utils\ErrorCodes::REST_API_KEY_IS_NOT_CORRECT);
+        $this->setError(401, tirreno('utils')->errorCodes->REST_API_KEY_IS_NOT_CORRECT);
     }
 
     /*protected function authorize(string $subjectId): void {
@@ -113,7 +109,7 @@ abstract class Endpoint {
             return;
         }
 
-        $this->setError(403, \Tirreno\Utils\ErrorCodes::REST_API_NOT_AUTHORIZED);
+        $this->setError(403, tirreno('utils')->errorCodes->REST_API_NOT_AUTHORIZED);
     }*/
 
     protected function getBodyProp(string $key, string $paramType = 'string'): string|int|array|null {
@@ -127,16 +123,16 @@ abstract class Endpoint {
     }
 
     protected function saveLogbook(): void {
-        $model = new \Tirreno\Models\Logbook();
-        $model->add(
-            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',
-            $this->f3->get('PATH'),
-            null,
-            !isset($this->error) ? \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_SUCCESS : \Tirreno\Utils\Constants::get()->LOGBOOK_ERROR_TYPE_CRITICAL_ERROR,
-            !isset($this->error) ? null : json_encode(['Undefined error']),
-            json_encode($this->body),
-            $this->formatStartTime(),
+        tirreno('entities')->logbook->addRecord(
+            tirreno('request')->getPath(),
+            $this->formatStartTime(),                                           //$started,
+            $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1',                             //$ip,
+            null,                                                               //$eventId,
+            !isset($this->error) ? null : json_encode(['Undefined error']),     //$errorText,
+            json_encode($this->body),                                           //$raw,
             $this->apiKeyId,
+            !isset($this->error) ? tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_SUCCESS : tirreno('utils')->constants->LOGBOOK_ERROR_TYPE_CRITICAL_ERROR,
+            //$ended,
         );
     }
 
@@ -147,7 +143,7 @@ abstract class Endpoint {
     }
 
     protected function setError(int $statusCode, int $errorCode): void {
-        $this->f3->status($statusCode);
+        tirreno('router')->status($statusCode);
         $this->statusCode = $statusCode;
         $this->error = $errorCode;
         $this->afterRoute();
@@ -155,13 +151,13 @@ abstract class Endpoint {
     }
 
     private function parseBody(): void {
-        $body = $this->f3->get('BODY');
+        $body = tirreno('request')->getBody();
         $this->body = json_decode($body, true) ?? [];
     }
 
     private function handleInternalServerError(): void {
-        $errorData = \Tirreno\Utils\ErrorHandler::getErrorDetails($this->f3);
-        \Tirreno\Utils\ErrorHandler::saveErrorInformation($this->f3, $errorData);
+        $errorData = tirreno('utils')->errorHandler->getErrorDetails();
+        tirreno('utils')->errorHandler->saveErrorInformation($errorData);
 
         $this->setError(500, 500);
     }

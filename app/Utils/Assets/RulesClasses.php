@@ -47,27 +47,6 @@ class RulesClasses extends Base {
         return self::RULES_TYPES[$uid[0]] ?? $uid[0];
     }
 
-    public static function getUserScoreClass(?int $score): array {
-        $cls = 'empty';
-        if ($score === null) {
-            return ['&minus;', $cls];
-        }
-
-        if ($score >= \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_INF && $score < \Tirreno\Utils\Constants::get()->USER_LOW_SCORE_SUP) {
-            $cls = 'low';
-        }
-
-        if ($score >= \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_INF && $score < \Tirreno\Utils\Constants::get()->USER_MEDIUM_SCORE_SUP) {
-            $cls = 'medium';
-        }
-
-        if ($score >= \Tirreno\Utils\Constants::get()->USER_HIGH_SCORE_INF) {
-            $cls = 'high';
-        }
-
-        return [$score, $cls];
-    }
-
     protected static function getDirectory(bool $core = true): string {
         return dirname(__DIR__, 3) . ($core ? '/assets/rules/core' : '/assets/rules/custom');
     }
@@ -109,7 +88,7 @@ class RulesClasses extends Base {
                 $obj = new $cls($ruleBuilder, []);
                 break;
             } catch (\Throwable $e) {
-                self::log('Rule validation failed at file ' . $filename . ' with message ' . $e->getMessage());
+                tirreno('log')->info('rule file %s not found: %s.', $filename, $e->getMessage());
             }
         }
 
@@ -144,7 +123,7 @@ class RulesClasses extends Base {
                     $out[$name] = $cls;
                 } catch (\Throwable $e) {
                     $failed[] = $name;
-                    self::log('Fail on include_once: ' . $e->getMessage());
+                    tirreno('log')->info('rule file %s not found: %s.', $file->getFilename(), $e->getMessage());
                 }
             }
         }

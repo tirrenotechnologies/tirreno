@@ -16,11 +16,11 @@
 declare(strict_types=1);
 
 return [
-    'AdminRetentionPolicy_form_title' => 'Data retention',
-    'AdminRetentionPolicy_form_title_tooltip' => 'Configure the maximum duration of the recorded information storage.',
-    'AdminRetentionPolicy_form_button_save' => 'Update',
+    'settings_retentionPolicy_form_title' => 'Data retention',
+    'settings_retentionPolicy_form_title_tooltip' => 'Configure the maximum duration of the recorded information storage.',
+    'settings_retentionPolicy_form_button_save' => 'Update',
 
-    'AdminRetentionPolicy_form_field_policy_label' => 'Retention period',
-    'AdminRetentionPolicy_form_field_policy_warning' => 'Caution! Reducing the data retention period will result in the removal of all data belonging to users who haven’t logged in beyond the updated retention period.',
-    'AdminRetentionPolicy_changeTimezone_success_message' => 'Data retention period has been changed successfully.',
+    'settings_retentionPolicy_form_field_policy_label' => 'Retention period',
+    'settings_retentionPolicy_form_field_policy_warning' => 'Reducing the retention period will result in the removal of all data belonging to entities who haven\'t logged in beyond selected period.',
+    'settings_retentionPolicy_changeTimezone_success_message' => 'Data retention period has been changed successfully.',
 ];

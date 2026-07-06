@@ -17,12 +17,12 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Operator extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_operators';
+class Operator extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_operators';
 
     public function insertRecord(?string $password, string $email, string $timezone): int {
         $params = [
-            ':password' => $password ? \Tirreno\Utils\Access::hashPassword($password) : $password,
+            ':password' => $password ? tirreno('utils')->access->hashPassword($password) : $password,
             ':email'    => $email,
             ':timezone' => $timezone,
             ':active'   => 1,
@@ -43,7 +43,7 @@ class Operator extends \Tirreno\Models\BaseSql {
 
     public function updatePassword(string $password, int $operatorId): void {
         $params = [
-            ':password'     => \Tirreno\Utils\Access::hashPassword($password),
+            ':password'     => tirreno('utils')->access->hashPassword($password),
             ':operator_id'  => $operatorId,
         ];
 
@@ -211,17 +211,18 @@ class Operator extends \Tirreno\Models\BaseSql {
             WHERE event_email.key IN (SELECT id FROM dshb_api WHERE creator = :operator_id);',
         ];
 
+        $db = $this->getDatabaseConnection();
         try {
-            $this->db->begin();
-            $this->db->exec($queries, array_fill(0, 5, $params));
+            $db->begin();
+            $db->exec($queries, array_fill(0, 5, $params));
 
             $query = 'DELETE FROM dshb_api WHERE creator = :operator_id';
-            $this->db->exec($query, $params);
+            $db->exec($query, $params);
 
-            $this->db->commit();
+            $db->commit();
         } catch (\Exception $e) {
-            $this->db->rollback();
-            error_log($e->getMessage());
+            $db->rollback();
+            tirreno('log')->error('failed to delete operator: %s.', $e->getMessage());
             throw $e;
         }
     }
@@ -337,23 +338,33 @@ class Operator extends \Tirreno\Models\BaseSql {
             return false;
         }
 
-        return \Tirreno\Utils\Access::verifyPassword($password, $operatorPassword);
+        return tirreno('utils')->access->verifyPassword($password, $operatorPassword);
     }
 
     public function getAll(): array {
+        $params = [
+            ':reserved_ids_limit'    => tirreno('utils')->constants->RESERVED_OPERATOR_IDS,
+        ];
+
         $query = (
             'SELECT
-                id,
+                dshb_operators.id,
                 email,
                 firstname,
                 lastname,
                 last_event_time,
-                review_queue_cnt
+                review_queue_cnt,
+                json_agg(dshb_operators_roles.role) AS roles
             FROM
                 dshb_operators
+            LEFT JOIN dshb_operators_roles
+            ON dshb_operators_roles.operator = dshb_operators.id
+            WHERE
+                dshb_operators.id > :reserved_ids_limit
+            GROUP BY dshb_operators.id
             ORDER BY email ASC'
         );
 
-        return $this->execQuery($query, null);
+        return $this->execQuery($query, $params);
     }
 }

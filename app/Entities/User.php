@@ -17,81 +17,188 @@ declare(strict_types=1);
 
 namespace Tirreno\Entities;
 
-class User {
-    public int $id;
-    public string $userid;
-    public string $lastseen;
-    public string $created;
-    public ?string $firstname;
-    public ?string $lastname;
-    public int $score;
-    public ?array $scoreDetails;
-    public ?string $scoreUpdatedAt;
-    public bool $isImportant;
-    public ?bool $fraud;
-    public ?bool $reviewed;
-    public ?string $latestDecision;
-    public ?string $addedToReview;
-    public ?string $email;
+class User extends \Tirreno\Entities\Single {
+    protected int $id;
+    protected string $userid;
+    protected ?string $fullname;
+    protected ?string $firstname;
+    protected ?string $middlename;
+    protected ?string $lastname;
+
+    protected ?int $score;
+    protected ?array $scoreDetails;
+    protected ?bool $reviewed;
+    protected ?bool $fraud;
+
+    protected ?bool $scoreRecalculate;
+    protected ?bool $isImportant;
+    protected ?string $lastIp;
+
+    protected ?int $totalVisit;
+    protected ?int $totalCountry;
+    protected ?int $totalIp;
+    protected ?int $totalDevice;
+    protected ?int $totalSharedIp;
+    protected ?int $totalSharedPhone;
+
+    protected string $lastseen;
+    protected string $created;
+    protected string $updated;
+    protected string $scoreUpdatedAt;
+    protected ?string $latestDecision;
+    protected ?string $addedToReview;
+
+    protected \Tirreno\Entities\Email|\Tirreno\Entities\EmptyEmail $email;
+    protected \Tirreno\Entities\Phone|\Tirreno\Entities\EmptyPhone $phone;
+
+    protected int $key;
+
+    protected array $nestedProps = ['email', 'phone'];
+    protected array $tsFields = ['created', 'lastseen', 'scoreUpdatedAt', 'latestDecision', 'updated', 'addedToReview'];
 
     public function __construct(
         int $id,
         string $userid,
+        ?string $fullname,
+        ?string $firstname,
+        ?string $middlename,
+        ?string $lastname,
+        ?int $score,
+        ?string $scoreDetails,
+        ?bool $reviewed,
+        ?bool $fraud,
+        ?bool $scoreRecalculate,
+        ?bool $isImportant,
+        ?string $lastIp,
+        ?int $totalVisit,
+        ?int $totalCountry,
+        ?int $totalIp,
+        ?int $totalDevice,
+        ?int $totalSharedIp,
+        ?int $totalSharedPhone,
         string $lastseen,
         string $created,
-        ?string $firstname,
-        ?string $lastname,
-        int $score,
-        ?string $scoreDetails,
-        ?string $scoreUpdatedAt,
-        bool $isImportant,
-        ?bool $fraud,
-        ?bool $reviewed,
+        string $updated,
+        string $scoreUpdatedAt,
         ?string $latestDecision,
         ?string $addedToReview,
-        ?string $email,
+        \Tirreno\Entities\Email|\Tirreno\Entities\EmptyEmail $email,
+        \Tirreno\Entities\Phone|\Tirreno\Entities\EmptyPhone $phone,
+        int $key,
     ) {
         $this->id               = $id;
         $this->userid           = $userid;
-        $this->lastseen         = $lastseen;
-        $this->created          = $created;
+        $this->fullname         = $fullname;
         $this->firstname        = $firstname;
+        $this->middlename       = $middlename;
         $this->lastname         = $lastname;
         $this->score            = $score;
-        $this->scoreDetails     = $scoreDetails !== null ? json_decode($scoreDetails) : $scoreDetails;
-        $this->scoreUpdatedAt   = $scoreUpdatedAt;
-        $this->isImportant      = $isImportant;
-        $this->fraud            = $fraud;
+        $this->scoreDetails     = $scoreDetails ? json_decode($scoreDetails, true) : null;
         $this->reviewed         = $reviewed;
+        $this->fraud            = $fraud;
+        $this->scoreRecalculate = $scoreRecalculate;
+        $this->isImportant      = $isImportant;
+        $this->lastIp           = $lastIp;
+        $this->totalVisit       = $totalVisit;
+        $this->totalCountry     = $totalCountry;
+        $this->totalIp          = $totalIp;
+        $this->totalDevice      = $totalDevice;
+        $this->totalSharedIp    = $totalSharedIp;
+        $this->totalSharedPhone = $totalSharedPhone;
+        $this->lastseen         = $lastseen;
+        $this->created          = $created;
+        $this->updated          = $updated;
+        $this->scoreUpdatedAt   = $scoreUpdatedAt;
         $this->latestDecision   = $latestDecision;
         $this->addedToReview    = $addedToReview;
         $this->email            = $email;
+        $this->phone            = $phone;
+        $this->key              = $key;
     }
 
-    public static function getById(int $accountId, int $apiKey): ?self {
-        $model = new \Tirreno\Models\User();
-        $user = $model->getUserById($accountId, $apiKey);
+    public static function getById(int $id, int $key): ?self {
+        $model = new \Tirreno\Models\Query\Users($key);
 
-        if (!$user) {
-            return null;
+        return $model->where('user_id', '=', $id)->get()->data[0] ?? null;
+    }
+
+    public static function getFromQuery(array $data, int $key): self {
+        return new self(
+            $data['user_id'],
+            $data['user_userid'],
+            $data['user_fullname'],
+            $data['user_firstname'],
+            $data['user_middlename'],
+            $data['user_lastname'],
+            $data['user_score'],
+            $data['user_score_details'],
+            $data['user_reviewed'],
+            $data['user_fraud'],
+            $data['user_score_recalculate'],
+            $data['user_is_important'],
+            $data['user_last_ip'],
+            $data['user_total_visit'],
+            $data['user_total_country'],
+            $data['user_total_ip'],
+            $data['user_total_device'],
+            $data['user_total_shared_ip'],
+            $data['user_total_shared_phone'],
+            $data['user_lastseen'],
+            $data['user_created'],
+            $data['user_updated'],
+            $data['user_score_updated_at'],
+            $data['user_latest_decision'],
+            $data['user_added_to_review'],
+            isset($data['email_id']) ? tirreno('entities')->email->getFromQuery($data, $key) : tirreno('entities')->emptyEmail->get(),
+            isset($data['phone_id']) ? tirreno('entities')->phone->getFromQuery($data, $key) : tirreno('entities')->emptyPhone->get(),
+            $key,
+        );
+    }
+
+    public function setWhitelist(): void {
+        $this->fraud = false;
+        tirreno('models')->user->updateFraudFlag([$this->id], $this->key, false);
+    }
+
+    public function setBlacklist(): void {
+        $this->fraud = true;
+        tirreno('models')->user->updateFraudFlag([$this->id], $this->key, true);
+    }
+
+    // immediately!
+    public function delete(): void {
+        tirreno('models')->user->deleteAllUserData($this->id, $this->key);
+    }
+
+    public function isScheduledForDeletion(): array {
+        [$scheduled, $status] = tirreno('models')->queue->isInQueueStatus($this->id, tirreno('utils')->constants->DELETE_USER_QUEUE_ACTION_TYPE, $this->key);
+
+        return [$scheduled, ($status === tirreno('utils')->constants->FAILED_QUEUE_STATUS_TYPE) ? tirreno('utils')->errorCodes->USER_DELETION_FAILED : null];
+    }
+
+    public function isScheduledForBlacklist(): array {
+        [$scheduled, $status] = tirreno('models')->queue->isInQueueStatus($this->id, tirreno('utils')->constants->BLACKLIST_QUEUE_ACTION_TYPE, $this->key);
+
+        return [$scheduled, ($status === tirreno('utils')->constants->FAILED_QUEUE_STATUS_TYPE) ? tirreno('utils')->errorCodes->USER_BLACKLISTING_FAILED : null];
+    }
+
+    public function extendScoreDetails(): void {
+        $rules = tirreno('models')->rules->getAll();
+
+        $details = [];
+        $scoreDetails = $this->scoreDetails ?? [];
+
+        foreach ($scoreDetails as $detail) {
+            $score = $detail['score'] ?? null;
+            $ruleUid = $detail['uid'] ?? null;
+            if ($score !== 0 && isset($rules[$ruleUid])) {
+                $item = $rules[$ruleUid];
+                $item['score'] = $score;
+                $details[] = $item;
+            }
         }
 
-        return new self(
-            $user['accountid'],
-            $user['userid'],
-            $user['lastseen'],
-            $user['created'],
-            $user['firstname'],
-            $user['lastname'],
-            $user['score'],
-            $user['score_details'],
-            $user['score_updated_at'],
-            $user['is_important'],
-            $user['fraud'],
-            $user['reviewed'],
-            $user['latest_decision'],
-            $user['added_to_review'],
-            $user['email'],
-        );
+        usort($details, [\Tirreno\Utils\Sort::class, 'cmpScore']);
+        $this->scoreDetails = $details;
     }
 }

@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\FraudFlagUpdaterInterface {
-    protected ?string $DB_TABLE_NAME = 'event_ip';
+class Ip extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\FraudFlagUpdaterInterface {
+    protected string $tableName = 'event_ip';
 
     public function getIdByValue(string $ipAddress, int $apiKey): ?int {
         $params = [
@@ -41,7 +41,7 @@ class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
         return $results[0]['id'] ?? null;
     }
 
-    public function getFullIpInfoById(int $ipId, int $apiKey): array {
+    public function getIpById(int $ipId, int $apiKey): array {
         $params = [
             ':ipid'     => $ipId,
             ':api_key'  => $apiKey,
@@ -54,6 +54,7 @@ class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
                 event_ip.cidr,
                 event_ip.lastseen,
                 event_ip.created,
+                event_ip.updated,
                 event_ip.ip AS title,
                 event_ip.isp AS ispid,
                 event_ip.data_center,
@@ -64,6 +65,10 @@ class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
                 event_ip.fraud_detected,
                 event_ip.blocklist,
                 event_ip.checked,
+                event_ip.total_visit,
+                event_ip.shared,
+                -- event_ip.domains_count,
+
 
                 event_isp.asn,
                 event_isp.name,
@@ -311,7 +316,7 @@ class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
             ':key' => $apiKey,
         ];
 
-        // count only ips appearing in events (not overriden by retention)
+        // count only ips appearing in events (not overridden by retention)
         $query = (
             'SELECT
                 COUNT(DISTINCT event_ip.id) AS count
@@ -333,7 +338,7 @@ class Ip extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAc
             ':key' => $apiKey,
         ];
 
-        // count only ips appearing in events (not overriden by retention)
+        // count only ips appearing in events (not overridden by retention)
         $query = (
             'SELECT 1
             FROM event

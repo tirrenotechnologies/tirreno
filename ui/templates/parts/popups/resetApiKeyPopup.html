@@ -1,0 +1,16 @@
+<div class="details-card is-hidden" id="reset-api-key-popup">
+    <header class="card-header">
+        <p class="card-header-title">
+            {{ @api_manual_reset_key_popup_warning_header }}<button class="delete"></button>
+        </p>
+    </header>
+
+    <div class="content is-hidden">
+        <p class="level-left">{{ @api_manual_reset_key_popup_submit_warning_message }}</p>
+        <footer class="pop-up-footer">
+            <div class="control">
+                <button class="button is-danger" id="confirm-reset-api-key-button">{{ @api_manual_reset_key_popup_submit_button }}</button>
+            </div>
+        </footer>
+    </div>
+</div>

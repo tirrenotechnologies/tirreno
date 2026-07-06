@@ -1,5 +1,5 @@
-import {fireEvent} from './utils/Event.js?v=2';
-import {debounce} from './utils/Functions.js?v=2';
+import {fireEvent} from './utils/Event.js?v=0.10.0';
+import {debounce} from './utils/Functions.js?v=0.10.0';
 
 export class SearchFilter {
     constructor(id=null) {

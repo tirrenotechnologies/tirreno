@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class ReviewQueue extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
+class ReviewQueue extends \Tirreno\Models\Base {
     public function getCount(int $apiKey): int {
         $params = [
             ':api_key'  => $apiKey,

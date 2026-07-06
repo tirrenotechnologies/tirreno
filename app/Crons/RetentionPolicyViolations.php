@@ -21,19 +21,15 @@ class RetentionPolicyViolations extends Base {
     public function process(): void {
         $this->addLog('Start retention policy violations.');
 
-        $eventsModel = new \Tirreno\Models\Events();
-        $retentionModel = new \Tirreno\Models\RetentionPolicies();
-        $fieldAuditModel = new \Tirreno\Models\FieldAuditTrail();
-
-        $retentionKeys = $retentionModel->getRetentionKeys();
+        $retentionKeys = tirreno('models')->retentionPolicies->getRetentionKeys();
         $cnt = 0;
         $fieldCnt = 0;
 
         foreach ($retentionKeys as $key) {
             // insuring clause
             if ($key['retention_policy'] > 0) {
-                $cnt += $eventsModel->retentionDeletion($key['retention_policy'], $key['id']);
-                $fieldCnt += $fieldAuditModel->retentionDeletion($key['retention_policy'], $key['id']);
+                $cnt += tirreno('models')->events->retentionDeletion($key['retention_policy'], $key['id']);
+                $fieldCnt += tirreno('models')->fieldAuditTrail->retentionDeletion($key['retention_policy'], $key['id']);
             }
         }
 

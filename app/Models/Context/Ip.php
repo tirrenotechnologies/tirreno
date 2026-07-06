@@ -19,10 +19,9 @@ namespace Tirreno\Models\Context;
 
 class Ip extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
-        $details = $this->getIpDetails($accountIds, $apiKey);
+        $details = $this->getIpDetails($accountIds, $apiKey);       // 10
 
         $recordsByAccount = [];
-
         foreach ($details as $record) {
             $accountId = $record['accountid'];
             if (!isset($recordsByAccount[$accountId])) {
@@ -55,7 +54,7 @@ class Ip extends Base {
             $recordsByAccount[$accountId]['eip_country_count'][$countryId]++;
         }
 
-        $records = $this->getDetails($accountIds, $apiKey);
+        $records = $this->getDetails($accountIds, $apiKey);         // 13
 
         foreach ($records as $record) {
             $accountId = $record['accountid'];
@@ -70,6 +69,7 @@ class Ip extends Base {
             $recordsByAccount[$accountId]['eip_domains_count_len']  = $record['eip_domains_count_len'];         // int
             $recordsByAccount[$accountId]['eip_unique_cidrs']       = $record['eip_unique_cidrs'];              // int
             $recordsByAccount[$accountId]['eip_country_id']         = json_decode($record['eip_country_id']);   // array
+            $recordsByAccount[$accountId]['eip_asn']                = json_decode($record['eip_asn']);          // array
         }
 
         return $recordsByAccount;
@@ -108,6 +108,19 @@ class Ip extends Base {
         return $this->execQuery($query, $params);
     }
 
+    // for each user get:
+    //  has tor
+    //  has dc
+    //  has vpn
+    //  has starlink
+    //  has blocklist
+    //  has fraud_detected
+    //  has shared              -- check without .checked filter!
+    //  maximum domains count
+    //  has lan
+    //  array of countries
+    //  array of asns
+    //  array of cidrs
     protected function getDetails(array $accountIds, int $apiKey): array {
         [$params, $placeHolders] = $this->getRequestParams($accountIds, $apiKey);
 
@@ -125,6 +138,7 @@ class Ip extends Base {
                 COALESCE(MAX(json_array_length(event_ip.domains_count::json)), 0)                   AS eip_domains_count_len,
                 COALESCE(BOOL_OR(event_ip.cidr IS NULL AND event_ip.data_center IS FALSE), false)   AS eip_lan,
                 array_to_json(array_agg(DISTINCT event_ip.country))                                 AS eip_country_id,
+                array_to_json(array_agg(DISTINCT event_isp.asn))                                    AS eip_asn,
                 COUNT(DISTINCT (event_ip.cidr IS NULL, event_ip.cidr))                              AS eip_unique_cidrs
 
             FROM
@@ -133,6 +147,9 @@ class Ip extends Base {
             INNER JOIN event
             ON (event_ip.id = event.ip)
 
+            LEFT JOIN event_isp
+            ON event_ip.isp = event_isp.id
+
             WHERE
                 event.account IN ({$placeHolders}) AND
                 event_ip.checked IS TRUE AND
@@ -140,7 +157,6 @@ class Ip extends Base {
 
             GROUP BY event.account"
         );
-
         return $this->execQuery($query, $params);
     }
 }

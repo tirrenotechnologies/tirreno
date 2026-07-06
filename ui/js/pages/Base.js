@@ -1,6 +1,10 @@
-import {SearchLine} from '../parts/SearchLine.js?v=2';
-import {Tooltip} from '../parts/Tooltip.js?v=2';
-import {Constants} from '../parts/utils/Constants.js?v=2';
+import {SearchLine} from '../parts/SearchLine.js?v=0.10.0';
+import {Tooltip} from '../parts/Tooltip.js?v=0.10.0';
+import {Constants} from '../parts/utils/Constants.js?v=0.10.0';
+import {
+    closest,
+    mapKeys,
+} from '../parts/utils/Functions.js?v=0.10.0';
 
 export class BasePage {
     constructor(name, single = false) {
@@ -20,8 +24,10 @@ export class BasePage {
                 this.getParamsSection = () => {
                     let result = {};
 
-                    for (const [key, value] of Object.entries(this.filters)) {
-                        result[key] = value.getValue();
+                    const filterKeys = mapKeys(this.filters);
+                    for (let i = 0; i < filterKeys.length; i++) {
+                        const key = filterKeys[i];
+                        result[key] = this.filters[key].getValue();
                     }
 
                     return result;
@@ -67,7 +73,7 @@ export class BasePage {
     }
 
     onCloseNotificationButtonClick() {
-        const notification = event.target.closest('.notification.system');
+        const notification = closest(event.target, '.notification.system');
         if (notification) {
             notification.remove();
         }
@@ -82,7 +88,7 @@ export class BasePage {
 
     getDevicesGridParams() {
         return {
-            url:        `${window.app_base}/admin/loadDevices`,
+            url:        `${window.app_base}/loadDevices`,
             tileId:     'totalDevices',
             tableId:    'devices-table',
             panelType:  'device',
@@ -95,7 +101,7 @@ export class BasePage {
 
     getIpsGridParams() {
         return {
-            url:        `${window.app_base}/admin/loadIps`,
+            url:        `${window.app_base}/loadIps`,
             tileId:     'totalIps',
             tableId:    'ips-table',
 
@@ -108,7 +114,7 @@ export class BasePage {
 
     getEventsGridParams() {
         return {
-            url:        `${window.app_base}/admin/loadEvents`,
+            url:        `${window.app_base}/loadEvents`,
             tileId:     'totalEvents',
             tableId:    'user-events-table',
             panelType:  'event',
@@ -121,7 +127,7 @@ export class BasePage {
 
     getUsersGridParams() {
         return {
-            url:        `${window.app_base}/admin/loadUsers`,
+            url:        `${window.app_base}/loadUsers`,
             tileId:     'totalUsers',
             tableId:    'users-table',
 
@@ -133,7 +139,7 @@ export class BasePage {
 
     getIspsGridParams() {
         return {
-            url:        `${window.app_base}/admin/loadIsps`,
+            url:        `${window.app_base}/loadIsps`,
             tileId:     'totalIsps',
             tableId:    'isps-table',
 
@@ -145,7 +151,7 @@ export class BasePage {
 
     getFieldAuditTrailParams() {
         return {
-            url:        `${window.app_base}/admin/loadFieldAuditTrail`,
+            url:        `${window.app_base}/loadFieldAuditTrail`,
             tileId:     'totalEdits',
             tableId:    'field-audit-trail-table',
             panelType:  'field',
@@ -167,22 +173,9 @@ export class BasePage {
 
     getBarChartParams() {
         return {
-            getParams: () => ({
-                mode:   this.name,
-                id:     this.id,
-            }),
-        };
-    }
-
-    getChartParams(datesFilter, searchFilter) {
-        return {
-            getParams: () => {
-                const mode        = this.name;
-                const dateRange   = datesFilter.getValue();
-                const searchValue = searchFilter.getValue();
-
-                return {mode, dateRange, searchValue};
-            },
+            url:    `${window.app_base}/loadEventsChart`,
+            mode:   this.name,
+            id:     this.id,
         };
     }
 

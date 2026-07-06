@@ -197,7 +197,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
@@ -214,7 +214,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
-            $queryParams[':offset'] = strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset());
+            $queryParams[':offset'] = strval(tirreno('utils')->timezones->getCurrentOperatorOffset());
         }
 
         //Add search into request
@@ -224,13 +224,13 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applyEntityTypes(string &$query, array &$queryParams): void {
         $searchCondition = '';
 
-        $entityTypeIds = \Tirreno\Utils\Conversion::getArrayRequestParam('entityTypeIds');
+        $entityTypeIds = tirreno('utils')->conversion->getArrayRequestParam('entityTypeIds');
         if ($entityTypeIds) {
             $clauses = [];
 
             foreach ($entityTypeIds as $key => $entityTypeId) {
                 $clauses[] = 'extra.type = :entity_type_' . $key;
-                $queryParams[':entity_type_' . $key] = strtolower(\Tirreno\Utils\Constants::get()->ENTITY_TYPES[$entityTypeId]);
+                $queryParams[':entity_type_' . $key] = strtolower(tirreno('utils')->constants->ENTITY_TYPES[$entityTypeId]);
             }
 
             $searchCondition = ' AND (' . implode(' OR ', $clauses) . ')';

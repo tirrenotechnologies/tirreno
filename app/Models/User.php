@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\ApiKeyAccountAccessAuthorizationInterface {
-    protected ?string $DB_TABLE_NAME = 'event_account';
+class User extends \Tirreno\Models\Base implements \Tirreno\Interfaces\ApiKeyAccessAuthorizationInterface, \Tirreno\Interfaces\ApiKeyAccountAccessAuthorizationInterface {
+    protected string $tableName = 'event_account';
 
     public function checkAccess(int $userId, int $apiKey): bool {
         $params = [
@@ -148,37 +148,27 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
                 event_session.key = :api_key',
         ];
 
-        try {
-            $model = new \Tirreno\Models\Events();
-            $entities = $model->uniqueEntitiesByUserId($userId, $apiKey);
+        $db = $this->getDatabaseConnection();
 
-            $this->db->begin();
-            $this->db->exec($queries, array_fill(0, 6, $params));
+        try {
+            $entities = tirreno('models')->events->uniqueEntitiesByUserId($userId, $apiKey);
+
+            $db->begin();
+            $db->exec($queries, array_fill(0, 6, $params));
 
             // force update totals for ips before isps and countries!
-            $model = new \Tirreno\Models\Ip();
-            $model->updateTotalsByEntityIds($entities['ip_ids'], $apiKey, true);
-
-            $model = new \Tirreno\Models\Isp();
-            $model->updateTotalsByEntityIds($entities['isp_ids'], $apiKey, true);
-
-            $model = new \Tirreno\Models\Country();
-            $model->updateTotalsByEntityIds($entities['country_ids'], $apiKey, true);
-
-            $model = new \Tirreno\Models\Resource();
-            $model->updateTotalsByEntityIds($entities['url_ids'], $apiKey, true);
-
-            $model = new \Tirreno\Models\Domain();
-            $model->updateTotalsByEntityIds($entities['domain_ids'], $apiKey, true);
-
-            $model = new \Tirreno\Models\Phone();
+            tirreno('models')->ip->updateTotalsByEntityIds($entities['ip_ids'], $apiKey, true);
+            tirreno('models')->isp->updateTotalsByEntityIds($entities['isp_ids'], $apiKey, true);
+            tirreno('models')->country->updateTotalsByEntityIds($entities['country_ids'], $apiKey, true);
+            tirreno('models')->resource->updateTotalsByEntityIds($entities['url_ids'], $apiKey, true);
+            tirreno('models')->domain->updateTotalsByEntityIds($entities['domain_ids'], $apiKey, true);
             // it is always a force update
-            $model->updateTotalsByValues($entities['phone_numbers'], $apiKey);
+            tirreno('models')->phone->updateTotalsByValues($entities['phone_numbers'], $apiKey);
 
-            $this->db->commit();
+            $db->commit();
         } catch (\Exception $e) {
-            $this->db->rollback();
-            error_log($e->getMessage());
+            $db->rollback();
+            tirreno('log')->error('failed to delete user: %s.', $e->getMessage());
             throw $e;
         }
     }
@@ -284,6 +274,25 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
         $this->execQuery($query, $params);
     }
 
+    public function addToReviewQueue(int $accountId, int $apiKey): void {
+        $params = [
+            ':account_id'   => $accountId,
+            ':api_key'      => $apiKey,
+        ];
+
+        $query = (
+            'UPDATE event_account
+            SET
+                added_to_review = NOW(),
+                fraud = NULL
+            WHERE
+                 event_account.id = :account_id AND
+                 event_account.key = :api_key'
+        );
+
+        $this->execQuery($query, $params);
+    }
+
     public function updateFraudFlag(array $accountIds, int $apiKey, bool $fraud): void {
         if (!count($accountIds)) {
             return;
@@ -307,7 +316,7 @@ class User extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\ApiKey
         $this->execQuery($query, $params);
     }
 
-    public function updateReviewedFlag(int $accountId, int $apiKey, bool $reviewed): void {
+    public function updateReviewedFlag(int $accountId, bool $reviewed, int $apiKey): void {
         $params = [
             ':account_id'   => $accountId,
             ':api_key'      => $apiKey,

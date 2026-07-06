@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class FieldAuditTrails extends Base {
-    protected ?string $DB_TABLE_NAME = 'event_field_audit_trail';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 

@@ -18,7 +18,7 @@ class A08 extends \Tirreno\Assets\Rule {
 
         if ($params['eup_device_count'] > 1 && count($langCount) > 1) {
             foreach ($params['event_device'] as $idx => $deviceId) {
-                if (\Tirreno\Utils\Rules::eventDeviceIsNew($params, $idx)) {
+                if (tirreno('utils')->rules->eventDeviceIsNew($params, $idx)) {
                     $innerId = array_search($deviceId, $params['eup_device_id']);
                     $lang = strtoupper(explode('-', preg_replace('/;.*$/', '', trim(explode(',', $params['eup_lang'][$innerId] ?? '')[0])))[0]);
                     if ($langCount[$lang] === 1) {

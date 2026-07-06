@@ -1,5 +1,6 @@
-import {fireEvent} from './utils/Event.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
+import {fireEvent} from './utils/Event.js?v=0.10.0';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
+import {closest} from './utils/Functions.js?v=0.10.0';
 
 export class WatchlistTags {
     constructor() {
@@ -10,7 +11,7 @@ export class WatchlistTags {
     }
 
     onRemoveUserTagClick(e) {
-        const wrapper = e.target.closest('.control');
+        const wrapper = closest(e.target, '.control');
         const id = wrapper.querySelector('[data-id]').dataset.id;
         const data = {
             'userId': id,
@@ -19,8 +20,8 @@ export class WatchlistTags {
         const me = this;
 
         $.ajax({
-            type: 'POST',
-            url: `${window.app_base}/admin/removeWatchlisted`,
+            type: 'PUT',
+            url: `${window.app_base}/removeWatchlisted`,
             data: data,
             scope: me,
             success: me.onUserTagRemoveCallback,
@@ -33,7 +34,7 @@ export class WatchlistTags {
         if (response.success) {
             const userId = response.userId;
             const tag = document.querySelector(`[data-id="${userId}"]`);
-            const wrapper = tag.closest('.control');
+            const wrapper = closest(tag, '.control');
 
             wrapper.remove();
 

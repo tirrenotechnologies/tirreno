@@ -498,7 +498,7 @@ function compatibilityCheck(int $step, array &$steps): void {
         }
     } else {
         $steps[$step]['tasks'][1]['warn'] = true;
-        $steps[$step]['tasks'][1]['error'] = 'Could not be autodetected. Please check manualy.';
+        $steps[$step]['tasks'][1]['error'] = 'Could not be autodetected. Please check manually.';
     }
 
     $steps[$step]['tasks'][2]['status'] = extension_loaded('pdo_pgsql') && extension_loaded('pgsql');

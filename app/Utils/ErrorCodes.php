@@ -76,8 +76,10 @@ class ErrorCodes {
     public const THERE_ARE_NO_EVENTS_YET = 670;
     public const THERE_ARE_NO_EVENTS_LAST_DAY = 671;
     public const CUSTOM_ERROR_FROM_DSHB_MESSAGES = 672;
+    public const OPERATION_NOT_PERMITTED = 673;
 
     //Watchlist
+    public const USER_ADDED_TO_REVIEW = 680;
     public const USER_ADDED_TO_WATCHLIST = 681;
     public const USER_REMOVED_FROM_WATCHLIST = 682;
     public const USER_FRAUD_FLAG_SET = 683;

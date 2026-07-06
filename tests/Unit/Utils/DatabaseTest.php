@@ -12,23 +12,20 @@ use ReflectionMethod;
 /**
  * Unit tests for Tirreno\Utils\Database.
  *
- * Covered (unit-testable without refactor):
- * - initConnect():
- *   - returns true when APP_DATABASE already set (no connection attempt)
- *   - returns false when no DSN provided by Variables::getDB() (env+F3 empty)
- * - getDbConnect() (private) via Reflection:
- *   - throws InvalidArgumentException on invalid DSN format
+ * Covered:
+ * - Database::initConnect() returns true when APP_DATABASE is already set.
+ * - Database::initConnect() returns false when Variables::getDB() provides no DSN.
+ * - Database::getDbConnect() rejects invalid DSN formats.
  *
- * Not covered (recommended to refactor first):
- * - real connection establishment (new \DB\SQL) and session wiring (new \DB\SQL\Session)
- * - error handling branch calling $f3->error(503) (framework-dependent side effect)
+ * @todo Extract database connection creation from private Database::getDbConnect()
+ *       into a replaceable dependency and remove Reflection from this test.
  *
- * @todo Refactor:
- * - extract ConfigInterface (wrap Base::instance()->get/set/clear)
- * - extract VariablesReaderInterface (getDatabaseUrl(): ?string)
- * - extract DbConnectorInterface (connect(string $dsn): \DB\SQL)
- * - extract SessionFactoryInterface (create(\DB\SQL $db): void)
- * - make getDbConnect() non-private and test via pure input/output contract (no Reflection)
+ * @todo Cover successful connection creation after \DB\SQL can be replaced in tests.
+ *
+ * @todo Cover session wiring after \DB\SQL\Session can be replaced in tests.
+ *
+ * @todo Cover error response branch after tirreno('response')->error(503)
+ *       can be isolated from framework side effects.
  */
 final class DatabaseTest extends TestCase {
     private \Base $f3;
@@ -63,6 +60,8 @@ final class DatabaseTest extends TestCase {
     }
 
     protected function tearDown(): void {
+        $this->clearF3();
+
         $this->restoreEnv();
         $this->restoreF3();
 
@@ -70,53 +69,38 @@ final class DatabaseTest extends TestCase {
     }
 
     public function testInitConnectReturnsTrueWhenDbAlreadySet(): void {
-        $fakeDb = $this->makeDbSqlWithoutConstructor();
-        Database::setDb($fakeDb);
+        $database = $this->makeDbSqlWithoutConstructor();
 
-        $keepSession = false;
-        $actual = Database::initConnect($keepSession);
+        Database::setDb($database);
 
-        $expected = true;
-        $this->assertSame($expected, $actual);
+        $actual = Database::initConnect(false);
+
+        $this->assertSame(true, $actual);
     }
 
     public function testInitConnectReturnsFalseWhenNoDsnProvided(): void {
-        // Ensure Variables::getDB() returns null:
-        // - env DATABASE_URL is cleared in setUp()
-        // - F3 DATABASE_URL is cleared in setUp()
+        $actual = Database::initConnect(false);
 
-        $keepSession = false;
-        $actual = Database::initConnect($keepSession);
-
-        $expected = false;
-        $this->assertSame($expected, $actual);
+        $this->assertSame(false, $actual);
     }
 
     public function testGetDbConnectThrowsOnInvalidDsnFormat(): void {
-        $url = 'not-a-dsn';
-
         $method = $this->getPrivateStaticMethod(Database::class, 'getDbConnect');
 
-        $expectedException = \InvalidArgumentException::class;
-        $this->expectException($expectedException);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid DSN format');
 
-        $method->invoke(null, $url);
+        $method->invoke(null, 'not-a-dsn');
     }
 
     public function testGetDbConnectThrowsOnMissingParts(): void {
-        // parse_url() returns array, but required parts are missing.
-        // Example: scheme present, host missing, user/pass missing, path missing.
-        $url = 'pgsql://';
-
         $method = $this->getPrivateStaticMethod(Database::class, 'getDbConnect');
 
-        $expectedException = \InvalidArgumentException::class;
-        $this->expectException($expectedException);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid DSN format');
 
-        $method->invoke(null, $url);
+        $method->invoke(null, 'pgsql://');
     }
-
-    /* ================= helpers: env ================= */
 
     private function backupEnv(): void {
         foreach ($this->envKeys as $key) {
@@ -140,8 +124,6 @@ final class DatabaseTest extends TestCase {
             putenv($key . '=' . $value);
         }
     }
-
-    /* ================= helpers: F3 ================= */
 
     private function backupF3(): void {
         foreach ($this->f3Keys as $key) {
@@ -167,14 +149,13 @@ final class DatabaseTest extends TestCase {
         }
     }
 
-    /* ================= helpers: reflection / fakes ================= */
-
     private function makeDbSqlWithoutConstructor(): \DB\SQL {
         $class = new ReflectionClass(\DB\SQL::class);
         $instance = $class->newInstanceWithoutConstructor();
 
         /** @var \DB\SQL $database */
         $database = $instance;
+
         return $database;
     }
 

@@ -1,17 +1,16 @@
 <div class="details-card is-hidden" id="enrich-all-popup">
     <header class="card-header">
-        <p class="card-header-title">{{ @AdminApi_manual_enrichment_popup_header }}<button class="delete"></button></p>
+        <p class="card-header-title">{{ @api_manual_enrichment_popup_header }}<button class="delete"></button></p>
     </header>
 
     <div class="content is-hidden">
         <p class="level-left">{{ @Details_calculation }}</p>
         <div id="details_calculation"></div>
+        <footer class="pop-up-footer">
+            <div class="control">
+                <button class="button is-primary" id="confirm-enrich-all-button" {{ @SCHEDULED_FOR_ENRICHMENT ? 'disabled' : '' }}>{{ @api_manual_enrichment_popup_submit_button }}</button>
+            </div>
+        </footer>
     </div>
     <div class="text-loader is-hidden"></div>
-
-    <footer class="pop-up-footer">
-        <div class="control">
-            <button class="button is-primary" id="confirm-enrich-all-button" {{ @SCHEDULED_FOR_ENRICHMENT ? 'disabled' : '' }}>{{ @AdminApi_manual_enrichment_popup_submit_button }}</button>
-        </div>
-    </footer>
 </div>

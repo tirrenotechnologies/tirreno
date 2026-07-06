@@ -16,6 +16,6 @@
 declare(strict_types=1);
 
 return [
-    'AdminUserAgent_page_title' => 'User agent',
-    'AdminUserAgent_breadcrumb_title' => 'User agent',
+    'userAgent_page_title' => 'User agents',
+    'userAgent_breadcrumb_title' => 'User agents',
 ];

@@ -89,7 +89,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_domain.id', $queryParams);
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -101,7 +101,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
-            $queryParams[':offset'] = strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset());
+            $queryParams[':offset'] = strval(tirreno('utils')->timezones->getCurrentOperatorOffset());
         }
 
         //Add search and ids into request

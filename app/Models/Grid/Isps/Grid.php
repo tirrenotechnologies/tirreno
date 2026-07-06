@@ -18,45 +18,37 @@ declare(strict_types=1);
 namespace Tirreno\Models\Grid\Isps;
 
 class Grid extends \Tirreno\Models\Grid\Base\Grid {
-    public function __construct(int $apiKey) {
-        parent::__construct();
-
-        $this->apiKey = $apiKey;
-        $this->idsModel = new Ids($apiKey);
-        $this->queryModel = new Query($apiKey);
-    }
-
-    public function getIspsByUserId(int $userId): array {
+    public function getIspsByUserId(int $userId, int $apiKey): array {
         $params = [':account_id' => $userId];
 
-        return $this->getGrid($this->idsModel->getIspsIdsByUserId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getIspsIdsByUserId(), $params);
     }
 
-    public function getIspsByDomainId(int $domainId): array {
+    public function getIspsByDomainId(int $domainId, int $apiKey): array {
         $params = [':domain_id' => $domainId];
 
-        return $this->getGrid($this->idsModel->getIspsIdsByDomainId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getIspsIdsByDomainId(), $params);
     }
 
-    public function getIspsByCountryId(int $countryId): array {
+    public function getIspsByCountryId(int $countryId, int $apiKey): array {
         $params = [':country_id' => $countryId];
 
-        return $this->getGrid($this->idsModel->getIspsIdsByCountryId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getIspsIdsByCountryId(), $params);
     }
 
-    public function getIspsByResourceId(int $resourceId): array {
+    public function getIspsByResourceId(int $resourceId, int $apiKey): array {
         $params = [':resource_id' => $resourceId];
 
-        return $this->getGrid($this->idsModel->getIspsIdsByResourceId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getIspsIdsByResourceId(), $params);
     }
 
-    public function getIspsByFieldId(int $fieldId): array {
+    public function getIspsByFieldId(int $fieldId, int $apiKey): array {
         $params = [':field_id' => $fieldId];
 
-        return $this->getGrid($this->idsModel->getIspsIdsByFieldId(), $params);
+        return $this->getGrid($apiKey, $this->idsModel->getIspsIdsByFieldId(), $params);
     }
 
-    public function getAll(): array {
-        return $this->getGrid();
+    public function getAll(int $apiKey): array {
+        return $this->getGrid($apiKey);
     }
 }

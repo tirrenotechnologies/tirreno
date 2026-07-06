@@ -1,13 +1,13 @@
-import {BasePage} from './Base.js?v=2';
-import {SequentialLoad} from '../parts/SequentialLoad.js?v=2';
-import {UsersGrid} from '../parts/grid/Users.js?v=2';
-import {EventsGrid} from '../parts/grid/Events.js?v=2';
-import {DevicesGrid} from '../parts/grid/Devices.js?v=2';
-import {BaseBarChart} from '../parts/chart/BaseBar.js?v=2';
-import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
-import {DevicePanel} from '../parts/panel/DevicePanel.js?v=2';
-import {IpTiles} from '../parts/details/IpTiles.js?v=2';
-import {ReenrichmentButton} from '../parts/ReenrichmentButton.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {UsersGrid} from '../parts/grid/Users.js?v=0.10.0';
+import {EventsGrid} from '../parts/grid/Events.js?v=0.10.0';
+import {DevicesGrid} from '../parts/grid/Devices.js?v=0.10.0';
+import {BaseBarChart} from '../parts/chart/BaseBar.js?v=0.10.0';
+import {EventPanel} from '../parts/panel/EventPanel.js?v=0.10.0';
+import {DevicePanel} from '../parts/panel/DevicePanel.js?v=0.10.0';
+import {IpTiles} from '../parts/details/IpTiles.js?v=0.10.0';
+import {ReenrichmentButton} from '../parts/button/ReenrichmentButton.js?v=0.10.0';
 
 export class IpPage extends BasePage {
     constructor() {

@@ -19,20 +19,18 @@ namespace Tirreno\Crons;
 
 class BatchedNewEvents extends Base {
     protected function readyToProcess(): bool {
-        $model = new \Tirreno\Models\Cursor();
-
         // was not locked; locking now
-        if ($model->safeLock()) {
+        if (tirreno('models')->cursor->safeLock()) {
             return true;
         }
 
-        $result = $model->getLock();
+        $result = tirreno('models')->cursor->getLock();
 
-        if (\Tirreno\Utils\DateRange::isQueueTimeouted($result['updated'])) {
+        if (tirreno('utils')->dateRange->isQueueTimeouted($result['updated'])) {
             return false;
         }
 
-        $model->forceLock();
+        tirreno('models')->cursor->forceLock();
 
         return true; // relocked
     }
@@ -44,26 +42,24 @@ class BatchedNewEvents extends Base {
             return;
         }
 
-        $model = new \Tirreno\Models\Cursor();
-
         try {
-            $cursor = $model->getCursor();
-            $next = $model->getNextCursor($cursor, \Tirreno\Utils\Variables::getNewEventsBatchSize());
+            $cursor = tirreno('models')->cursor->getCursor();
+            $next = tirreno('models')->cursor->getNextCursor($cursor, tirreno('utils')->variables->getNewEventsBatchSize());
 
             if (!$next) {
                 $this->addLog('No new events.');
-                $model->unlock();
+                tirreno('models')->cursor->unlock();
 
                 return;
             }
 
-            $accounts = (new \Tirreno\Models\Events())->getDistinctAccounts($cursor, $next);
+            $accounts = tirreno('models')->events->getDistinctAccountsVisitLimit($cursor, $next);
 
-            \Tirreno\Utils\Routes::callExtra('BATCHING_NEW_EVENTS', $cursor, $next);
+            tirreno('utils')->routes->callExtra('BATCHING_NEW_EVENTS', $cursor, $next);
 
-            (new \Tirreno\Models\Queue())->addBatch($accounts, \Tirreno\Utils\Constants::get()->RISK_SCORE_QUEUE_ACTION_TYPE);
+            tirreno('models')->queue->addBatch($accounts, tirreno('utils')->constants->RISK_SCORE_QUEUE_ACTION_TYPE);
 
-            $model->updateCursor($next);
+            tirreno('models')->cursor->updateCursor($next);
 
             // TODO: Log new events cursor to database?
             $this->addLog('Updated \'last_event_id\' in \'queue_new_events_cursor\' table to ' . strval($next));
@@ -72,6 +68,6 @@ class BatchedNewEvents extends Base {
             $this->addLog(sprintf('Batched new events error %s.', $e->getMessage()));
         }
 
-        $model->unlock();
+        tirreno('models')->cursor->unlock();
     }
 }

@@ -4,19 +4,19 @@
         <input type="hidden" name="cmd" value="closeAccount" />
 
         <header class="card-header">
-            <p class="card-header-title">{{ @AdminSettings_form_closeAccount_title }}</p>
+            <p class="card-header-title">{{ @settings_form_closeAccount_title }}</p>
         </header>
 
         <div class="card-content">
             <div class="content">
                 <div class="field">
-                    <p>{{ @AdminSettings_form_closeAccount_confirmationMessage | raw }}</p>
+                    <p>{{ @settings_form_closeAccount_confirmationMessage | raw }}</p>
                 </div>
             </div>
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-danger" id="close-account-btn" value="{{ @AdminSettings_closeAccount_form_button_save }}" >
+            <input type="submit" class="button is-danger" id="close-account-btn" value="{{ @settings_closeAccount_form_button_save }}" >
         </footer>
     </form>
 </div>

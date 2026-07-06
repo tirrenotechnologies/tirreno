@@ -11,19 +11,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\DateRange.
  *
- * Covered (unit-testable without refactor):
+ * Covered:
  * - DateRange::inIntervalTillNow()
- * - DateRange::getDatesRangeByGivenDates()
- * - DateRange::getLatestNDatesRangeFromRequest() (format + rough boundaries)
- * - DateRange::getResolutionFromRequest() (via F3 REQUEST)
- * - DateRange::getDatesRangeFromRequest() (via F3 REQUEST/SESSION)
- *
- * Not covered (recommended to refactor first):
  * - DateRange::isQueueTimeouted()
- *
- * @todo Refactor:
- * - inject a Clock (now()) and a Config/Constants provider (queue timeout seconds),
- *   then isQueueTimeouted() becomes deterministic and properly unit-testable.
+ * - DateRange::getDatesRangeByGivenDates()
+ * - DateRange::getDatesRangeFromRequest()
+ * - DateRange::getLatestNDatesRangeFromRequest()
+ * - DateRange::getResolutionFromRequest()
  */
 final class DateRangeTest extends TestCase {
     private Base $f3;
@@ -31,13 +25,19 @@ final class DateRangeTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
 
-        $f3 = Base::instance();
-        $this->f3 = $f3;
+        $this->f3 = Base::instance();
 
-        $this->f3->clear('REQUEST');
-        $this->f3->clear('SESSION');
-        $this->f3->clear('EXTRA_SECONDS_IN_DAY');
-        $this->f3->clear('EXTRA_CHART_RESOLUTION');
+        $this->clearRequestState();
+
+        tirreno('request')->resetPayloadCache();
+    }
+
+    protected function tearDown(): void {
+        $this->clearRequestState();
+
+        tirreno('request')->resetPayloadCache();
+
+        parent::tearDown();
     }
 
     /**
@@ -53,18 +53,59 @@ final class DateRangeTest extends TestCase {
         $now = time();
 
         return [
-            'null time -> null' => [null, 60, null],
-            'within interval' => [gmdate('Y-m-d H:i:s', $now - 10), 60, true],
-            'outside interval' => [gmdate('Y-m-d H:i:s', $now - 120), 60, false],
-            'future still counts by abs diff' => [gmdate('Y-m-d H:i:s', $now + 30), 60, true],
-            'zero interval always false for non-null time' => [gmdate('Y-m-d H:i:s', $now - 1), 0, false],
+            'null time -> null' => [
+                'time' => null,
+                'interval' => 60,
+                'expected' => null,
+            ],
+            'within interval' => [
+                'time' => gmdate('Y-m-d H:i:s', $now - 10),
+                'interval' => 60,
+                'expected' => true,
+            ],
+            'outside interval' => [
+                'time' => gmdate('Y-m-d H:i:s', $now - 120),
+                'interval' => 60,
+                'expected' => false,
+            ],
+            'future still counts by abs diff' => [
+                'time' => gmdate('Y-m-d H:i:s', $now + 30),
+                'interval' => 60,
+                'expected' => true,
+            ],
+            'zero interval always false for non-null time' => [
+                'time' => gmdate('Y-m-d H:i:s', $now - 1),
+                'interval' => 0,
+                'expected' => false,
+            ],
         ];
+    }
+
+    public function testIsQueueTimeoutedReturnsFalseForRecentUpdate(): void {
+        $updated = gmdate('Y-m-d H:i:s');
+
+        $result = DateRange::isQueueTimeouted($updated);
+
+        $this->assertFalse($result);
+    }
+
+    public function testIsQueueTimeoutedReturnsTrueForOldUpdate(): void {
+        $updated = gmdate('Y-m-d H:i:s', time() - 999999);
+
+        $result = DateRange::isQueueTimeouted($updated);
+
+        $this->assertTrue($result);
     }
 
     /**
      * @dataProvider getDatesRangeByGivenDatesProvider
      */
-    public function testGetDatesRangeByGivenDates(string $startDate, string $endDate, int $offset, array $expected): void {
+    public function testGetDatesRangeByGivenDates(
+        string $startDate,
+        string $endDate,
+        int $offset,
+        array $expected
+    ): void {
         $result = DateRange::getDatesRangeByGivenDates($startDate, $endDate, $offset);
 
         $this->assertSame($expected, $result);
@@ -105,16 +146,14 @@ final class DateRangeTest extends TestCase {
     /**
      * @dataProvider getResolutionFromRequestProvider
      */
-    public function testGetResolutionFromRequest(?string $requestValue, array $chartResolution, string $expected): void {
-        // Provide CHART_RESOLUTION through EXTRA override so Constants::get() sees it.
-        // Constants::get('CHART_RESOLUTION') will merge/override with EXTRA_CHART_RESOLUTION.
-        $this->f3->set('EXTRA_CHART_RESOLUTION', $chartResolution);
-
+    public function testGetResolutionFromRequest(?string $requestValue, string $expected): void {
         if ($requestValue === null) {
-            $this->f3->clear('REQUEST.resolution');
+            $this->f3->clear('GET.resolution');
         } else {
-            $this->f3->set('REQUEST.resolution', $requestValue);
+            $this->f3->set('GET.resolution', $requestValue);
         }
+
+        tirreno('request')->resetPayloadCache();
 
         $result = DateRange::getResolutionFromRequest();
 
@@ -122,16 +161,23 @@ final class DateRangeTest extends TestCase {
     }
 
     public static function getResolutionFromRequestProvider(): array {
-        $chartResolution = [
-            'day' => 86400,
-            'hour' => 3600,
-            'minute' => 60,
-        ];
-
         return [
-            'missing request -> day' => [null, $chartResolution, 'day'],
-            'valid request hour -> hour' => ['hour', $chartResolution, 'hour'],
-            'invalid request -> day' => ['week', $chartResolution, 'day'],
+            'missing request -> day' => [
+                'requestValue' => null,
+                'expected' => 'day',
+            ],
+            'valid request hour -> hour' => [
+                'requestValue' => 'hour',
+                'expected' => 'hour',
+            ],
+            'valid request minute -> minute' => [
+                'requestValue' => 'minute',
+                'expected' => 'minute',
+            ],
+            'invalid request -> day' => [
+                'requestValue' => 'week',
+                'expected' => 'day',
+            ],
         ];
     }
 
@@ -148,26 +194,24 @@ final class DateRangeTest extends TestCase {
         ?string $expectedSessionEnd
     ): void {
         if ($dateFrom !== null) {
-            $this->f3->set('REQUEST.dateFrom', $dateFrom);
+            $this->f3->set('GET.dateFrom', $dateFrom);
         }
 
         if ($dateTo !== null) {
-            $this->f3->set('REQUEST.dateTo', $dateTo);
+            $this->f3->set('GET.dateTo', $dateTo);
         }
 
         if ($keepDates !== null) {
-            $this->f3->set('REQUEST.keepDates', $keepDates);
+            $this->f3->set('GET.keepDates', $keepDates);
         }
+
+        tirreno('request')->resetPayloadCache();
 
         $result = DateRange::getDatesRangeFromRequest($offset);
 
         $this->assertSame($expectedDates, $result);
-
-        $sessionStart = $this->f3->get('SESSION.filterStartDate');
-        $sessionEnd = $this->f3->get('SESSION.filterEndDate');
-
-        $this->assertSame($expectedSessionStart, $sessionStart);
-        $this->assertSame($expectedSessionEnd, $sessionEnd);
+        $this->assertSame($expectedSessionStart, $this->f3->get('SESSION.filterStartDate'));
+        $this->assertSame($expectedSessionEnd, $this->f3->get('SESSION.filterEndDate'));
     }
 
     public static function getDatesRangeFromRequestProvider(): array {
@@ -209,9 +253,6 @@ final class DateRangeTest extends TestCase {
     }
 
     public function testGetLatestNDatesRangeFromRequestReturnsValidFormat(): void {
-        // Provide SECONDS_IN_DAY through EXTRA override.
-        $this->f3->set('EXTRA_SECONDS_IN_DAY', 86400);
-
         $days = 7;
 
         $result = DateRange::getLatestNDatesRangeFromRequest($days, 0);
@@ -229,12 +270,27 @@ final class DateRangeTest extends TestCase {
         $this->assertNotFalse($endTs);
         $this->assertLessThan($endTs, $startTs, 'startDate must be earlier than endDate');
 
-        // Calendar day distance must match $days exactly.
         $startDay = new \DateTimeImmutable(substr($result['startDate'], 0, 10));
         $endDay = new \DateTimeImmutable(substr($result['endDate'], 0, 10));
 
         $diffDays = $endDay->diff($startDay)->days;
 
         $this->assertSame($days, $diffDays);
+    }
+
+    private function clearRequestState(): void {
+        $keys = [
+            'REQUEST',
+            'SESSION',
+            'GET',
+            'POST',
+            'BODY',
+            'HEADERS',
+            'PARAMS',
+        ];
+
+        foreach ($keys as $key) {
+            $this->f3->clear($key);
+        }
     }
 }

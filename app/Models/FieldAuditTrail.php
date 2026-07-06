@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class FieldAuditTrail extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_field_audit_trail';
+class FieldAuditTrail extends \Tirreno\Models\Base {
+    protected string $tableName = 'event_field_audit_trail';
 
     public function getById(int $trailId, int $apiKey): array {
         $params = [
@@ -112,7 +112,7 @@ class FieldAuditTrail extends \Tirreno\Models\BaseSql {
         $params = [
             ':api_key'  => $apiKey,
             ':weeks'    => $weeks,
-            ':week_sec' => \Tirreno\Utils\Constants::get()->SECONDS_IN_WEEK,
+            ':week_sec' => tirreno('utils')->constants->SECONDS_IN_WEEK,
         ];
 
         $query = (

@@ -3,25 +3,25 @@
     <ul>
         <check if="false !== strpos(@CURRENT_PATH, '/id/')">
             <true>
-                <li><a href="{{ @BASE }}/id" aria-current="page">{{ @AdminUsers_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/id" aria-current="page">{{ @users_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/country/')">
             <true>
-                <li><a href="{{ @BASE }}/country" aria-current="page">{{ @AdminCountries_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/country" aria-current="page">{{ @countries_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/ip/')">
             <true>
-                <li><a href="{{ @BASE }}/ip" aria-current="page">{{ @AdminIps_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/ip" aria-current="page">{{ @ips_breadcrumb_title }}</a></li>
             </true>
         </check>
 
         <check if="false !== strpos(@CURRENT_PATH, '/resource/')">
             <true>
-                <li><a href="{{ @BASE }}/resource" aria-current="page">{{ @AdminResources_breadcrumb_title }}</a></li>
+                <li><a href="{{ @BASE }}/resource" aria-current="page">{{ @resources_breadcrumb_title }}</a></li>
             </true>
         </check>
 

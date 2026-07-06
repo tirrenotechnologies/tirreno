@@ -1,0 +1,25 @@
+<include href="templates/parts/panel/eventPanel.html" />
+<include href="templates/parts/panel/devicePanel.html" />
+
+{~
+    $country = ['iso' => $IP['country_iso']];
+
+    $subtitle = array();
+    if(isset($IP['name']) && !empty($IP['name'])) {
+        $subtitle[] = $IP['name'];
+    }
+
+    if(isset($IP['description']) && !empty($IP['description'])) {
+        $subtitle[] = $IP['description'];
+    }
+
+    $subtitle = join(', ', $subtitle);
+    $subtitle = preg_replace('/-|_/', ' ', $subtitle);
+~}
+<include href="templates/parts/infoHeader.html" with="title={{@IP.ip}}, country={{@country}}, lastseen={{@IP.lastseen}}, subtitle={{@subtitle}}, type=ip, id={{@IP.id}}, dataIncomplete={{!@IP.checked && @IS_ENRICHABLE}}"/>
+
+<include href="templates/parts/widgets/ip.html" />
+<include href="templates/parts/tables/users.html" />
+<include href="templates/parts/tables/devices.html" />
+{**<include href="templates/parts/tables/ips.html" with="showChart=0, title={{@ip_ips_table_by_cidr_title}}"/>**}
+<include href="templates/parts/tables/events.html" with="showChart=1"/>

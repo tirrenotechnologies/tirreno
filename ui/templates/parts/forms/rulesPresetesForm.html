@@ -1,28 +1,33 @@
 <div class="card events-card" data-item-id="rules-presets-form">
-    <form method="POST" action="{{ @BASE }}{{ 'rules' | alias }}" id="apply-rules-set-form">
+    <form method="POST" action="{{ @BASE }}{{ 'rules' | alias }}" id="apply-rules-preset-form">
         <input type="hidden" name="token" value="{{ @CSRF }}">
         <input type="hidden" name="cmd" value="applyRulesPreset" />
         <input type="hidden" name="keyId" value="{{ @apiKeyId }}">
 
         <header class="card-header">
-            <div class="card-header-title">{{ @AdminApplyRulesPresets_form_title }}<p class="tooltip-info tooltip" title="{{ @AdminApplyRulesPresets_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
+            <div class="card-header-title">{{ @rules_applyRulesPresets_form_title }}<p class="tooltip-info tooltip" title="{{ @rules_applyRulesPresets_form_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p>
             </div>
         </header>
 
         <div class="card-content">
             <div class="content">
-                {{ @AdminApplyRulesPresets_form_field_warning }}
                 <div class="field">
-                    <label class="label">{{ @AdminApplyRulesPresets_form_field_label }}</label>
+                    <label class="label">{{ @rules_applyRulesPresets_form_field_label }}</label>
                     <div class="control">
                         <include href="templates/parts/rulesPresetsSelector.html" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label"></label>
+                    <div class="control">
+                        <div class="neutral-text level-right">{{ @rules_applyRulesPresets_form_field_warning }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-warning" id="apply-rules-set-btn" value="{{ @AdminApplyRulesPresets_form_button_save }}" disabled>
+            <input type="submit" class="button is-warning" id="apply-rules-preset-btn" value="{{ @rules_applyRulesPresets_form_button_save }}">
         </footer>
     </form>
 </div>

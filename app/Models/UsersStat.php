@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class UsersStat extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
-
+class UsersStat extends \Tirreno\Models\Base {
     public function getStatByPeriod(int $apiKey, int $userId, ?array $dateRange = null): array {
         $params = [
             ':api_key' => $apiKey,

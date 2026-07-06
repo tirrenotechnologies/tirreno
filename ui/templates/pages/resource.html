@@ -1,0 +1,16 @@
+<include href="templates/parts/panel/eventPanel.html" />
+<include href="templates/parts/panel/eventPanel.html" with="fromField=true"/>
+<include href="templates/parts/panel/devicePanel.html" />
+{~
+    $titleParam = $RESOURCE['url'] ?: '/';
+~}
+
+<include href="templates/parts/infoHeader.html" with="title={{@titleParam}}, lastseen={{@RESOURCE.lastseen}}, subtitle={{@RESOURCE.title}}"/>
+<include href="templates/parts/widgets/resource.html" />
+
+<include href="templates/parts/tables/users.html" />
+<include href="templates/parts/mapWithIps.html" />
+<include href="templates/parts/tables/isps.html" />
+<include href="templates/parts/tables/devices.html" />
+<include href="templates/parts/tables/fieldAuditTrail.html" />
+<include href="templates/parts/tables/events.html" with="showChart=1"/>

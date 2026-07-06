@@ -21,7 +21,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     protected ?string $defaultOrder = null;
     protected string $dateRangeField = 'event_account.added_to_review';
 
-    protected array $allowedColumns = ['score', 'lastseen', 'firstname', 'lastname', 'created', 'added_to_review'];
+    protected array $allowedColumns = ['score', 'lastseen', 'created', 'added_to_review'];
 
     public function getData(): array {
         $queryParams = $this->getQueryParams();
@@ -96,7 +96,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
         $this->applyDateRange($query, $queryParams);
 
         $searchConditions = '';
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
             $searchConditions .= (
@@ -110,13 +110,12 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
                     LOWER(event_email.email)        LIKE LOWER(:search_value) OR
                     LOWER(event_account.userid)     LIKE LOWER(:search_value) OR
 
-                    TO_CHAR((event_account.lastseen + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value OR
-                    TO_CHAR((event_account.created + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
+                    TO_CHAR((event_account.added_to_review + :offset)::timestamp without time zone, 'dd/mm/yyyy hh24:mi:ss') LIKE :search_value
                 )"
             );
 
             $queryParams[':search_value'] = '%' . $search['value'] . '%';
-            $queryParams[':offset'] = strval(\Tirreno\Utils\Timezones::getCurrentOperatorOffset());
+            $queryParams[':offset'] = strval(tirreno('utils')->timezones->getCurrentOperatorOffset());
         }
 
         //Add search and ids into request
@@ -124,7 +123,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyRules(string &$query, array &$queryParams): void {
-        $ruleUids = \Tirreno\Utils\Conversion::getArrayRequestParam('ruleUids');
+        $ruleUids = tirreno('utils')->conversion->getArrayRequestParam('ruleUids');
         if (!$ruleUids) {
             return;
         }

@@ -21,15 +21,13 @@ class LogbookRotation extends Base {
     public function process(): void {
         $this->addLog('Start logbook rotation.');
 
-        $model = new \Tirreno\Models\ApiKeys();
-        $keys = $model->getAllApiKeyIds();
+        $keys = tirreno('models')->apiKeys->getAllApiKeyIds();
         // rotate events for unauthorized requests
         $keys[] = ['id' => null];
 
-        $model = new \Tirreno\Models\Logbook();
         $cnt = 0;
         foreach ($keys as $key) {
-            $cnt += $model->rotateRequests($key['id']);
+            $cnt += tirreno('models')->logbook->rotateRequests($key['id']);
         }
 
         $this->addLog(sprintf('Deleted %s events for %s keys in logbook.', $cnt, count($keys)));

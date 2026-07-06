@@ -10,38 +10,29 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Variables.
  *
- * Covered (unit-testable without refactor):
- * - env > F3 precedence for scalar getters:
- *   getDB(), getAdminEmail(), getMailLogin(), getMailPassword(),
- *   getEnrichmentApi(), getPepper()
- * - getConfigFile() (default + env override)
- * - getHosts() / getHost():
- *   - env comma-separated string
- *   - F3 array
- *   - F3 scalar wrapped into array
- * - boolean flags via explicit values:
- *   - getForceHttps() (env/F3 true/false)
- *   - getForgotPasswordAllowed()
- *   - getEmailPhoneAllowed()
- * - protocol composition:
- *   - getHostWithProtocol()
- *   - getHostWithProtocolAndBase()
- * - getAvailableTimezones():
- *   - filters invalid timezone identifiers
- * - completedConfig():
- *   - false if any required value missing
- *   - true if all present (env or F3)
+ * Covered:
+ * - env > storage precedence for scalar getters
+ * - getDB()
+ * - getConfigFile()
+ * - getHosts()
+ * - getHost()
+ * - getAdminEmail()
+ * - getMailLogin()
+ * - getMailPassword()
+ * - getEnrichmentApi()
+ * - getPepper()
+ * - getForceHttps()
+ * - getForgotPasswordAllowed()
+ * - getEmailPhoneAllowed()
+ * - getHostWithProtocol()
+ * - getHostWithProtocolAndBase()
+ * - getAvailableTimezones()
+ * - completedConfig()
  *
- * Not covered (unstable without refactor):
- * - default boolean behavior when all sources missing
- *   (depends on Conversion::filterBool() null-handling)
- * - numeric getters depending on Constants::get()
+ * @todo Cover numeric getters after constants fallback behavior is reviewed.
  *
- * @todo Refactor:
- * - extract EnvReaderInterface (get(string): ?string)
- * - extract ConfigReaderInterface (F3 wrapper)
- * - eliminate direct getenv()/Base::instance() usage
- * - make boolean defaults explicit (no ?? true / ?? false)
+ * @todo Refactor Variables to read env/config through replaceable dependencies
+ *       instead of direct getenv() and tirreno('storage') calls.
  */
 final class VariablesTest extends TestCase {
     private \Base $f3;
@@ -96,138 +87,241 @@ final class VariablesTest extends TestCase {
     }
 
     protected function tearDown(): void {
+        $this->clearEnv();
+        $this->clearF3();
+
         $this->restoreEnv();
         $this->restoreF3();
 
         parent::tearDown();
     }
 
-    /* ---------- precedence: env > F3 ---------- */
-
-    public function testGetDbPrefersEnvOverF3(): void {
-        $this->setF3('DATABASE_URL', 'f3-db');
+    public function testGetDbPrefersEnvOverStorage(): void {
+        $this->setF3('DATABASE_URL', 'storage-db');
         $this->setEnv('DATABASE_URL', 'env-db');
 
-        $expected = 'env-db';
         $actual = Variables::getDB();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('env-db', $actual);
     }
 
-    public function testGetDbFallsBackToF3(): void {
-        $this->setF3('DATABASE_URL', 'f3-db');
+    public function testGetDbFallsBackToStorage(): void {
+        $this->setF3('DATABASE_URL', 'storage-db');
 
-        $expected = 'f3-db';
         $actual = Variables::getDB();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('storage-db', $actual);
     }
-
-    public function testScalarGettersPreferEnv(): void {
-        $this->setF3('ADMIN_EMAIL', 'f3@ex');
-        $this->setEnv('ADMIN_EMAIL', 'env@ex');
-
-        $expected = 'env@ex';
-        $actual = Variables::getAdminEmail();
-
-        $this->assertSame($expected, $actual);
-    }
-
-    /* ---------- config file ---------- */
 
     public function testGetConfigFileDefault(): void {
-        $expected = 'local/config.local.ini';
         $actual = Variables::getConfigFile();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('local/config.local.ini', $actual);
     }
 
     public function testGetConfigFileFromEnv(): void {
         $this->setEnv('CONFIG_FILE', 'custom.ini');
 
-        $expected = 'custom.ini';
         $actual = Variables::getConfigFile();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('custom.ini', $actual);
     }
 
-    /* ---------- hosts ---------- */
+    /**
+     * @dataProvider scalarGetterProvider
+     */
+    public function testScalarGettersPreferEnvOverStorage(
+        string $storageKey,
+        string $envValue,
+        string $storageValue,
+        string $method
+    ): void {
+        $this->setF3($storageKey, $storageValue);
+        $this->setEnv($storageKey, $envValue);
+
+        $actual = Variables::$method();
+
+        $this->assertSame($envValue, $actual);
+    }
+
+    public static function scalarGetterProvider(): array {
+        return [
+            'admin email' => [
+                'storageKey' => 'ADMIN_EMAIL',
+                'envValue' => 'env-admin@example.com',
+                'storageValue' => 'storage-admin@example.com',
+                'method' => 'getAdminEmail',
+            ],
+            'mail login' => [
+                'storageKey' => 'MAIL_LOGIN',
+                'envValue' => 'env-mail-login',
+                'storageValue' => 'storage-mail-login',
+                'method' => 'getMailLogin',
+            ],
+            'mail password' => [
+                'storageKey' => 'MAIL_PASS',
+                'envValue' => 'env-mail-pass',
+                'storageValue' => 'storage-mail-pass',
+                'method' => 'getMailPassword',
+            ],
+            'enrichment api' => [
+                'storageKey' => 'ENRICHMENT_API',
+                'envValue' => 'env-enrichment-api',
+                'storageValue' => 'storage-enrichment-api',
+                'method' => 'getEnrichmentApi',
+            ],
+            'pepper' => [
+                'storageKey' => 'PEPPER',
+                'envValue' => 'env-pepper',
+                'storageValue' => 'storage-pepper',
+                'method' => 'getPepper',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider scalarGetterStorageFallbackProvider
+     */
+    public function testScalarGettersFallBackToStorage(
+        string $storageKey,
+        string $storageValue,
+        string $method
+    ): void {
+        $this->setF3($storageKey, $storageValue);
+
+        $actual = Variables::$method();
+
+        $this->assertSame($storageValue, $actual);
+    }
+
+    public static function scalarGetterStorageFallbackProvider(): array {
+        return [
+            'admin email' => [
+                'storageKey' => 'ADMIN_EMAIL',
+                'storageValue' => 'storage-admin@example.com',
+                'method' => 'getAdminEmail',
+            ],
+            'mail login' => [
+                'storageKey' => 'MAIL_LOGIN',
+                'storageValue' => 'storage-mail-login',
+                'method' => 'getMailLogin',
+            ],
+            'mail password' => [
+                'storageKey' => 'MAIL_PASS',
+                'storageValue' => 'storage-mail-pass',
+                'method' => 'getMailPassword',
+            ],
+            'enrichment api' => [
+                'storageKey' => 'ENRICHMENT_API',
+                'storageValue' => 'storage-enrichment-api',
+                'method' => 'getEnrichmentApi',
+            ],
+            'pepper' => [
+                'storageKey' => 'PEPPER',
+                'storageValue' => 'storage-pepper',
+                'method' => 'getPepper',
+            ],
+        ];
+    }
 
     public function testGetHostsFromEnv(): void {
         $this->setEnv('SITE', 'a.example,b.example');
 
-        $expected = ['a.example', 'b.example'];
         $actual = Variables::getHosts();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(['a.example', 'b.example'], $actual);
     }
 
-    public function testGetHostsFromF3Array(): void {
+    public function testGetHostsFromStorageArray(): void {
         $this->setF3('SITE', ['a.example', 'b.example']);
 
-        $expected = ['a.example', 'b.example'];
         $actual = Variables::getHosts();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(['a.example', 'b.example'], $actual);
     }
 
-    public function testGetHostsFromF3Scalar(): void {
+    public function testGetHostsFromStorageScalar(): void {
         $this->setF3('SITE', 'single.example');
 
-        $expected = ['single.example'];
         $actual = Variables::getHosts();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame(['single.example'], $actual);
     }
 
-    public function testGetHostReturnsFirst(): void {
+    public function testGetHostReturnsFirstHost(): void {
         $this->setF3('SITE', ['a.example', 'b.example']);
 
-        $expected = 'a.example';
         $actual = Variables::getHost();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('a.example', $actual);
     }
-
-    /* ---------- booleans (explicit values only) ---------- */
 
     public function testForceHttpsTrueFromEnv(): void {
         $this->setEnv('FORCE_HTTPS', 'true');
 
-        $expected = true;
         $actual = Variables::getForceHttps();
 
-        $this->assertSame($expected, $actual);
+        $this->assertTrue($actual);
     }
 
     public function testForceHttpsFalseFromEnv(): void {
         $this->setEnv('FORCE_HTTPS', 'false');
 
-        $expected = false;
         $actual = Variables::getForceHttps();
 
-        $this->assertSame($expected, $actual);
+        $this->assertFalse($actual);
     }
 
     public function testForgotPasswordAllowedTrue(): void {
         $this->setEnv('ALLOW_FORGOT_PASSWORD', 'true');
 
-        $expected = true;
         $actual = Variables::getForgotPasswordAllowed();
 
-        $this->assertSame($expected, $actual);
+        $this->assertTrue($actual);
     }
 
-    /* ---------- protocol helpers ---------- */
+    public function testEmailPhoneAllowedTrue(): void {
+        $this->setEnv('ALLOW_EMAIL_PHONE', 'true');
+
+        $actual = Variables::getEmailPhoneAllowed();
+
+        $this->assertTrue($actual);
+    }
 
     public function testHostWithProtocolHttps(): void {
         $this->setF3('SITE', 'example.com');
         $this->setEnv('FORCE_HTTPS', 'true');
 
-        $expected = 'https://example.com';
         $actual = Variables::getHostWithProtocol();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('https://example.com', $actual);
+    }
+
+    public function testHostWithProtocolHttp(): void {
+        $this->setF3('SITE', 'example.com');
+        $this->setEnv('FORCE_HTTPS', 'false');
+
+        $actual = Variables::getHostWithProtocol();
+
+        $this->assertSame('http://example.com', $actual);
+    }
+
+    public function testHostWithProtocolWrapsIpv6Host(): void {
+        $this->setF3('SITE', '::1');
+        $this->setEnv('FORCE_HTTPS', 'true');
+
+        $actual = Variables::getHostWithProtocol();
+
+        $this->assertSame('https://[::1]', $actual);
+    }
+
+    public function testHostWithProtocolDoesNotDoubleWrapIpv6Host(): void {
+        $this->setF3('SITE', '[::1]');
+        $this->setEnv('FORCE_HTTPS', 'true');
+
+        $actual = Variables::getHostWithProtocol();
+
+        $this->assertSame('https://[::1]', $actual);
     }
 
     public function testHostWithProtocolAndBase(): void {
@@ -235,13 +329,10 @@ final class VariablesTest extends TestCase {
         $this->setF3('BASE', '/base');
         $this->setEnv('FORCE_HTTPS', 'true');
 
-        $expected = 'https://example.com/base';
         $actual = Variables::getHostWithProtocolAndBase();
 
-        $this->assertSame($expected, $actual);
+        $this->assertSame('https://example.com/base', $actual);
     }
-
-    /* ---------- timezones ---------- */
 
     public function testAvailableTimezonesFiltersInvalid(): void {
         $this->setF3('timezones', [
@@ -252,41 +343,42 @@ final class VariablesTest extends TestCase {
 
         $actual = Variables::getAvailableTimezones();
 
-        $expectedHasUtc = true;
-        $actualHasUtc = array_key_exists('UTC', $actual);
-        $this->assertSame($expectedHasUtc, $actualHasUtc);
-
-        $expectedHasInvalid = false;
-        $actualHasInvalid = array_key_exists('Invalid/Zone', $actual);
-        $this->assertSame($expectedHasInvalid, $actualHasInvalid);
+        $this->assertArrayHasKey('UTC', $actual);
+        $this->assertArrayHasKey('Europe/Kyiv', $actual);
+        $this->assertArrayNotHasKey('Invalid/Zone', $actual);
     }
 
-    /* ---------- completedConfig ---------- */
-
-    public function testCompletedConfigFalseWhenMissing(): void {
+    public function testCompletedConfigFalseWhenMissingRequiredValue(): void {
         $this->setEnv('SITE', 'example.com');
-        $this->setEnv('PEPPER', 'pep');
+        $this->setEnv('PEPPER', 'pepper');
         $this->setEnv('ENRICHMENT_API', 'api');
 
-        $expected = false;
         $actual = Variables::completedConfig();
 
-        $this->assertSame($expected, $actual);
+        $this->assertFalse($actual);
     }
 
     public function testCompletedConfigTrueFromEnv(): void {
         $this->setEnv('SITE', 'example.com');
-        $this->setEnv('PEPPER', 'pep');
+        $this->setEnv('PEPPER', 'pepper');
         $this->setEnv('ENRICHMENT_API', 'api');
         $this->setEnv('DATABASE_URL', 'db');
 
-        $expected = true;
         $actual = Variables::completedConfig();
 
-        $this->assertSame($expected, $actual);
+        $this->assertTrue($actual);
     }
 
-    /* ---------- helpers ---------- */
+    public function testCompletedConfigTrueFromStorage(): void {
+        $this->setF3('SITE', 'example.com');
+        $this->setF3('PEPPER', 'pepper');
+        $this->setF3('ENRICHMENT_API', 'api');
+        $this->setF3('DATABASE_URL', 'db');
+
+        $actual = Variables::completedConfig();
+
+        $this->assertTrue($actual);
+    }
 
     private function setEnv(string $key, string $value): void {
         putenv($key . '=' . $value);
@@ -334,10 +426,6 @@ final class VariablesTest extends TestCase {
     }
 
     private function restoreF3(): void {
-        foreach ($this->f3Keys as $key) {
-            $this->f3->clear($key);
-        }
-
         foreach ($this->f3Backup as $key => $value) {
             $this->f3->set($key, $value);
         }

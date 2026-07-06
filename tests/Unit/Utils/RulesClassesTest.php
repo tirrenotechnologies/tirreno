@@ -10,22 +10,18 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Assets\RulesClasses.
  *
- * Covered (unit-testable without refactor):
- * - RulesClasses::getRuleClass() (pure mapping + broken override)
- * - RulesClasses::getRuleTypeByUid() (pure mapping by UID prefix)
+ * Covered:
+ * - RulesClasses::getRuleClass()
+ * - RulesClasses::getRuleTypeByUid()
  *
- * Not covered (recommended to refactor first):
- * - RulesClasses::getUserScoreClass() (depends on Constants::get() thresholds; hard global/static dependency)
- * - RulesClasses::getRulesClasses() (filesystem scan + include_once + reflection; heavy side effects)
- * - RulesClasses::getSingleRuleObject() (filesystem + include_once + reflection + error_log side effects)
- * - RulesClasses::getAllRulesObjects() (depends on getRulesClasses() + instantiation side effects)
+ * @todo Cover RulesClasses::getRulesClasses() after filesystem scanning,
+ *       class loading and reflection can be isolated.
  *
- * @todo Refactor:
- * - extract score thresholds provider behind an interface:
- *   UserScoreThresholdsProviderInterface (lowInf/lowSup/mediumInf/mediumSup/highInf)
- * - extract rule discovery/loading behind interfaces:
- *   RulesFilesystemScannerInterface, RuleClassLoaderInterface, RuleFactoryInterface.
- * - after that, getUserScoreClass()/getRulesClasses()/getSingleRuleObject() become deterministic and properly unit-testable.
+ * @todo Cover RulesClasses::getSingleRuleObject() after rule discovery,
+ *       class validation and object creation can be isolated.
+ *
+ * @todo Cover RulesClasses::getAllRulesObjects() after getRulesClasses()
+ *       and rule instantiation can be isolated.
  */
 final class RulesClassesTest extends TestCase {
     /**
@@ -40,44 +36,44 @@ final class RulesClassesTest extends TestCase {
     public static function ruleClassProvider(): array {
         return [
             'broken overrides everything' => [
-                20,
-                true,
-                'broken',
+                'value' => 20,
+                'broken' => true,
+                'expected' => 'broken',
             ],
             'null value uses default 0 => none' => [
-                null,
-                false,
-                'none',
+                'value' => null,
+                'broken' => false,
+                'expected' => 'none',
             ],
             'explicit 0 => none' => [
-                0,
-                false,
-                'none',
+                'value' => 0,
+                'broken' => false,
+                'expected' => 'none',
             ],
             '-20 => positive' => [
-                -20,
-                false,
-                'positive',
+                'value' => -20,
+                'broken' => false,
+                'expected' => 'positive',
             ],
             '10 => medium' => [
-                10,
-                false,
-                'medium',
+                'value' => 10,
+                'broken' => false,
+                'expected' => 'medium',
             ],
             '20 => high' => [
-                20,
-                false,
-                'high',
+                'value' => 20,
+                'broken' => false,
+                'expected' => 'high',
             ],
             '70 => extreme' => [
-                70,
-                false,
-                'extreme',
+                'value' => 70,
+                'broken' => false,
+                'expected' => 'extreme',
             ],
             'unknown value => none' => [
-                999,
-                false,
-                'none',
+                'value' => 999,
+                'broken' => false,
+                'expected' => 'none',
             ],
         ];
     }
@@ -94,48 +90,48 @@ final class RulesClassesTest extends TestCase {
     public static function ruleTypeProvider(): array {
         return [
             'A => Account takeover' => [
-                'A01',
-                'Account takeover',
+                'uid' => 'A01',
+                'expected' => 'Account takeover',
             ],
             'B => Behaviour' => [
-                'B12',
-                'Behaviour',
+                'uid' => 'B12',
+                'expected' => 'Behaviour',
             ],
             'C => Country' => [
-                'C999',
-                'Country',
+                'uid' => 'C999',
+                'expected' => 'Country',
             ],
             'D => Device' => [
-                'D01',
-                'Device',
+                'uid' => 'D01',
+                'expected' => 'Device',
             ],
             'E => Email' => [
-                'E02',
-                'Email',
+                'uid' => 'E02',
+                'expected' => 'Email',
             ],
             'I => IP' => [
-                'I77',
-                'IP',
+                'uid' => 'I77',
+                'expected' => 'IP',
             ],
             'R => Reuse' => [
-                'R01',
-                'Reuse',
+                'uid' => 'R01',
+                'expected' => 'Reuse',
             ],
             'P => Phone' => [
-                'P10',
-                'Phone',
+                'uid' => 'P10',
+                'expected' => 'Phone',
             ],
             'X => Extra' => [
-                'X01',
-                'Extra',
+                'uid' => 'X01',
+                'expected' => 'Extra',
             ],
             'unknown prefix falls back to first char' => [
-                'Z01',
-                'Z',
+                'uid' => 'Z01',
+                'expected' => 'Z',
             ],
             'single-letter uid returns that letter' => [
-                'Q',
-                'Q',
+                'uid' => 'Q',
+                'expected' => 'Q',
             ],
         ];
     }

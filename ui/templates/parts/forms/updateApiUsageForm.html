@@ -5,14 +5,14 @@
 
     <div class="card-content">
         <div class="content">
-            <div class="field"><p>{{ @AdminApi_form_confirmationMessage | raw }}</p></div>
-            <textarea class="textarea" name="apiToken" placeholder="{{ @AdminApi_form_field_token_placeholder }}" rows="2" cols="84" required>{{ @API_KEY.apiToken }}</textarea>
+            <div class="field"><p>{{ @api_form_confirmationMessage | raw }}</p></div>
+            <textarea class="textarea" name="apiToken" placeholder="{{ @api_form_field_token_placeholder }}" rows="2" cols="84" required>{{ @API_KEY.apiToken }}</textarea>
 
             <repeat group="{{ @API_KEY.enrichedAttributes }}" key="{{ @attribute }}" value="{{ @enabled }}">
                 <check if="{{ @ALLOW_EMAIL_PHONE }}">
                     <true>
                         <div class="field">
-                            <label class="label">{{ @AdminApi_data_enrichment_attributes[@attribute] }}</label>
+                            <label class="label">{{ @api_data_enrichment_attributes[@attribute] }}</label>
                             <div class="control">
                                 <input type="checkbox" name="enrichedAttributes[{{ @attribute }}]" value="{{ @attribute }}" {{ @enabled ? 'checked' : '' }} />
                             </div>
@@ -29,7 +29,7 @@
             </repeat>
 {***
             <div class="field">
-                <label class="label">{{ @AdminApi_data_alert_list_exchange }}</label>
+                <label class="label">{{ @api_data_alert_list_exchange }}</label>
                 <div class="control">
                     <input type="checkbox" name="exchangeBlacklist" {{ @API_KEY.skip_blacklist_sync ? '' : 'checked' }} />
                 </div>
@@ -38,6 +38,6 @@
         </div>
     </div>
     <footer class="card-footer">
-        <input type="submit" class="button is-primary" value="{{ @AdminApi_form_button_save }}" >
+        <input type="submit" class="button is-primary" value="{{ @api_form_button_save }}" >
     </footer>
 </form>

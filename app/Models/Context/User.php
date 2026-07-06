@@ -23,7 +23,7 @@ class User extends Base {
     public function getContext(array $accountIds, int $apiKey): array {
         $results = $this->getDetails($accountIds, $apiKey);
 
-        \Tirreno\Utils\Enrichment::calculateEmailReputationForContext($results);
+        $results = tirreno('utils')->enrichment->calculateEmailReputationForContext($results);
 
         $recordsByAccount = [];
         foreach ($results as $item) {

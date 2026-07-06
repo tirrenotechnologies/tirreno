@@ -110,7 +110,7 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     private function applySearch(string &$query, array &$queryParams): void {
         $this->applyDateRange($query, $queryParams);
 
-        $search = \Tirreno\Utils\Conversion::getDictionaryRequestParam('search');
+        $search = tirreno('utils')->conversion->getDictionaryRequestParam('search');
         $searchConditions = $this->injectIdQuery('event_url.id', $queryParams);
 
         if (isset($search['value']) && is_string($search['value']) && $search['value'] !== '') {
@@ -129,13 +129,13 @@ class Query extends \Tirreno\Models\Grid\Base\Query {
     }
 
     private function applyFileExtensions(string &$query, array &$queryParams): void {
-        $fileTypeIds = \Tirreno\Utils\Conversion::getArrayRequestParam('fileTypeIds');
+        $fileTypeIds = tirreno('utils')->conversion->getArrayRequestParam('fileTypeIds');
         if (!$fileTypeIds) {
             return;
         }
 
-        $list = \Tirreno\Utils\Assets\Lists\FileExtensions::getList();
-        $keys = \Tirreno\Utils\Assets\Lists\FileExtensions::getKeys();
+        $list = tirreno('assets')->fileExtensionsList->getList();
+        $keys = tirreno('assets')->fileExtensionsList->getKeys();
 
         $extensions = [];
 

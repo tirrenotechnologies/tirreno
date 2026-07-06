@@ -1,6 +1,7 @@
-import {Loader} from './Loader.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
-import {fireEvent} from './utils/Event.js?v=2';
+import {Loader} from './Loader.js?v=0.10.0';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
+import {replaceChildren} from './utils/Functions.js?v=0.10.0';
+import {fireEvent} from './utils/Event.js?v=0.10.0';
 
 export class DashboardTile {
     constructor(tilesParams) {
@@ -37,8 +38,8 @@ export class DashboardTile {
         fireEvent('dateFilterChangedCaught');
 
         $.ajax({
-            url: `${window.app_base}/admin/loadDashboardStat?token=${token}`,
-            type: 'get',
+            url: `${window.app_base}/loadDashboardStat?token=${token}`,
+            type: 'GET',
             scope: me,
             data: params,
             success: me.onLoad,
@@ -72,8 +73,7 @@ export class DashboardTile {
             frag.appendChild(period);
             //frag.appendChild(total);
 
-            const el = document.querySelector(`.${this.scope.config.mode} .title`);
-            el.replaceChildren(frag);
+            replaceChildren(document.querySelector(`.${this.scope.config.mode} .title`), frag);
         }
     }
 

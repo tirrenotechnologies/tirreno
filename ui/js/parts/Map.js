@@ -1,7 +1,8 @@
-import {TotalTile} from './TotalTile.js?v=2';
-import {getQueryParams} from './utils/DataSource.js?v=2';
-import {handleAjaxError} from './utils/ErrorHandler.js?v=2';
-import {fireEvent} from './utils/Event.js?v=2';
+import {TotalTile} from './TotalTile.js?v=0.10.0';
+import {getQueryParams} from './utils/DataSource.js?v=0.10.0';
+import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
+import {fireEvent} from './utils/Event.js?v=0.10.0';
+import {mapKeys} from './utils/Functions.js?v=0.10.0';
 
 export class Map {
     constructor(mapParams) {
@@ -117,9 +118,10 @@ export class Map {
         const map  = this.mapObject;
 
         //Remove countries which does not exist in the vectormap: MU, BH, etc...
-        for (const [key, value] of Object.entries(regions)) {
-            if (!map.regions.hasOwnProperty(key)) {
-                delete regions[key];
+        const regionKeys = mapKeys(regions);
+        for (let i = 0; i < regionKeys.length; i++) {
+            if (!map.regions.hasOwnProperty(regionKeys[i])) {
+                delete regions[regionKeys[i]];
             }
         }
 
@@ -145,8 +147,8 @@ export class Map {
         fireEvent('dateFilterChangedCaught');
 
         $.ajax({
-            type: 'get',
-            url: `${window.app_base}/admin/loadMap?token=${token}`,
+            type: 'GET',
+            url: `${window.app_base}/loadMap?token=${token}`,
             data: data,
             scope: me,
             success: me.onCountriesListLoaded,

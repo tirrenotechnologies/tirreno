@@ -34,7 +34,7 @@ return array_merge(
     include 'Pages/PasswordRecovering.php',
     include 'Pages/AccountActivation.php',
     include 'Pages/Settings.php',
-    include 'Pages/AdminHome.php',
+    include 'Pages/Home.php',
     include 'Pages/Api.php',
     include 'Pages/BaseTable.php',
     include 'Pages/Blacklist.php',

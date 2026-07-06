@@ -9,7 +9,7 @@ class B04 extends \Tirreno\Assets\Rule {
 
     protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
-            $this->rb['event_multiple_5xx_http']->greaterThan(\Tirreno\Utils\Constants::get()->RULE_MAXIMUM_NUMBER_OF_500_CODES),
+            $this->rb['event_multiple_5xx_http']->greaterThan(tirreno('utils')->constants->RULE_MAXIMUM_NUMBER_OF_500_CODES),
         );
     }
 }

@@ -3,7 +3,7 @@
         <input type="hidden" name="token" value="{{ @CSRF }}">
 
         <header class="card-header">
-            <p class="card-header-title">{{ @AdminManualCheck_form_title }}</p>
+            <p class="card-header-title">{{ @manualCheck_form_title }}</p>
         </header>
 
         <div class="card-content">
@@ -15,7 +15,7 @@
                                 <set TYPE="{{ isset(@SEARCH_VALUES) ? @SEARCH_VALUES.type : '' }}" />
                                 <div class="selector">
                                     <select class="input" name="type" id="type">
-                                        <repeat group="{{ @AdminManualCheck_form_types }}" key="{{ @key }}" value="{{ @type }}">
+                                        <repeat group="{{ @manualCheck_form_types }}" key="{{ @key }}" value="{{ @type }}">
                                             <set active="{{ @TYPE === @key }} " />
                                             <option value="{{ @key }}" {{ @active ? 'selected' : '' }}>{{ @type }}</option>
                                         </repeat>
@@ -33,7 +33,7 @@
                         </td>
                         <td>
                             <div class="field">
-                                <input type="submit" class="button is-primary" value="{{ @AdminManualCheck_form_button_search }}">
+                                <input type="submit" class="button is-primary" value="{{ @manualCheck_form_button_search }}">
                             </div>
                         </td>
                     </tr>
@@ -45,11 +45,11 @@
         <div class="card-content">
             <div class="content">
                 <div class="field">
-                    <label class="label">{{ @AdminManualCheck_form_field_type_label }}</label>
+                    <label class="label">{{ @manualCheck_form_field_type_label }}</label>
                     <div class="control">
                         <set TYPE="{{ isset(@SEARCH_VALUES) ? @SEARCH_VALUES.type : '' }}" />
                         <select class="input" name="type" id="type">
-                            <repeat group="{{ @AdminManualCheck_form_types }}" key="{{ @key }}" value="{{ @type }}">
+                            <repeat group="{{ @manualCheck_form_types }}" key="{{ @key }}" value="{{ @type }}">
                                 <set active="{{ @TYPE === @key }} " />
                                 <option value="{{ @key }}" {{ @active ? 'selected' : '' }}>{{ @type }}</option>
                             </repeat>
@@ -58,7 +58,7 @@
                 </div>
 
                 <div class="field">
-                    <label class="label">{{ @AdminManualCheck_form_field_search_query_label }}</label>
+                    <label class="label">{{ @manualCheck_form_field_search_query_label }}</label>
                     <div class="control">
                         <set SEARCH="{{ isset(@SEARCH_VALUES) ? @SEARCH_VALUES.search : '' }}" />
                         <input class="input" name="search" type="text" value="{{ @SEARCH }}" autocomplete="off"/>
@@ -68,7 +68,7 @@
         </div>
 
         <footer class="card-footer">
-            <input type="submit" class="button is-primary" value="{{ @AdminManualCheck_form_button_search }}">
+            <input type="submit" class="button is-primary" value="{{ @manualCheck_form_button_search }}">
         </footer>
 **}
     </form>

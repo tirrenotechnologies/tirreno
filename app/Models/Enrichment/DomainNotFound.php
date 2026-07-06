@@ -75,7 +75,6 @@ class DomainNotFound extends \Tirreno\Models\Enrichment\Base {
                 event_domain.key = :key
         ");
 
-        $model = new \Tirreno\Models\Domain();
-        $model->execQuery($query, $params);
+        tirreno('models')->domain->execQuery($query, $params);
     }
 }

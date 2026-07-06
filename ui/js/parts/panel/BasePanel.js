@@ -1,13 +1,15 @@
-import {Loader} from '../Loader.js?v=2';
-import {Tooltip} from '../Tooltip.js?v=2';
-import {fireEvent, handleEscape} from '../utils/Event.js?v=2';
-import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
+import {Loader} from '../Loader.js?v=0.10.0';
+import {Tooltip} from '../Tooltip.js?v=0.10.0';
+import {fireEvent, handleEscape} from '../utils/Event.js?v=0.10.0';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=0.10.0';
+import {replaceChildren} from '../utils/Functions.js?v=0.10.0';
 
 export class BasePanel {
     constructor(eventParams) {
-        this.enrichment = eventParams.enrichment;
+        //this.enrichment = eventParams.enrichment;
         this.type = eventParams.type;
         this.url = eventParams.url;
+        this.enrichmentUrl = eventParams.enrichmentUrl;
         this.cardId = eventParams.cardId;
         this.panelClosed = eventParams.panelClosed;
         this.closePanel = eventParams.closePanel;
@@ -29,7 +31,8 @@ export class BasePanel {
         const onCloseButtonClick = this.onCloseButtonClick.bind(this);
         this.closeButton.addEventListener('click', onCloseButtonClick, false);
 
-        if (this.enrichment) {
+        //if (this.enrichment) {
+        if (this.enrichmentUrl) {
             const onEnrichmentButtonClick = this.onEnrichmentButtonClick.bind(this);
             this.reenrichmentButton.addEventListener('click', onEnrichmentButtonClick, false);
         }
@@ -63,9 +66,9 @@ export class BasePanel {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: `${window.app_base}/admin/reenrichment`,
-            type: 'post',
-            data: {type: this.type, entityId: this.itemId, token: token},
+            url: this.enrichmentUrl,
+            type: 'PUT',
+            data: {entityId: this.itemId, token: token},
             success: onEnrichmentLoaded,
             error: handleAjaxError,
         });
@@ -101,7 +104,7 @@ export class BasePanel {
 
         $.ajax({
             url: this.url,
-            type: 'get',
+            type: 'GET',
             data: {id: id, token: token},
             success: onDetailsLoaded,
             error: handleAjaxError,
@@ -154,7 +157,7 @@ export class BasePanel {
                     prev.classList.remove('is-hidden');
                 }
 
-                span.replaceChildren(data[key]);
+                replaceChildren(span, data[key]);
             }
         }
     }

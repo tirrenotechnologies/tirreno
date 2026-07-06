@@ -1,7 +1,7 @@
-import {BaseGrid} from './Base.js?v=2';
-import {fireEvent} from '../utils/Event.js?v=2';
-import {handleAjaxError} from '../utils/ErrorHandler.js?v=2';
-import {renderDefaultIfEmptyElement}  from '../DataRenderers.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
+import {fireEvent} from '../utils/Event.js?v=0.10.0';
+import {handleAjaxError} from '../utils/ErrorHandler.js?v=0.10.0';
+import {renderDefaultIfEmptyElement}  from '../DataRenderers.js?v=0.10.0';
 
 export class TopTenGrid extends BaseGrid {
     get columnDefs() {
@@ -48,7 +48,7 @@ export class TopTenGrid extends BaseGrid {
                 data.mode = mode;
                 data.token = token;
                 $.ajax({
-                    url: `${window.app_base}/admin/loadTopTen`,
+                    url: `${window.app_base}/loadTopTen`,
                     method: 'POST',
                     data: data,
                     dataType: 'json',

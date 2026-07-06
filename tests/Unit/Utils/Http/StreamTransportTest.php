@@ -9,7 +9,25 @@ use Tirreno\Utils\Http\StreamTransport;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Tirreno\Utils\Http\StreamTransport
+ * Unit tests for StreamTransport.
+ *
+ * Covered:
+ * - isAvailable() reflects file_get_contents availability
+ * - request() returns failure response when stream reading fails
+ *
+ * Not covered:
+ * - successful HTTP response handling
+ * - HTTP status extraction from real response headers
+ * - SSL option behavior
+ * - request body/header/method context options
+ *
+ * Notes:
+ * - failure branch is tested with a missing local file URL
+ * - no real network request is performed
+ *
+ * @todo Refactor StreamTransport so safeFileGetContents() and
+ *       extractHttpStatus() can be tested without relying on global
+ *       file_get_contents(), $http_response_header and stream context state.
  */
 final class StreamTransportTest extends TestCase {
     protected function tearDown(): void {

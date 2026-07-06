@@ -18,12 +18,12 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Network {
-    public static function sendApiRequest(?array $data, string $path, string $method, ?string $enrichmentKey): \Tirreno\Entities\HttpResponse {
-        $version = \Tirreno\Utils\VersionControl::versionString();
-        $userAgent = \Base::instance()->get('APP_USER_AGENT');
+    public static function sendApiRequest(?array $data, string $path, string $method, ?string $enrichmentKey, ?int $apiKey = null): \Tirreno\Entities\HttpResponse {
+        $version = tirreno('utils')->versionControl->versionString();
+        $userAgent = tirreno('storage')->get('APP_USER_AGENT');
         $userAgent = ($version && $userAgent) ? $userAgent . '/' . $version : $userAgent;
 
-        $url = \Tirreno\Utils\Variables::getEnrichmentApi() . $path;
+        $url = tirreno('utils')->variables->getEnrichmentApi() . $path;
 
         $headers = [
             'User-Agent: ' . $userAgent,
@@ -37,20 +37,18 @@ class Network {
         if ($data !== null) {
             $body = json_encode($data);
             if ($body === false) {
-                return \Tirreno\Entities\HttpResponse::failure(null, 'json_encode_failed', []);
+                return tirreno('entities')->httpResponse->failure(null, 'json_encode_failed', []);
             }
         }
-
-        $headers = \Tirreno\Utils\Http\HeaderUtils::ensureHeader($headers, 'Content-Type', 'application/json');
 
         if ($data !== null) {
             $headers[] = 'Content-Type: application/json';
             $data = json_encode($data);
         }
 
-        $request = new \Tirreno\Entities\HttpRequest($url, $method, $headers, $data);
-        $client = \Tirreno\Utils\Http\HttpClient::default();
+        $request = tirreno('entities')->httpRequest->create($url, $method, $headers, $data);
+        $client = tirreno('utils')->httpClient->default();
 
-        return $client->request($request);
+        return $client->request($request, $apiKey);
     }
 }

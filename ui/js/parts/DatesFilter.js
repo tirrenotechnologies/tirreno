@@ -1,11 +1,11 @@
-import {fireEvent} from './utils/Event.js?v=2';
+import {fireEvent} from './utils/Event.js?v=0.10.0';
 import {
     formatStringTime,
     addDays,
     addHours,
-} from './utils/Date.js?v=2';
-import {debounce} from './utils/Functions.js?v=2';
-import {Constants} from './utils/Constants.js?v=2';
+} from './utils/Date.js?v=0.10.0';
+import {debounce} from './utils/Functions.js?v=0.10.0';
+import {Constants} from './utils/Constants.js?v=0.10.0';
 
 export class DatesFilter {
     constructor(sequential=false) {

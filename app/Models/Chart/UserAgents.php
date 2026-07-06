@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class UserAgents extends Base {
-    protected ?string $DB_TABLE_NAME = 'event_ua_parsed';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 

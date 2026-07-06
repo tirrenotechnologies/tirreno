@@ -17,19 +17,19 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class ApiKeys extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_api';
+class ApiKeys extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_api';
 
     public function insertRecord(string $skipEnrichingAttr, bool $skipBlacklistSync, int $operatorId): int {
-        $quote = $this->f3->get('DEFAULT_API_KEY_QUOTE');
+        $quote = tirreno('storage')->get('DEFAULT_API_KEY_QUOTE');
         $uuid = sprintf('%s%s%s', $operatorId, $quote, time());
 
         $params = [
-            ':quote'                => $this->f3->get('DEFAULT_API_KEY_QUOTE'),
+            ':quote'                => tirreno('storage')->get('DEFAULT_API_KEY_QUOTE'),
             ':operator_id'          => $operatorId,
             ':skip_enriching_attr'  => $skipEnrichingAttr,
             ':skip_blacklist_sync'  => $skipBlacklistSync,
-            ':key'                  => \Tirreno\Utils\Access::saltHash($uuid),
+            ':key'                  => tirreno('utils')->access->saltHash($uuid),
         ];
 
         $query = (
@@ -85,7 +85,7 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
         $params = [
             ':operator_id'  => $operatorId,
             ':key_id'       => $keyId,
-            ':key'          => \Tirreno\Utils\Access::saltHash($uuid),
+            ':key'          => tirreno('utils')->access->saltHash($uuid),
         ];
 
         $query = (
@@ -207,7 +207,7 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
 
         $results = json_decode($results[0]['skip_enriching_attributes']);
 
-        if (!\Tirreno\Utils\Variables::getEmailPhoneAllowed()) {
+        if (!tirreno('utils')->variables->getEmailPhoneAllowed()) {
             if (!in_array('email', $results, true)) {
                 $results[] = 'email';
             }
@@ -224,7 +224,7 @@ class ApiKeys extends \Tirreno\Models\BaseSql {
 
     public function enrichableAttributes(int $keyId): array {
         $skipAttributes = $this->getSkipEnrichingAttributes($keyId);
-        $attributes = \Tirreno\Utils\Constants::get()->ENRICHING_ATTRIBUTES;
+        $attributes = tirreno('utils')->constants->ENRICHING_ATTRIBUTES;
         $attributes = array_diff_key($attributes, array_flip($skipAttributes));
 
         return $attributes;

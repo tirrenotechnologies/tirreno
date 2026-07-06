@@ -18,7 +18,7 @@ declare(strict_types=1);
 return [
     'LeftMenu_ips_link' => 'IP addresses',
     'LeftMenu_home_link' => 'Dashboard',
-    'LeftMenu_users_link' => 'Users',
+    'LeftMenu_users_link' => 'Entities',
     'LeftMenu_not_reviewed_users_link' => 'Review queue',
     'LeftMenu_countries_link' => 'Countries',
     'LeftMenu_resources_link' => 'Resources',
@@ -30,7 +30,7 @@ return [
     'LeftMenu_emails_link' => 'Emails',
     'LeftMenu_phones_link' => 'Phones',
     'LeftMenu_manual_check_link' => 'Manual check',
-    'LeftMenu_rules_link' => 'Rules',
+    'LeftMenu_rules_link' => 'Rules engine',
     'LeftMenu_devices_link' => 'Devices',
     'LeftMenu_user_agents_link' => 'User agents',
     'LeftMenu_isps_link' => 'Networks',

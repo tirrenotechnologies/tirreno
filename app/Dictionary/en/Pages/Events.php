@@ -16,12 +16,12 @@
 declare(strict_types=1);
 
 return [
-    'AdminEvents_page_title' => 'Activities',
-    'AdminEvents_breadcrumb_title' => 'Activities',
-    'AdminEvents_search_placeholder' => 'User ID, Timestamp, IP, HTTP Code',
-    'AdminEvents_event_type_search_placeholder' => '+ Add another event type',
-    'AdminEvents_device_type_search_placeholder' => '+ Add another device type',
+    'events_page_title' => 'Latest events',
+    'events_breadcrumb_title' => 'Latest events',
+    'events_search_placeholder' => 'Entity ID, Timestamp, IP, HTTP Code',
+    'events_event_type_search_placeholder' => '+ Add another event type',
+    'events_device_type_search_placeholder' => '+ Add another device type',
 
-    'AdminEvents_table_title' => 'Activities',
-    'AdminEvents_table_title_tooltip' => 'This page lists events recorded during a selected period of time. To see extended event details, click on a table row. The chart shows the number of events recorded each day.',
+    'events_table_title' => 'Latest events',
+    'events_table_title_tooltip' => 'This page lists events recorded during a selected period of time. To see extended event details, click on a table row. The chart shows the number of events recorded each day.',
 ];

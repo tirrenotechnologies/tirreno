@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class ForgotPassword extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_operators_forgot_password';
+class ForgotPassword extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_operators_forgot_password';
 
     public function insertRecord(int $operatorId): string {
         $params = [
@@ -38,7 +38,7 @@ class ForgotPassword extends \Tirreno\Models\BaseSql {
 
         $this->execQuery($query, $params);
 
-        $renewKey = \Tirreno\Utils\Access::pseudoRandString(32);
+        $renewKey = tirreno('utils')->access->pseudoRandString(32);
 
         $params = [
             ':operator_id'  => $operatorId,

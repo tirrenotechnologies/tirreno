@@ -16,11 +16,11 @@
 declare(strict_types=1);
 
 return [
-    'AdminEmail_page_title' => 'Email',
-    'AdminEmail_breadcrumb_title' => 'Email',
-    'AdminEmail_reputation' => 'Reputation',
-    'AdminEmail_noprofiles' => 'No profiles',
-    'AdminEmail_nobreach' => 'No breach',
-    'AdminEmail_free_provider' => 'Free provider',
-    'AdminEmail_disposable' => 'Disposable',
+    'email_page_title' => 'Email',
+    'email_breadcrumb_title' => 'Email',
+    'email_reputation' => 'Reputation',
+    'email_noprofiles' => 'No profiles',
+    'email_nobreach' => 'No breach',
+    'email_free_provider' => 'Free provider',
+    'email_disposable' => 'Disposable',
 ];

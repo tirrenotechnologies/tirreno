@@ -1,24 +1,13 @@
+import {Constants} from './Constants.js?v=0.10.0';
+
 const replaceAll = (str, search, replacement) => {
     return str.split(search).join(replacement);
 };
 
 const getRuleClass = (value) => {
-    switch (value) {
-        case -20:
-            return 'positive';
+    const className = Constants.RULE_WEIGHTS[parseInt(value, 10)];
 
-        case 10:
-            return 'medium';
-
-        case 20:
-            return 'high';
-
-        case 70:
-            return 'extreme';
-
-        default:
-            return 'none';
-    }
+    return className ? className : Constants.RULE_WEIGHTS['0'];
 };
 
 const formatTime = (str) => {

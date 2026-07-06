@@ -18,13 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Views;
 
 abstract class Base {
-    public \Base $f3;
     public array|string $data = [];
-
-    public function __construct() {
-        $f3 = \Base::instance();
-        $this->f3 = $f3;
-    }
 
     abstract public function render(): string|array|false|null;
 }

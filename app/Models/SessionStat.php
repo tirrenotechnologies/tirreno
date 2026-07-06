@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class SessionStat extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_session_stat';
+class SessionStat extends \Tirreno\Models\Base {
+    protected string $tableName = 'event_session_stat';
 
     public function updateTotalsByAccountIds(array $ids, int $apiKey): ?int {
         if (!count($ids)) {
@@ -69,7 +69,6 @@ class SessionStat extends \Tirreno\Models\BaseSql {
         $params = [
             ':key'  => $apiKey,
         ];
-
 
         // select only that sessions which events have not went under retention
         $query = ('
@@ -137,6 +136,7 @@ class SessionStat extends \Tirreno\Models\BaseSql {
         return $cnt;
     }
 
+    // TODO: add new_country_count + new_cidr_count
     public function updateStatsByIds(array $sessionIds, int $apiKey): ?int {
         $batchSize = 5000;
 

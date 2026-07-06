@@ -18,7 +18,7 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Enrichment {
-    public static function calculateIpType(array &$records): void {
+    public static function calculateIpType(array $records): array {
         $iters = count($records);
 
         for ($i = 0; $i < $iters; ++$i) {
@@ -67,9 +67,11 @@ class Enrichment {
 
             $records[$i] = $record;
         }
+
+        return $records;
     }
 
-    public static function calculateEmailReputation(array &$records, string $fieldName = 'reputation'): void {
+    public static function calculateEmailReputation(array $records, string $fieldName = 'reputation'): array {
         $iters = count($records);
 
         for ($i = 0; $i < $iters; ++$i) {
@@ -77,7 +79,7 @@ class Enrichment {
             $reputation = 'none';
 
             if ($record['data_breach'] !== null) {
-                $reputationLevel = \Tirreno\Utils\Conversion::intVal($record['data_breach'], 0) + \Tirreno\Utils\Conversion::intVal(!$record['blockemails'], 0);
+                $reputationLevel = tirreno('utils')->conversion->intVal($record['data_breach'], 0) + tirreno('utils')->conversion->intVal(!$record['blockemails'], 0);
                 $reputation = match ($reputationLevel) {
                     2       => 'high',
                     1       => 'medium',
@@ -102,9 +104,11 @@ class Enrichment {
 
             $records[$i] = $record;
         }
+
+        return $records;
     }
 
-    public static function calculateEmailReputationForContext(array &$records): void {
+    public static function calculateEmailReputationForContext(array $records): array {
         $iters = count($records);
 
         for ($i = 0; $i < $iters; ++$i) {
@@ -119,7 +123,7 @@ class Enrichment {
         }
 
         $fieldName = 'ee_reputation';
-        self::calculateEmailReputation($records, $fieldName);
+        $records = self::calculateEmailReputation($records, $fieldName);
 
         for ($i = 0; $i < $iters; ++$i) {
             $record = $records[$i];
@@ -131,9 +135,11 @@ class Enrichment {
 
             $records[$i] = $record;
         }
+
+        return $records;
     }
 
-    public static function applyDeviceParams(array &$records): void {
+    public static function applyDeviceParams(array $records): array {
         $iters = count($records);
 
         for ($i = 0; $i < $iters; ++$i) {
@@ -154,5 +160,17 @@ class Enrichment {
 
             $records[$i] = $record;
         }
+
+        return $records;
+    }
+
+    public static function calculateRuleType(array $records): array {
+        foreach ($records as &$record) {
+            $record['type'] = tirreno('assets')->rules->getRuleTypeByUid($record['uid']);
+        }
+
+        unset($record);
+
+        return $records;
     }
 }

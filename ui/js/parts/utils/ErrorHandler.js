@@ -1,4 +1,5 @@
-import {notificationTime} from './Date.js?v=2';
+import {notificationTime} from './Date.js?v=0.10.0';
+import {replaceChildren} from './Functions.js?v=0.10.0';
 
 const handleAjaxError = (xhr, status, error) => {
     // ignore abort, but not network issues
@@ -6,13 +7,13 @@ const handleAjaxError = (xhr, status, error) => {
         return;
     }
 
-    if (xhr.status === 401 || xhr.status === 403) {
+    if (xhr.status === 403) {
         window.location.href = escape(window.app_base + '/login');
         return;
     }
 
     const time = notificationTime();
-    const msg = 'An error occurred while requesting resource. Please try again later.';
+    const msg = (xhr.status === 401) ? 'Operation is not permitted.' : 'An error occurred while requesting resource. Please try again later.';
     const notificationEl = document.getElementById('client-error');
 
     const frag = document.createDocumentFragment();
@@ -30,7 +31,7 @@ const handleAjaxError = (xhr, status, error) => {
     frag.appendChild(el);
     frag.appendChild(button);
 
-    notificationEl.replaceChildren(frag);
+    replaceChildren(notificationEl, frag);
 
     const deleteButton = notificationEl.querySelector('.delete');
     deleteButton.addEventListener('click', () => {

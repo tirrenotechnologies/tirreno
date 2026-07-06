@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'Login_page_title' => 'Log in',
-    'Login_form_email_label' => 'Email address',
-    'Login_form_password_label' => 'Password',
-    'Login_form_signin_button' => 'Log in',
-    'Login_form_create_account_link' => 'Create your account',
-    'Login_form_forgot_password_link' => 'Forgot password?',
+    'login_page_title' => 'Log in',
+    'login_form_email_label' => 'Email address',
+    'login_form_password_label' => 'Password',
+    'login_form_signin_button' => 'Log in',
+    'login_form_create_account_link' => 'Create your account',
+    'login_form_forgot_password_link' => 'Forgot password?',
 ];

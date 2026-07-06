@@ -11,7 +11,7 @@ class A03 extends \Tirreno\Assets\Rule {
         $eventNewDeviceNewCountry = false;
         if ($params['eup_device_count'] > 1 && count(array_unique($params['eip_country_id'])) > 1) {
             foreach (array_keys($params['event_device']) as $idx) {
-                if (\Tirreno\Utils\Rules::eventDeviceIsNew($params, $idx) && \Tirreno\Utils\Rules::countryIsNewByIpId($params, $params['event_ip'][$idx])) {
+                if (tirreno('utils')->rules->eventDeviceIsNew($params, $idx) && tirreno('utils')->rules->countryIsNewByIpId($params, $params['event_ip'][$idx])) {
                     $eventNewDeviceNewCountry = true;
                     break;
                 }

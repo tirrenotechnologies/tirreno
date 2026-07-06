@@ -1,0 +1,18 @@
+<div class="columns">
+    <div class="column manual-check-page">
+        <include href="templates/parts/forms/manualCheckForm.html" />
+    </div>
+</div>
+
+<check if="{{ isset(@RESULT) }}">
+    <true>
+        <repeat group="{{ @RESULT }}" key="{{ @type }}" value="{{ @results }}">
+            <include href="templates/parts/tables/manualCheckResult.html" />
+        </repeat>
+    </true>
+</check>
+<check if="{{ count(@HISTORY) > 0 }}">
+    <true>
+        <include href="templates/parts/tables/manualCheckHistory.html" />
+    </true>
+</check>

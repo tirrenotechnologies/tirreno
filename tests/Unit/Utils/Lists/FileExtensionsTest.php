@@ -7,6 +7,19 @@ namespace Tests\Unit\Utils\Lists;
 use Tests\Support\Utils\Lists\FileExtensionsStubWithExtension;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Unit tests for FileExtensions.
+ *
+ * Covered:
+ * - getList() returns extension data provided by getExtension()
+ * - getKeys() returns top-level keys from the extension map
+ * - getValues() returns values for an existing key
+ * - getValues() returns an empty array for an unknown key
+ *
+ * Notes:
+ * - filesystem access is disabled via FileExtensionsStubWithExtension
+ * - tests verify only public API behaviour
+ */
 final class FileExtensionsTest extends TestCase {
     public function testGetWordsReturnsExtensionMapWhenExtensionProvided(): void {
         $actual = FileExtensionsStubWithExtension::getList();

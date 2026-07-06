@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Rules extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'dshb_rules';
+class Rules extends \Tirreno\Models\Base {
+    protected string $tableName = 'dshb_rules';
 
     public function getAll(): array {
         $query = (
@@ -35,6 +35,78 @@ class Rules extends \Tirreno\Models\BaseSql {
         );
 
         return $this->execQuery($query, null);
+    }
+
+    // collect rule values from dshb_rules, not from stored user-related score_details
+    public function getRulesByUserId(int $userId, int $apiKey): array {
+        $params = [
+            ':user_id'  => $userId,
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = (
+            "SELECT
+                dshb_rules.uid,
+                dshb_rules.validated,
+                dshb_rules.name,
+                dshb_rules.descr,
+                dshb_rules.attributes,
+                dshb_rules.updated,
+                dshb_rules.missing,
+                dshb_operators_rules.value,
+                dshb_operators_rules.id,
+                dshb_operators_rules.created_at,
+                dshb_operators_rules.proportion,
+                dshb_operators_rules.proportion_updated_at
+
+            FROM
+                event_account
+
+            CROSS JOIN jsonb_array_elements(event_account.score_details) AS details
+
+            LEFT JOIN dshb_rules
+            ON dshb_rules.uid = details->>'uid'
+
+            LEFT JOIN dshb_operators_rules
+            ON dshb_operators_rules.rule_uid = details->>'uid' AND dshb_operators_rules.key = event_account.key
+
+            WHERE
+                event_account.id = :user_id AND
+                event_account.key = :api_key"
+
+        );
+
+        return $this->execQuery($query, $params);
+    }
+
+    public function getRulesByOperator(int $apiKey): array {
+        $params = [
+            ':api_key'  => $apiKey,
+        ];
+
+        $query = (
+            'SELECT
+                dshb_rules.uid,
+                dshb_rules.validated,
+                dshb_rules.name,
+                dshb_rules.descr,
+                dshb_rules.attributes,
+                dshb_rules.updated,
+                dshb_rules.missing,
+                dshb_operators_rules.value,
+                dshb_operators_rules.id,
+                dshb_operators_rules.created_at,
+                dshb_operators_rules.proportion,
+                dshb_operators_rules.proportion_updated_at
+
+            FROM
+                dshb_rules
+
+            LEFT JOIN dshb_operators_rules
+            ON (dshb_rules.uid = dshb_operators_rules.rule_uid AND dshb_operators_rules.key = :api_key)'
+        );
+
+        return $this->execQuery($query, $params);
     }
 
     public function addRule(string $uid, string $name, string $descr, array $attr, bool $validated): void {

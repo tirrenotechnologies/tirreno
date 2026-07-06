@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Email extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\FraudFlagUpdaterInterface {
-    protected ?string $DB_TABLE_NAME = 'event';
+class Email extends \Tirreno\Models\Base implements \Tirreno\Interfaces\FraudFlagUpdaterInterface {
+    protected string $tableName = 'event_email';
 
     public function getEmailDetails(int $id, int $apiKey): array {
         $params = [
@@ -71,7 +71,7 @@ class Email extends \Tirreno\Models\BaseSql implements \Tirreno\Interfaces\Fraud
 
         $results = $this->execQuery($query, $params);
 
-        \Tirreno\Utils\Enrichment::calculateEmailReputation($results);
+        $results = tirreno('utils')->enrichment->calculateEmailReputation($results);
 
         return $results[0] ?? [];
     }

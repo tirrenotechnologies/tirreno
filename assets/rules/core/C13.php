@@ -8,7 +8,7 @@ class C13 extends \Tirreno\Assets\Rule {
     public const ATTRIBUTES = ['ip'];
 
     protected function prepareParams(array $params): array {
-        $common = array_intersect(\Tirreno\Utils\Constants::get()->COUNTRY_CODES_NORTH_AMERICA, $params['eip_country_id']);
+        $common = array_intersect(tirreno('utils')->constants->COUNTRY_CODES_NORTH_AMERICA, $params['eip_country_id']);
         $params['eip_has_specific_country'] = (bool) count($common);
 
         return $params;

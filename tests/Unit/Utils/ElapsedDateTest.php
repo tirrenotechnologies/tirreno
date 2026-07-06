@@ -10,42 +10,41 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\ElapsedDate.
  *
- * Covered (unit-testable without refactor):
+ * Covered:
  * - short(): formats non-null input as "d/m/Y H:i:s"; returns null for null
  * - date(): formats non-null input as "d/m/Y"; returns null for null
  *
- * Partially covered (weak assertions; time-dependent):
- * - long(): uses time() internally, so only invariant properties are asserted:
+ * Partially covered (time-dependent):
+ * - long():
  *   - contains "ago."
  *   - contains "and"
  *   - does not return empty string
  *   - includes at least one time unit token for sufficiently old timestamps
  *
- * Not covered (recommended to refactor first):
- * - exact unit breakdown in long() (years/weeks/days/hours/minutes/seconds)
+ * @todo Refactor ElapsedDate::long() to accept a Clock/current timestamp
+ *       so exact elapsed-unit breakdown can be tested deterministically.
  *
- * @todo Refactor:
- * - extract ClockInterface (nowTimestamp(): int) and pass it to long()
- * - remove float arithmetic in long() (use integer divisions and remainders)
- * - define exact output grammar (Oxford comma, "and" placement, pluralization rules)
+ * @todo Define expected output for timestamps with no elapsed units.
+ *       Current implementation can return "and ago.".
+ *
+ * @todo Define exact output grammar for ElapsedDate::long():
+ *       "and" placement, pluralization rules and zero-unit behavior.
  */
 final class ElapsedDateTest extends TestCase {
     public function testShortReturnsNullForNull(): void {
         $timestampStr = null;
 
-        $expected = null;
         $actual = ElapsedDate::short($timestampStr);
 
-        $this->assertSame($expected, $actual);
+        $this->assertNull($actual);
     }
 
     public function testDateReturnsNullForNull(): void {
         $timestampStr = null;
 
-        $expected = null;
         $actual = ElapsedDate::date($timestampStr);
 
-        $this->assertSame($expected, $actual);
+        $this->assertNull($actual);
     }
 
     public function testShortFormatsDatetime(): void {
@@ -66,7 +65,7 @@ final class ElapsedDateTest extends TestCase {
         $this->assertSame($expected, $actual);
     }
 
-    public function testLongContainsAgoAndIsNotEmptyForOldEnoughTimestamp(): void {
+    public function testLongContainsAgoAndAndIsNotEmptyForOldEnoughTimestamp(): void {
         $secondsInTwoDays = 2 * 24 * 60 * 60;
         $timestamp = time() - $secondsInTwoDays;
 
@@ -75,7 +74,8 @@ final class ElapsedDateTest extends TestCase {
         $actual = ElapsedDate::long($timestampStr);
 
         $this->assertNotSame('', $actual);
-        $this->assertTrue(str_contains($actual, 'ago.'));
+        $this->assertStringContainsString('ago.', $actual);
+        $this->assertStringContainsString('and', $actual);
     }
 
     public function testLongIncludesAtLeastOneTimeUnitForOldTimestamp(): void {
@@ -87,24 +87,28 @@ final class ElapsedDateTest extends TestCase {
         $actual = ElapsedDate::long($timestampStr);
 
         $hasAnyUnit =
-            str_contains($actual, ' year') || str_contains($actual, ' years') ||
-            str_contains($actual, ' week') || str_contains($actual, ' weeks') ||
-            str_contains($actual, ' day') || str_contains($actual, ' days') ||
-            str_contains($actual, ' hour') || str_contains($actual, ' hours') ||
-            str_contains($actual, ' minute') || str_contains($actual, ' minutes');
+            str_contains($actual, ' year') ||
+            str_contains($actual, ' years') ||
+            str_contains($actual, ' week') ||
+            str_contains($actual, ' weeks') ||
+            str_contains($actual, ' day') ||
+            str_contains($actual, ' days') ||
+            str_contains($actual, ' hour') ||
+            str_contains($actual, ' hours') ||
+            str_contains($actual, ' minute') ||
+            str_contains($actual, ' minutes');
 
         $this->assertTrue($hasAnyUnit);
     }
 
     public function testLongIncludesMinuteTokenWhenAtLeastOneMinuteOld(): void {
-        $seconds = 61;
-        $timestamp = time() - $seconds;
+        $timestamp = time() - 61;
 
         $timestampStr = date('Y-m-d H:i:s', $timestamp);
 
         $actual = ElapsedDate::long($timestampStr);
 
-        $this->assertTrue(str_contains($actual, 'ago.'));
+        $this->assertStringContainsString('ago.', $actual);
 
         $hasMinute =
             str_contains($actual, ' minute') ||

@@ -16,9 +16,9 @@
 declare(strict_types=1);
 
 return [
-    'AdminPhones_page_title' => 'Phones',
-    'AdminPhones_breadcrumb_title' => 'Phones',
-    'AdminPhones_table_title' => 'Phones',
-    'AdminPhones_table_title_tooltip' => 'A list of phone numbers linked to the user.',
-    'AdminPhones_search_placeholder' => 'Search placeholder for phones',
+    'phones_page_title' => 'Phones',
+    'phones_breadcrumb_title' => 'Phones',
+    'phones_table_title' => 'Phones',
+    'phones_table_title_tooltip' => 'A list of phone numbers linked to the entity.',
+    'phones_search_placeholder' => 'Search placeholder for phones',
 ];

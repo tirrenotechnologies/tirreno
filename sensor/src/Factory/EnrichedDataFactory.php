@@ -51,7 +51,12 @@ class EnrichedDataFactory {
     /**
      * @phpstan-param EnrichmentClientResponse $data
      */
-    public function createFromResponse(array $data, array $origin): EnrichedData {
+    public function createFromResponse(array $data, array $query): EnrichedData {
+        $origin = [];
+        foreach ($query as $key => $param) {
+            $origin[$key] = is_array($param) && isset($param['value']) ? $param['value'] : $param;
+        }
+
         $email = null;
         if (isset($data['email']['email'])) {
             try {

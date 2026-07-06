@@ -9,7 +9,7 @@ class B25 extends \Tirreno\Assets\Rule {
 
     protected function defineCondition(): \Ruler\Operator\LogicalOperator {
         return $this->rb->logicalAnd(
-            $this->rb['ea_userid']->equalTo(\Tirreno\Utils\Constants::get()->UNAUTHORIZED_USERID),
+            $this->rb['ea_userid']->equalTo(tirreno('utils')->constants->UNAUTHORIZED_USERID),
             $this->rb['event_2xx_http']->equalTo(true),
         );
     }

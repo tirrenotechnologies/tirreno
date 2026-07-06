@@ -1,5 +1,64 @@
 # tirreno changelog
 
+## tirreno v0.10.0
+
+* RBAC
+* guest and cron system operators
+* tirreno('...') API for custom program
+* additional rule presets in `assets/rules/custom/preset-<preset-name>.php`
+* `CHECK_RULE_USERS_LIMIT`, `RECALCULATE_TOTALS_ON_VISIT`, `LOG_TO_STDERR` config variables
+* meta for PhpStorm IDE
+* tidy ui/templates/pages/ and app/Controllers/ structure
+* separate list for AI bot detection rule
+* list of flagged ASNs for rules
+* session recreation after log in (CWE-384), thanks to Pranav Pandit
+* rename user -> entity
+* replace week-over-week entity activity comparison with a yesterday/today comparison
+* CSS updates
+* logbook view restyling
+* tirreno router in place of f3 router
+* new operator roles
+* DEBUG = 1 to evoke a stack trace on the error page
+* WIP: additional pages development in `assets/pages/<custom-page>.php`
+* WIP tirreno('queries') builder
+* /assets/pages/llb-bots.example.php example for detecting LLM bots
+
+### New API interfaces
+tirreno('assets')
+tirreno('charts')
+tirreno('controllers')
+tirreno('db')
+tirreno('entities')
+tirreno('grids')
+tirreno('helpers')
+tirreno('ip')
+tirreno('ips')
+tirreno('log')
+tirreno('models')
+tirreno('page')
+tirreno('pages')
+tirreno('request')
+tirreno('resource')
+tirreno('resources')
+tirreno('response')
+tirreno('router')
+tirreno('rule')
+tirreno('rules')
+tirreno('session')
+tirreno('storage')
+tirreno('sysop')
+tirreno('user')
+tirreno('users')
+tirreno('utils')
+
+### New rules
+Rule I13 for flagging suspicious ASN
+Rule D11 detecting empty user-agent
+Rule D12 detecting empty browser language
+
+### Dependencies
+Device detector version update
+
 ## tirreno v0.9.12
 
 * flexible assets class for UI constants in `/assets/dashboard/Constants.php`

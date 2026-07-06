@@ -1,9 +1,9 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {FieldAuditsChart} from '../parts/chart/FieldAudits.js?v=2';
-import {FieldAuditsGrid} from '../parts/grid/FieldAudits.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {FieldAuditsChart} from '../parts/chart/FieldAudits.js?v=0.10.0';
+import {FieldAuditsGrid} from '../parts/grid/FieldAudits.js?v=0.10.0';
 
 export class FieldAuditsPage extends BasePage {
     constructor() {
@@ -17,13 +17,13 @@ export class FieldAuditsPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadFieldAudits`,
+            url:        `${window.app_base}/loadFieldAudits`,
             //tileId:     '',
             tableId:    'field-audits-table',
 
             dateRangeGrid:      true,
             singleUser:         false,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadFieldAuditsTimeFrameTotal`,
             totals: {
                 type: 'field',
                 columns: ['total_edit', 'total_account'],
@@ -32,9 +32,16 @@ export class FieldAuditsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadFieldAuditsChart`,
+            getParams:  this.getParamsSection,
+        };
 
-        new FieldAuditsChart(chartParams);
-        new FieldAuditsGrid(gridParams);
+        const elements = [
+            [FieldAuditsChart,    chartParams],
+            [FieldAuditsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

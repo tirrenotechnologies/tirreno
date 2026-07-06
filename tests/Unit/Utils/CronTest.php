@@ -10,14 +10,20 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Cron.
  *
- * Covered (unit-testable without refactor):
+ * Covered:
  * - Cron::getHashes()
  * - Cron::printLogs()
+ * - Cron::parseTimestamp()
+ * - Cron::parseExpression()
  *
- * @todo Refactor (requires refactor / DI to become unit-testable):
- * - Cron::checkTimezone()
- * - Cron::sendBlacklistReportPostRequest()
- * - Cron::sendUnreviewedItemsReminderEmail()
+ * @todo Cover Cron::checkTimezone() after current time/timezone resolving
+ *       can be injected or otherwise controlled in tests.
+ *
+ * @todo Cover Cron::sendBlacklistReportPostRequest() after network client
+ *       can be replaced in tests.
+ *
+ * @todo Cover Cron::sendUnreviewedItemsReminderEmail() after Audit, storage,
+ *       variables and mailer dependencies can be replaced in tests.
  */
 final class CronTest extends TestCase {
     /**
@@ -31,8 +37,7 @@ final class CronTest extends TestCase {
     ): void {
         $result = Cron::getHashes($items, $userEmail);
 
-        $expectedCount = count($items);
-        $this->assertCount($expectedCount, $result);
+        $this->assertCount(count($items), $result);
 
         $expectedUserHash = hash('sha256', $userEmail);
 
@@ -46,10 +51,10 @@ final class CronTest extends TestCase {
             $this->assertSame($expectedUserHash, $row['id']);
         }
 
-        if ($expectedCount > 1) {
+        if (count($items) > 1) {
             $firstId = $result[0]['id'];
 
-            for ($i = 1; $i < $expectedCount; ++$i) {
+            for ($i = 1; $i < count($items); ++$i) {
                 $this->assertSame($firstId, $result[$i]['id']);
             }
         }
@@ -121,6 +126,125 @@ final class CronTest extends TestCase {
             'preserves new lines' => [
                 'logs' => ['Line1' . PHP_EOL, 'Line2' . PHP_EOL],
                 'expectedOutput' => 'Line1' . PHP_EOL . 'Line2' . PHP_EOL,
+            ],
+        ];
+    }
+
+    public function testParseTimestamp(): void {
+        $time = new \DateTime('2026-06-16 09:05:00');
+
+        $actual = Cron::parseTimestamp($time);
+
+        $this->assertSame([5, 9, 16, 6, 2], $actual);
+    }
+
+    /**
+     * @dataProvider parseExpressionValidProvider
+     */
+    public function testParseExpressionReturnsPartsForValidExpression(
+        string $expression,
+        array $expected
+    ): void {
+        $actual = Cron::parseExpression($expression);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public static function parseExpressionValidProvider(): array {
+        return [
+            'every minute' => [
+                'expression' => '* * * * *',
+                'expected' => [
+                    range(0, 59),
+                    range(0, 23),
+                    range(1, 31),
+                    range(1, 12),
+                    range(0, 6),
+                ],
+            ],
+            'exact values' => [
+                'expression' => '5 9 16 6 2',
+                'expected' => [
+                    [5],
+                    [9],
+                    [16],
+                    [6],
+                    [2],
+                ],
+            ],
+            'range' => [
+                'expression' => '0-2 9 1 1 1',
+                'expected' => [
+                    [0, 1, 2],
+                    [9],
+                    [1],
+                    [1],
+                    [1],
+                ],
+            ],
+            'step' => [
+                'expression' => '*/15 * * * *',
+                'expected' => [
+                    [0, 15, 30, 45],
+                    range(0, 23),
+                    range(1, 31),
+                    range(1, 12),
+                    range(0, 6),
+                ],
+            ],
+            'list' => [
+                'expression' => '1,3,5 9 * * *',
+                'expected' => [
+                    [1, 3, 5],
+                    [9],
+                    range(1, 31),
+                    range(1, 12),
+                    range(0, 6),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider parseExpressionInvalidProvider
+     */
+    public function testParseExpressionReturnsFalseForInvalidExpression(string $expression): void {
+        $actual = Cron::parseExpression($expression);
+
+        $this->assertFalse($actual);
+    }
+
+    public static function parseExpressionInvalidProvider(): array {
+        return [
+            'too few parts' => [
+                'expression' => '* * * *',
+            ],
+            'too many parts' => [
+                'expression' => '* * * * * *',
+            ],
+            'invalid token' => [
+                'expression' => 'abc * * * *',
+            ],
+            'minute out of range' => [
+                'expression' => '60 * * * *',
+            ],
+            'hour out of range' => [
+                'expression' => '* 24 * * *',
+            ],
+            'day of month out of range' => [
+                'expression' => '* * 32 * *',
+            ],
+            'month out of range' => [
+                'expression' => '* * * 13 *',
+            ],
+            'day of week out of range' => [
+                'expression' => '* * * * 7',
+            ],
+            'range start greater than end' => [
+                'expression' => '10-5 * * * *',
+            ],
+            'zero step' => [
+                'expression' => '*/0 * * * *',
             ],
         ];
     }

@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Phones extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getData(int $apiKey): array {
         $data = $this->getFirstLine($apiKey);
 

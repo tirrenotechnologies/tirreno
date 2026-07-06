@@ -16,14 +16,14 @@
 declare(strict_types=1);
 
 return [
-    'ForgotPassword_page_title' => 'Reset your password',
-    'ForgotPassword_form_title' => 'Reset your password',
-    'ForgotPassword_form_email_label' => 'Email address',
-    'ForgotPassword_form_reset_button' => 'Reset',
-    'ForgotPassword_form_create_account_link' => 'Create an account',
-    'ForgotPassword_form_login_link' => 'Sign in',
-    'ForgotPassword_form_renew_button' => 'Reset',
+    'forgotPassword_page_title' => 'Reset your password',
+    'forgotPassword_form_title' => 'Reset your password',
+    'forgotPassword_form_email_label' => 'Email address',
+    'forgotPassword_form_reset_button' => 'Reset',
+    'forgotPassword_form_create_account_link' => 'Create an account',
+    'forgotPassword_form_login_link' => 'Sign in',
+    'forgotPassword_form_renew_button' => 'Reset',
 
-    'ForgotPassowrd_renew_password_subject' => 'Reset your password',
-    'ForgotPassowrd_renew_password_body' => 'Thanks for your request. We have prepared a link where you can reset your password. %s Please ignore this message if you didn\'t reset password.',
+    'forgotPassowrd_renew_password_subject' => 'Reset your password',
+    'forgotPassowrd_renew_password_body' => 'Thanks for your request. We have prepared a link where you can reset your password. %s Please ignore this message if you didn\'t reset password.',
 ];

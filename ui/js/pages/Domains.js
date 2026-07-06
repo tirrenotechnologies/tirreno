@@ -1,9 +1,9 @@
-import {BasePage} from './Base.js?v=2';
-
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {DomainsChart} from '../parts/chart/Domains.js?v=2';
-import {DomainsGrid} from '../parts/grid/Domains.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {DomainsChart} from '../parts/chart/Domains.js?v=0.10.0';
+import {DomainsGrid} from '../parts/grid/Domains.js?v=0.10.0';
 
 export class DomainsPage extends BasePage {
     constructor() {
@@ -17,12 +17,12 @@ export class DomainsPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:        `${window.app_base}/admin/loadDomains`,
+            url:        `${window.app_base}/loadDomains`,
             tileId:     'totalDomains',
             tableId:    'domains-table',
 
             dateRangeGrid:      true,
-            calculateTotals:    true,
+            timeFrameTotalUrl:  `${window.app_base}/loadDomainsTimeFrameTotal`,
             totals: {
                 type: 'domain',
                 columns: ['total_account'],
@@ -31,9 +31,16 @@ export class DomainsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
+        const chartParams = {
+            url:        `${window.app_base}/loadDomainsChart`,
+            getParams: this.getParamsSection,
+        };
 
-        new DomainsChart(chartParams);
-        new DomainsGrid(gridParams);
+        const elements = [
+            [DomainsChart,    chartParams],
+            [DomainsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

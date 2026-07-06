@@ -19,7 +19,6 @@ namespace Tirreno\Models\Chart;
 
 class Watchlist extends Base {
     private array $userIds = [];
-    protected ?string $DB_TABLE_NAME = 'event';
 
     public function getData(int $apiKey): array {
         $params = [
@@ -52,7 +51,7 @@ class Watchlist extends Base {
             GROUP BY day
             ORDER BY day"
         );
-        //$request = $this->f3->get('REQUEST');
+        //$request = tirreno('storage')->get('REQUEST');
         //$dateRange = $this->getDatesRange($request);
 
         return $this->execQuery($query, $params);

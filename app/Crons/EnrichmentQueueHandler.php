@@ -18,14 +18,14 @@ declare(strict_types=1);
 namespace Tirreno\Crons;
 
 class EnrichmentQueueHandler extends BaseQueue {
-    private \Tirreno\Controllers\Admin\Enrichment\Data $controller;
+    private object $controller;
 
     public function __construct() {
-        $this->controller = new \Tirreno\Controllers\Admin\Enrichment\Data();
+        $this->controller = tirreno('controllers')->enrichment;
     }
 
     public function process(): void {
-        parent::baseProcess(\Tirreno\Utils\Constants::get()->ENRICHMENT_QUEUE_ACTION_TYPE);
+        parent::baseProcess(tirreno('utils')->constants->ENRICHMENT_QUEUE_ACTION_TYPE);
     }
 
     protected function processItem(array $item): void {
@@ -35,7 +35,7 @@ class EnrichmentQueueHandler extends BaseQueue {
 
         $entities = $this->controller->getNotCheckedEntitiesByUserId($userId, $apiKey);
 
-        $key = (new \Tirreno\Models\ApiKeys())->getKeyById($apiKey);
+        $key = tirreno('models')->apiKeys->getKeyById($apiKey);
         $subscriptionKey = $key['token'];
 
         // TODO: check key ?

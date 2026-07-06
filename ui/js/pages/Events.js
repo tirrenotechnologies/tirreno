@@ -1,13 +1,13 @@
-import {BasePage} from './Base.js?v=2';
-
-import {EventsChart} from '../parts/chart/Events.js?v=2';
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {EventTypeFilter} from '../parts/choices/EventTypeFilter.js?v=2';
-import {DeviceTypeFilter} from '../parts/choices/DeviceTypeFilter.js?v=2';
-import {RulesFilter} from '../parts/choices/RulesFilter.js?v=2';
-import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
-import {EventsGrid} from '../parts/grid/Events.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
+import {SequentialLoad} from '../parts/SequentialLoad.js?v=0.10.0';
+import {EventsChart} from '../parts/chart/Events.js?v=0.10.0';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {EventTypeFilter} from '../parts/choices/EventTypeFilter.js?v=0.10.0';
+import {DeviceTypeFilter} from '../parts/choices/DeviceTypeFilter.js?v=0.10.0';
+import {RulesFilter} from '../parts/choices/RulesFilter.js?v=0.10.0';
+import {EventPanel} from '../parts/panel/EventPanel.js?v=0.10.0';
+import {EventsGrid} from '../parts/grid/Events.js?v=0.10.0';
 
 export class EventsPage extends BasePage {
     constructor() {
@@ -21,8 +21,6 @@ export class EventsPage extends BasePage {
         const deviceTypeFilter  = new DeviceTypeFilter();
         const rulesFilter       = new RulesFilter();
 
-        const chartParams = this.getChartParams(datesFilter, searchFilter);
-
         this.filters = {
             dateRange:      datesFilter,
             searchValue:    searchFilter,
@@ -32,7 +30,7 @@ export class EventsPage extends BasePage {
         };
 
         const gridParams = {
-            url:            `${window.app_base}/admin/loadEvents`,
+            url:            `${window.app_base}/loadEvents`,
             tileId:         'totalEvents',
             tableId:        'user-events-table',
             panelType:      'event',
@@ -51,8 +49,18 @@ export class EventsPage extends BasePage {
             getParams: this.getParamsSection,
         };
 
+        const chartParams = {
+            url:        `${window.app_base}/loadEventsChart`,
+            getParams:  this.getParamsSection,
+        };
+
         new EventPanel();
-        new EventsChart(chartParams);
-        new EventsGrid(gridParams);
+
+        const elements = [
+            [EventsChart,    chartParams],
+            [EventsGrid,     gridParams],
+        ];
+
+        new SequentialLoad(elements);
     }
 }

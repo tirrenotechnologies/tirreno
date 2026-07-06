@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06a8d1b4728a62e396b1ec843bced9bd",
+    "content-hash": "d90404952fca65e59eb2308ee5126d85",
     "packages": [
         {
             "name": "bcosca/fatfree-core",
@@ -53,16 +53,16 @@
         },
         {
             "name": "matomo/device-detector",
-            "version": "6.5.0",
+            "version": "6.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "e0fff2309dad83eb3cfb2564e524be715cfcf3cf"
+                "reference": "f30457500c6be4c80c8830466f8a746724779fd0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/e0fff2309dad83eb3cfb2564e524be715cfcf3cf",
-                "reference": "e0fff2309dad83eb3cfb2564e524be715cfcf3cf",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/f30457500c6be4c80c8830466f8a746724779fd0",
+                "reference": "f30457500c6be4c80c8830466f8a746724779fd0",
                 "shasum": ""
             },
             "require": {
@@ -76,11 +76,11 @@
                 "matthiasmullie/scrapbook": "^1.4.7",
                 "mayflower/mo4-coding-standard": "^v9.0.0",
                 "phpstan/phpstan": "^1.10.44",
-                "phpunit/phpunit": "^8.5.2 || ^9 || ^10 || ^11 || ^12",
+                "phpunit/phpunit": "^8.5.2 || ^9 || ^10 || ^11 || ^12 || ^13",
                 "psr/cache": "^1.0.1 || ^2.0 || ^3.0",
                 "psr/simple-cache": "^1.0.1 || ^2.0 || ^3.0",
                 "slevomat/coding-standard": "<8.16.0",
-                "symfony/yaml": "^5.1.7"
+                "symfony/yaml": "^5.4 || ^6.4 || ^7.4 || ^8.0"
             },
             "suggest": {
                 "ext-yaml": "Necessary for using the Pecl YAML parser"
@@ -116,9 +116,9 @@
                 "forum": "https://forum.matomo.org/",
                 "issues": "https://github.com/matomo-org/device-detector/issues",
                 "source": "https://github.com/matomo-org/matomo",
-                "wiki": "https://dev.matomo.org/"
+                "wiki": "https://developer.matomo.org/"
             },
-            "time": "2026-01-21T07:53:39+00:00"
+            "time": "2026-05-27T09:53:26+00:00"
         },
         {
             "name": "mustangostang/spyc",

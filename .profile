@@ -9,3 +9,4 @@ chmod -R 755 assets/rules/custom
 chmod -R 755 assets/logs
 chmod -R 755 assets/lists
 chmod -R 755 assets/dashboard
+chmod -R 755 assets/pages

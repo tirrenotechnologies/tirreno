@@ -60,8 +60,7 @@ class ApiKey {
     }
 
     public static function getById(int $apiKey): ?self {
-        $model = new \Tirreno\Models\ApiKeys();
-        $key = $model->getKeyById($apiKey);
+        $key = tirreno('models')->apiKeys->getKeyById($apiKey);
 
         if (!$key) {
             return null;

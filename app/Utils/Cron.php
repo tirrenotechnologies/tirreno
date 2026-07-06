@@ -18,8 +18,17 @@ declare(strict_types=1);
 namespace Tirreno\Utils;
 
 class Cron {
-    private const NOTIFICATION_WINDOW_HOUR_START = 9;
-    private const NOTIFICATION_WINDOW_HOUR_END = 17;
+    protected const NOTIFICATION_WINDOW_HOUR_START = 9;
+    protected const NOTIFICATION_WINDOW_HOUR_END = 17;
+
+    protected const RANGES = [
+        ['min' => 0, 'max' => 59], // minute
+        ['min' => 0, 'max' => 23], // hour
+        ['min' => 1, 'max' => 31], // day of month
+        ['min' => 1, 'max' => 12], // month
+        ['min' => 0, 'max' => 6],  // day of week (0 = Sunday)
+    ];
+    protected const PATTERN = '/^(\*|\d+)(?:-(\d+))?(?:\/(\d+))?$/';
 
     public static function getHashes(array $items, string $userEmail): array {
         $userHash = hash('sha256', $userEmail);
@@ -33,19 +42,19 @@ class Cron {
         }, $items);
     }
 
-    public static function sendBlacklistReportPostRequest(array $hashes, string $enrichmentKey): string {
+    public static function sendBlacklistReportPostRequest(array $hashes, string $enrichmentKey, int $apiKey): string {
         $postFields = [
             'data' => $hashes,
         ];
 
-        $response = \Tirreno\Utils\Network::sendApiRequest($postFields, '/global_alert_report', 'POST', $enrichmentKey);
+        $response = tirreno('utils')->network->sendApiRequest($postFields, '/global_alert_report', 'POST', $enrichmentKey, $apiKey);
 
-        return $response->error() ?? '';
+        return $response->error ?? '';
     }
 
     public static function checkTimezone(string $timezone): bool {
-        $hour = (new \DateTime('now', \Tirreno\Utils\Timezones::getTimezone($timezone)))->format('H');
-        $hour = \Tirreno\Utils\Conversion::intValCheckEmpty($hour, 0);
+        $hour = (new \DateTime('now', tirreno('utils')->timezones->getTimezone($timezone)))->format('H');
+        $hour = tirreno('utils')->conversion->intValCheckEmpty($hour, 0);
 
         return $hour >= self::NOTIFICATION_WINDOW_HOUR_START && $hour < self::NOTIFICATION_WINDOW_HOUR_END;
     }
@@ -56,14 +65,14 @@ class Cron {
             return false;
         }
 
-        $subject = \Base::instance()->get('UnreviewedItemsReminder_email_subject');
+        $subject = tirreno('storage')->get('UnreviewedItemsReminder_email_subject');
         $subject = sprintf($subject, $reviewCount);
 
-        $message = \Base::instance()->get('UnreviewedItemsReminder_email_body');
-        $url = \Tirreno\Utils\Variables::getHostWithProtocolAndBase();
+        $message = tirreno('storage')->get('UnreviewedItemsReminder_email_body');
+        $url = tirreno('utils')->variables->getHostWithProtocolAndBase();
         $message = sprintf($message, $name, $email, $reviewCount, $url);
 
-        \Tirreno\Utils\Mailer::send($name, $email, $subject, $message);
+        tirreno('utils')->mailer->send($name, $email, $subject, $message);
 
         return true;
     }
@@ -72,5 +81,62 @@ class Cron {
         foreach ($logs as $log) {
             echo $log;
         }
+    }
+
+    public static function parseTimestamp(\DateTime $time): array {
+        return [
+            tirreno('utils')->conversion->intValCheckEmpty($time->format('i'), 0), // minute
+            tirreno('utils')->conversion->intValCheckEmpty($time->format('H'), 0), // hour
+            tirreno('utils')->conversion->intValCheckEmpty($time->format('d'), 1), // day of month
+            tirreno('utils')->conversion->intValCheckEmpty($time->format('m'), 1), // month
+            tirreno('utils')->conversion->intValCheckEmpty($time->format('w'), 0), // day of week
+        ];
+    }
+
+    public static function parseExpression(string $expression): false|array {
+        $parts = [];
+        $expressionParts = preg_split('/\s+/', trim($expression), -1, PREG_SPLIT_NO_EMPTY);
+
+        if (count($expressionParts) !== 5) {
+            return false;
+        }
+
+        foreach ($expressionParts as $i => $field) {
+            $values = [];
+            // handle lists
+            $fieldParts = explode(',', $field);
+
+            foreach ($fieldParts as $part) {
+                if (!preg_match(self::PATTERN, $part, $matches)) {
+                    return false;
+                }
+
+                $start = $matches[1];
+                $end = $matches[2] ?? null;
+                $step = $matches[3] ?? 1;
+
+                // Convert '*' to start and end values
+                if ($start === '*') {
+                    $start = self::RANGES[$i]['min'];
+                    $end = self::RANGES[$i]['max'];
+                } else {
+                    $start = tirreno('utils')->conversion->intValCheckEmpty($start, 0);
+                    $end = tirreno('utils')->conversion->intValCheckEmpty($end, $start);
+                }
+                $step = tirreno('utils')->conversion->intValCheckEmpty($step, 0);
+
+                if ($start > $end || $start < self::RANGES[$i]['min'] || $end > self::RANGES[$i]['max'] || $step < 1) {
+                    return false;
+                }
+
+                $range = range($start, $end, $step);
+                $values = array_merge($values, $range);
+            }
+
+            $parts[$i] = array_unique($values);
+            sort($parts[$i]);
+        }
+
+        return $parts;
     }
 }

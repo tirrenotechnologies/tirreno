@@ -17,9 +17,7 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Dashboard extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event_account';
-
+class Dashboard extends \Tirreno\Models\Base {
     public function getTotalBlockedUsers(?array $dateRange, int $apiKey): int {
         $query = (
             'SELECT

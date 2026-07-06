@@ -68,12 +68,7 @@ class EventRepository {
 
         $sessionId = $this->sessionRepository->insert($event->session);
 
-        $payloadId = null;
-        if ($event->payload) {
-            if ($eventTypeId === Constants::PAGE_SEARCH_EVENT_TYPE_ID || $eventTypeId === Constants::ACCOUNT_EMAIL_CHANGE_EVENT_TYPE_ID) {
-                $payloadId = $this->payloadRepository->insert($event->payload);
-            }
-        }
+        $payloadId = $event->payload ? $this->payloadRepository->insert($event->payload) : null;
 
         $eventId = $this->insertEvent(
             $event,

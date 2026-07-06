@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Cursor extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'queue_new_events_cursor';
+class Cursor extends \Tirreno\Models\Base {
+    protected string $tableName = 'queue_new_events_cursor';
 
     public function getCursor(): int {
         $query = (

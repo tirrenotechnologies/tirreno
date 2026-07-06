@@ -17,8 +17,60 @@ declare(strict_types=1);
 
 namespace Tirreno\Models;
 
-class Event extends \Tirreno\Models\BaseSql {
-    protected ?string $DB_TABLE_NAME = 'event';
+class Event extends \Tirreno\Models\Base {
+    protected string $tableName = 'event';
+
+    public function getLastEventTimeBefore(int $time, int $accountId, int $apiKey): ?string {
+        $params = [
+            ':api_key'  => $apiKey,
+            ':user_id'  => $accountId,
+            ':time'     => tirreno('utils')->dateRange->getDateString($time),
+        ];
+
+        $query = (
+            'SELECT
+                event.time
+            FROM
+                event
+            WHERE
+                event.account = :user_id AND
+                event.time < :time AND
+                event.key = :api_key
+            ORDER BY event.time DESC
+            LIMIT 1'
+        );
+
+        return $this->execQuery($query, $params)[0]['time'] ?? null;
+    }
+
+    public function getLastEventTimeInDayFrame(int $weekSecondsOffset, string $before, int $accountId, int $apiKey): ?string {
+        $params = [
+            ':api_key'      => $apiKey,
+            ':user_id'      => $accountId,
+            ':week_offset'  => $weekSecondsOffset,
+            ':day'          => tirreno('utils')->constants->SECONDS_IN_DAY,
+            ':week'         => tirreno('utils')->constants->SECONDS_IN_WEEK,
+            ':before'       => $before,
+        ];
+
+        // unix ts 0 dow == thursday
+        $query = (
+            'SELECT
+                event.time
+            FROM
+                event
+            WHERE
+                event.account = :user_id AND
+                event.time < :before AND
+                MOD(EXTRACT(EPOCH FROM event.time)::bigint + (3 * :day), :week) >= :week_offset AND
+                MOD(EXTRACT(EPOCH FROM event.time)::bigint + (3 * :day), :week) < :week_offset + :day AND
+                event.key = :api_key
+            ORDER BY event.time DESC
+            LIMIT 1'
+        );
+
+        return $this->execQuery($query, $params)[0]['time'] ?? null;
+    }
 
     public function getLastEvent(int $apiKey): array {
         $params = [
@@ -208,8 +260,8 @@ class Event extends \Tirreno\Models\BaseSql {
 
         $results = $this->execQuery($query, $params);
 
-        \Tirreno\Utils\Enrichment::calculateIpType($results);
-        \Tirreno\Utils\Enrichment::calculateEmailReputation($results);
+        $results = tirreno('utils')->enrichment->calculateIpType($results);
+        $results = tirreno('utils')->enrichment->calculateEmailReputation($results);
         //$this->translateTimezones($results, ['event_time', 'domain_creation_date']);
 
         if (count($results)) {
@@ -218,8 +270,7 @@ class Event extends \Tirreno\Models\BaseSql {
             $spamlist = $results['ip_type'] === 'Spam list';
             $results['spamlist'] = $spamlist;
 
-            $model = new \Tirreno\Models\User();
-            $results['score_details'] = $model->getApplicableRulesByAccountId($results['accountid'], $apiKey, true);
+            $results['score_details'] = tirreno('models')->user->getApplicableRulesByAccountId($results['accountid'], $apiKey, true);
             $results['score_calculated'] = $results['score'] !== null;
         }
 

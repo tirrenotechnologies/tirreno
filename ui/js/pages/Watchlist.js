@@ -1,10 +1,10 @@
-import {BasePage} from './Base.js?v=2';
+import {BasePage} from './Base.js?v=0.10.0';
 
-import {DatesFilter} from '../parts/DatesFilter.js?v=2';
-import {SearchFilter} from '../parts/SearchFilter.js?v=2';
-import {EventPanel} from '../parts/panel/EventPanel.js?v=2';
-import {WatchlistTags} from '../parts/WatchlistTags.js?v=2';
-import {EventsGrid} from '../parts/grid/Events.js?v=2';
+import {DatesFilter} from '../parts/DatesFilter.js?v=0.10.0';
+import {SearchFilter} from '../parts/SearchFilter.js?v=0.10.0';
+import {EventPanel} from '../parts/panel/EventPanel.js?v=0.10.0';
+import {WatchlistTags} from '../parts/WatchlistTags.js?v=0.10.0';
+import {EventsGrid} from '../parts/grid/Events.js?v=0.10.0';
 
 export class WatchlistPage extends BasePage {
     constructor() {
@@ -18,7 +18,7 @@ export class WatchlistPage extends BasePage {
         this.setBaseFilters(datesFilter, searchFilter);
 
         const gridParams = {
-            url:            `${window.app_base}/admin/loadEvents?watchlist=true`,
+            url:            `${window.app_base}/loadEvents?watchlist=true`,
             tileId:         'totalEvents',
             tableId:        'user-events-table',
             panelType:      'event',

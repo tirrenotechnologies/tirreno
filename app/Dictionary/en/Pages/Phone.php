@@ -16,10 +16,10 @@
 declare(strict_types=1);
 
 return [
-    'AdminPhone_page_title' => 'Phone',
-    'AdminPhone_breadcrumb_title' => 'Phone',
-    'AdminPhone_type' => 'Type',
-    'AdminPhone_profiles' => 'Profiles',
-    'AdminPhone_carrier' => 'Carrier',
-    'AdminPhone_blocklist' => 'Spam list',
+    'phone_page_title' => 'Phone',
+    'phone_breadcrumb_title' => 'Phone',
+    'phone_type' => 'Type',
+    'phone_profiles' => 'Profiles',
+    'phone_carrier' => 'Carrier',
+    'phone_blocklist' => 'Spam list',
 ];

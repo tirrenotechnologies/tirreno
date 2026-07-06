@@ -3,7 +3,7 @@
         <div class="control">
             <div class="selector">
                 <select class="input" name="version" multiple>
-                    <option placeholder disabled>{{ @AdminUsers_file_type_search_placeholder }}</option>
+                    <option placeholder disabled>{{ @users_file_type_search_placeholder }}</option>
                     <repeat group="{{ @FILE_TYPES }}" key="{{ @key }}" value="{{ @value }}">
                         <option value="{{ @key }}">{{ @value }}</option>
                     </repeat>

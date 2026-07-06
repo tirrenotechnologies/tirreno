@@ -15,4 +15,4 @@
 
 declare(strict_types=1);
 
-return array_merge(include 'en/All.php', \Base::instance()->get('EXTRA_DICT_EN') ?? []);
+return array_merge(include 'en/All.php', tirreno('storage')->get('EXTRA_DICT_EN') ?? []);

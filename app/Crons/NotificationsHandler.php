@@ -19,23 +19,21 @@ namespace Tirreno\Crons;
 
 class NotificationsHandler extends Base {
     public function process(): void {
-        $model = new \Tirreno\Models\NotificationPreferences();
-
-        $operators = $model->operatorsToNotify();
+        $operators = tirreno('models')->notification->operatorsToNotify();
 
         $cnt = 0;
         $failed = 0;
 
         foreach ($operators as $operator) {
-            if (\Tirreno\Utils\Cron::checkTimezone($operator['timezone'] ?? '')) {
+            if (tirreno('utils')->cron->checkTimezone($operator['timezone'] ?? '')) {
                 try {
                     $name   = $operator['firstname'] ?? '';
                     $email  = $operator['email'] ?? '';
                     $review = $operator['review_queue_cnt'] ?? 0;
-                    if (!\Tirreno\Utils\Cron::sendUnreviewedItemsReminderEmail($name, $email, $review)) {
+                    if (!tirreno('utils')->cron->sendUnreviewedItemsReminderEmail($name, $email, $review)) {
                         $this->addLog(sprintf('Username `%s` is not email; review count is %s', $email, $review));
                     }
-                    $model->updateUnreviewedReminder($operator['id']);
+                    tirreno('models')->notification->updateUnreviewedReminder($operator['id']);
                     $cnt++;
                 } catch (\Throwable $e) {
                     $this->addLog(sprintf('Notification handler error %s.', $e->getMessage()));

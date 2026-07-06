@@ -11,16 +11,17 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Conversion.
  *
- * These tests focus on behavior and edge cases:
- * - intVal() normalization + validation + fallbacks
- * - intValCheckEmpty() truthy/empty handling
- * - formatKiloValue() threshold + floor rounding
- * - F3 REQUEST/PARAMS helpers (when Base is available)
+ * Covered:
+ * - Conversion::intVal()
+ * - Conversion::intValCheckEmpty()
+ * - Conversion::formatKiloValue()
+ * - Conversion::filterIp()
+ * - Conversion::filterIpGetType()
+ * - Conversion::filterEmail()
+ * - Conversion::filterBool()
+ * - request helpers through tirreno('request') / tirreno('storage')
  */
 final class ConversionTest extends TestCase {
-    /**
-     * @var Base
-     */
     private Base $f3;
 
     protected function setUp(): void {
@@ -30,6 +31,18 @@ final class ConversionTest extends TestCase {
 
         $this->f3->clear('REQUEST');
         $this->f3->clear('PARAMS');
+        $this->f3->clear('GET');
+        $this->f3->clear('POST');
+        $this->f3->clear('BODY');
+        $this->f3->clear('HEADERS');
+
+        tirreno('request')->resetPayloadCache();
+    }
+
+    protected function tearDown(): void {
+        tirreno('request')->resetPayloadCache();
+
+        parent::tearDown();
     }
 
     /**
@@ -50,16 +63,16 @@ final class ConversionTest extends TestCase {
             'negative int' => [-12, null, -12],
             'string int' => ['42', null, 42],
             'string negative' => ['-42', null, -42],
-            'string plus (valid)' => ['+42', null, 42],
+            'string plus' => ['+42', null, 42],
 
             'leading zeros' => ['000123', null, 123],
             'all zeros' => ['000', null, 0],
 
-            'string with spaces (invalid for FILTER_VALIDATE_INT)' => [' 42', null, 42],
-            'string trailing spaces (invalid)' => ['42 ', null, 42],
-            'string with newline (invalid)' => ["42\n", null, 42],
-            'string float (invalid) -> default' => ['42.0', 9, 9],
-            'string scientific (invalid) -> default' => ['1e3', 9, 9],
+            'string with leading spaces' => [' 42', null, 42],
+            'string with trailing spaces' => ['42 ', null, 42],
+            'string with newline' => ["42\n", null, 42],
+            'string float -> default' => ['42.0', 9, 9],
+            'string scientific -> default' => ['1e3', 9, 9],
 
             'empty string -> null default means null' => ['', null, null],
             'empty string -> default 99' => ['', 99, 99],
@@ -79,18 +92,26 @@ final class ConversionTest extends TestCase {
             'null -> default' => [null, 0, 0],
             'null -> null' => [null, null, null],
 
-            'object __toString numeric' => [new class {
-                public function __toString(): string {
-                    return '0008';
-                }
-            }, null, null],
-            'object __toString invalid' => [new class {
-                public function __toString(): string {
-                    return 'abc';
-                }
-            }, 13, 13],
+            'object __toString numeric' => [
+                new class {
+                    public function __toString(): string {
+                        return '0008';
+                    }
+                },
+                null,
+                null,
+            ],
+            'object __toString invalid' => [
+                new class {
+                    public function __toString(): string {
+                        return 'abc';
+                    }
+                },
+                13,
+                13,
+            ],
 
-            'too large int string (platform dependent) -> default' => ['9999999999999999999999999', 77, 77],
+            'too large int string -> default' => ['9999999999999999999999999', 77, 77],
         ];
     }
 
@@ -147,12 +168,14 @@ final class ConversionTest extends TestCase {
     }
 
     public function testRequestAndParamsHelpers(): void {
-        $this->f3->set('REQUEST.a', '0007');
-        $this->f3->set('REQUEST.b', '');
-        $this->f3->set('REQUEST.c', ['x' => 1]);
+        $this->f3->set('GET.a', '0007');
+        $this->f3->set('GET.b', '');
+        $this->f3->set('GET.c', ['x' => 1]);
 
         $this->f3->set('PARAMS.id', '05');
         $this->f3->set('PARAMS.missing', null);
+
+        tirreno('request')->resetPayloadCache();
 
         $this->assertSame(7, Conversion::getIntRequestParam('a'));
         $this->assertSame('', Conversion::getStringRequestParam('b', false));
@@ -162,7 +185,6 @@ final class ConversionTest extends TestCase {
 
         $this->assertSame(5, Conversion::getIntUrlParam('id'));
 
-        // nullable behavior for ints
         $this->assertSame(0, Conversion::getIntRequestParam('missing', false));
         $this->assertNull(Conversion::getIntRequestParam('missing', true));
         $this->assertSame(0, Conversion::getIntUrlParam('missing', false));
@@ -173,7 +195,10 @@ final class ConversionTest extends TestCase {
         $this->assertSame([], Conversion::getArrayRequestParam('missing', false));
         $this->assertNull(Conversion::getArrayRequestParam('missing', true));
 
-        $this->f3->set('REQUEST.arr', 'not-an-array');
+        $this->f3->set('GET.arr', 'not-an-array');
+
+        tirreno('request')->resetPayloadCache();
+
         $this->assertSame([], Conversion::getArrayRequestParam('arr', false));
         $this->assertNull(Conversion::getArrayRequestParam('arr', true));
     }
@@ -182,16 +207,21 @@ final class ConversionTest extends TestCase {
         $this->assertSame([], Conversion::getDictionaryRequestParam('missing', false));
         $this->assertNull(Conversion::getDictionaryRequestParam('missing', true));
 
-        $this->f3->set('REQUEST.arr', 'not-an-array');
+        $this->f3->set('GET.arr', 'not-an-array');
+
+        tirreno('request')->resetPayloadCache();
+
         $this->assertSame([], Conversion::getDictionaryRequestParam('arr', false));
         $this->assertNull(Conversion::getDictionaryRequestParam('arr', true));
     }
 
-   /**
+    /**
      * @dataProvider filterBoolProvider
      */
     public function testFilterBool(mixed $value, ?bool $expected): void {
-        $this->assertSame($expected, Conversion::filterBool($value));
+        $result = Conversion::filterBool($value);
+
+        $this->assertSame($expected, $result);
     }
 
     public static function filterBoolProvider(): array {
@@ -209,14 +239,22 @@ final class ConversionTest extends TestCase {
             'int 1' => [1, true],
             'int 0' => [0, false],
             'null -> false' => [null, false],
-            'object __toString numeric' => [new class {
-                public function __toString(): string {
-                    return '0008';
-                }
-            }, null],
+            'object __toString numeric' => [
+                new class {
+                    public function __toString(): string {
+                        return '0008';
+                    }
+                },
+                null,
+            ],
             'array -> null' => [['123'], null],
             'empty array -> null' => [[], null],
         ];
+    }
+
+    public function testFilterIpReturnsValidatedIp(): void {
+        $this->assertSame('192.168.0.1', Conversion::filterIp('192.168.0.1'));
+        $this->assertSame('2001:db8::1', Conversion::filterIp('2001:db8::1'));
     }
 
     /**
@@ -224,9 +262,12 @@ final class ConversionTest extends TestCase {
      */
     public function testFilterIpAndType(mixed $value, bool $valid, int|false $type): void {
         $ip = Conversion::filterIp($value);
+
         $this->assertSame($valid, $ip !== false);
 
-        $this->assertSame($type, Conversion::filterIpGetType($value));
+        $result = Conversion::filterIpGetType($value);
+
+        $this->assertSame($type, $result);
     }
 
     public static function ipProvider(): array {
@@ -237,14 +278,22 @@ final class ConversionTest extends TestCase {
             'empty' => ['', false, false],
             'null' => [null, false, false],
             'bool' => [true, false, false],
-            'object __toString numeric' => [new class {
-                public function __toString(): string {
-                    return '0008';
-                }
-            }, false, false],
+            'object __toString numeric' => [
+                new class {
+                    public function __toString(): string {
+                        return '0008';
+                    }
+                },
+                false,
+                false,
+            ],
             'array -> false' => [['123'], false, false],
             'empty array -> false' => [[], false, false],
         ];
+    }
+
+    public function testFilterEmailReturnsValidatedEmail(): void {
+        $this->assertSame('a@example.com', Conversion::filterEmail('a@example.com'));
     }
 
     /**
@@ -252,6 +301,7 @@ final class ConversionTest extends TestCase {
      */
     public function testFilterEmail(mixed $value, bool $valid): void {
         $email = Conversion::filterEmail($value);
+
         $this->assertSame($valid, $email !== false);
     }
 
@@ -262,11 +312,14 @@ final class ConversionTest extends TestCase {
             'empty' => ['', false],
             'null' => [null, false],
             'bool' => [true, false],
-            'object __toString numeric' => [new class {
-                public function __toString(): string {
-                    return '0008';
-                }
-            }, false],
+            'object __toString numeric' => [
+                new class {
+                    public function __toString(): string {
+                        return '0008';
+                    }
+                },
+                false,
+            ],
             'array -> false' => [['123'], false],
             'empty array -> false' => [[], false],
         ];

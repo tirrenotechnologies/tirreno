@@ -18,8 +18,6 @@ declare(strict_types=1);
 namespace Tirreno\Models\Chart;
 
 class Domains extends Base {
-    protected ?string $DB_TABLE_NAME = 'event';
-
     public function getData(int $apiKey): array {
         $field1 = 'unique_domains_count';
         $data1 = $this->getFirstLine($apiKey);

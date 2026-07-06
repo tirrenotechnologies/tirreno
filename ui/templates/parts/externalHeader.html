@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=1216, initial-scale=0.6">
+    <meta name="color-scheme" content="dark">
+    <title>{{ @PAGE_TITLE }}</title>
+    <link rel="icon" href="{{ @BASE }}/ui/images/favicon.png">
+    <link rel="stylesheet" type="text/css" href="{{ @BASE }}/ui/css/main.all.css?dc={{time()}}" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="google" content="notranslate">
+    <meta name="generator" content="FrontPage 4.0">
+    <script>window.app_base = "{{ @BASE }}"</script>
+    <check if="isset(@JS) && @JS">
+        <script type="module" src="{{ @BASE }}/ui/js/endpoints/{{@JS}}?dc={{time()}}"></script>
+    </check>
+</head>
+<body>

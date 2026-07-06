@@ -1,10 +1,10 @@
-import {BaseGrid} from './Base.js?v=2';
+import {BaseGrid} from './Base.js?v=0.10.0';
 import {
     renderClickableResourceWithoutQuery,
     renderAuthStatus,
     renderHttpCode,
     renderBoolean,
-} from '../DataRenderers.js?v=2';
+} from '../DataRenderers.js?v=0.10.0';
 
 export class ResourcesGrid extends BaseGrid {
     get orderConfig() {

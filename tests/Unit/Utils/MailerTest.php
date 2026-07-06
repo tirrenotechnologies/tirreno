@@ -10,23 +10,19 @@ use PHPUnit\Framework\TestCase;
 /**
  * Unit tests for Tirreno\Utils\Mailer.
  *
- * Covered (unit-testable without refactor):
- * - Mailer::send() returns a development-mode response when SEND_EMAIL is falsy
- *   (no external IO, no PHPMailer, no sendmail binary checks).
+ * Covered:
+ * - Mailer::send() returns a development-mode response when SEND_EMAIL is falsy.
  *
- * Not covered (unstable without refactor):
- * - Mailer::send() when SEND_EMAIL is truthy:
- *   - depends on Variables::getMailPassword() and other static config
- *   - may instantiate PHPMailer and attempt SMTP
- *   - may check filesystem for sendmail and call mail()
- * - sendByMailgun() / sendByNativeMail():
- *   - external IO (SMTP, filesystem, system mail)
+ * Not covered:
+ * - Mailer::send() SMTP branch (PHPMailer, SMTP configuration, network IO).
+ * - Mailer::send() native mail branch (filesystem checks, sendmail, mail()).
+ * - sendByMailgun().
+ * - sendByNativeMail().
  *
  * @todo Refactor:
- * - extract ConfigInterface (F3 wrapper) for SEND_EMAIL / SMTP_DEBUG
- * - extract MailTransportInterface for SMTP/native implementations
- * - inject Variables/Constants readers (avoid static calls)
- * - avoid calling global mail(), file_exists(), is_executable() directly (wrap)
+ * - extract MailTransportInterface.
+ * - extract ConfigInterface for application settings.
+ * - wrap filesystem checks and mail() behind interfaces.
  */
 final class MailerTest extends TestCase {
     private \Base $f3;

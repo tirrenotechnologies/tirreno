@@ -19,8 +19,7 @@ namespace Tirreno\Utils;
 
 class Mailer {
     public static function send(?string $toName, string $toAddress, string $subj, string $msg, bool $html = false): array {
-        $f3 = \Base::instance();
-        $canSendEmail = $f3->get('SEND_EMAIL');
+        $canSendEmail = tirreno('storage')->get('SEND_EMAIL');
         if (!$canSendEmail) {
             return [
                 'success' => true,
@@ -30,7 +29,7 @@ class Mailer {
 
         $toName = $toName ?? '';
         $data = null;
-        if (\Tirreno\Utils\Variables::getMailPassword()) {
+        if (tirreno('utils')->variables->getMailPassword()) {
             $data = self::sendByMailgun($toAddress, $toName, $subj, $msg, $html);
         }
 
@@ -42,13 +41,11 @@ class Mailer {
     }
 
     private static function sendByMailgun(string $toAddress, string $toName, string $subj, string $msg, bool $html): array {
-        $f3 = \Base::instance();
-
-        $fromName = \Tirreno\Utils\Constants::get()->MAIL_FROM_NAME;
-        $smtpDebug = $f3->get('SMTP_DEBUG');
-        $fromAddress = \Tirreno\Utils\Variables::getMailLogin();
-        $mailLogin = \Tirreno\Utils\Variables::getMailLogin();
-        $mailPassword = \Tirreno\Utils\Variables::getMailPassword();
+        $fromName = tirreno('utils')->constants->MAIL_FROM_NAME;
+        $smtpDebug = tirreno('storage')->get('SMTP_DEBUG');
+        $fromAddress = tirreno('utils')->variables->getMailLogin();
+        $mailLogin = tirreno('utils')->variables->getMailLogin();
+        $mailPassword = tirreno('utils')->variables->getMailPassword();
 
         if ($fromAddress === null) {
             return [
@@ -63,7 +60,7 @@ class Mailer {
             //Server settings
             $mail->SMTPDebug = $smtpDebug;                                              //Enable verbose debug output
             $mail->isSMTP();                                                            //Send using SMTP
-            $mail->Host = \Tirreno\Utils\Constants::get()->MAIL_HOST;                   //Set the SMTP server to send through
+            $mail->Host = tirreno('utils')->constants->MAIL_HOST;                   //Set the SMTP server to send through
             $mail->SMTPAuth = true;                                                     //Enable SMTP authentication
             $mail->Username = $mailLogin;                                               //SMTP username
             $mail->Password = $mailPassword;                                            //SMTP password
@@ -96,7 +93,7 @@ class Mailer {
     }
 
     private static function sendByNativeMail(string $toAddress, string $toName, string $subj, string $msg): array {
-        $sendMailPath = \Tirreno\Utils\Constants::get()->MAIL_SEND_BIN;
+        $sendMailPath = tirreno('utils')->constants->MAIL_SEND_BIN;
 
         if (!file_exists($sendMailPath) || !is_executable($sendMailPath)) {
             return [
@@ -105,8 +102,8 @@ class Mailer {
             ];
         }
 
-        $fromName = \Tirreno\Utils\Constants::get()->MAIL_FROM_NAME;
-        $fromAddress = \Tirreno\Utils\Variables::getMailLogin();
+        $fromName = tirreno('utils')->constants->MAIL_FROM_NAME;
+        $fromAddress = tirreno('utils')->variables->getMailLogin();
 
         if ($fromAddress === null) {
             return [
