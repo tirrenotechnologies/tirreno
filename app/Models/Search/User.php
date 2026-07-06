@@ -65,9 +65,9 @@ class User extends \Tirreno\Models\Base {
 
             WHERE
                 (
-                    LOWER(REPLACE(event_account.firstname || event_account.lastname, ' ', ''))
+                    LOWER(REPLACE(CONCAT_WS('', event_account.firstname, event_account.lastname), ' ', ''))
                                                     LIKE LOWER(REPLACE(:query, ' ', '')) OR
-                    LOWER(REPLACE(event_account.lastname || event_account.firstname, ' ', ''))
+                    LOWER(REPLACE(CONCAT_WS('', event_account.lastname, event_account.firstname), ' ', ''))
                                                     LIKE LOWER(REPLACE(:query, ' ', ''))
                 ) AND
                 event_account.key = :api_key

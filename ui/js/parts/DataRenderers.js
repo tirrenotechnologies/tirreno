@@ -2138,26 +2138,105 @@ const domToHtml = function(node) {
     return div.innerHTML;
 };
 
+const escapeRegexChars = function(value) {
+    return value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
+};
+
+const highlightTextMatches = function(node, currentValue) {
+    const searchValue = currentValue ? currentValue.trim() : '';
+
+    if (!searchValue) {
+        return node;
+    }
+
+    const regex = new RegExp(`(${escapeRegexChars(searchValue)})`, 'gi');
+    const textNodes = [];
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach(textNode => {
+        regex.lastIndex = 0;
+
+        if (!regex.test(textNode.nodeValue)) {
+            return;
+        }
+
+        regex.lastIndex = 0;
+
+        const frag = document.createDocumentFragment();
+        const parts = textNode.nodeValue.split(regex);
+
+        parts.forEach(part => {
+            if (!part) {
+                return;
+            }
+
+            if (part.toLowerCase() === searchValue.toLowerCase()) {
+                const strong = document.createElement('strong');
+                strong.textContent = part;
+                frag.appendChild(strong);
+            } else {
+                frag.appendChild(document.createTextNode(part));
+            }
+        });
+
+        textNode.parentNode.replaceChild(frag, textNode);
+    });
+
+    return node;
+};
+
 const formatSearchResult = function(suggestion, currentValue) {
     const data = suggestion.data ? suggestion.data : {};
     const category = data.category ? data.category : null;
+    let result = null;
 
-    if (category === 'IP') {
-        return domToHtml(renderIpWithCountry({
-            ip:          suggestion.value,
-            country_iso: data.country_iso ? data.country_iso : 'lh',
-        }));
+    switch (category) {
+        case 'IP':
+            result = renderIpWithCountry({
+                ip:          suggestion.value,
+                country_iso: data.country_iso ? data.country_iso : 'lh',
+            });
+            break;
+
+        case 'Domain':
+            result = renderClickableDomain({
+                id:     data.id ? data.id : null,
+                domain: suggestion.value,
+            });
+            break;
+
+        case 'ASN':
+            result = renderClickableAsn({
+                ispid: data.id ? data.id : null,
+                asn:   suggestion.value,
+            });
+            break;
+
+        case 'ID':
+        case 'Name':
+        case 'Email':
+        case 'Phone':
+            result = renderClickableImportantUserWithScore({
+                accountid:        data.id ? data.id : null,
+                email:            suggestion.value,
+                accounttitle:     suggestion.value,
+                score:            data.score ? data.score : null,
+                score_updated_at: null,
+                is_important:     false,
+            });
+            break;
+
+        default:
+            result = document.createElement('span');
+            result.textContent = suggestion.value;
+            break;
     }
 
-    // ID, Name, Email — all map to a user record
-    return domToHtml(renderClickableImportantUserWithScore({
-        accountid:        data.id ? data.id : null,
-        email:            suggestion.value,
-        accounttitle:     suggestion.value,
-        score:            data.score ? data.score : null,
-        score_updated_at: null,
-        is_important:     false,
-    }));
+    return domToHtml(highlightTextMatches(result, currentValue));
 };
 
 export {
