@@ -72,7 +72,9 @@ export class BaseGrid {
             $(`#${tableId}`).DataTable(config);
 
             const onReloadButtonClick = me.onReloadButtonClick.bind(me);
-            me.reloadButton.addEventListener('click', onReloadButtonClick);
+            if (me.reloadButton) {
+                me.reloadButton.addEventListener('click', onReloadButtonClick);
+            }
 
             const onTableRowClick = me.onTableRowClick.bind(me);
             $(`#${tableId} tbody`).on('click', 'tr', onTableRowClick);
