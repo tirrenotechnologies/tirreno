@@ -19,9 +19,9 @@ export class SearchLine {
             deferRequestBy: 300,
             minChars: 3,
             groupBy: 'category',
-            formatResult: formatSearchResult,
             showNoSuggestionNotice: true,
             noSuggestionNotice: 'Sorry, no matching results',
+            formatResult: formatSearchResult,
 
             onSelect: function(suggestion) {
                 window.open(`${window.app_base}/${suggestion.entityId}/${suggestion.id}`, '_self');

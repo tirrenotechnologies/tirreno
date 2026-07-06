@@ -2130,26 +2130,34 @@ const renderRuleManageButtons = record => {
     return frag;
 };
 
-const domToHtml = (node) => {
+// These two functions return a string (via div.innerHTML) rather than a DOM node.
+// A string return value is required by Devbridge jQuery Autocomplete's formatResult callback setting.
+const domToHtml = function(node) {
     const div = document.createElement('div');
     div.appendChild(node.cloneNode(true));
-
     return div.innerHTML;
 };
 
-const formatSearchResult = (suggestion, _currentValue) => {
-    const data = suggestion && suggestion.data ? suggestion.data : {};
-    const category = data.category;
+const formatSearchResult = function(suggestion, currentValue) {
+    const data = suggestion.data ? suggestion.data : {};
+    const category = data.category ? data.category : null;
 
     if (category === 'IP') {
-        return domToHtml(renderIpWithCountry(suggestion));
+        return domToHtml(renderIpWithCountry({
+            ip:          suggestion.value,
+            country_iso: data.country_iso ? data.country_iso : 'lh',
+        }));
     }
 
-    if (category === 'ID' || category === 'Name' || category === 'Email') {
-        return domToHtml(renderClickableImportantUserWithScore(suggestion, 'long'));
-    }
-
-    return suggestion.value;
+    // ID, Name, Email — all map to a user record
+    return domToHtml(renderClickableImportantUserWithScore({
+        accountid:        data.id ? data.id : null,
+        email:            suggestion.value,
+        accounttitle:     suggestion.value,
+        score:            data.score ? data.score : null,
+        score_updated_at: null,
+        is_important:     false,
+    }));
 };
 
 export {
