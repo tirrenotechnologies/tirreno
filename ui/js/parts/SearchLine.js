@@ -12,7 +12,7 @@ export class SearchLine {
 
         const me = this;
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
-        const url = `${window.app_base}/search?token=${token}`;
+        const url = `${window.app_base}/admin/search?token=${token}`;
 
         $('#auto-complete').autocomplete({
             serviceUrl: url,
@@ -56,7 +56,7 @@ export class SearchLine {
         const token = document.head.querySelector('[name=\'csrf-token\'][content]').content;
 
         $.ajax({
-            url: `${window.app_base}/currentTime`,
+            url: `${window.app_base}/admin/currentTime`,
             type: 'GET',
             data: {token: token},
             success: onDetailsLoaded,
