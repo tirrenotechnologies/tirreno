@@ -59,15 +59,14 @@ class Main extends \Tirreno\Controllers\Services\Base {
 
         $model = new \Tirreno\Models\Search\User();
         $result4 = $model->searchByUserId($query, $apiKey);
-        $result5 = $model->searchByName($query, $apiKey);
 
         $model = new \Tirreno\Models\Search\Email();
-        $result6 = $model->searchByEmail($query, $apiKey);
+        $result5 = $model->searchByEmail($query, $apiKey);
 
         $model = new \Tirreno\Models\Search\Phone();
-        $result7 = $model->searchByPhone($query, $apiKey);
+        $result6 = $model->searchByPhone($query, $apiKey);
 
-        $result = array_merge($result1, $result2, $result3, $result4, $result5, $result6, $result7);
+        $result = array_merge($result1, $result2, $result3, $result4, $result5, $result6);
         $iters = count($result);
 
         for ($i = 0; $i < $iters; ++$i) {
