@@ -57,17 +57,16 @@ class User extends \Tirreno\Models\Base {
                 'Name'                                  AS \"groupName\",
                 'id'                                    AS \"entityId\",
                 CONCAT_WS(' ', event_account.firstname,
-                               event_account.lastname)  AS value,
-                event_account.score                     AS score
+                               event_account.lastname)  AS value
 
             FROM
                 event_account
 
             WHERE
                 (
-                    LOWER(REPLACE(CONCAT_WS('', event_account.firstname, event_account.lastname), ' ', ''))
+                    LOWER(REPLACE(event_account.firstname || event_account.lastname, ' ', ''))
                                                     LIKE LOWER(REPLACE(:query, ' ', '')) OR
-                    LOWER(REPLACE(CONCAT_WS('', event_account.lastname, event_account.firstname), ' ', ''))
+                    LOWER(REPLACE(event_account.lastname || event_account.firstname, ' ', ''))
                                                     LIKE LOWER(REPLACE(:query, ' ', ''))
                 ) AND
                 event_account.key = :api_key
