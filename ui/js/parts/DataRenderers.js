@@ -2226,6 +2226,8 @@ const formatSearchResult = function(suggestion, currentValue) {
                 accounttitle:     suggestion.value,
                 score:            data.score ? data.score : null,
                 score_updated_at: null,
+                fraud:            defined(data.fraud) ? data.fraud : null,
+                added_to_review:  data.added_to_review ? data.added_to_review : null,
                 is_important:     false,
             });
             break;
