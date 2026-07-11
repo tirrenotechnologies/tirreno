@@ -2,6 +2,7 @@ import {Loader} from './Loader.js?v=0.10.0';
 import {Tooltip} from './Tooltip.js?v=0.10.0';
 import {handleAjaxError} from './utils/ErrorHandler.js?v=0.10.0';
 import {padZero} from './utils/Date.js?v=0.10.0';
+import {formatSearchResult} from './DataRenderers.js?v=0.10.0';
 
 export class SearchLine {
     constructor() {
@@ -20,6 +21,7 @@ export class SearchLine {
             groupBy: 'category',
             showNoSuggestionNotice: true,
             noSuggestionNotice: 'Sorry, no matching results',
+            formatResult: formatSearchResult,
 
             onSelect: function(suggestion) {
                 window.open(`${window.app_base}/${suggestion.entityId}/${suggestion.id}`, '_self');

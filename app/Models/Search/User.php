@@ -26,10 +26,13 @@ class User extends \Tirreno\Models\Base {
 
         $query = (
             "SELECT
-                event_account.id     AS id,
-                'ID'                 AS \"groupName\",
-                'id'                 AS \"entityId\",
-                event_account.userid AS value
+                event_account.id              AS id,
+                'ID'                          AS \"groupName\",
+                'id'                          AS \"entityId\",
+                event_account.userid          AS value,
+                event_account.score           AS score,
+                event_account.fraud           AS fraud,
+                event_account.added_to_review AS added_to_review
 
             FROM
                 event_account
