@@ -13,8 +13,7 @@
     <header class="card-header">
         <div class="card-header-title">
             {{ sprintf(@logbook_table_title, htmlspecialchars(tirreno('utils')->variables->getLogbookLimit(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')) }}
-            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @logbook_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/>
-            </p>
+            <span>&#8943;</span><p class="tooltip-info tooltip" title="{{ @logbook_table_title_tooltip }}"><include href="images/icons/information.svg" alt=''/></p><a class="reload" href="#"><include href="images/icons/reload.svg" alt=''/></a>
         </div>
     </header>
 

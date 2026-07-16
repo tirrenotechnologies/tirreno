@@ -46,6 +46,11 @@ export class BaseGrid {
         if (!this.config.sequential) {
             window.addEventListener('searchFilterChanged', onSearchFilterChanged, false);
         }
+
+        const onReloadButtonClick = this.onReloadButtonClick.bind(this);
+        if (this.reloadButton) {
+            this.reloadButton.addEventListener('click', onReloadButtonClick);
+        }
     }
 
     initLoad() {
@@ -419,6 +424,11 @@ export class BaseGrid {
         $(me.table).DataTable().ajax.reload();
     }
 
+    onReloadButtonClick(e) {
+        e.preventDefault();
+        this.loadData();
+    }
+
     onDateFilterChanged() {
         this.loadData();
     }
@@ -444,6 +454,11 @@ export class BaseGrid {
 
     get table() {
         return document.getElementById(this.config.tableId);
+    }
+
+    get reloadButton() {
+        const card = this.table.closest('.card');
+        return card ? card.querySelector('a.reload') : null;
     }
 
     renderTotalsLoader(data, type, record, meta) {
