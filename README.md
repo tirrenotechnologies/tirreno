@@ -13,18 +13,18 @@
 
 tirreno *[tir.ˈrɛ.no]* helps understand, monitor, and protect your product from threats, fraud, and abuse. While classic cybersecurity focuses on infrastructure and network perimeter, most breaches occur through compromised accounts and application logic abuse that bypasses firewalls, SIEM, WAFs, and other defenses. tirreno detects threats where they actually happen: inside your product.
 
-tirreno is a hand-written, few-dependency, "low-tech" PHP/PostgreSQL application. After a straightforward five-minute installation, you can ingest events through API calls and immediately access a real-time threat dashboard.
+tirreno is a hand-written, few-dependency, "low-tech" PHP/PostgreSQL application. After a straightforward five-minute installation, you can ingest events through API calls and immediately access a dashboard.
 
 ## Core components
 * **SDKs & API** Integrate tirreno into any product with SDKs.
   Send events with full context in a few lines of code.
 * **Built-in dashboard** Monitor and understand your product's
-  security events from a single interface. Ready for use in minutes.
+  security and risk events from a single interface. Ready for use in minutes.
 * **Single user view** Analyze behaviour patterns, risk scores,
-  connected identities, and activity timelines for a specific user.
+  connected identities, and activity timelines for a specific entity.
 * **Rule engine** Calculate risk scores automatically with preset
   rules or create your own customized for your product.
-* **Review queue** Automatically suspend accounts with risky events
+* **Review queue** Automatically suspend entities with risky events
   or flag them for manual review through threshold settings.
 * **Field audit trail** Track modifications to important fields,
   including what changed and when to streamline audit and compliance.
@@ -117,9 +117,9 @@ composer require tirreno/tirreno
 * [NodeJS](https://github.com/tirrenotechnologies/tirreno-nodejs-tracker)
 * [WordPress](https://github.com/tirrenotechnologies/tirreno-wordpress-tracker)
 
-## Custom page examples
+## API reference 
 
-tirreno ingests the universal primitives (users/entities, IPs, devices, sessions, events) and exposes them through composable machinery: the rule engine, the tirreno('queries') builder, and the file-based assets/pages/ extension system — through which an operator can express whatever risk model they have. The examples below show custom pages built on that extension system.
+tirreno('…')` is tirreno's built-in API. It gives your own code the same building blocks the console uses: the current request and page, the ingested data, the rule engine, the tirreno('queries') builder, logging, and utilities. Use it to customize tirreno. The examples below show custom sections built with this API.
 
 ### LLM bots
 
@@ -137,11 +137,11 @@ See the [User guide](https://docs.tirreno.com/) for details on how to use tirren
 
 ## About
 
-tirreno is is a free, [open source security framework](https://www.tirreno.com). Event tracking, threat detection, and risk scoring for any product.
+[tirreno](https://www.tirreno.com) is an open-source framework for building sovereign security, compliance and fraud prevention applications.
 
 The project started as a proprietary system in 2021 and was open-sourced (AGPL) in December 2024.
 
-Behind tirreno is a blend of extraordinary engineers and professionals, with over a decade of experience in cyberdefence. We solve real people's challenges through love in *ascétique* code and open technologies. tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine the place of security in modern applications.
+We solve real people's challenges through love in *ascétique* code and open technologies. tirreno is not VC-motivated. Our inspiration comes from the daily threats posed by organized cybercriminals, driving us to reimagine the place of security in modern organizations.
 
 ## Why the name tirreno?
 
@@ -156,6 +156,7 @@ While working on the logo, we conducted our own historical study and traced ment
 * [Website](https://www.tirreno.com)
 * [Live demo](https://play.tirreno.com)
 * [Admin documentation](https://github.com/tirrenotechnologies/ADMIN.md)
+* [API reference](https://github.com/tirrenotechnologies/API.md)
 * [Developers documentation](https://github.com/tirrenotechnologies/DEVELOPMENT.md)
 * [Resource center](https://www.tirreno.com/bat/)
 * [Docker Hub](https://hub.docker.com/r/tirreno/tirreno)
