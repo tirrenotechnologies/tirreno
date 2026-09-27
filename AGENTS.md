@@ -1,17 +1,6 @@
 # AGENTS.md
 
-This document describes how tirreno (https://www.tirreno.com) should be used as a framework for building sovereign security, compliance and fraud prevention applications. This file is for building new apps and pages on it.
-
-## Where custom code goes
-
-| What | Where | Copy from |
-|------|-------|-----------|
-| Page, opens at `/<name>` with a menu item | `assets/pages/<name>.php` + `assets/pages/views/<name>.html` | `assets/pages/risk-users.example.php` |
-| Detection rule | `assets/rules/custom/X01.php` … `X99.php` | `assets/rules/custom/X03.example.php` |
-| Extra rule attributes | `assets/rules/custom/Context.php` | `assets/rules/custom/Context.example.php` |
-| Pattern list | `assets/lists/<list>.php` (replaces the whole default list) | `app/Utils/Assets/Lists/*.php` |
-
-- Never change `app/`, `ui/`, `sensor/` or `config/config.ini` for a customisation; updates overwrite them. `<name>` may contain only letters, digits, `-` and `_`; `.example.php` files are ignored. New rules become active after **Refresh** on the Rules page. If something isn't in the API list below, read the code: `app/Core/Services/<Name>.php`, columns in `app/Models/Query/<Name>.php`, entity properties in `app/Entities/<Name>.php`, constants in `app/Utils/Constants.php`.
+This document describes how tirreno (https://www.tirreno.com) should be used as a open-source framework for building sovereign security, compliance and fraud prevention applications. This file is for building new apps and pages on it.
 
 ## Repo entrypoints
 - Dev docs: https://github.com/tirrenotechnologies/DEVELOPMENT.md
@@ -35,6 +24,17 @@ This document describes how tirreno (https://www.tirreno.com) should be used as 
 - If you touch code, you own its quality, including tests and relevant checks.
 - Prefer native JS and jQuery for new UI work where it fits the surrounding code.
 - Tracking must remain fast and predictable. Avoid additional database queries, remote calls, heavy parsing, or per-request complexity growth, and prefer the tirreno API.
+
+## Where custom code goes
+
+| What | Where | Copy from |
+|------|-------|-----------|
+| Page, opens at `/<name>` with a menu item | `assets/pages/<name>.php` + `assets/pages/views/<name>.html` | `assets/pages/risk-users.example.php` |
+| Detection rule | `assets/rules/custom/X01.php` … `X99.php` | `assets/rules/custom/X03.example.php` |
+| Extra rule attributes | `assets/rules/custom/Context.php` | `assets/rules/custom/Context.example.php` |
+| Pattern list | `assets/lists/<list>.php` (replaces the whole default list) | `app/Utils/Assets/Lists/*.php` |
+
+- Never change `app/`, `ui/`, `sensor/` or `config/config.ini` for a customisation; updates overwrite them. `<name>` may contain only letters, digits, `-` and `_`; `.example.php` files are ignored. New rules become active after **Refresh** on the Rules page. If something isn't in the API list below, read the code: `app/Core/Services/<Name>.php`, columns in `app/Models/Query/<Name>.php`, entity properties in `app/Entities/<Name>.php`, constants in `app/Utils/Constants.php`.
 
 ## Recipe: page with a list and an action
 
